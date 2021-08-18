@@ -59,7 +59,6 @@ Expected error messages are explained in details in individual sections.
 Get a system status response, with basic information about the running application.
 
 <!-- begin remove -->
-### Service status - parameters
 <table>
 <tr>
 <td>Method</td>
@@ -80,7 +79,7 @@ The list of expected status codes:
 | 404  | Not found - application is not running |
 | 500  | Server errors - unexpected server error |
 
-#### Service status - response
+#### Response 200
 
 ```json
 {
@@ -125,7 +124,7 @@ may be identical, however in typical deployments they are different. Client TLS 
 </table>
 <!-- end -->
 
-The list of expected status codes during authentication:
+The list of expected status codes:
 
 | Code | Description |
 |------|-------------|
@@ -135,7 +134,7 @@ The list of expected status codes during authentication:
 | 400  | `REMOTE_ERROR` - communication with remote system failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### User lookup - request
+#### Request
 
 ```json
 {
@@ -223,7 +222,9 @@ The list of expected status codes during authentication:
 }
 ```
 
-#### User lookup response - user account exists
+#### Response 200
+
+##### User lookup response - user account exists
 
 ```json
 {
@@ -239,7 +240,7 @@ The list of expected status codes during authentication:
 }
 ```
 
-#### User lookup response - user account exists, however the account is not active (e.g. blocked)
+##### User lookup response - user account exists, however the account is not active (e.g. blocked)
 
 ```json
 {
@@ -254,7 +255,7 @@ The list of expected status codes during authentication:
 }
 ```
 
-#### User lookup response - user account does not exist
+##### User lookup response - user account does not exist
 
 ```json
 {
@@ -271,7 +272,7 @@ The list of expected status codes during authentication:
 Note that in SCA steps the implementations should hide this error, because the error could reveal which usernames are valid 
 and which are not.
 
-#### User lookup response - invalid input
+##### User lookup response - invalid input
 
 ```json
 {
@@ -297,7 +298,6 @@ and which are not.
 
 Perform an authentication operation with user ID and password. This method is not SCA compliant.
 
-#### User authentication - parameters
 <!-- begin remove -->
 <table>
   <tr>
@@ -311,7 +311,7 @@ Perform an authentication operation with user ID and password. This method is no
 </table>
 <!-- end -->
 
-The list of expected status codes during authentication:
+The list of expected status codes:
 
 | Code | Description |
 |------|-------------|
@@ -320,7 +320,7 @@ The list of expected status codes during authentication:
 | 400  | `REMOTE_ERROR` - communication with remote system failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### User authentication - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -416,7 +416,7 @@ The list of expected status codes during authentication:
 }
 ```
 
-#### User password encryption and decryption
+##### User password encryption and decryption
 
 The `NO_PROTECTION` password protection type is used for plain text password in request (sent by default). 
 
@@ -466,9 +466,10 @@ private String decryptPassword(String secretKeyBase64, String cipherTransformati
 // Verify that decrypted password matches expected password
 ```
 
-#### User authentication response - authentication succeeded
+#### Response 200
 
-- Status Code: `200`
+##### User authentication response - authentication succeeded
+
 - Headers:
   - `Content-Type: application/json`
 
@@ -485,11 +486,10 @@ private String decryptPassword(String secretKeyBase64, String cipherTransformati
 }
 ```
 
-#### User authentication response - authentication failed
+##### User authentication response - authentication failed
 
 This message should be sent when the Data Adapter receives a correct message, however the username and password combination is invalid.
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -506,7 +506,7 @@ This message should be sent when the Data Adapter receives a correct message, ho
 }
 ```
 
-#### User authentication response - input validation errors
+##### User authentication response - input validation errors
 
 This error should be returned when username or password format is invalid - either it contains unsupported characters or it is empty or too long. This error is also used when authentication type is not supported.
 
@@ -536,7 +536,7 @@ The sample response below is returned when password is empty.
 
 For more information, see classes `AuthenticationRequestValidator` and `DefaultExceptionResolver`.
 
-#### User authentication response - internal error
+##### User authentication response - internal error
 
 This error should be used for all unexpected errors.
 
@@ -562,7 +562,6 @@ This error should be used for all unexpected errors.
 
 Fetch user details based on user ID.
 
-### User information - parameters
 <!-- begin remove -->
 <table>
   <tr>
@@ -586,7 +585,7 @@ The list of expected status codes:
 | 400  | `REMOTE_ERROR` - communication with remote system failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### User information - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -600,9 +599,8 @@ The list of expected status codes:
 }
 ```
 
-#### User information response - user info successfully retrieved
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -627,8 +625,6 @@ The list of expected status codes:
 
 Initialize an authentication method and set its parameters, e.g. client certificate configuration.
 
-#### Initialize an authentication method - parameters
-
 <!-- begin remove -->
 <table>
   <tr>
@@ -651,7 +647,7 @@ The list of expected status codes:
 | 400  | `OPERATION_CONTEXT_INVALID` - invalid operation context |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Initialize an authentication method - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -699,9 +695,8 @@ The list of expected status codes:
 }
 ```
 
-#### Initialize an authentication method - response - authentication method was initialized
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -722,8 +717,6 @@ The list of expected status codes:
 ### Decorate Form Data
 
 Retrieve form data and decorate it (optional).
-
-#### Decorate form data - parameters
 
 <!-- begin remove -->
 <table>
@@ -748,7 +741,7 @@ The list of expected status codes:
 | 400  | `REMOTE_ERROR` - communication with remote system failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Decorate form data - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -840,9 +833,8 @@ The list of expected status codes:
 }
 ```
 
-#### Decorate form data - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -959,8 +951,6 @@ The list of expected status codes:
 
 Notification of Data Adapter about formData change.
 
-#### FormData change notification - parameters
-
 <!-- begin remove -->
 <table>
   <tr>
@@ -983,7 +973,7 @@ The list of expected status codes:
 | 400  | `REMOTE_ERROR` - communication with remote system failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### FormData change notification - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -1079,9 +1069,8 @@ The list of expected status codes:
 }
 ```
 
-#### FormData change notification - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -1096,8 +1085,6 @@ The list of expected status codes:
 ### Operation Change Notification
 
 Notification of Data Adapter about operation change.
-
-#### Operation change notification - parameters
 
 <!-- begin remove -->
 <table>
@@ -1121,7 +1108,7 @@ The list of expected status codes:
 | 400  | `REMOTE_ERROR` - communication with remote system failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Operation change notification - request
+#### Request
 
 Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
 
@@ -1217,9 +1204,8 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
 }
 ```
 
-#### Operation change notification - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -1234,8 +1220,6 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
 ### Create Implicit Login Operation
 
 Create an implicit login operation when accessing Web Flow without a previously created operation.
-
-#### Create implicit login operation - parameters
 
 <!-- begin remove -->
 <table>
@@ -1259,7 +1243,7 @@ The list of expected status codes:
 | 400  | `OPERATION_CONTEXT_INVALID` - invalid operation context |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Create implicit login operation - request
+#### Request
 
 Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
 
@@ -1277,9 +1261,8 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
 }
 ```
 
-#### Create implicit login operation - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -1325,8 +1308,6 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
 
 Mapping of complex Next Step operations into individual operations. PowerAuth operation template can be configured using the `templateName` parameter in response.
 
-#### Operation mapping - parameters
-
 <!-- begin remove -->
 <table>
   <tr>
@@ -1348,7 +1329,7 @@ The list of expected status codes:
 | 400  | `INPUT_INVALID` - request validation errors |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Operation mapping - request
+#### Request
 
 Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
 
@@ -1444,9 +1425,8 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
 }
 ```
 
-#### Operation mapping - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -1487,8 +1467,6 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
 
 Generate an OTP authorization code, store it in the database and send a SMS message to the user.
 
-#### Generate and send SMS authorization code - parameters
-
 <!-- begin remove -->
 <table>
   <tr>
@@ -1511,7 +1489,7 @@ The list of expected status codes:
 | 400  | `OPERATION_CONTEXT_INVALID` - invalid operation context |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Generate and send SMS authorization code - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -1608,9 +1586,10 @@ The list of expected status codes:
 }
 ```
 
-#### Generate and send SMS authorization code response - SMS has been successfully created and sent
+#### Response 200
 
-- Status Code: `200`
+##### Generate and send SMS authorization code response - SMS has been successfully created and sent
+
 - Headers:
   - `Content-Type: application/json`
 
@@ -1625,9 +1604,8 @@ The list of expected status codes:
 }
 ```
 
-#### Generate and send SMS authorization code response - SMS could not be sent
+##### Generate and send SMS authorization code response - SMS could not be sent
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
   
@@ -1647,8 +1625,6 @@ The list of expected status codes:
 ### Send SMS Authorization Code
 
 Send an SMS message with previously generated OTP authorization code to the user.
-
-#### Send SMS authorization code - parameters
 
 <!-- begin remove -->
 <table>
@@ -1672,7 +1648,7 @@ The list of expected status codes:
 | 400  | `OPERATION_CONTEXT_INVALID` - invalid operation context |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Send SMS authorization code - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -1770,9 +1746,10 @@ The list of expected status codes:
 }
 ```
 
-#### Send SMS authorization code response - SMS has been successfully sent
+#### Response 200
 
-- Status Code: `200`
+##### Send SMS authorization code response - SMS has been successfully sent
+
 - Headers:
   - `Content-Type: application/json`
 
@@ -1787,9 +1764,8 @@ The list of expected status codes:
 }
 ```
 
-#### Send SMS authorization code response - SMS could not be sent
+##### Send SMS authorization code response - SMS could not be sent
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -1808,9 +1784,7 @@ The list of expected status codes:
 <!-- begin api POST /api/auth/sms/verify -->
 ### Verify Authorization SMS Code
 
-Verify an authorization OTP code from a SMS message.
-
-### Verify authorization SMS code - parameters
+Verify an authorization OTP code from an SMS message.
 
 <!-- begin remove -->
 <table>
@@ -1834,7 +1808,7 @@ The list of expected status codes:
 | 400  | `OPERATION_CONTEXT_INVALID` - invalid operation context |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Verify authorization SMS code - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -1930,9 +1904,10 @@ The list of expected status codes:
 }
 ```
 
-#### Verify authorization SMS code response - SMS authorization code has been successfully verified
+#### Response 200
 
-- Status Code: `200`
+##### Verify authorization SMS code response - SMS authorization code has been successfully verified
+
 - Headers:
   - `Content-Type: application/json`
 
@@ -1948,7 +1923,7 @@ The list of expected status codes:
 }
 ```
 
-#### Verify authorization SMS code response - SMS authorization code verification failed
+##### Verify authorization SMS code response - SMS authorization code verification failed
 
 ```json
 {
@@ -1967,8 +1942,6 @@ The list of expected status codes:
 ### Verify Authorization SMS Code and Password
 
 Verify an authorization OTP code from a SMS message together with user password.
-
-#### Verify authorization SMS code and password - parameters
 
 <!-- begin remove -->
 <table>
@@ -1997,7 +1970,7 @@ type of encryption and the `cipherTransformation` parameter contains information
 
 See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Reference.md#user-password-encryption-and-decryption) for additional details.
 
-#### Verify authorization SMS code and password - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -2099,9 +2072,10 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
 }
 ```
 
-#### Verify authorization SMS code and password response - SMS authorization code and password have been successfully verified
+#### Response 200
 
-- Status Code: `200`
+##### Verify authorization SMS code and password response - SMS authorization code and password have been successfully verified
+
 - Headers:
   - `Content-Type: application/json`
 
@@ -2118,9 +2092,8 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
 }
 ```
 
-#### Verify authorization SMS code and password response - SMS authorization code and/or password verification failed
+##### Verify authorization SMS code and password response - SMS authorization code and/or password verification failed
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
   
@@ -2142,8 +2115,6 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
 ### Verify a Client TLS Certificate
 
 Verify a client TLS certificate for user authentication.
-
-#### Verify a client TLS certificate - parameters
 
 <!-- begin remove -->
 <table>
@@ -2167,7 +2138,7 @@ The list of expected status codes:
 | 400  | `OPERATION_CONTEXT_INVALID` - invalid operation context |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Verify a client TLS certificate - request
+##### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -2263,9 +2234,10 @@ The list of expected status codes:
 }
 ```
 
-#### Verify a client TLS certificate response - client TLS certificate has been verified, verification result is sent in response
+#### Response 200
 
-- Status Code: `200`
+##### Verify a client TLS certificate response - client TLS certificate has been verified, verification result is sent in response
+
 - Headers:
   - `Content-Type: application/json`
 
@@ -2292,8 +2264,6 @@ In case the client TLS certificate verification fails, the parameter `certificat
 
 Initialize the OAuth 2.0 consent form and get information whether consent form should be displayed.
 
-#### Initialize OAuth 2.0 consent form - parameters
-
 <!-- begin remove -->
 <table>
   <tr>
@@ -2317,7 +2287,7 @@ The list of expected status codes:
 | 400  | `REMOTE_ERROR` - communication with remote system failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Initialize OAuth 2.0 consent form - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -2410,9 +2380,8 @@ The list of expected status codes:
 }
 ```
 
-#### Initialize OAuth 2.0 consent form response - consent form has been successfully initialized
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -2430,8 +2399,6 @@ The list of expected status codes:
 ### Create OAuth 2.0 Consent Form
 
 Create the OAuth 2.0 consent form and obtain form options.
-
-#### Create OAuth 2.0 consent form - parameters
 
 <!-- begin remove -->
 <table>
@@ -2456,7 +2423,7 @@ The list of expected status codes:
 | 400  | `REMOTE_ERROR` - communication with remote system failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Create OAuth 2.0 consent form - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -2550,9 +2517,8 @@ The list of expected status codes:
 }
 ```
 
-#### Create OAuth 2.0 consent form response - consent form has been successfully created
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -2587,8 +2553,6 @@ The list of expected status codes:
 
 Validate submitted options in the OAuth 2.0 consent form.
 
-#### Validate OAuth 2.0 consent form - parameters
-
 <!-- begin remove -->
 <table>
   <tr>
@@ -2613,7 +2577,7 @@ The list of expected status codes:
 | 400  | `REMOTE_ERROR` - communication with remote system failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Validate consent form - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -2723,9 +2687,10 @@ The list of expected status codes:
 }
 ```
 
-#### Validate consent form response - consent form has been successfully validated
+#### Response 200
 
-- Status Code: `200`
+##### Validate consent form response - consent form has been successfully validated
+
 - Headers:
   - `Content-Type: application/json`
 
@@ -2740,9 +2705,8 @@ The list of expected status codes:
 }
 ```
 
-#### Validate consent form response - consent form options validation failed
+##### Validate consent form response - consent form options validation failed
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -2774,8 +2738,6 @@ The list of expected status codes:
 
 Save the OAuth 2.0 consent form options.
 
-#### Save OAuth 2.0 consent form - parameters
-
 <!-- begin remove -->
 <table>
   <tr>
@@ -2800,7 +2762,7 @@ The list of expected status codes:
 | 400  | `REMOTE_ERROR` - communication with remote system failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Save OAuth 2.0 consent form - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -2909,9 +2871,10 @@ The list of expected status codes:
 }
 ```
 
-#### Save OAuth 2.0 consent form response - consent form has been successfully saved
+#### Response 200
 
-- Status Code: `200`
+##### Save OAuth 2.0 consent form response - consent form has been successfully saved
+
 - Headers:
   - `Content-Type: application/json`
 
@@ -2924,9 +2887,8 @@ The list of expected status codes:
 }
 ```
 
-#### Save OAuth 2.0 consent form response - the processing was correct however consent form could not be saved at this time
+##### Save OAuth 2.0 consent form response - the processing was correct however consent form could not be saved at this time
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -2946,8 +2908,6 @@ The list of expected status codes:
 ### Execute an AFS Action
 
 Execute an AFS action using the remote anti-fraud system.
-
-#### Execute an AFS action - parameters
 
 <!-- begin remove -->
 <table>
@@ -2971,7 +2931,7 @@ The list of expected status codes:
 | 400  | `REMOTE_ERROR` - communication with remote system failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-#### Execute an AFS action - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3081,9 +3041,8 @@ The list of expected status codes:
 }
 ```
 
-#### Execute an AFS action response - AFS action was successfully executed
+##### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 

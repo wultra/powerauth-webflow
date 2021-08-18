@@ -168,7 +168,6 @@ All error responses that are produced by the Next Step Server have following bod
 Get a system status response, with basic information about the running application.
 
 <!-- begin remove -->
-#### Service status - parameters
 <table>
 <tr>
 <td>Method</td>
@@ -189,8 +188,7 @@ The list of expected status codes:
 | 404  | Not found - application is not running |
 | 500  | Server errors - unexpected server error |
 
-
-#### Service status - response
+#### Response 200
 
 ```json
 {
@@ -223,7 +221,6 @@ The list of expected status codes:
 Create an authentication method in Next Step server.
 
 <!-- begin remove -->
-#### Create an authentication method - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -236,6 +233,8 @@ Create an authentication method in Next Step server.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -243,7 +242,7 @@ Create an authentication method in Next Step server.
 | 400  | `AUTH_METHOD_ALREADY_EXISTS` - authentication method already exists |
 | 500  | Server errors - unexpected error occurred |
 
-#### Create an authentication method - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -265,9 +264,8 @@ Create an authentication method in Next Step server.
 }
 ```
 
-#### Create an authentication method - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -298,7 +296,6 @@ List all authentication methods supported by the server.
 This method has a `POST /auth-method/list` alternative.
 
 <!-- begin remove -->
-#### List authentication methods - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -323,6 +320,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -330,7 +329,7 @@ Alternative with `POST` method:
 | 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
 | 500  | Server error - unexpected error occurred |
 
-#### List authentication methods - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -342,9 +341,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List authentication methods - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -421,7 +419,6 @@ List enabled authentication methods for given user.
 This method has a `POST /user/auth-method/enabled/list` alternative.
 
 <!-- begin remove -->
-#### List authentication methods enabled for given user - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -446,6 +443,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -453,7 +452,7 @@ Alternative with `POST` method:
 | 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
 | 500  | Server error - unexpected error occurred |
 
-#### List authentication methods enabled for given user - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -467,9 +466,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List authentication methods for given user - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -495,7 +493,6 @@ List all authentication methods for given user.
 This method has a `POST /user/auth-method/list` alternative.
 
 <!-- begin remove -->
-#### List authentication methods for given user - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -520,6 +517,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -527,7 +526,7 @@ Alternative with `POST` method:
 | 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
 | 500  | Server error - unexpected error occurred |
 
-#### List authentication methods for given user - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -540,9 +539,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List authentication methods for given user - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -638,7 +636,6 @@ Alternative with `POST` method:
 Enable an authentication method for given user and lists all authentication methods enabled for given user after the authentication method has been enabled.
 
 <!-- begin remove -->
-#### Enable an authentication method for given user - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -651,6 +648,8 @@ Enable an authentication method for given user and lists all authentication meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -659,7 +658,7 @@ Enable an authentication method for given user and lists all authentication meth
 | 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
 | 500  | Server error - unexpected error occurred |
 
-#### Enable an authentication method for given user - request
+#### Request
 
 The request contains three parameters:
 * userId - identification of the user
@@ -694,9 +693,8 @@ For other authentication methods use the following configuration:
 }
 ```
 
-#### Enable an authentication method for given user - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -793,7 +791,6 @@ Disable an authentication method for given user and lists all authentication met
 This method has a `POST /user/auth-method/delete` alternative.
 
 <!-- begin remove -->
-#### Disable an authentication method for given user - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -818,6 +815,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -826,7 +825,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
 | 500  | Server error - unexpected error occurred |
 
-#### Disable an authentication method for given user - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -840,9 +839,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Disable an authentication method for given user - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -929,7 +927,6 @@ Delete an authentication method. Use only when the authentication method which i
 This method has a `POST /auth-method/delete` alternative.
 
 <!-- begin remove -->
-#### Delete an authentication method - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -954,6 +951,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -962,7 +961,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `DELETE_NOT_ALLOWED` - authentication method removal is not allowed |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete an authentication method - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -975,9 +974,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete an authentication method - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -1445,7 +1443,6 @@ Create an operation in Next Step server.
 Documentation for operation data is available [in a separate document](https://developers.wultra.com/docs/2019.05/powerauth-webflow/Operation-Data).
 
 <!-- begin remove -->
-#### Create an operation - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -1458,6 +1455,8 @@ Documentation for operation data is available [in a separate document](https://d
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -1467,7 +1466,9 @@ Documentation for operation data is available [in a separate document](https://d
 | 400  | `ORGANIZATION_NOT_FOUND` - organization specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Create an operation - request (AISP)
+#### Request
+
+##### Sample request for creating a login operation (AISP)
 
 - Headers:
     - `Content-Type: application/json`
@@ -1502,7 +1503,7 @@ Documentation for operation data is available [in a separate document](https://d
 }
 ```
 
-#### Create an operation - request (PISP)
+##### Sample request for creating a payment operation (PISP)
 
 - Headers:
     - `Content-Type: application/json`
@@ -1580,9 +1581,10 @@ Documentation for operation data is available [in a separate document](https://d
 }
 ```
 
-#### Create an operation - response (AISP)
+#### Response 200
 
-- Status Code: `200`
+##### Sample response for creating a login operation (AISP)
+
 - Headers:
     - `Content-Type: application/json`
     
@@ -1633,9 +1635,8 @@ Documentation for operation data is available [in a separate document](https://d
 }
 ```
 
-#### Create an operation - response (PISP)
+##### Sample response for creating a payment operation (PISP)
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -1730,7 +1731,6 @@ Update an operation in Next Step server.
 This method has a `POST /operation/update` alternative.
 
 <!-- begin remove -->
-#### Update an operation - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -1755,6 +1755,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -1770,7 +1772,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `ORGANIZATION_NOT_FOUND` - organization specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update an operation - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -1789,9 +1791,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update an operation - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -1880,7 +1881,6 @@ Retrieve detail of an operation in the Next Step server.
 This method has a `POST /operation/detail` alternative.
 
 <!-- begin remove -->
-#### Operation detail - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -1906,6 +1906,8 @@ Alternative with `POST` method
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -1914,7 +1916,7 @@ Alternative with `POST` method
 | 400  | `OPERATION_NOT_FOUND` - operation with specified identifier was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Operation detail - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -1927,9 +1929,8 @@ Alternative with `POST` method
 }
 ```
 
-#### Operation detail - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -2039,7 +2040,6 @@ List pending operation for given user and authentication method.
 This method has a `POST /user/operation/list` alternative.
 
 <!-- begin remove -->
-#### List pending operations - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -2064,13 +2064,15 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
 | 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
 | 500  | Server error - unexpected error occurred |
 
-#### List pending operations - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -2084,9 +2086,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List pending operations - response
+#### Response
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -2190,7 +2191,6 @@ Alternative with `POST` method:
 Find all operations with matching external transaction ID.
 
 <!-- begin remove -->
-#### Lookup operations by external transaction ID - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -2203,13 +2203,15 @@ Find all operations with matching external transaction ID.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
 | 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Lookup operations by external transaction ID - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -2222,9 +2224,8 @@ Find all operations with matching external transaction ID.
 }
 ```
 
-#### Lookup operations by external transaction ID - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -2334,7 +2335,6 @@ Update operation formData for given operation. Only the userInput part of formDa
 This method has a `POST /operation/formData/update` alternative.
 
 <!-- begin remove -->
-#### Update operation formData - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -2359,6 +2359,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -2366,7 +2368,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `OPERATION_NOT_FOUND` - operation with specified identifier was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update operation formData - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -2468,9 +2470,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update operation formData - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -2489,7 +2490,6 @@ Update application context for an operation.
 This method has a `POST /operation/application/update` alternative.
 
 <!-- begin remove -->
-#### Update application context for an operation - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -2514,6 +2514,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -2521,7 +2523,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `OPERATION_NOT_FOUND` - operation with specified identifier was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update application context for an operation - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -2543,9 +2545,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update application context for an operation - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -2564,7 +2565,6 @@ Update user ID, organization ID and account status for an operation.
 This method has a `POST /operation/user/update` alternative.
 
 <!-- begin remove -->
-#### Update user for an operation - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -2589,6 +2589,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -2597,7 +2599,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `ORGANIZATION_NOT_FOUND` - organization specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update user for an operation - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -2613,9 +2615,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update user for an operation - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -2634,7 +2635,6 @@ Set chosen authentication method for current operation step.
 This method has a `POST /operation/chosenAuthMethod/update` alternative.
 
 <!-- begin remove -->
-#### Set chosen authentication method - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -2659,6 +2659,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -2668,7 +2670,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `OPERATION_NOT_FOUND` - operation with specified identifier was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Set chosen authentication method - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -2682,9 +2684,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Set chosen authentication method - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -2702,7 +2703,6 @@ Set whether mobile token is active for an operation.
 This method has a `POST /operation/mobileToken/status/update` alternative.
 
 <!-- begin remove -->
-#### Update mobile token status for an operation - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -2727,6 +2727,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -2736,7 +2738,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
 | 500  | Server error - unexpected error occurred |
 
-#### Update mobile token status for an operation - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -2750,9 +2752,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update mobile token status for an operation - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -2771,7 +2772,6 @@ Get whether mobile token is enabled for given user ID, operation name and authen
 This method has a `POST /operation/mobileToken/config/detail` alternative.
 
 <!-- begin remove -->
-#### Get mobile token configuration - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -2796,6 +2796,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -2803,7 +2805,7 @@ Alternative with `POST` method:
 | 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
 | 500  | Server error - unexpected error occurred |
 
-#### Get mobile token configuration - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -2818,9 +2820,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### Get mobile token configuration - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -2840,7 +2841,6 @@ Alternative with `POST` method:
 Store result of an AFS action for an operation.
 
 <!-- begin remove -->
-#### Store result of an AFS action - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -2853,13 +2853,15 @@ Store result of an AFS action for an operation.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
 | 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Store result of an AFS action - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -2879,9 +2881,8 @@ Store result of an AFS action for an operation.
 }
 ```
 
-#### Store result of an AFS action - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -2898,7 +2899,6 @@ Store result of an AFS action for an operation.
 Retrieve list of operation configurations.
 
 <!-- begin remove -->
-#### List operation configurations - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -2911,13 +2911,15 @@ Retrieve list of operation configurations.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
 | 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
 | 500  | Server error - unexpected error occurred |
 
-#### List operation configurations - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -2929,9 +2931,8 @@ Retrieve list of operation configurations.
 }
 ```
 
-#### List operation configurations - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -2976,7 +2977,6 @@ Retrieve list of operation configurations.
 Create an operation configuration.
 
 <!-- begin remove -->
-#### Create an operation configuration - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -2989,6 +2989,8 @@ Create an operation configuration.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -2996,7 +2998,7 @@ Create an operation configuration.
 | 400  | `OPERATION_CONFIG_ALREADY_EXISTS` - operation configuration already exists |
 | 500  | Server error - unexpected error occurred |
 
-#### Create an operation configuration - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3016,9 +3018,8 @@ Create an operation configuration.
 }
 ```
 
-#### Create an operation configuration - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -3047,7 +3048,6 @@ Get operation configuration detail.
 This method has a `POST /operation/config/detail` alternative.
 
 <!-- begin remove -->
-#### Get operation configuration detail - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3072,6 +3072,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3079,7 +3081,7 @@ Alternative with `POST` method:
 | 400  | `OPERATION_CONFIG_NOT_FOUND` - operation configuration was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Get operation configuration detail - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -3092,9 +3094,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### Get operation configuration detail - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -3119,7 +3120,6 @@ Delete an operation configuration.
 This method has a `POST /operation/config/delete` alternative.
 
 <!-- begin remove -->
-#### Delete an operation configuration - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3144,6 +3144,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3152,7 +3154,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `DELETE_NOT_ALLOWED` - operation configuration removal is not allowed |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete an operation configuration - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3166,9 +3168,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete an operation configuration - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -3188,7 +3189,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create a configuration for an operation and an authentication method.
 
 <!-- begin remove -->
-#### Create an operation and authentication method configuration - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3201,6 +3201,8 @@ Create a configuration for an operation and an authentication method.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3210,7 +3212,7 @@ Create a configuration for an operation and an authentication method.
 | 400  | `AUTH_METHOD_NOT_FOUND` - authentication method was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Create an operation and authentication method configuration - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3225,9 +3227,8 @@ Create a configuration for an operation and an authentication method.
 }
 ```
 
-#### Create an operation and authentication method configuration - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -3251,7 +3252,6 @@ Get configuration for an operation and an authentication method.
 This method has a `POST /operation/auth-method/config/detail` alternative.  
 
 <!-- begin remove -->
-#### Get an operation and authentication method configuration detail - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3276,6 +3276,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3283,7 +3285,7 @@ Alternative with `POST` method:
 | 400  | `OPERATION_METHOD_CONFIG_NOT_FOUND` - operation and authentication method configuration was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Get an operation and authentication method configuration detail - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3297,9 +3299,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### Get an operation and authentication method configuration detail - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -3323,7 +3324,6 @@ Delete a configuration for an operation and an authentication method.
 This method has a `POST /operation/auth-method/config/delete` alternative.
 
 <!-- begin remove -->
-#### Delete an operation and authentication method configuration detail - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3336,6 +3336,8 @@ This method has a `POST /operation/auth-method/config/delete` alternative.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3343,7 +3345,7 @@ This method has a `POST /operation/auth-method/config/delete` alternative.
 | 400  | `OPERATION_METHOD_CONFIG_NOT_FOUND` - operation and authentication method configuration was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete an operation and authentication method configuration detail - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3357,9 +3359,8 @@ This method has a `POST /operation/auth-method/config/delete` alternative.
 }
 ```
 
-#### Delete an operation and authentication method configuration detail - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -3382,7 +3383,6 @@ This method has a `POST /operation/auth-method/config/delete` alternative.
 Create an organization.
 
 <!-- begin remove -->
-#### Create an organization - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3395,6 +3395,8 @@ Create an organization.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3402,7 +3404,7 @@ Create an organization.
 | 400  | `ORGANIZATION_ALREADY_EXISTS` - organization with identifier specified in the request already exists |
 | 500  | Server error - unexpected error occurred |
 
-#### Create an organization - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3420,9 +3422,8 @@ Create an organization.
 }
 ```
 
-#### Create an organization - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -3449,7 +3450,6 @@ List all organizations configured on the server.
 This method has a `POST /organization/list` alternative.
 
 <!-- begin remove -->
-#### List organizations - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3474,12 +3474,14 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
 | 500  | Server error - unexpected error occurred |
 
-#### List organizations - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -3491,9 +3493,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List organizations - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -3532,7 +3533,6 @@ Get detail of an organization configured on the server.
 This method has a `POST /organization/detail` alternative.
 
 <!-- begin remove -->
-#### Organization detail - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3557,6 +3557,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3564,7 +3566,7 @@ Alternative with `POST` method:
 | 400  | `ORGANIZATION_NOT_FOUND` - organization specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Organization detail - request
+#### Request
 
 - Headers:
     - `Content-Type: application/json`
@@ -3577,9 +3579,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### Organization detail - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
 
@@ -3607,7 +3608,6 @@ Delete an organization.
 This method has a `POST /organization/delete` alternative.
 
 <!-- begin remove -->
-#### Delete an organization - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3632,6 +3632,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3640,7 +3642,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `DELETE_NOT_ALLOWED` - organization removal is not allowed |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete an organization - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3653,9 +3655,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete an organization - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -3678,7 +3679,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create a step definition.
 
 <!-- begin remove -->
-#### Create a step definition - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3691,6 +3691,8 @@ Create a step definition.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3698,7 +3700,7 @@ Create a step definition.
 | 400  | `STEP_DEFINITION_ALREADY_EXISTS` - step definition with identifier specified in the request already exists |
 | 500  | Server error - unexpected error occurred |
 
-#### Create a step definition - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3718,9 +3720,8 @@ Create a step definition.
 }
 ```
 
-#### Create a step definition - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -3749,7 +3750,6 @@ Delete a step definition.
 This method has a `POST /step/definition/delete` alternative.
 
 <!-- begin remove -->
-#### Delete a step definition - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3774,6 +3774,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3781,7 +3783,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `STEP_DEFINITION_NOT_FOUND` - step definition with identifier specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete a step definition - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3794,9 +3796,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete a step definition - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -3819,7 +3820,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create a Next Step application.
 
 <!-- begin remove -->
-#### Create an application - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3832,6 +3832,8 @@ Create a Next Step application.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3839,7 +3841,7 @@ Create a Next Step application.
 | 400  | `APPLICATION_ALREADY_EXISTS` - application with name specified in the request already exists |
 | 500  | Server error - unexpected error occurred |
 
-#### Create an application - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3853,9 +3855,8 @@ Create a Next Step application.
 }
 ```
 
-#### Create an application - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -3879,7 +3880,6 @@ List all applications configured on the server.
 This method has a `POST /application/list` alternative.
 
 <!-- begin remove -->
-#### List applications - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3904,13 +3904,15 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
 | 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
 | 500  | Server error - unexpected error occurred |
 
-#### List applications - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3923,9 +3925,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List applications - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -3955,7 +3956,6 @@ Update an application configured on the server.
 This method has a `POST /application/update` alternative.
 
 <!-- begin remove -->
-#### Update an application - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -3980,6 +3980,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -3987,7 +3989,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `APPLICATION_NOT_FOUND` - application with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update an application - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -4002,9 +4004,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update an application - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -4029,7 +4030,6 @@ Delete an application.
 This method has a `POST /application/delete` alternative.
 
 <!-- begin remove -->
-#### Delete an application - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -4054,6 +4054,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -4061,7 +4063,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `APPLICATION_NOT_FOUND` - application with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete an application - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -4074,9 +4076,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete an application - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -4100,7 +4101,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create a user role.
 
 <!-- begin remove -->
-#### Create a role - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -4113,6 +4113,8 @@ Create a user role.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -4120,7 +4122,7 @@ Create a user role.
 | 400  | `ROLE_ALREADY_EXISTS` - role with name specified in the request already exists |
 | 500  | Server error - unexpected error occurred |
 
-#### Create a role - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -4134,9 +4136,8 @@ Create a user role.
 }
 ```
 
-#### Create a role - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -4159,7 +4160,6 @@ List all user roles.
 This method has a `POST /role/list` alternative.
 
 <!-- begin remove -->
-#### List roles - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -4184,13 +4184,15 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
 | 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
 | 500  | Server error - unexpected error occurred |
 
-#### List roles - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -4202,9 +4204,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List roles - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -4233,7 +4234,6 @@ Delete a user role.
 This method has a `POST /role/delete` alternative.
 
 <!-- begin remove -->
-#### Delete a role - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -4258,6 +4258,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -4266,7 +4268,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `DELETE_NOT_ALLOWED` - role removal is not allowed |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete a role - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -4279,9 +4281,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete a role - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -4304,7 +4305,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create a credential policy.
 
 <!-- begin remove -->
-#### Create a credential policy - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -4317,6 +4317,8 @@ Create a credential policy.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -4325,7 +4327,7 @@ Create a credential policy.
 | 400  | `CREDENTIAL_POLICY_ALREADY_EXISTS` - credential policy with name specified in the request already exists |
 | 500  | Server error - unexpected error occurred |
 
-#### Create a credential policy - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -4389,9 +4391,8 @@ Create a credential policy.
 }
 ```
 
-#### Create a credential policy - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -4465,7 +4466,6 @@ List all credential policies configured on the server.
 This method has a `POST /credential/policy/list` alternative.
 
 <!-- begin remove -->
-#### List credential policies - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -4490,13 +4490,15 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
 | 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
 | 500  | Server error - unexpected error occurred |
 
-#### List credential policies - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -4509,9 +4511,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List credential policies - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -4591,7 +4592,6 @@ Update a credential policy configured on the server.
 This method has a `POST /credential/policy/update` alternative.
 
 <!-- begin remove -->
-#### Update a credential policy - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -4616,6 +4616,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -4624,7 +4626,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `CREDENTIAL_POLICY_NOT_FOUND` - credential policy with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update a credential policy - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -4689,9 +4691,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update a credential policy - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -4766,7 +4767,6 @@ Delete a credential policy.
 This method has a `POST /credential/policy/delete` alternative.
 
 <!-- begin remove -->
-#### Delete a credential policy - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -4791,6 +4791,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -4798,7 +4800,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `CREDENTIAL_POLICY_NOT_FOUND` - credential policy with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete a credential policy - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -4811,9 +4813,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete a credential policy - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -4837,7 +4838,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create a credential definition.
 
 <!-- begin remove -->
-#### Create a credential definition - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -4850,6 +4850,8 @@ Create a credential definition.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -4861,7 +4863,7 @@ Create a credential definition.
 | 400  | `ORGANIZATION_NOT_FOUND` - organization with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Create a credential definition - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -4884,9 +4886,8 @@ Create a credential definition.
 }
 ```
 
-#### Create a credential definition - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -4922,7 +4923,6 @@ List all credential definitions configured on the server.
 This method has a `POST /credential/definition/list` alternative.
 
 <!-- begin remove -->
-#### List credential definitions - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -4947,13 +4947,15 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
 | 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
 | 500  | Server error - unexpected error occurred |
 
-#### List credential definitions - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -4966,9 +4968,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List credential definitions - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5011,7 +5012,6 @@ Update a credential definition configured on the server.
 This method has a `POST /credential/definition/update` alternative.
 
 <!-- begin remove -->
-#### Update a credential definition - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5036,6 +5036,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -5047,7 +5049,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `ORGANIZATION_NOT_FOUND` - organization with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update a credential definition - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5074,9 +5076,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update a credential definition - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5114,7 +5115,6 @@ Delete a credential definition.
 This method has a `POST /credential/definition/delete` alternative.
 
 <!-- begin remove -->
-#### Delete a credential definition - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5139,6 +5139,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -5146,7 +5148,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete a credential definition - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5159,9 +5161,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete a credential definition - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5185,7 +5186,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create an OTP policy.
 
 <!-- begin remove -->
-#### Create an OTP policy - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5198,6 +5198,8 @@ Create an OTP policy.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -5206,7 +5208,7 @@ Create an OTP policy.
 | 400  | `OTP_POLICY_ALREADY_EXISTS` - OTP policy with name specified in the request already exists |
 | 500  | Server error - unexpected error occurred |
 
-#### Create an OTP policy - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5224,9 +5226,8 @@ Create an OTP policy.
 }
 ```
 
-#### Create an OTP policy - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5257,7 +5258,6 @@ List all OTP policies configured on the server.
 THis method has a `POST /otp/policy/list` alternative.
 
 <!-- begin remove -->
-#### List OTP policies - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5282,6 +5282,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -5289,7 +5291,7 @@ Alternative with `POST` method:
 | 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
 | 500  | Server error - unexpected error occurred |
 
-#### List OTP policies - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5302,9 +5304,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List OTP policies - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5341,7 +5342,6 @@ Update an OTP policy configured on the server.
 This method has a `POST /otp/policy/update` alternative.
 
 <!-- begin remove -->
-#### Update an OTP policy - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5366,6 +5366,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -5374,7 +5376,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `OTP_POLICY_NOT_FOUND` - OTP policy with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update an OTP policy - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5396,9 +5398,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update an OTP policy - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5430,7 +5431,6 @@ Delete an OTP policy.
 This method has a `POST /otp/policy/delete` alternative.
 
 <!-- begin remove -->
-#### Delete an OTP policy - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5455,6 +5455,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -5462,7 +5464,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `OTP_POLICY_NOT_FOUND` - OTP policy with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete an OTP policy - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5475,9 +5477,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete an OTP policy - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5501,7 +5502,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create an OTP definition.
 
 <!-- begin remove -->
-#### Create an OTP definition - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5514,6 +5514,8 @@ Create an OTP definition.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -5523,7 +5525,7 @@ Create an OTP definition.
 | 400  | `OTP_POLICY_NOT_FOUND` - OTP policy with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Create an OTP definition - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5543,9 +5545,8 @@ Create an OTP definition.
 }
 ```
 
-#### Create an OTP definition - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5574,7 +5575,6 @@ List all OTP definitions configured on the server.
 This method has a `POST /otp/definition/list` alternative.
 
 <!-- begin remove -->
-#### List OTP definitions - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5599,13 +5599,15 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
 | 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
 | 500  | Server error - unexpected error occurred |
 
-#### List OTP definitions - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5618,9 +5620,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List OTP definitions - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5655,7 +5656,6 @@ Update an OTP definition configured on the server.
 This method has a `POST /otp/definition/update` alternative.
 
 <!-- begin remove -->
-#### Update an OTP definition - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5680,6 +5680,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -5689,7 +5691,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `OTP_POLICY_NOT_FOUND` - OTP policy with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update an OTP definition - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5709,9 +5711,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update an OTP definition - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5741,7 +5742,6 @@ Delete an OTP definition.
 This method has a `POST /otp/definition/delete` alternative.
 
 <!-- begin remove -->
-#### Delete an OTP definition - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5766,6 +5766,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -5773,7 +5775,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `OTP_DEFINITION_NOT_FOUND` - OTP definition with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete an OTP definition - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5786,9 +5788,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete an OTP definition - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5812,7 +5813,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create a hashing configuration.
 
 <!-- begin remove -->
-#### Create a hashing configuration - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5825,6 +5825,8 @@ Create a hashing configuration.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -5833,7 +5835,7 @@ Create a hashing configuration.
 | 400  | `HASHING_CONFIG_ALREADY_EXISTS` - hashing configuration with name specified in the request already exists |
 | 500  | Server error - unexpected error occurred |
 
-#### Create a hashing configuration - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5854,9 +5856,8 @@ Create a hashing configuration.
 }
 ```
 
-#### Create a hashing configuration - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5887,7 +5888,6 @@ List all hashing configurations configured on the server.
 This method has a `POST /hashconfig/list` alternative.
 
 <!-- begin remove -->
-#### List hashing configurations - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5912,6 +5912,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -5919,7 +5921,7 @@ Alternative with `POST` method:
 | 400  | `INVALID_CONFIGURATION` - Next Step server configuration is invalid |
 | 500  | Server error - unexpected error occurred |
 
-#### List hashing configurations - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -5932,9 +5934,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List hashing configurations - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -5970,7 +5971,6 @@ Update a hashing configuration configured on the server.
 This method has a `POST /hashconfig/update` alternative.
 
 <!-- begin remove -->
-#### Update a hashing configuration - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -5995,6 +5995,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -6003,7 +6005,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `HASHING_CONFIG_NOT_FOUND` - hashing configuration with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update a hashing configuration - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6025,9 +6027,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update a hashing configuration - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -6059,7 +6060,6 @@ Delete a hashing configuration.
 This method has a `POST /hashconfig/delete` alternative.
 
 <!-- begin remove -->
-#### Delete a hashing configuration - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -6084,6 +6084,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -6091,7 +6093,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `HASHING_CONFIG_NOT_FOUND` - hashing configuration with name specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete a hashing configuration - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6104,9 +6106,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete a hashing configuration - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -6130,7 +6131,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create a user identity.
 
 <!-- begin remove -->
-#### Create a user identity - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -6142,6 +6142,8 @@ Create a user identity.
     </tr>
 </table>
 <!-- end -->
+
+The list of expected status codes:
 
 | Code | Description |
 |------|-------------|
@@ -6155,7 +6157,7 @@ Create a user identity.
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Create a user identity - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6187,9 +6189,8 @@ Create a user identity.
 }
 ```
 
-#### Create a user identity - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -6242,7 +6243,6 @@ Get user identity detail.
 This method has a `POST /user/detail` alternative.
 
 <!-- begin remove -->
-#### Get user identity detail - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -6267,6 +6267,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -6278,7 +6280,7 @@ Alternative with `POST` method:
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Get user identity detail - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6291,9 +6293,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### Get user identity detail - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -6347,7 +6348,6 @@ Update a user identity.
 This method has a `POST /user/update` alternative.
 
 <!-- begin remove -->
-#### Update a user identity - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -6372,6 +6372,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -6384,7 +6386,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Update a user identity - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6420,9 +6422,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update a user identity - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -6478,7 +6479,6 @@ Update multiple user identities.
 This method has a `POST /user/update/multi` alternative.
 
 <!-- begin remove -->
-#### Update multiple user identities - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -6503,6 +6503,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -6510,7 +6512,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update multiple user identities - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6527,9 +6529,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update multiple user identities - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -6556,7 +6557,6 @@ Lookup a user identity.
 The operation ID parameter is required in case Data Adapter proxy is enabled.
 
 <!-- begin remove -->
-#### Lookup a user identity - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -6569,6 +6569,8 @@ The operation ID parameter is required in case Data Adapter proxy is enabled.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -6579,7 +6581,7 @@ The operation ID parameter is required in case Data Adapter proxy is enabled.
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Lookup a user identity - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6594,9 +6596,8 @@ The operation ID parameter is required in case Data Adapter proxy is enabled.
 }
 ```
 
-#### Lookup a user identity - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -6652,7 +6653,6 @@ The operation ID parameter is required in case Data Adapter proxy is enabled.
 Lookup user identities.
 
 <!-- begin remove -->
-#### Lookup user identities - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -6665,6 +6665,8 @@ Lookup user identities.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -6675,7 +6677,7 @@ Lookup user identities.
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Lookup user identities - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6694,9 +6696,8 @@ Lookup user identities.
 }
 ```
 
-#### Lookup user identities - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -6754,7 +6755,6 @@ Lookup user identities.
 Block a user identity.
 
 <!-- begin remove -->
-#### Block a user identity - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -6767,6 +6767,8 @@ Block a user identity.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -6775,7 +6777,7 @@ Block a user identity.
 | 400  | `USER_IDENTITY_NOT_ACTIVE` -  user identity with identifier specified in the request is not in `ACTIVE` state |
 | 500  | Server error - unexpected error occurred |
 
-#### Block a user identity - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6788,9 +6790,8 @@ Block a user identity.
 }
 ```
 
-#### Block a user identity - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -6811,7 +6812,6 @@ Block a user identity.
 Unblock a user identity.
 
 <!-- begin remove -->
-#### Unblock a user identity - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -6824,6 +6824,8 @@ Unblock a user identity.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -6832,7 +6834,7 @@ Unblock a user identity.
 | 400  | `USER_IDENTITY_NOT_BLOCKED` -  user identity with identifier specified in the request is not in `BLOCKED` state |
 | 500  | Server error - unexpected error occurred |
 
-#### Unblock a user identity - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6845,9 +6847,8 @@ Unblock a user identity.
 }
 ```
 
-#### Unblock a user identity - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -6870,7 +6871,6 @@ Delete a user identity.
 This method has a `POST /otp/policy/delete` alternative.
 
 <!-- begin remove -->
-#### Delete a user identity - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -6895,6 +6895,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -6902,7 +6904,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete a user identity - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6915,9 +6917,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete a user identity - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -6938,7 +6939,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create a user contact.
 
 <!-- begin remove -->
-#### Create a user contact - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -6951,6 +6951,8 @@ Create a user contact.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -6959,7 +6961,7 @@ Create a user contact.
 | 400  | `USER_CONTACT_ALREADY_EXISTS` - user contact already exists |
 | 500  | Server error - unexpected error occurred |
 
-#### Create a user contact - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -6976,9 +6978,8 @@ Create a user contact.
 }
 ```
 
-#### Create a user contact - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7004,7 +7005,6 @@ List all user contacts.
 This method has a `POST /user/contact/list` alternative.
 
 <!-- begin remove -->
-#### List user contacts - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7029,6 +7029,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7036,7 +7038,7 @@ Alternative with `POST` method:
 | 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### List user contacts - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7049,9 +7051,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List user contacts - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7083,7 +7084,6 @@ Update a user contact.
 This method has a `POST /user/contact/update` alternative.
 
 <!-- begin remove -->
-#### Update a user contact - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7108,6 +7108,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7116,7 +7118,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `USER_CONTACT_NOT_FOUND` - user contact was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update a user contact - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7133,9 +7135,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update a user contact - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7162,7 +7163,6 @@ Delete a user contact.
 This method has a `POST /user/contact/delete` alternative.
 
 <!-- begin remove -->
-#### Delete a user contact - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7187,6 +7187,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7195,7 +7197,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `USER_CONTACT_NOT_FOUND` - user contact was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete a user contact - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7210,9 +7212,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete a user contact - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7234,7 +7235,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Create a user alias.
 
 <!-- begin remove -->
-#### Create a user alias - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7247,6 +7247,8 @@ Create a user alias.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7256,7 +7258,7 @@ Create a user alias.
 | 400  | `USER_ALIAS_ALREADY_EXISTS` - user alias already exists |
 | 500  | Server error - unexpected error occurred |
 
-#### Create a user alias - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7274,9 +7276,8 @@ Create a user alias.
 }
 ```
 
-#### Create a user alias - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7304,7 +7305,6 @@ List all user aliases.
 This method has a `POST /user/alias/list` alternative.
 
 <!-- begin remove -->
-#### List user aliases - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7329,6 +7329,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7337,7 +7339,7 @@ Alternative with `POST` method:
 | 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### List user aliases - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7351,9 +7353,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### List user aliases - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7387,7 +7388,6 @@ Update a user alias.
 This method has a `POST /user/alias/update` alternative.
 
 <!-- begin remove -->
-#### Update a user alias - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7412,6 +7412,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7421,7 +7423,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `USER_ALIAS_NOT_FOUND` - user alias was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Update a user alias - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7440,9 +7442,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update a user contact - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7470,7 +7471,6 @@ Delete a user alias.
 This method has a `POST /user/alias/delete` alternative.
 
 <!-- begin remove -->
-#### Delete a user alias - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7495,6 +7495,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7503,7 +7505,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `USER_ALIAS_NOT_FOUND` - user alias was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete a user alias - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7517,9 +7519,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete a user alias - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7541,7 +7542,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Assign a role to user identity.
 
 <!-- begin remove -->
-#### Assign a role to user identity - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7554,6 +7554,8 @@ Assign a role to user identity.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7563,7 +7565,7 @@ Assign a role to user identity.
 | 400  | `USER_ROLE_ALREADY_ASSIGNED` - user role is already assigned |
 | 500  | Server error - unexpected error occurred |
 
-#### Assign a role to user identity - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7577,9 +7579,8 @@ Assign a role to user identity.
 }
 ```
 
-#### Assign a role to user identity 
+#### Response 200 
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7603,7 +7604,6 @@ Remove a user role from user identity.
 This method has a `POST /user/role/delete` alternative.
 
 <!-- begin remove -->
-#### Remove a role from user identity - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7628,6 +7628,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7637,7 +7639,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `USER_ROLE_NOT_ASSIGNED` - user role is not assigned |
 | 500  | Server error - unexpected error occurred |
 
-#### Remove a role from user identity - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7651,9 +7653,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Remove a role from user identity - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7677,7 +7678,6 @@ Get user credential list.
 This method has a `POST /user/credential/list` alternative.
 
 <!-- begin remove -->
-#### Get user credential list - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7702,6 +7702,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7711,7 +7713,7 @@ Alternative with `POST` method:
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Get user credential list - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7725,9 +7727,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### Get user credential list - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7764,7 +7765,6 @@ Get user credential list.
 This method has a `POST /user/authentication/list` alternative.
 
 <!-- begin remove -->
-#### Get user authentication list - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7789,6 +7789,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7796,7 +7798,7 @@ Alternative with `POST` method:
 | 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Get user authentication list - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7811,9 +7813,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### Get user authentication list - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7846,7 +7847,6 @@ Alternative with `POST` method:
 Create a credential.
 
 <!-- begin remove -->
-#### Create a credential - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7858,6 +7858,8 @@ Create a credential.
     </tr>
 </table>
 <!-- end -->
+
+The list of expected status codes:
 
 | Code | Description |
 |------|-------------|
@@ -7871,7 +7873,7 @@ Create a credential.
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Create a credential - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7890,9 +7892,8 @@ Create a credential.
 }
 ```
 
-#### Create a credential - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -7920,7 +7921,6 @@ Update a credential.
 This method has a `POST /credential/update` alternative.
 
 <!-- begin remove -->
-#### Update a credential - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -7945,6 +7945,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -7958,7 +7960,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Update a credential - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -7975,9 +7977,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update a credential - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8002,7 +8003,6 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 Validate a credential.
 
 <!-- begin remove -->
-#### Validate a credential - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8015,6 +8015,8 @@ Validate a credential.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -8026,7 +8028,7 @@ Validate a credential.
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Validate a credential - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8043,9 +8045,8 @@ Validate a credential.
 }
 ```
 
-#### Validate a credential - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8069,7 +8070,6 @@ Validate a credential.
 Reset a credential.
 
 <!-- begin remove -->
-#### Reset a credential - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8082,6 +8082,8 @@ Reset a credential.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -8093,7 +8095,7 @@ Reset a credential.
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Reset a credential - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8108,9 +8110,8 @@ Reset a credential.
 }
 ```
 
-#### Reset a credential - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8134,7 +8135,6 @@ Reset a credential.
 Block a credential.
 
 <!-- begin remove -->
-#### Block a credential - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8147,6 +8147,8 @@ Block a credential.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -8157,7 +8159,7 @@ Block a credential.
 | 400  | `CREDENTIAL_NOT_ACTIVE` - credential is not in `ACTIVE` state |
 | 500  | Server error - unexpected error occurred |
 
-#### Block a credential - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8171,9 +8173,8 @@ Block a credential.
 }
 ```
 
-#### Block a credential - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8195,7 +8196,6 @@ Block a credential.
 Block a credential.
 
 <!-- begin remove -->
-#### Unblock a credential - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8208,6 +8208,8 @@ Block a credential.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -8218,7 +8220,7 @@ Block a credential.
 | 400  | `CREDENTIAL_NOT_BLOCKED` - credential is not in `BLOCKED_PERMANENT` or `BLOCKED_TEMPORARY` state |
 | 500  | Server error - unexpected error occurred |
 
-#### Unblock a credential - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8232,9 +8234,8 @@ Block a credential.
 }
 ```
 
-#### Unblock a credential - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8258,7 +8259,6 @@ Delete a credential.
 This method has a `POST /credential/delete` alternative.
 
 <!-- begin remove -->
-#### Delete a credential - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8283,6 +8283,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -8292,7 +8294,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete a credential - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8306,9 +8308,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete a credential - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8334,7 +8335,6 @@ Update a credential counter.
 This method has a `POST /credential/counter/update` alternative.
 
 <!-- begin remove -->
-#### Update a credential counter - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8359,6 +8359,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -8370,7 +8372,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 | 400  | `CREDENTIAL_NOT_ACTIVE` - credential is not in `ACTIVE` state |
 | 500  | Server error - unexpected error occurred |
 
-#### Update a credential counter - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8385,9 +8387,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 }
 ```
 
-#### Update a credential - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8409,7 +8410,6 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 Reset all soft failed counters.
 
 <!-- begin remove -->
-#### Reset all soft failed attempt counters - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8422,6 +8422,8 @@ Reset all soft failed counters.
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -8429,7 +8431,7 @@ Reset all soft failed counters.
 | 400  | `INVALID_REQUEST` - invalid request received |
 | 500  | Server error - unexpected error occurred |
 
-#### Reset all soft failed attempt counters - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8442,9 +8444,8 @@ Reset all soft failed counters.
 }
 ```
 
-#### Reset all soft failed attempt counters - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8466,7 +8467,6 @@ Reset all soft failed counters.
 Create an OTP.
 
 <!-- begin remove -->
-#### Create an OTP - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8478,6 +8478,8 @@ Create an OTP.
     </tr>
 </table>
 <!-- end -->
+
+The list of expected status codes:
 
 | Code | Description |
 |------|-------------|
@@ -8497,7 +8499,7 @@ Create an OTP.
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Create an OTP - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8514,9 +8516,8 @@ Create an OTP.
 }
 ```
 
-#### Create an OTP - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8540,7 +8541,6 @@ Create an OTP.
 Create and send an OTP via Data Adapter.
 
 <!-- begin remove -->
-#### Create and send an OTP - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8552,6 +8552,8 @@ Create and send an OTP via Data Adapter.
     </tr>
 </table>
 <!-- end -->
+
+The list of expected status codes:
 
 | Code | Description |
 |------|-------------|
@@ -8571,7 +8573,7 @@ Create and send an OTP via Data Adapter.
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Create and send an OTP - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8589,9 +8591,8 @@ Create and send an OTP via Data Adapter.
 }
 ```
 
-#### Create and send an OTP - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8618,7 +8619,6 @@ Get OTP list for an operation.
 This method has a `POST /otp/list` alternative.
 
 <!-- begin remove -->
-#### Get OTP list - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8643,6 +8643,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -8651,7 +8653,7 @@ Alternative with `POST` method:
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Get OTP list - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8665,9 +8667,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### Get OTP list - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8708,7 +8709,6 @@ Get OTP detail.
 This method has a `POST /otp/detail` alternative.
 
 <!-- begin remove -->
-#### Get OTP detail - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8733,6 +8733,8 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -8744,7 +8746,7 @@ Alternative with `POST` method:
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Get OTP detail - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8758,9 +8760,8 @@ Alternative with `POST` method:
 }
 ```
 
-#### Get OTP detail - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8799,7 +8800,6 @@ Delete an OTP.
 This method has a `POST /otp/delete` alternative.
 
 <!-- begin remove -->
-#### Delete a credential - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8824,6 +8824,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
 | Code | Description |
 |------|-------------|
 | 200  | OK response - request succeeded |
@@ -8833,7 +8835,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 | 400  | `OPERATION_NOT_FOUND` - operation was not found |
 | 500  | Server error - unexpected error occurred |
 
-#### Delete an OTP - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8847,9 +8849,8 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 }
 ```
 
-#### Delete an OTP - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8873,7 +8874,6 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 Authenticate using a one time password.
 
 <!-- begin remove -->
-#### Authenticate using an OTP - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8885,6 +8885,8 @@ Authenticate using a one time password.
     </tr>
 </table>
 <!-- end -->
+
+The list of expected status codes:
 
 | Code | Description |
 |------|-------------|
@@ -8903,7 +8905,7 @@ Authenticate using a one time password.
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Authenticate using an OTP - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -8920,9 +8922,8 @@ Authenticate using a one time password.
 }
 ```
 
-#### Authenticate using an OTP - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -8951,7 +8952,6 @@ Authenticate using a one time password.
 Authenticate using a credential.
 
 <!-- begin remove -->
-#### Authenticate using a credential - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -8963,6 +8963,8 @@ Authenticate using a credential.
     </tr>
 </table>
 <!-- end -->
+
+The list of expected status codes:
 
 | Code | Description |
 |------|-------------|
@@ -8982,7 +8984,7 @@ Authenticate using a credential.
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Authenticate using a credential - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -9002,9 +9004,8 @@ Authenticate using a credential.
 }
 ```
 
-#### Authenticate using a credential - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
@@ -9033,7 +9034,6 @@ Authenticate using a credential.
 Authenticate using a credential and one time password.
 
 <!-- begin remove -->
-#### Authenticate using a credential and OTP - parameters
 <table>
     <tr>
         <td>Method</td>
@@ -9045,6 +9045,8 @@ Authenticate using a credential and one time password.
     </tr>
 </table>
 <!-- end -->
+
+The list of expected status codes:
 
 | Code | Description |
 |------|-------------|
@@ -9064,7 +9066,7 @@ Authenticate using a credential and one time password.
 | 400  | `ENCRYPTION_FAILED` - encryption failed |
 | 500  | Server error - unexpected error occurred |
 
-#### Authenticate using a credential and OTP - request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -9086,9 +9088,8 @@ Authenticate using a credential and one time password.
 }
 ```
 
-#### Authenticate using a credential and OTP - response
+#### Response 200
 
-- Status Code: `200`
 - Headers:
   - `Content-Type: application/json`
 
