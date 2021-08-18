@@ -2138,7 +2138,7 @@ The list of expected status codes:
 | 400  | `OPERATION_CONTEXT_INVALID` - invalid operation context |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-##### Request
+#### Request
 
 - Headers:
   - `Content-Type: application/json`
@@ -3041,7 +3041,7 @@ The list of expected status codes:
 }
 ```
 
-##### Response 200
+#### Response 200
 
 - Headers:
   - `Content-Type: application/json`
@@ -3060,6 +3060,4 @@ The list of expected status codes:
   }
 }
 ```
-<!-- end -->
-
 <!-- end -->

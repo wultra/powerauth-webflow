@@ -2086,7 +2086,7 @@ The list of expected status codes:
 }
 ```
 
-#### Response
+#### Response 200
 
 - Headers:
     - `Content-Type: application/json`
