@@ -2,11 +2,16 @@
 
 <!-- template api -->
 
-PowerAuth Web Flow communicates with the Next Step Server via a REST API to resolve the next step in the authentication process. This chapter defines the REST API implemented by Next Step Server and consumed by the Web Flow Server during authentication. The REST API can be also used by other components.
+PowerAuth Web Flow communicates with the Next Step Server via a REST API to resolve the next step in the authentication process. This chapter defines the REST API published by Next Step Server and consumed by the Web Flow Server during user authentication. The Next Step REST API can be also used standalone.
 
-The Next Step API can list available authentication methods and enable/disable authentication methods per user. Authentication method configuration can be updated - for instance the activation ID of registered user device is set for the Mobile Token authentication method.
-
-The Next Step API is also used by other components involved in the authentication process (e.g. Mobile Token which uses the API indirectly through Web Flow or a party initiating a new operation). The API can be used to query operation details, create an operation, update an operation (move it to the next step) as well as update operation form data and set chosen authentication method as the user progresses in the authentication and authorization process.
+The Next Step REST API has following main use cases:
+- manage authentication methods and configure them (e.g. enable mobile token for a user, list enabled authentication methods, etc.)
+- manage operations and configure them (e.g. create an operation, update an operation, configure operation parameters, etc.)
+- configure Next Step organizations, applications, step definitions, and user roles
+- configure credential policies, credential definitions, OTP policies, OTP policies, OTP definitions, and hashing configurations
+- manage user identities (e.g. create user, update user, lookup users, manage user contacts, roles, and aliases, etc.)
+- manage user credentials and OTP codes (e.g. create credentials and OTP codes, their listing and management)
+- perform user authentication using credentials and/or OTP codes
 
 Following topics are covered in this chapter:
 - [Status codes and error handling](#status-codes-and-error-handling)
@@ -8324,7 +8329,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 <!-- begin api PUT /credential/counter -->
 ### Update a Credential Counter
 
-Update a credential.
+Update a credential counter.
 
 This method has a `POST /credential/counter/update` alternative.
 
@@ -8964,7 +8969,7 @@ Authenticate using a credential.
 | 200  | OK response - request succeeded |
 | 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
 | 400  | `INVALID_REQUEST` - invalid request received |
-| 400  | `USER_IDENTITY_NOT_FOUND` - user identity was not found |`
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity was not found |
 | 400  | `AUTH_METHOD_NOT_FOUND` - authentication method was not found |
 | 400  | `OPERATION_ALREADY_FINISHED` - operation is already in `DONE` state |
 | 400  | `OPERATION_ALREADY_FAILED` - operation is already in `FAILED` state |
@@ -9046,7 +9051,7 @@ Authenticate using a credential and one time password.
 | 200  | OK response - request succeeded |
 | 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
 | 400  | `INVALID_REQUEST` - invalid request received |
-| 400  | `USER_IDENTITY_NOT_FOUND` - user identity was not found |`
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity was not found |
 | 400  | `AUTH_METHOD_NOT_FOUND` - authentication method was not found |
 | 400  | `OPERATION_ALREADY_FINISHED` - operation is already in `DONE` state |
 | 400  | `OPERATION_ALREADY_FAILED` - operation is already in `FAILED` state |
