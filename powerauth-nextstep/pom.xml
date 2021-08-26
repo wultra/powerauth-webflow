@@ -6,13 +6,13 @@
     <name>powerauth-nextstep</name>
     <artifactId>powerauth-nextstep</artifactId>
     <description>PowerAuth 2.0 Next Step Server</description>
-    <version>1.1.0</version>
+    <version>1.2.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -49,22 +49,22 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-nextstep-model</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-java-crypto</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-data-adapter-client</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-rest-client-spring</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.core</groupId>
@@ -113,7 +113,7 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-nextstep-client</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
