@@ -17,9 +17,9 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controll
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.Response;
-import io.getlime.push.client.MobilePlatform;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
+import io.getlime.push.model.enumeration.MobilePlatform;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.lib.mtoken.model.request.PushRegisterRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
