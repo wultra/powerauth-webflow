@@ -25,10 +25,10 @@ import io.getlime.security.powerauth.lib.mtoken.model.request.PushRegisterReques
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.MobileAppApiException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
-import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
-import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthToken;
+import io.getlime.security.powerauth.rest.api.spring.authentication.PowerAuthApiAuthentication;
+import io.getlime.security.powerauth.rest.api.spring.exception.PowerAuthAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,7 +143,7 @@ public class PushRegistrationController {
 
         // Check if the context is authenticated - if it is, add activation ID.
         // This assures that the activation is assigned with a correct device.
-        String activationId = apiAuthentication.getActivationId();
+        String activationId = apiAuthentication.getActivationObject().getActivationId();
         Long applicationId = apiAuthentication.getApplicationId();
 
         // Verify that applicationId and activationId are set

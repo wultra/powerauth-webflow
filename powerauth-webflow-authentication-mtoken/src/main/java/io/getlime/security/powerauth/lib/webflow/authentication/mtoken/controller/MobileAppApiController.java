@@ -53,10 +53,10 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.res
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.PowerAuthOperationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.WebSocketMessageService;
-import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
-import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthToken;
+import io.getlime.security.powerauth.rest.api.spring.authentication.PowerAuthApiAuthentication;
+import io.getlime.security.powerauth.rest.api.spring.exception.PowerAuthAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,8 +153,8 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      */
     private ObjectResponse<OperationListResponse> getOperationListImpl(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
-        if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
-            String activationId = apiAuthentication.getActivationId();
+        if (apiAuthentication != null && apiAuthentication.getUserId() != null && apiAuthentication.getActivationObject() != null) {
+            String activationId = apiAuthentication.getActivationObject().getActivationId();
             String userId = apiAuthentication.getUserId();
 
             // Verify that the activation ID from context matches configured activation ID for given user.
@@ -244,8 +244,8 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         String operationId = request.getRequestObject().getId();
         final GetOperationDetailResponse operation = getOperation(operationId);
 
-        if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
-            String activationId = apiAuthentication.getActivationId();
+        if (apiAuthentication != null && apiAuthentication.getUserId() != null && apiAuthentication.getActivationObject() != null) {
+            String activationId = apiAuthentication.getActivationObject().getActivationId();
             String userId = apiAuthentication.getUserId();
 
             // Verify that the activation ID from context matches configured activation ID for given user.
@@ -264,7 +264,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 operation.setFormData(formDataConverter.fromFormData(response.getFormData()));
 
                 // Check if signature type is allowed
-                if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), apiAuthentication.getSignatureFactors())) {
+                if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), apiAuthentication.getAuthenticationContext().getSignatureType())) {
                     throw new PowerAuthAuthenticationException();
                 }
 
@@ -272,7 +272,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                         && operation.getUserId() != null
                         && operation.getUserId().equals(apiAuthentication.getUserId())) {
                     final List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.POWERAUTH_TOKEN);
-                    SignatureType signatureType = SignatureType.enumFromString(apiAuthentication.getSignatureFactors().toString());
+                    SignatureType signatureType = SignatureType.enumFromString(apiAuthentication.getAuthenticationContext().getSignatureType().toString());
                     boolean approvalSucceeded = powerAuthOperationService.approveOperation(operation, activationId, signatureType);
                     if (!approvalSucceeded) {
                         throw new OperationIsAlreadyFailedException("Operation approval has failed");
@@ -310,8 +310,8 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     @PowerAuth(resourceId = "/operation/cancel", signatureType = {PowerAuthSignatureTypes.POSSESSION})
     public @ResponseBody Response cancelOperation(@RequestBody ObjectRequest<OperationRejectRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
 
-        if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
-            String activationId = apiAuthentication.getActivationId();
+        if (apiAuthentication != null && apiAuthentication.getUserId() != null && apiAuthentication.getActivationObject() != null) {
+            String activationId = apiAuthentication.getActivationObject().getActivationId();
             String userId = apiAuthentication.getUserId();
             String operationId = request.getRequestObject().getId();
 
