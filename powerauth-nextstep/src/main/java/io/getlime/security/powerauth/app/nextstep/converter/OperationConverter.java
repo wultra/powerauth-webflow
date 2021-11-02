@@ -195,7 +195,7 @@ public class OperationConverter {
                 authenticationContext = new ObjectMapper().readValue(historyEntity.getPowerAuthAuthenticationContext(), PAAuthenticationContext.class);
             } catch (IOException ex) {
                 logger.error("Error while deserializing authentication context", ex);
-                audit.error("Error while deserializing  authentication context", ex);
+                audit.error("Error while deserializing authentication context", ex);
             }
             history.setPaAuthenticationContext(authenticationContext);
         }

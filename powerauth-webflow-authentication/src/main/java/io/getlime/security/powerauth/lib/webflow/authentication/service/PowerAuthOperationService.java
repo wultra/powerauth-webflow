@@ -316,7 +316,7 @@ public class PowerAuthOperationService {
     private void failNextStepOperation(GetOperationDetailResponse operation) {
         try {
             PAAuthenticationContext authenticationContext = null;
-            if (operation.getHistory() != null) {
+            if (operation.getHistory() != null && !operation.getHistory().isEmpty()) {
                 authenticationContext = operation.getHistory().get(operation.getHistory().size() - 1).getPaAuthenticationContext();
             }
             // Fail Next Step operation
