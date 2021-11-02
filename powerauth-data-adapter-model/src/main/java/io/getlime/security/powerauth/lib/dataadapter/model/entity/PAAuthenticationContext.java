@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.entity;
 
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PowerAuthSignatureType;
 import lombok.Data;
 
 import javax.validation.constraints.PositiveOrZero;
@@ -27,7 +28,7 @@ import javax.validation.constraints.PositiveOrZero;
 @Data
 public class PAAuthenticationContext {
 
-    private String signatureType;
+    private PowerAuthSignatureType signatureType;
     @PositiveOrZero
     private Integer remainingAttempts;
     private boolean blocked;

@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PowerAuthSignatureType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.PAAuthenticationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -94,7 +95,7 @@ public class OperationCustomizationService {
                 try {
                     PAAuthenticationContext authenticationContextNS = objectMapper.readValue(authContext, PAAuthenticationContext.class);
                     authenticationContextDA = new io.getlime.security.powerauth.lib.dataadapter.model.entity.PAAuthenticationContext();
-                    authenticationContextDA.setSignatureType(authenticationContextNS.getSignatureType());
+                    authenticationContextDA.setSignatureType(PowerAuthSignatureType.getEnumFromString(authenticationContextNS.getSignatureType()));
                     authenticationContextDA.setRemainingAttempts(authenticationContextNS.getRemainingAttempts());
                     authenticationContextDA.setBlocked(authenticationContextNS.isBlocked());
                     break;
@@ -112,6 +113,7 @@ public class OperationCustomizationService {
             authenticationContextDA.setSignatureType(null);
             authenticationContextDA.setRemainingAttempts(null);
         }
+        operationContext.setAuthenticationContext(authenticationContextDA);
         try {
             dataAdapterClient.operationChangedNotification(operationChange, userId, organizationId, operationContext);
         } catch (DataAdapterClientErrorException ex) {
