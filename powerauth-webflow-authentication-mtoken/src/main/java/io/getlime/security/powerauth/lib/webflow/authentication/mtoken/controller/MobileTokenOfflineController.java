@@ -30,6 +30,7 @@ import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureTyp
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.converter.OperationTextNormalizer;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.PAAuthenticationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -146,6 +147,11 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             logger.warn(ex.getMessage(), ex);
             throw new OfflineModeInvalidAuthCodeException("Offline signature verification failed, reason: " + ex.getMessage());
         }
+        PAAuthenticationContext authenticationContext = new PAAuthenticationContext();
+        authenticationContext.setBlocked(signatureResponse.getActivationStatus() == ActivationStatus.BLOCKED);
+        authenticationContext.setSignatureType(signatureResponse.getSignatureType() != null ? signatureResponse.getSignatureType().toString().toLowerCase() : null);
+        authenticationContext.setRemainingAttempts(signatureResponse.getRemainingAttempts() != null ? signatureResponse.getRemainingAttempts().intValue() : null);
+
         if (signatureResponse.isSignatureValid()) {
             String userId = operation.getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
@@ -156,7 +162,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
                 }
                 cleanHttpSession();
                 logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
-                return new AuthResultDetail(userId, operation.getOrganizationId(), false);
+                return new AuthResultDetail(userId, operation.getOrganizationId(), false, authenticationContext);
             }
         } else {
             boolean approvalFailSucceeded = powerAuthOperationService.failApprovalForOperation(operation);
@@ -172,7 +178,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         // otherwise fail authorization
         Integer remainingAttemptsNS;
         try {
-            AuthOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
+            AuthOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), authenticationContext, null);
             if (response.getAuthResult() == AuthResult.FAILED || signatureResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
                 if (signatureResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
                     // Activation was blocked or removed, cancel the operation

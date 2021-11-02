@@ -90,7 +90,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         for (OperationHistory h : history) {
             if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod())
                     && !AuthResult.FAILED.equals(h.getAuthResult())) {
-                return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
+                return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false, h.getPaAuthenticationContext());
             }
         }
         return null;

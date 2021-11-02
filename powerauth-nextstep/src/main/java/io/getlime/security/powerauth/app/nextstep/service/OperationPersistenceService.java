@@ -259,6 +259,9 @@ public class OperationPersistenceService {
             // Params, steps and auth instruments are saved as JSON for now - new entities would be required to store this data.
             // We can add these entities later in case they are needed.
             operationHistory.setRequestAuthInstruments(objectMapper.writeValueAsString(request.getAuthInstruments()));
+            if (request.getAuthenticationContext() != null) {
+                operationHistory.setPowerAuthAuthenticationContext(objectMapper.writeValueAsString(request.getAuthenticationContext()));
+            }
             operationHistory.setRequestParams(objectMapper.writeValueAsString(request.getParams()));
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
         } catch (JsonProcessingException e) {

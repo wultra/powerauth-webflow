@@ -28,6 +28,7 @@ import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.PAAuthenticationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.NextStepError;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
@@ -193,7 +194,7 @@ public class NextStepClient {
      * @return A Response with UpdateOperationResponse object.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<UpdateOperationResponse> updateOperation(@NotNull String operationId, String userId, String organizationId, @NotNull AuthMethod authMethod, List<AuthInstrument> authInstruments, @NotNull AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
+    public ObjectResponse<UpdateOperationResponse> updateOperation(@NotNull String operationId, String userId, String organizationId, @NotNull AuthMethod authMethod, List<AuthInstrument> authInstruments, @NotNull AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext, PAAuthenticationContext authenticationContext) throws NextStepClientException {
         final UpdateOperationRequest request = new UpdateOperationRequest();
         request.setOperationId(operationId);
         request.setUserId(userId);
@@ -206,6 +207,7 @@ public class NextStepClient {
             request.getParams().addAll(params);
         }
         request.setApplicationContext(applicationContext);
+        request.setAuthenticationContext(authenticationContext);
         return putObjectImpl("/operation", new ObjectRequest<>(request), UpdateOperationResponse.class);
     }
   
@@ -224,7 +226,7 @@ public class NextStepClient {
      * @return A Response with UpdateOperationResponse object.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<UpdateOperationResponse> updateOperationPost(@NotNull String operationId, String userId, String organizationId, @NotNull AuthMethod authMethod, List<AuthInstrument> authInstruments, @NotNull AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
+    public ObjectResponse<UpdateOperationResponse> updateOperationPost(@NotNull String operationId, String userId, String organizationId, @NotNull AuthMethod authMethod, List<AuthInstrument> authInstruments, @NotNull AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext, PAAuthenticationContext authenticationContext) throws NextStepClientException {
         final UpdateOperationRequest request = new UpdateOperationRequest();
         request.setOperationId(operationId);
         request.setUserId(userId);
@@ -237,6 +239,7 @@ public class NextStepClient {
             request.getParams().addAll(params);
         }
         request.setApplicationContext(applicationContext);
+        request.setAuthenticationContext(authenticationContext);
         return postObjectImpl("/operation/update", new ObjectRequest<>(request), UpdateOperationResponse.class);
     }
 

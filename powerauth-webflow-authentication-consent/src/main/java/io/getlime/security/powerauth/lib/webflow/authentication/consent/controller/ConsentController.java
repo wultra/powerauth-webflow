@@ -106,7 +106,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             // Consent form is skipped, step authentication is complete
             logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             cleanHttpSession();
-            return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
+            return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false, null);
         }
         final String userId = operation.getUserId();
         final String organizationId = operation.getOrganizationId();
@@ -127,7 +127,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
                 cleanHttpSession();
                 if (saveResponse.isSaveSucceeded()) {
                     logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-                    return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
+                    return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false, null);
                 }
                 // Validation succeeded, however save failed, allow user to retry the consent confirmation
                 throw new AuthStepException("User consent could not be saved", "error.communication");
@@ -148,7 +148,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
             Integer remainingAttemptsNS;
             try {
-                AuthOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
+                AuthOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null, null);
                 if (response.getAuthResult() == AuthResult.FAILED) {
                     cleanHttpSession();
                     // FAILED result instead of CONTINUE means the authentication method is failed

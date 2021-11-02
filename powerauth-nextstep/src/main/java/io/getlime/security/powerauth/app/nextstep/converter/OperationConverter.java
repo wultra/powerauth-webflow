@@ -25,10 +25,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +50,8 @@ public class OperationConverter {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * Se
-     * @param audit
+     * Set audit interface.
+     * @param audit Audit interface.
      */
     @Autowired
     public void setAudit(Audit audit) {
@@ -175,12 +172,32 @@ public class OperationConverter {
             h.setAuthResult(history.getResponseResult());
             h.setMobileTokenActive(history.isMobileTokenActive());
             h.setPowerAuthOperationId(history.getPowerAuthOperationId());
+            assignAuthenticationContext(h, history);
             response.getHistory().add(h);
         }
         // set chosen authentication method
         final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory != null) {
             response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
+        }
+    }
+
+    /**
+     * In case operation history entity has serialized PowerAuth operation context, attempt to deserialize the
+     * object and assign it to the operation history in response.
+     * @param history Operation history response object.
+     * @param historyEntity Operation history entity.
+     */
+    private void assignAuthenticationContext(OperationHistory history, OperationHistoryEntity historyEntity) {
+        if (historyEntity.getPowerAuthAuthenticationContext() != null) {
+            PAAuthenticationContext authenticationContext = null;
+            try {
+                authenticationContext = new ObjectMapper().readValue(historyEntity.getPowerAuthAuthenticationContext(), PAAuthenticationContext.class);
+            } catch (IOException ex) {
+                logger.error("Error while deserializing authentication context", ex);
+                audit.error("Error while deserializing  authentication context", ex);
+            }
+            history.setPaAuthenticationContext(authenticationContext);
         }
     }
 

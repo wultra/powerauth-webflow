@@ -461,6 +461,7 @@ CREATE TABLE ns_operation_history (
   mobile_token_active         NUMBER(1) DEFAULT 0 NOT NULL,               -- Information about if mobile token is active during the particular authentication step, in order to show the mobile token operation at the right time.
   authentication_id           VARCHAR2(256 CHAR),                         -- Reference to the authentication record.
   pa_operation_id             VARCHAR2(256 CHAR),                         -- PowerAuth operation ID for PowerAuth operations.
+  pa_auth_context             VARCHAR2(256 CHAR),                         -- PowerAuth operation ID for PowerAuth operations.
   CONSTRAINT ns_history_pk PRIMARY KEY (operation_id, result_id),
   CONSTRAINT ns_history_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id),
   CONSTRAINT ns_history_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method),

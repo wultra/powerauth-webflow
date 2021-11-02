@@ -194,7 +194,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             }
             if (authResponse.getAuthenticationResult() == AuthenticationResult.SUCCEEDED) {
                 logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), authResponse.getUserId(), getAuthMethodName().toString());
-                return new AuthResultDetail(userId, organizationId, true);
+                return new AuthResultDetail(userId, organizationId, true, null);
             } else {
                 Integer remainingAttempts = authResponse.getRemainingAttempts();
                 if (remainingAttempts != null && remainingAttempts == 0) {

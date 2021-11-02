@@ -28,6 +28,7 @@ import com.wultra.security.powerauth.client.v3.GetActivationStatusResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.PAAuthenticationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -314,10 +315,14 @@ public class PowerAuthOperationService {
      */
     private void failNextStepOperation(GetOperationDetailResponse operation) {
         try {
+            PAAuthenticationContext authenticationContext = null;
+            if (operation.getHistory() != null) {
+                authenticationContext = operation.getHistory().get(operation.getHistory().size() - 1).getPaAuthenticationContext();
+            }
             // Fail Next Step operation
             nextStepClient.updateOperation(operation.getOperationId(), operation.getUserId(),
                     operation.getOrganizationId(), getAuthMethod(operation), Collections.singletonList(AuthInstrument.POWERAUTH_TOKEN),
-                    AuthStepResult.AUTH_METHOD_FAILED, null, null, operation.getApplicationContext());
+                    AuthStepResult.AUTH_METHOD_FAILED, null, null, operation.getApplicationContext(), authenticationContext);
         } catch (NextStepClientException ex) {
             logger.warn(ex.getMessage(), ex);
         }

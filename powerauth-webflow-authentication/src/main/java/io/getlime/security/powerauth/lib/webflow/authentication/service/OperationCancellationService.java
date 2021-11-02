@@ -68,6 +68,7 @@ public class OperationCancellationService {
      * @param authMethod Authentication method which triggered operation cancellation.
      * @param cancelReason Reason for canceling the operation.
      * @return Update operation response or null in case cancellation was skipped.
+     * @throws CommunicationFailedException Thrown in case communication with remote system fails.
      */
     public UpdateOperationResponse cancelOperation(String operationId, AuthMethod authMethod, OperationCancelReason cancelReason, boolean cancelPowerAuthOperation) throws CommunicationFailedException {
         try {
@@ -86,6 +87,7 @@ public class OperationCancellationService {
      * @param authMethod Authentication method which triggered operation cancellation.
      * @param cancelReason Reason for canceling the operation.
      * @return Update operation response or null in case cancellation was skipped.
+     * @throws CommunicationFailedException Thrown in case communication with remote system fails.
      */
     public UpdateOperationResponse cancelOperation(GetOperationDetailResponse operationDetail, AuthMethod authMethod, OperationCancelReason cancelReason, boolean cancelPowerAuthOperation) throws CommunicationFailedException {
         try {
@@ -111,7 +113,7 @@ public class OperationCancellationService {
                     return null;
                 }
                 final ApplicationContext applicationContext = operationDetail.getApplicationContext();
-                updateOperationResponse = nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), authMethod, Collections.emptyList(), AuthStepResult.CANCELED, cancelReason.toString(), null, applicationContext);
+                updateOperationResponse = nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), authMethod, Collections.emptyList(), AuthStepResult.CANCELED, cancelReason.toString(), null, applicationContext, null);
                 return updateOperationResponse.getResponseObject();
             }
         } catch (NextStepClientException ex) {

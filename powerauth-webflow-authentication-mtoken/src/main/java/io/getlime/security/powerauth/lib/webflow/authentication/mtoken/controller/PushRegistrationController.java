@@ -143,7 +143,7 @@ public class PushRegistrationController {
 
         // Check if the context is authenticated - if it is, add activation ID.
         // This assures that the activation is assigned with a correct device.
-        String activationId = apiAuthentication.getActivationObject().getActivationId();
+        String activationId = apiAuthentication.getActivationContext().getActivationId();
         Long applicationId = apiAuthentication.getApplicationId();
 
         // Verify that applicationId and activationId are set
