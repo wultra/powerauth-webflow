@@ -57,8 +57,7 @@ public class PowerAuthOperationService {
     private final PowerAuthClient powerAuthClient;
     private final DataAdapterClient dataAdapterClient;
     private final Audit audit;
-
-    private final OperationConverter operationConverter = new OperationConverter();
+    private final OperationConverter operationConverter;
 
     /**
      * Service constructor.
@@ -66,13 +65,15 @@ public class PowerAuthOperationService {
      * @param powerAuthClient PowerAuth client.
      * @param dataAdapterClient Data Adapter client.
      * @param audit Audit interface.
+     * @param operationConverter Operation converter.
      */
     @Autowired
-    public PowerAuthOperationService(NextStepServerConfiguration nextStepServerConfiguration, PowerAuthClient powerAuthClient, DataAdapterClient dataAdapterClient, Audit audit) {
+    public PowerAuthOperationService(NextStepServerConfiguration nextStepServerConfiguration, PowerAuthClient powerAuthClient, DataAdapterClient dataAdapterClient, Audit audit, OperationConverter operationConverter) {
         this.nextStepServerConfiguration = nextStepServerConfiguration;
         this.powerAuthClient = powerAuthClient;
         this.dataAdapterClient = dataAdapterClient;
         this.audit = audit;
+        this.operationConverter = operationConverter;
     }
 
     /**

@@ -29,6 +29,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -40,17 +41,19 @@ import org.springframework.stereotype.Service;
 public class OtpCustomizationService {
 
     private final DataAdapterClient dataAdapterClient;
+    private final OperationConverter operationConverter;
 
     private final Logger logger = LoggerFactory.getLogger(OtpCustomizationService.class);
-
-    private final OperationConverter operationConverter = new OperationConverter();
 
     /**
      * Customization service for OTP.
      * @param dataAdapterClient Data Adapter client.
+     * @param operationConverter Operation converter.
      */
-    public OtpCustomizationService(DataAdapterClient dataAdapterClient) {
+    @Autowired
+    public OtpCustomizationService(DataAdapterClient dataAdapterClient, OperationConverter operationConverter) {
         this.dataAdapterClient = dataAdapterClient;
+        this.operationConverter = operationConverter;
     }
 
     /**

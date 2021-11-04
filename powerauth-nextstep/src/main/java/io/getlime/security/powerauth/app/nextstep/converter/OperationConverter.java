@@ -30,6 +30,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,21 +42,23 @@ import java.util.Map;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Component
 public class OperationConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(OperationConverter.class);
 
-    private Audit audit;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Audit audit;
+    private final ObjectMapper objectMapper;
 
     /**
-     * Set audit interface.
+     * Converter constructor.
      * @param audit Audit interface.
+     * @param objectMapper Object mapper.
      */
     @Autowired
-    public void setAudit(Audit audit) {
+    public OperationConverter(Audit audit, ObjectMapper objectMapper) {
         this.audit = audit;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -112,7 +115,7 @@ public class OperationConverter {
         if (operation.getOperationFormData() != null) {
             OperationFormData formData = null;
             try {
-                formData = new ObjectMapper().readValue(operation.getOperationFormData(), OperationFormData.class);
+                formData = objectMapper.readValue(operation.getOperationFormData(), OperationFormData.class);
             } catch (IOException ex) {
                 logger.error("Error while deserializing operation display formData", ex);
                 audit.error("Error while deserializing operation display formData", ex);
@@ -189,15 +192,14 @@ public class OperationConverter {
      * @param historyEntity Operation history entity.
      */
     private void assignAuthenticationContext(OperationHistory history, OperationHistoryEntity historyEntity) {
-        if (historyEntity.getPowerAuthAuthenticationContext() != null) {
-            PAAuthenticationContext authenticationContext = null;
+        if (history != null && historyEntity.getPowerAuthAuthenticationContext() != null) {
             try {
-                authenticationContext = new ObjectMapper().readValue(historyEntity.getPowerAuthAuthenticationContext(), PAAuthenticationContext.class);
+                final PAAuthenticationContext authenticationContext = objectMapper.readValue(historyEntity.getPowerAuthAuthenticationContext(), PAAuthenticationContext.class);
+                history.setPaAuthenticationContext(authenticationContext);
             } catch (IOException ex) {
                 logger.error("Error while deserializing authentication context", ex);
                 audit.error("Error while deserializing authentication context", ex);
             }
-            history.setPaAuthenticationContext(authenticationContext);
         }
     }
 

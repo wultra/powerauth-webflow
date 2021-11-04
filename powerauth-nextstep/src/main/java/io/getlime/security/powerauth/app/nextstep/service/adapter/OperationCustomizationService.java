@@ -29,6 +29,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -45,19 +46,22 @@ import java.util.List;
 public class OperationCustomizationService {
 
     private final DataAdapterClient dataAdapterClient;
+    private final OperationConverter operationConverter;
+    private final ObjectMapper objectMapper;
 
     private final Logger logger = LoggerFactory.getLogger(OperationCustomizationService.class);
 
-    private final OperationConverter operationConverter = new OperationConverter();
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     /**
      * Customization service for operations.
-     *
      * @param dataAdapterClient Data Adapter client.
+     * @param operationConverter Operation converter.
+     * @param objectMapper Object mapper.
      */
-    public OperationCustomizationService(DataAdapterClient dataAdapterClient) {
+    @Autowired
+    public OperationCustomizationService(DataAdapterClient dataAdapterClient, OperationConverter operationConverter, ObjectMapper objectMapper) {
         this.dataAdapterClient = dataAdapterClient;
+        this.operationConverter = operationConverter;
+        this.objectMapper = objectMapper;
     }
 
     /**

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
 import com.wultra.security.powerauth.client.model.enumeration.OperationStatus;
@@ -79,6 +80,7 @@ public class OperationPersistenceService {
 
     {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
     /**
@@ -88,7 +90,7 @@ public class OperationPersistenceService {
      * @param audit Audit interface.
      */
     @Autowired
-    public OperationPersistenceService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit) {
+    public OperationPersistenceService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit, ObjectMapper objectMapper) {
         this.operationRepository = repositoryCatalogue.getOperationRepository();
         this.organizationRepository = repositoryCatalogue.getOrganizationRepository();
         this.operationHistoryRepository = repositoryCatalogue.getOperationHistoryRepository();

@@ -35,6 +35,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.error.NextStepErr
  */
 public class NextStepClientException extends Exception {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private Error error;
 
     /**
@@ -126,15 +128,15 @@ public class NextStepClientException extends Exception {
         RestClientException ex = (RestClientException) cause;
         if (ex.getErrorResponse() == null) {
             try {
-                ErrorResponse errorResponse = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).readValue(ex.getResponse(), ErrorResponse.class);
+                ErrorResponse errorResponse = objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).readValue(ex.getResponse(), ErrorResponse.class);
                 if (errorResponse != null && errorResponse.getResponseObject() != null) {
                     switch (errorResponse.getResponseObject().getCode()) {
                         case "CREDENTIAL_VALIDATION_FAILED":
-                            ObjectResponse<CredentialValidationError> validationErrorResponse = new ObjectMapper().readValue(ex.getResponse(), new TypeReference<ObjectResponse<CredentialValidationError>>(){});
+                            ObjectResponse<CredentialValidationError> validationErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<ObjectResponse<CredentialValidationError>>(){});
                             return validationErrorResponse.getResponseObject();
 
                         case "REQUEST_VALIDATION_FAILED":
-                            ObjectResponse<ExtendedError> extendedErrorResponse = new ObjectMapper().readValue(ex.getResponse(), new TypeReference<ObjectResponse<ExtendedError>>(){});
+                            ObjectResponse<ExtendedError> extendedErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<ObjectResponse<ExtendedError>>(){});
                             return extendedErrorResponse.getResponseObject();
 
                         default:

@@ -156,7 +156,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      */
     private ObjectResponse<OperationListResponse> getOperationListImpl(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
-        if (apiAuthentication != null && apiAuthentication.getUserId() != null && apiAuthentication.getActivationContext() != null) {
+        if (apiAuthentication != null && apiAuthentication.getUserId() != null && apiAuthentication.getActivationContext().getActivationId() != null) {
             String activationId = apiAuthentication.getActivationContext().getActivationId();
             String userId = apiAuthentication.getUserId();
 
@@ -338,7 +338,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     @PowerAuth(resourceId = "/operation/cancel", signatureType = {PowerAuthSignatureTypes.POSSESSION})
     public @ResponseBody Response cancelOperation(@RequestBody ObjectRequest<OperationRejectRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
 
-        if (apiAuthentication != null && apiAuthentication.getUserId() != null && apiAuthentication.getActivationContext() != null) {
+        if (apiAuthentication != null && apiAuthentication.getUserId() != null && apiAuthentication.getActivationContext().getActivationId() != null) {
             String activationId = apiAuthentication.getActivationContext().getActivationId();
             String userId = apiAuthentication.getUserId();
             String operationId = request.getRequestObject().getId();

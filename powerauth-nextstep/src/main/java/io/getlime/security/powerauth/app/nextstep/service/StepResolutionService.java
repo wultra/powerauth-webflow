@@ -61,10 +61,9 @@ public class StepResolutionService {
     private final OperationMethodConfigRepository operationMethodConfigRepository;
     private final ServiceCatalogue serviceCatalogue;
     private final NextStepServerConfiguration nextStepServerConfiguration;
+    private final OperationConverter operationConverter;
 
     private final Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation = new HashMap<>();
-
-    private final OperationConverter operationConverter = new OperationConverter();
 
     private final Object stepDefinitionLock = new Object();
 
@@ -73,15 +72,17 @@ public class StepResolutionService {
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
      * @param nextStepServerConfiguration Next Step server configuration.
+     * @param operationConverter Operation converter.
      */
     @Autowired
-    public StepResolutionService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, NextStepServerConfiguration nextStepServerConfiguration) {
+    public StepResolutionService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, NextStepServerConfiguration nextStepServerConfiguration, OperationConverter operationConverter) {
         this.stepDefinitionRepository = repositoryCatalogue.getStepDefinitionRepository();
         this.authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
         this.operationConfigRepository = repositoryCatalogue.getOperationConfigRepository();
         this.operationMethodConfigRepository = repositoryCatalogue.getOperationMethodConfigRepository();
         this.serviceCatalogue = serviceCatalogue;
         this.nextStepServerConfiguration = nextStepServerConfiguration;
+        this.operationConverter = operationConverter;
         reloadStepDefinitions();
     }
 

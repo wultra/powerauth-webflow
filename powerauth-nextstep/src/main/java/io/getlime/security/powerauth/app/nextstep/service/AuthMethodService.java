@@ -64,20 +64,21 @@ public class AuthMethodService {
     private final RepositoryCatalogue repositoryCatalogue;
     private final ServiceCatalogue serviceCatalogue;
     private final Audit audit;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     /**
      * Service constructor.
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
      * @param audit Audit interface.
+     * @param objectMapper Object mapper.
      */
     @Autowired
-    public AuthMethodService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit) {
+    public AuthMethodService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit, ObjectMapper objectMapper) {
         this.repositoryCatalogue = repositoryCatalogue;
         this.serviceCatalogue = serviceCatalogue;
         this.audit = audit;
+        this.objectMapper = objectMapper;
     }
 
     /**
