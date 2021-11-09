@@ -262,10 +262,6 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                     // Activation is blocked
                     authenticationContext.setBlocked(true);
                 }
-                System.out.println(activationContext.getAuthenticationContext().isValid());
-                System.out.println(activationContext.getAuthenticationContext().getSignatureType());
-                System.out.println(activationContext.getActivationStatus());
-                System.out.println(activationContext.getAuthenticationContext().getRemainingAttempts());
                 try {
                     // Fail authentication in Next Step and store the authentication context
                     failAuthorization(operationId, userId, authInstruments, authenticationContext, null);
