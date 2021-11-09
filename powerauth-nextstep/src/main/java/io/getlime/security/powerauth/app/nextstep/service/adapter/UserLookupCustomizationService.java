@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserI
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetUserDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,15 +40,17 @@ public class UserLookupCustomizationService {
     private final Logger logger = LoggerFactory.getLogger(UserLookupCustomizationService.class);
 
     private final DataAdapterClient dataAdapterClient;
-
-    private final OperationConverter operationConverter = new OperationConverter();
+    private final OperationConverter operationConverter;
 
     /**
      * User identity customization service constructor.
      * @param dataAdapterClient Data Adapter client.
+     * @param operationConverter Operation converter.
      */
-    public UserLookupCustomizationService(DataAdapterClient dataAdapterClient) {
+    @Autowired
+    public UserLookupCustomizationService(DataAdapterClient dataAdapterClient, OperationConverter operationConverter) {
         this.dataAdapterClient = dataAdapterClient;
+        this.operationConverter = operationConverter;
     }
 
     /**

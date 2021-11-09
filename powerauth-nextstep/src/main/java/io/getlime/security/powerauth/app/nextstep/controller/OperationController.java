@@ -62,8 +62,7 @@ public class OperationController {
     private final OperationConfigurationService operationConfigurationService;
     private final StepResolutionService stepResolutionService;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
-
-    private final OperationConverter operationConverter = new OperationConverter();
+    private final OperationConverter operationConverter;
 
     /**
      * REST controller constructor.
@@ -71,14 +70,16 @@ public class OperationController {
      * @param operationConfigurationService Operation configuration service.
      * @param stepResolutionService Step resolution service.
      * @param mobileTokenConfigurationService Mobile token configuration service.
+     * @param operationConverter Operation converter.
      */
     @Autowired
     public OperationController(OperationPersistenceService operationPersistenceService, OperationConfigurationService operationConfigurationService,
-                               StepResolutionService stepResolutionService, MobileTokenConfigurationService mobileTokenConfigurationService) {
+                               StepResolutionService stepResolutionService, MobileTokenConfigurationService mobileTokenConfigurationService, OperationConverter operationConverter) {
         this.operationPersistenceService = operationPersistenceService;
         this.operationConfigurationService = operationConfigurationService;
         this.stepResolutionService = stepResolutionService;
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
+        this.operationConverter = operationConverter;
     }
 
     /**

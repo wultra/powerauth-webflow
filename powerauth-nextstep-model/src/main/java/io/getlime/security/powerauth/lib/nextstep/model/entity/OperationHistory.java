@@ -28,5 +28,6 @@ public class OperationHistory {
     private boolean mobileTokenActive;
     @Size(min = 1, max = 256)
     private String powerAuthOperationId;
+    private PAAuthenticationContext paAuthenticationContext;
 
 }

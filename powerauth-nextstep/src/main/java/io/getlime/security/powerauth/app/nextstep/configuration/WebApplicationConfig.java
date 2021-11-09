@@ -16,11 +16,9 @@
 package io.getlime.security.powerauth.app.nextstep.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -34,22 +32,17 @@ import java.util.List;
 @Configuration
 public class WebApplicationConfig implements WebMvcConfigurer {
 
+    private final ObjectMapper objectMapper;
+
     /**
-     * Custom object mapper to make sure that dates and other values serialize
-     * correctly.
-     *
-     * @return A new object mapper.
+     * Configuration constructor.
+     * @param objectMapper Object mapper.
      */
-    private ObjectMapper objectMapper() {
-        final Jackson2ObjectMapperFactoryBean bean = new Jackson2ObjectMapperFactoryBean();
-        bean.setIndentOutput(true);
-        bean.afterPropertiesSet();
-        final ObjectMapper objectMapper = bean.getObject();
-        objectMapper.registerModule(new JavaTimeModule());
-        // replacement for ISO8601DateFormat which is deprecated
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        return objectMapper;
+    @Autowired
+    public WebApplicationConfig(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
+
 
     /**
      * Set custom JSON converter.
@@ -58,7 +51,7 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      */
     private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
         final MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(objectMapper());
+        converter.setObjectMapper(objectMapper);
         return converter;
     }
 

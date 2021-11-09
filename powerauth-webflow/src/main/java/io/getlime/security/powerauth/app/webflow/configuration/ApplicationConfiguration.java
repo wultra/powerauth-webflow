@@ -15,7 +15,8 @@
  */
 package io.getlime.security.powerauth.app.webflow.configuration;
 
-import io.getlime.security.powerauth.rest.api.base.application.PowerAuthApplicationConfiguration;
+import io.getlime.security.powerauth.rest.api.spring.application.PowerAuthApplicationConfiguration;
+import io.getlime.security.powerauth.rest.api.spring.model.ActivationContext;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
@@ -29,7 +30,7 @@ import java.util.Map;
 public class ApplicationConfiguration implements PowerAuthApplicationConfiguration {
 
     @Override
-    public Map<String, Object> statusServiceCustomObject() {
+    public Map<String, Object> statusServiceCustomObject(ActivationContext activationContext) {
         return null;
     }
 

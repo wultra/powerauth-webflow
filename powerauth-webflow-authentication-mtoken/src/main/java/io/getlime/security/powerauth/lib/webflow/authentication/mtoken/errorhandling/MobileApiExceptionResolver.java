@@ -22,7 +22,7 @@ import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.mtoken.model.enumeration.ErrorCode;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.*;
-import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
+import io.getlime.security.powerauth.rest.api.spring.exception.PowerAuthAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

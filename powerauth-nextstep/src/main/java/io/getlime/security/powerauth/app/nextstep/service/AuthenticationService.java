@@ -65,10 +65,9 @@ public class AuthenticationService {
     private final ServiceCatalogue serviceCatalogue;
     private final OtpValueConverter otpValueConverter;
     private final Audit audit;
+    private final ObjectMapper objectMapper;
 
     private final AuthenticationConverter authenticationConverter = new AuthenticationConverter();
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Authentication service constructor.
@@ -76,13 +75,15 @@ public class AuthenticationService {
      * @param serviceCatalogue Service catalogue.
      * @param otpValueConverter OTP value converter.
      * @param audit Audit audit.
+     * @param objectMapper Object mapper.
      */
     @Autowired
-    public AuthenticationService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, OtpValueConverter otpValueConverter, Audit audit) {
+    public AuthenticationService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, OtpValueConverter otpValueConverter, Audit audit, ObjectMapper objectMapper) {
         this.authenticationRepository = repositoryCatalogue.getAuthenticationRepository();
         this.serviceCatalogue = serviceCatalogue;
         this.otpValueConverter = otpValueConverter;
         this.audit = audit;
+        this.objectMapper = objectMapper;
     }
 
     /**

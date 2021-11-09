@@ -15,6 +15,10 @@
  */
 package io.getlime.security.powerauth.app.nextstep.configuration;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.AuditFactory;
 import com.wultra.security.powerauth.client.PowerAuthClient;
@@ -217,6 +221,21 @@ public class NextStepServerConfiguration {
             audit().error(ex.getMessage(), ex);
             return null;
         }
+    }
+
+    /**
+     * Prepare and configure object mapper.
+     * @return Object mapper.
+     */
+    @Bean
+    public ObjectMapper objectMapper() {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper;
     }
 
     /**

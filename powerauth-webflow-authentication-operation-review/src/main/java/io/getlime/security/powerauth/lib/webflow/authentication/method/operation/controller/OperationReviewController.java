@@ -104,7 +104,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         //TODO: Check pre-authenticated user here
         logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
+        return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false, null);
     }
 
     /**

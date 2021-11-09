@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.PAAuthenticationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -52,5 +53,6 @@ public class UpdateOperationRequest {
     private ApplicationContext applicationContext;
     @Size(min = 36, max = 36)
     private String authenticationId;
+    private PAAuthenticationContext authenticationContext;
 
 }

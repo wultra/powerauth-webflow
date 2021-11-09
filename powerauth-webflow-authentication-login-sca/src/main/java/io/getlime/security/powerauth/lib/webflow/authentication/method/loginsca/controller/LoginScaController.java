@@ -397,7 +397,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
         }
         logger.debug("Step authentication failed with client certificate, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
         List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.CLIENT_CERTIFICATE);
-        AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null);
+        AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null, null);
         Integer remainingAttemptsDA = certResponse.getRemainingAttempts();
         if (response.getAuthResult() == AuthResult.FAILED || (remainingAttemptsDA != null && remainingAttemptsDA == 0)) {
             // FAILED result instead of CONTINUE means the authentication method is failed
@@ -429,7 +429,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
     private LoginScaAuthResponse authenticateStepUsingClientCertificate(String operationId, String userId, String organizationId) {
         List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.CLIENT_CERTIFICATE);
         try {
-            AuthOperationResponse updateResponse = authorize(operationId, userId, organizationId, authInstruments, null);
+            AuthOperationResponse updateResponse = authorize(operationId, userId, organizationId, authInstruments, null, null);
             final LoginScaAuthResponse response = new LoginScaAuthResponse();
             response.setResult(AuthStepResult.CONFIRMED);
             response.setMessage("authentication.success");

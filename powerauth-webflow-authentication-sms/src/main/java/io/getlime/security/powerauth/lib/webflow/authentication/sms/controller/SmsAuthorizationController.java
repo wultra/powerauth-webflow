@@ -120,7 +120,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 List<AuthInstrument> authInstruments = new ArrayList<>();
                 authInstruments.add(AuthInstrument.OTP_KEY);
                 authInstruments.add(AuthInstrument.CREDENTIAL);
-                AuthOperationResponse response = failAuthorization(operation.getOperationId(), null, authInstruments, null);
+                AuthOperationResponse response = failAuthorization(operation.getOperationId(), null, authInstruments, null, null);
                 if (response.getAuthResult() == AuthResult.FAILED) {
                     // FAILED result instead of CONTINUE means the authentication method is failed
                     throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
@@ -153,7 +153,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     cleanHttpSession();
                     request.setAuthInstruments(Collections.emptyList());
                     logger.info("Step authentication succeeded (NO_FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
-                    return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
+                    return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false, null);
                 } else if (!authStepOptions.isPasswordRequired()) {
                     // Only SMS authorization is required, skip password verification
                     OtpAuthenticationResponse otpResponse = nextStepClient.authenticateWithOtp(otpId, operationId, authCode, true, authMethod).getResponseObject();
@@ -166,7 +166,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     if (smsAuthorizationResult == AuthenticationResult.SUCCEEDED) {
                         cleanHttpSession();
                         logger.info("Step authentication succeeded (1FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
-                        return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), true);
+                        return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), true, null);
                     }
                     remainingAttempts = otpResponse.getRemainingAttempts();
                     showRemainingAttempts = otpResponse.isShowRemainingAttempts();
@@ -210,7 +210,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 if (authResponse.getAuthenticationResult() == AuthenticationResult.SUCCEEDED) {
                     cleanHttpSession();
                     logger.info("Step authentication succeeded (2FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
-                    return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), true);
+                    return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), true, null);
                 }
                 remainingAttempts = authResponse.getRemainingAttempts();
                 showRemainingAttempts = authResponse.isShowRemainingAttempts();

@@ -54,6 +54,8 @@ public class UserConsentService {
     private final UserConsentRepository userConsentRepository;
     private final UserConsentHistoryRepository userConsentHistoryRepository;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private final static Logger logger = LoggerFactory.getLogger(UserConsentService.class);
 
     @Autowired
@@ -397,7 +399,7 @@ public class UserConsentService {
      */
     private String convertToJsonString(Map<String, String> parameters) {
         try {
-            return new ObjectMapper().writeValueAsString(parameters);
+            return objectMapper.writeValueAsString(parameters);
         } catch (JsonProcessingException e) {
             logger.warn("Unable to serialize JSON string from object.", e);
             return null;

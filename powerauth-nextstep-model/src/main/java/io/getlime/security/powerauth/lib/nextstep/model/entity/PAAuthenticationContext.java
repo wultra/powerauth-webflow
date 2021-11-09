@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Wultra s.r.o.
+ * Copyright 2021 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.model;
+package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.PAAuthenticationContext;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import javax.validation.constraints.PositiveOrZero;
+
 /**
- * Result of authentication.
+ * PowerAuth authentication context.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
-@AllArgsConstructor
-public class AuthResultDetail {
+public class PAAuthenticationContext {
 
-    private String userId;
-    private String organizationId;
-    private boolean operationAlreadyUpdated;
-    private PAAuthenticationContext paAuthenticationContext;
+    private String signatureType;
+    @PositiveOrZero
+    private Integer remainingAttempts;
+    private boolean blocked;
 
 }

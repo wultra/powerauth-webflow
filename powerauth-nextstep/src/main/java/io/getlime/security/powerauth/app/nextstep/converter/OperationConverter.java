@@ -25,14 +25,12 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -44,21 +42,23 @@ import java.util.Map;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Component
 public class OperationConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(OperationConverter.class);
 
-    private Audit audit;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Audit audit;
+    private final ObjectMapper objectMapper;
 
     /**
-     * Se
-     * @param audit
+     * Converter constructor.
+     * @param audit Audit interface.
+     * @param objectMapper Object mapper.
      */
     @Autowired
-    public void setAudit(Audit audit) {
+    public OperationConverter(Audit audit, ObjectMapper objectMapper) {
         this.audit = audit;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -115,7 +115,7 @@ public class OperationConverter {
         if (operation.getOperationFormData() != null) {
             OperationFormData formData = null;
             try {
-                formData = new ObjectMapper().readValue(operation.getOperationFormData(), OperationFormData.class);
+                formData = objectMapper.readValue(operation.getOperationFormData(), OperationFormData.class);
             } catch (IOException ex) {
                 logger.error("Error while deserializing operation display formData", ex);
                 audit.error("Error while deserializing operation display formData", ex);
@@ -175,12 +175,31 @@ public class OperationConverter {
             h.setAuthResult(history.getResponseResult());
             h.setMobileTokenActive(history.isMobileTokenActive());
             h.setPowerAuthOperationId(history.getPowerAuthOperationId());
+            assignAuthenticationContext(h, history);
             response.getHistory().add(h);
         }
         // set chosen authentication method
         final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory != null) {
             response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
+        }
+    }
+
+    /**
+     * In case operation history entity has serialized PowerAuth operation context, attempt to deserialize the
+     * object and assign it to the operation history in response.
+     * @param history Operation history response object.
+     * @param historyEntity Operation history entity.
+     */
+    private void assignAuthenticationContext(OperationHistory history, OperationHistoryEntity historyEntity) {
+        if (history != null && historyEntity.getPowerAuthAuthenticationContext() != null) {
+            try {
+                final PAAuthenticationContext authenticationContext = objectMapper.readValue(historyEntity.getPowerAuthAuthenticationContext(), PAAuthenticationContext.class);
+                history.setPaAuthenticationContext(authenticationContext);
+            } catch (IOException ex) {
+                logger.error("Error while deserializing authentication context", ex);
+                audit.error("Error while deserializing authentication context", ex);
+            }
         }
     }
 

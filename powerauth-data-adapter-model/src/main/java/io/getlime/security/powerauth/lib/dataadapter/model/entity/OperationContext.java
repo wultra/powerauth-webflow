@@ -15,6 +15,7 @@ public class OperationContext {
     private String externalTransactionId;
     private FormData formData;
     private ApplicationContext applicationContext;
+    private PAAuthenticationContext authenticationContext;
 
     /**
      * Default constructor.
@@ -133,5 +134,21 @@ public class OperationContext {
      */
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
+    }
+
+    /**
+     * Get PowerAuth authentication context.
+     * @return PowerAuth authentication context.
+     */
+    public PAAuthenticationContext getAuthenticationContext() {
+        return authenticationContext;
+    }
+
+    /**
+     * Set PowerAuth authentication context.
+     * @param authenticationContext PowerAuth authentication context.
+     */
+    public void setAuthenticationContext(PAAuthenticationContext authenticationContext) {
+        this.authenticationContext = authenticationContext;
     }
 }

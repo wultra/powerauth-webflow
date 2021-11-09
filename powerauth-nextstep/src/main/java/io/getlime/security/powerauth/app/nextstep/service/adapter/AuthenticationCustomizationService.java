@@ -35,6 +35,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.CredentialAuthe
 import io.getlime.security.powerauth.lib.nextstep.model.response.OtpAuthenticationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -48,16 +49,19 @@ public class AuthenticationCustomizationService {
     private final Logger logger = LoggerFactory.getLogger(AuthenticationCustomizationService.class);
 
     private final DataAdapterClient dataAdapterClient;
+    private final OperationConverter operationConverter;
 
-    private final OperationConverter operationConverter = new OperationConverter();
     private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
 
     /**
      * Authentication customization service constructor.
      * @param dataAdapterClient Data Adapter client.
+     * @param operationConverter Operation converter.
      */
-    public AuthenticationCustomizationService(DataAdapterClient dataAdapterClient) {
+    @Autowired
+    public AuthenticationCustomizationService(DataAdapterClient dataAdapterClient, OperationConverter operationConverter) {
         this.dataAdapterClient = dataAdapterClient;
+        this.operationConverter = operationConverter;
     }
 
     /**

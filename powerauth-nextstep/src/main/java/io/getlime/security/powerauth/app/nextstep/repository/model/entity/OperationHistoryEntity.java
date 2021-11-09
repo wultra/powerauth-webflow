@@ -85,6 +85,9 @@ public class OperationHistoryEntity implements Serializable {
     @Column(name = "pa_operation_id")
     private String powerAuthOperationId;
 
+    @Column(name = "pa_auth_context")
+    private String powerAuthAuthenticationContext;
+
     @ToString.Exclude
     @JsonIgnore
     @ManyToOne

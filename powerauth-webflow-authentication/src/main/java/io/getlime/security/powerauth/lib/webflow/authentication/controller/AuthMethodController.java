@@ -300,22 +300,23 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     /**
      * Authorize operation with provided ID with user with given user ID.
      *
-     * @param operationId        Operation ID of operation to be authorized.
-     * @param userId             User ID of user who should authorize operation.
-     * @param organizationId     Organization ID of organization related to the operation.
-     * @param authInstruments    Used authentication / authorization instruments.
-     * @param params             Custom parameters.
+     * @param operationId           Operation ID of operation to be authorized.
+     * @param userId                User ID of user who should authorize operation.
+     * @param organizationId        Organization ID of organization related to the operation.
+     * @param authInstruments       Used authentication / authorization instruments.
+     * @param authenticationContext PowerAuth authentication context.
+     * @param params                Custom parameters.
      * @return Detail with information about operation update result.
      * @throws NextStepClientException In case communication with Next step service fails.
      * @throws AuthStepException In case authorization fails.
      */
-    protected AuthOperationResponse authorize(String operationId, String userId, String organizationId, List<AuthInstrument> authInstruments, List<KeyValueParameter> params) throws NextStepClientException, AuthStepException {
+    protected AuthOperationResponse authorize(String operationId, String userId, String organizationId, List<AuthInstrument> authInstruments, PAAuthenticationContext authenticationContext, List<KeyValueParameter> params) throws NextStepClientException, AuthStepException {
         // validate operation before requesting update
         GetOperationDetailResponse operation = getOperation(operationId);
         AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Step authorization started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod);
         ApplicationContext applicationContext = operation.getApplicationContext();
-        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, organizationId, authMethod, authInstruments, AuthStepResult.CONFIRMED, null, params, applicationContext);
+        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, organizationId, authMethod, authInstruments, AuthStepResult.CONFIRMED, null, params, applicationContext, authenticationContext);
         AuthResult authResult = response.getResponseObject().getResult();
         if (authResult == AuthResult.DONE) {
             // notify AFS about logout
@@ -332,20 +333,21 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     /**
      * Fail the operation with provided operation ID with user with given user ID.
      *
-     * @param operationId     Operation ID of operation to fail.
-     * @param userId          User ID of user who owns the operation.
-     * @param authInstruments Used authentication instruments.
-     * @param params          Custom parameters.
+     * @param operationId           Operation ID of operation to fail.
+     * @param userId                User ID of user who owns the operation.
+     * @param authInstruments       Used authentication instruments.
+     * @param authenticationContext PowerAuth authentication context.
+     * @param params                Custom parameters.
      * @return Detail with information about operation update result.
      * @throws NextStepClientException In case communication with Next Step service fails.
      * @throws AuthStepException In case authorization fails.
      */
-    protected AuthOperationResponse failAuthorization(String operationId, String userId, List<AuthInstrument> authInstruments, List<KeyValueParameter> params) throws NextStepClientException, AuthStepException {
+    protected AuthOperationResponse failAuthorization(String operationId, String userId, List<AuthInstrument> authInstruments, PAAuthenticationContext authenticationContext, List<KeyValueParameter> params) throws NextStepClientException, AuthStepException {
         GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Fail step started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod);
         ApplicationContext applicationContext = operation.getApplicationContext();
-        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), authMethod, authInstruments, AuthStepResult.AUTH_FAILED, null, params, applicationContext);
+        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), authMethod, authInstruments, AuthStepResult.AUTH_FAILED, null, params, applicationContext, authenticationContext);
         // notify Data Adapter in case operation is in FAILED state now
         AuthResult authResult = response.getResponseObject().getResult();
         // update operation result in operation to HTTP session mapping
@@ -504,15 +506,16 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     protected R buildAuthorizationResponse(T request, AuthResponseProvider provider) throws AuthStepException {
         try {
             AuthResultDetail authMethodResult = authenticate(request);
+            PAAuthenticationContext authenticationContext = authMethodResult.getPaAuthenticationContext();
             AuthOperationResponse authOperationResponse;
             String userId = null;
             String organizationId;
             if (authMethodResult != null && !authMethodResult.isOperationAlreadyUpdated()) {
+                GetOperationDetailResponse operation = getOperation();
                 if (authMethodResult.getUserId() == null || authMethodResult.getOrganizationId() == null) {
-                    GetOperationDetailResponse operation = getOperation();
                     // user was not authenticated - fail authorization
                     authenticationManagementService.clearContext();
-                    authOperationResponse = failAuthorization(operation.getOperationId(), null, request.getAuthInstruments(), null);
+                    authOperationResponse = failAuthorization(operation.getOperationId(), null, request.getAuthInstruments(), authenticationContext, null);
                 } else {
                     userId = authMethodResult.getUserId();
                     organizationId = authMethodResult.getOrganizationId();
@@ -520,7 +523,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                     String operationId = authenticationManagementService.updateAuthenticationWithUserDetails(userId, authMethodResult.getOrganizationId());
 
                     // response could not be derived - call authorize() method to update current operation
-                    authOperationResponse = authorize(operationId, userId, organizationId, request.getAuthInstruments(), null);
+                    authOperationResponse = authorize(operationId, userId, organizationId, request.getAuthInstruments(), authenticationContext, null);
                 }
             } else {
                 GetOperationDetailResponse operation = getOperation();

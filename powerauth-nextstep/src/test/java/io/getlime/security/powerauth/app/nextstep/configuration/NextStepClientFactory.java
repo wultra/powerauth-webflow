@@ -31,12 +31,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class NextStepClientFactory {
 
+    private final ObjectMapper objectMapper;
+
+    /**
+     * Next Step client factory constructor.
+     * @param objectMapper Object mapper.
+     */
+    public NextStepClientFactory(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    /**
+     * Create Next Step client.
+     * @param baseUrl Base URL.
+     * @return Next Step client.
+     * @throws NextStepClientException Thrown in case Next Step client could not be initialized.
+     */
     public NextStepClient createNextStepClient(String baseUrl) throws NextStepClientException {
         RestClientConfiguration restClientConfiguration = new RestClientConfiguration();
         restClientConfiguration.setBaseUrl(baseUrl);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         restClientConfiguration.setObjectMapper(objectMapper);
         return new NextStepClient(restClientConfiguration);
     }

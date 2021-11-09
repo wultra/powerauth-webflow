@@ -296,7 +296,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
         }
         logger.debug("Step authentication failed with client certificate, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
         List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.CLIENT_CERTIFICATE);
-        AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null);
+        AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null, null);
         if (response.getAuthResult() == AuthResult.FAILED) {
             // FAILED result instead of CONTINUE means the authentication method is failed
             throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
