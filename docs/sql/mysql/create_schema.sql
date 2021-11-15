@@ -629,7 +629,7 @@ CREATE INDEX audit_param_key ON audit_param (param_key);
 CREATE FULLTEXT INDEX audit_param_value ON audit_param (param_value);
 
 -- Foreign keys for user identity, to be used only when all user identities are stored in Next Step
-ALTER TABLE ns_operation ADD FOREIGN KEY ns_operation_user_fk (user_id) REFERENCES ns_user_identity (user_id);
-ALTER TABLE ns_user_prefs ADD FOREIGN KEY ns_user_prefs_fk (user_id) REFERENCES ns_user_identity (user_id);
-ALTER TABLE ns_otp_storage ADD FOREIGN KEY ns_otp_user_fk (user_id) REFERENCES ns_user_identity (user_id);
-ALTER TABLE ns_authentication ADD FOREIGN KEY ns_auth_user_fk (user_id) REFERENCES ns_user_identity (user_id);
+-- ALTER TABLE ns_operation ADD FOREIGN KEY ns_operation_user_fk (user_id) REFERENCES ns_user_identity (user_id);
+-- ALTER TABLE ns_user_prefs ADD FOREIGN KEY ns_user_prefs_fk (user_id) REFERENCES ns_user_identity (user_id);
+-- ALTER TABLE ns_otp_storage ADD FOREIGN KEY ns_otp_user_fk (user_id) REFERENCES ns_user_identity (user_id);
+-- ALTER TABLE ns_authentication ADD FOREIGN KEY ns_auth_user_fk (user_id) REFERENCES ns_user_identity (user_id);
