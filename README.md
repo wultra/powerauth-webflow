@@ -10,4 +10,5 @@ For the most recent documentation and tutorials, please visit [PowerAuth Web Flo
 
 ## License
 
-All sources are licensed using Apache 2.0 license, you can use them with no restriction. If you are using PowerAuth 2.0, please let us know. We will be happy to share and promote your project.
+The software is licensed using GNU AGPLv3 license. Please consult us at hello@wultra.com for the software use.
+
