@@ -25,13 +25,13 @@
     <artifactId>powerauth-webflow-client</artifactId>
     <groupId>io.getlime.security</groupId>
     <description>PowerAuth 2.0 Web Flow testing client for OAuth 2.0 dance.</description>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0</version>
     <packaging>war</packaging>
 
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.2.0-SNAPSHOT</version>
+        <version>1.2.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-nextstep-client</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>1.2.0</version>
         </dependency>
 
         <!-- H2 DB -->
@@ -110,7 +110,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.12.3</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
