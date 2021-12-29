@@ -25,25 +25,25 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.2.0-SNAPSHOT</version>
+        <version>1.2.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <name>powerauth-webflow-authentication-login-sca</name>
     <artifactId>powerauth-webflow-authentication-login-sca</artifactId>
     <groupId>io.getlime.security</groupId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0</version>
 
     <dependencies>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-java-crypto</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>${powerauth-java-crypto.version}</version>
         </dependency>
     </dependencies>
 

@@ -508,11 +508,14 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     protected R buildAuthorizationResponse(T request, AuthResponseProvider provider) throws AuthStepException {
         try {
             AuthResultDetail authMethodResult = authenticate(request);
-            PAAuthenticationContext authenticationContext = authMethodResult.getPaAuthenticationContext();
             AuthOperationResponse authOperationResponse;
             String userId = null;
             String organizationId;
-            if (authMethodResult != null && !authMethodResult.isOperationAlreadyUpdated()) {
+            if (authMethodResult == null || authMethodResult.isOperationAlreadyUpdated()) {
+                GetOperationDetailResponse operation = getOperation();
+                authOperationResponse = new AuthOperationResponse(operation.getOperationId(), operation.getResult(), null, operation.getSteps());
+            } else {
+                PAAuthenticationContext authenticationContext = authMethodResult.getPaAuthenticationContext();
                 GetOperationDetailResponse operation = getOperation();
                 if (authMethodResult.getUserId() == null || authMethodResult.getOrganizationId() == null) {
                     // user was not authenticated - fail authorization
@@ -527,9 +530,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                     // response could not be derived - call authorize() method to update current operation
                     authOperationResponse = authorize(operationId, userId, organizationId, request.getAuthInstruments(), authenticationContext, null);
                 }
-            } else {
-                GetOperationDetailResponse operation = getOperation();
-                authOperationResponse = new AuthOperationResponse(operation.getOperationId(), operation.getResult(), null, operation.getSteps());
             }
             // TODO: Allow passing custom parameters
             switch (authOperationResponse.getAuthResult()) {
