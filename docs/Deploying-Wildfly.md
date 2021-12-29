@@ -4,7 +4,7 @@ Two modules need to be configured for JBoss / Wildfly:
 - Web Flow - the main Web Flow application
 - Next Step - a backend service for Web Flow which manages operation steps and authentication methods
 
-Optionally Web Flow Client application can be also configured. 
+Optionally Web Flow Client application and TPP Engine application can be also configured. 
 
 ## JBoss Deployment Descriptor 
 
@@ -22,6 +22,12 @@ Web Flow contains the following configuration in `jboss-deployment-structure.xml
 		<dependencies>
 			<module name="com.wultra.powerauth.webflow.conf" />
 		</dependencies>
+		
+		<resources>
+			<!-- use WAR provided Bouncy Castle -->
+			<resource-root path="WEB-INF/lib/bcprov-jdk15on-1.68.jar" use-physical-code-source="true"/>
+		</resources>
+
 		<local-last value="true" />
 	</deployment>
 </jboss-deployment-structure>
@@ -40,6 +46,12 @@ Similarly, Next Step contains the following configuration in `jboss-deployment-s
 		<dependencies>
 			<module name="com.wultra.powerauth.nextstep.conf" />
 		</dependencies>
+		
+		<resources>
+			<!-- use WAR provided Bouncy Castle -->
+			<resource-root path="WEB-INF/lib/bcprov-jdk15on-1.68.jar" use-physical-code-source="true"/>
+		</resources>
+
 		<local-last value="true" />
 	</deployment>
 </jboss-deployment-structure>

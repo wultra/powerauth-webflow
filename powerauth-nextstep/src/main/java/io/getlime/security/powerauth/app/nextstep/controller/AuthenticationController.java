@@ -1,17 +1,19 @@
 /*
- * Copyright 2021 Wultra s.r.o.
+ * PowerAuth Web Flow and related software components
+ * Copyright (C) 2021 Wultra s.r.o.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.getlime.security.powerauth.app.nextstep.controller;
@@ -83,7 +85,7 @@ public class AuthenticationController {
     @Operation(summary = "Authenticate using a credential")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Authentication result sent in response"),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, USER_IDENTITY_NOT_FOUND, OPERATION_NOT_FOUND, OPERATION_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_CONFIGURATION, OPERATION_ALREADY_FINISHED, OPERATION_ALREADY_CANCELED, OPERATION_ALREADY_FAILED, OPERATION_NOT_VALID, AUTH_METHOD_NOT_FOUND, OPERATION_NOT_VALID"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, USER_IDENTITY_NOT_FOUND, OPERATION_NOT_FOUND, CREDENTIAL_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_CONFIGURATION, OPERATION_ALREADY_FINISHED, OPERATION_ALREADY_CANCELED, OPERATION_ALREADY_FAILED, OPERATION_NOT_VALID, AUTH_METHOD_NOT_FOUND, ENCRYPTION_FAILED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "credential", method = RequestMethod.POST)

@@ -1,17 +1,19 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * PowerAuth Web Flow and related software components
+ * Copyright (C) 2017 Wultra s.r.o.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.getlime.security.powerauth.lib.nextstep.client;
@@ -28,6 +30,7 @@ import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.PAAuthenticationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.NextStepError;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
@@ -193,7 +196,7 @@ public class NextStepClient {
      * @return A Response with UpdateOperationResponse object.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<UpdateOperationResponse> updateOperation(@NotNull String operationId, String userId, String organizationId, @NotNull AuthMethod authMethod, List<AuthInstrument> authInstruments, @NotNull AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
+    public ObjectResponse<UpdateOperationResponse> updateOperation(@NotNull String operationId, String userId, String organizationId, @NotNull AuthMethod authMethod, List<AuthInstrument> authInstruments, @NotNull AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext, PAAuthenticationContext authenticationContext) throws NextStepClientException {
         final UpdateOperationRequest request = new UpdateOperationRequest();
         request.setOperationId(operationId);
         request.setUserId(userId);
@@ -206,6 +209,7 @@ public class NextStepClient {
             request.getParams().addAll(params);
         }
         request.setApplicationContext(applicationContext);
+        request.setAuthenticationContext(authenticationContext);
         return putObjectImpl("/operation", new ObjectRequest<>(request), UpdateOperationResponse.class);
     }
   
@@ -224,7 +228,7 @@ public class NextStepClient {
      * @return A Response with UpdateOperationResponse object.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<UpdateOperationResponse> updateOperationPost(@NotNull String operationId, String userId, String organizationId, @NotNull AuthMethod authMethod, List<AuthInstrument> authInstruments, @NotNull AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
+    public ObjectResponse<UpdateOperationResponse> updateOperationPost(@NotNull String operationId, String userId, String organizationId, @NotNull AuthMethod authMethod, List<AuthInstrument> authInstruments, @NotNull AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext, PAAuthenticationContext authenticationContext) throws NextStepClientException {
         final UpdateOperationRequest request = new UpdateOperationRequest();
         request.setOperationId(operationId);
         request.setUserId(userId);
@@ -237,6 +241,7 @@ public class NextStepClient {
             request.getParams().addAll(params);
         }
         request.setApplicationContext(applicationContext);
+        request.setAuthenticationContext(authenticationContext);
         return postObjectImpl("/operation/update", new ObjectRequest<>(request), UpdateOperationResponse.class);
     }
 

@@ -16,10 +16,13 @@ Web Flow implements following functionality:
   - the authentication process consists of one or more authentication methods which are invoked as defined by the Next Step Server
   - each authentication method is stored in a separate project
 - central point which communicates with other backends
-  - communication with Next Step Server to get a response about next step and redirect of user to the right screen
-  - communication with Data Adapter to obtain additional data, authenticate user, send SMS messages and notify Data Adapter about operation status and form data changes
+  - communication with Next Step Server to get a response about the next step and redirect of user to the right screen, lookup user, authenticate user, and deliver OTP authorization codes
+  - communication with Data Adapter to perform TLS certificate verification, obtain consent options, validate consent data, save consent data, perform AFS actions, map complex operations, and notify Data Adapter about form data changes
   - communication with PowerAuth Server to obtain activation status, signature verification and token verification
   - communication with PowerAuth Push Server to deliver push messages to user mobile device
 - Web Socket communication with frontend for immediate response in Mobile Token authentication
 - tracking of operations within HTTP session to handle concurrent operations
 - preparation of operation form data (value formatting, resource localization, resource translation)
+- OAuth 2.0 consent form display, processing of consent options, and consent form validation
+- authentication using SCA and non-SCA methods with credentials and/or OTP authorization codes
+- authentication using client TLS certificate

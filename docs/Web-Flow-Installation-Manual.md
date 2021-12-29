@@ -10,8 +10,8 @@ If you prefer a faster setup, consider trying our [Docker images](https://github
 
 The Web Flow application has following dependencies which should be deployed before deploying Web Flow:
 - [PowerAuth Server](https://developers.wultra.com/docs/develop/powerauth-server/Deploying-PowerAuth-Server)
-- [PowerAuth Push Server](https://developers.wultra.com/docs/2019.05/powerauth-push-server/Deploying-Push-Server)
-- [PowerAuth Admin](https://developers.wultra.com/docs/2019.05/powerauth-admin/Deploying-PowerAuth-Admin)
+- [PowerAuth Push Server](https://developers.wultra.com/docs/develop/powerauth-push-server/Deploying-Push-Server)
+- [PowerAuth Admin](https://developers.wultra.com/docs/develop/powerauth-admin/Deploying-PowerAuth-Admin)
 
 ### Create required user and group
 
@@ -28,15 +28,21 @@ Optionally, add your user to the "tomcat" group:
 `$ usermod -a -G tomcat ext_johndoe`
 
 
-### Install Bouncy Castle
+### Configure Bouncy Castle Provider
 
-Please follow our [Bouncy Castle installation tutorial](https://github.com/wultra/powerauth-server/blob/develop/docs/Installing-Bouncy-Castle.md).
+Add an entry to the `java.security` file, where N is the last number of provider in the file incremented by one:
+
+```properties
+security.provider.N=org.bouncycastle.jce.provider.BouncyCastleProvider
+```
+
+A recent version of the Bouncy Castle library is bundled with Web Flow and Next Step applications.
 
 ### Install Tomcat
 
-Unzip Tomcat 8.5.14 to "/opt/tomcat" folder. You can download Tomcat here:
+Unzip Tomcat to "/opt/tomcat" folder. You can download Tomcat here:
 
-[https://tomcat.apache.org/download-80.cgi](https://tomcat.apache.org/download-80.cgi)
+[https://tomcat.apache.org/download-90.cgi](https://tomcat.apache.org/download-90.cgi)
 
 Change owner of the files to "tomcat" user:
 
@@ -58,22 +64,26 @@ Copy all resources which you want to modify into this folder. See resources in t
 
 ### Add required libraries
 
-#### Oracle:
-Copy "ojdbc6.jar" to "/opt/tomcat/lib" folder, so that the Oracle DB connector is on classpath. You can get the required JAR here:
-
-https://mvnrepository.com/artifact/oracle/ojdbc6
-
-Note that the JDBC driver version needs to be supported by installed database.
+The installation instructions are similar for all databases. Note that the JDBC driver version needs to be supported by installed database.
 Additional application properties may be required to be configured based on database version.
+
+#### Oracle:
+
+Copy "ojdbc-[version].jar" to "/opt/tomcat/lib" folder, so that the Oracle DB connector is on classpath. You can get the required JAR here:
+
+https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc8
 
 #### MySQL:
 
 Copy "mysql-connector-java-[version].jar" to "/opt/tomcat/lib" folder, so that the MySQL DB connector is on classpath. You can get the required JAR here:
 
-http://central.maven.org/maven2/mysql/mysql-connector-java
+https://mvnrepository.com/artifact/mysql/mysql-connector-java
 
-Note that the JDBC driver version needs to be supported by installed database. 
-Additional application properties may be required to be configured based on database version.
+#### PostgreSQL:
+
+Copy "mysql-connector-java-[version].jar" to "/opt/tomcat/lib" folder, so that the MySQL DB connector is on classpath. You can get the required JAR here:
+
+https://mvnrepository.com/artifact/org.postgresql/postgresql
 
 #### Other databases
 
@@ -98,6 +108,14 @@ For more details see document [Database Table Structure](./Database-Table-Struct
 * Create a new database or reuse an existing PowerAuth database.
 * Run the [create_schema.sql](./sql/oracle/create_schema.sql) script to create tables.
 * Run the [initial_data.sql](./sql/oracle/initial_data.sql) script to load initial data.
+
+For more details see document [Database Table Structure](./Database-Table-Structure.md).
+
+### Create database schema - PostgreSQL
+
+* Create a new database or reuse an existing PowerAuth database.
+* Run the [create_schema.sql](./sql/postgresql/create_schema.sql) script to create tables.
+* Run the [initial_data.sql](./sql/postgresql/initial_data.sql) script to load initial data.
 
 For more details see document [Database Table Structure](./Database-Table-Structure.md).
 
@@ -133,7 +151,6 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
 
     <!-- PowerAuth Push Server URL -->
     <Parameter name="powerauth.push.service.url" value="http://10.x.x.x:8080/powerauth-push-server"/>
-    <Parameter name="powerauth.push.service.appId" value="2"/>
 
     <!-- PowerAuth WebFlow Page Customization -->
     <Parameter name="powerauth.webflow.page.title" value="XYZ Bank - Web Authentication"/>
@@ -193,6 +210,14 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
+
+    <!-- PowerAuth Data Adapter Service URL -->
+    <Parameter name="powerauth.dataAdapter.service.url" value="http://10.x.x.x:8080/powerauth-data-adapter"/>
+
+    <!-- PowerAuthServer Service Security Settings -->
+    <Parameter name="powerauth.service.security.clientToken" value=""/>
+    <Parameter name="powerauth.service.security.clientSecret" value=""/>
+    <Parameter name="powerauth.service.ssl.acceptInvalidSslCertificate" value="false"/>
 
     <!-- Database Configuration - JDBC -->
     <Parameter name="spring.datasource.url" value="jdbc:oracle:thin:@//hostname:1523/SID"/>
@@ -293,6 +318,9 @@ The following war files are required for complete functionality including PowerA
 - powerauth-webflow-client.war
 - powerauth-webflow.war
 
+The following war files are optional:
+- powerauth-tpp-engine.war
+
 ### Configure Web Flow
 
 Web Flow needs to be configured before starting. See chapter [Web Flow Configuration](./Web-Flow-Configuration.md).
@@ -314,5 +342,3 @@ Start Tomcat with following command:
 To observe tomcat logs interactively, use following command:
 
 `$ tail -f -n200 /opt/tomcat/logs/catalina.out`
-
-

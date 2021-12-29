@@ -1,26 +1,26 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * PowerAuth Web Flow and related software components
+ * Copyright (C) 2017 Wultra s.r.o.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package io.getlime.security.powerauth.app.nextstep.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -34,22 +34,17 @@ import java.util.List;
 @Configuration
 public class WebApplicationConfig implements WebMvcConfigurer {
 
+    private final ObjectMapper objectMapper;
+
     /**
-     * Custom object mapper to make sure that dates and other values serialize
-     * correctly.
-     *
-     * @return A new object mapper.
+     * Configuration constructor.
+     * @param objectMapper Object mapper.
      */
-    private ObjectMapper objectMapper() {
-        final Jackson2ObjectMapperFactoryBean bean = new Jackson2ObjectMapperFactoryBean();
-        bean.setIndentOutput(true);
-        bean.afterPropertiesSet();
-        final ObjectMapper objectMapper = bean.getObject();
-        objectMapper.registerModule(new JavaTimeModule());
-        // replacement for ISO8601DateFormat which is deprecated
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        return objectMapper;
+    @Autowired
+    public WebApplicationConfig(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
+
 
     /**
      * Set custom JSON converter.
@@ -58,7 +53,7 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      */
     private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
         final MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(objectMapper());
+        converter.setObjectMapper(objectMapper);
         return converter;
     }
 

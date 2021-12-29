@@ -1,17 +1,19 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * PowerAuth Web Flow and related software components
+ * Copyright (C) 2017 Wultra s.r.o.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
@@ -30,6 +32,7 @@ import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureTyp
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.converter.OperationTextNormalizer;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.PAAuthenticationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -146,6 +149,11 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             logger.warn(ex.getMessage(), ex);
             throw new OfflineModeInvalidAuthCodeException("Offline signature verification failed, reason: " + ex.getMessage());
         }
+        PAAuthenticationContext authenticationContext = new PAAuthenticationContext();
+        authenticationContext.setBlocked(signatureResponse.getActivationStatus() == ActivationStatus.BLOCKED);
+        authenticationContext.setSignatureType(signatureResponse.getSignatureType() != null ? signatureResponse.getSignatureType().toString().toLowerCase() : null);
+        authenticationContext.setRemainingAttempts(signatureResponse.getRemainingAttempts() != null ? signatureResponse.getRemainingAttempts().intValue() : null);
+
         if (signatureResponse.isSignatureValid()) {
             String userId = operation.getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
@@ -156,7 +164,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
                 }
                 cleanHttpSession();
                 logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
-                return new AuthResultDetail(userId, operation.getOrganizationId(), false);
+                return new AuthResultDetail(userId, operation.getOrganizationId(), false, authenticationContext);
             }
         } else {
             boolean approvalFailSucceeded = powerAuthOperationService.failApprovalForOperation(operation);
@@ -172,7 +180,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         // otherwise fail authorization
         Integer remainingAttemptsNS;
         try {
-            AuthOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
+            AuthOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), authenticationContext, null);
             if (response.getAuthResult() == AuthResult.FAILED || signatureResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
                 if (signatureResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
                     // Activation was blocked or removed, cancel the operation

@@ -1,17 +1,19 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * PowerAuth Web Flow and related software components
+ * Copyright (C) 2017 Wultra s.r.o.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package io.getlime.security.powerauth.lib.nextstep.client;
@@ -34,6 +36,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.error.NextStepErr
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class NextStepClientException extends Exception {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private Error error;
 
@@ -126,15 +130,15 @@ public class NextStepClientException extends Exception {
         RestClientException ex = (RestClientException) cause;
         if (ex.getErrorResponse() == null) {
             try {
-                ErrorResponse errorResponse = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).readValue(ex.getResponse(), ErrorResponse.class);
+                ErrorResponse errorResponse = objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).readValue(ex.getResponse(), ErrorResponse.class);
                 if (errorResponse != null && errorResponse.getResponseObject() != null) {
                     switch (errorResponse.getResponseObject().getCode()) {
                         case "CREDENTIAL_VALIDATION_FAILED":
-                            ObjectResponse<CredentialValidationError> validationErrorResponse = new ObjectMapper().readValue(ex.getResponse(), new TypeReference<ObjectResponse<CredentialValidationError>>(){});
+                            ObjectResponse<CredentialValidationError> validationErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<ObjectResponse<CredentialValidationError>>(){});
                             return validationErrorResponse.getResponseObject();
 
                         case "REQUEST_VALIDATION_FAILED":
-                            ObjectResponse<ExtendedError> extendedErrorResponse = new ObjectMapper().readValue(ex.getResponse(), new TypeReference<ObjectResponse<ExtendedError>>(){});
+                            ObjectResponse<ExtendedError> extendedErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<ObjectResponse<ExtendedError>>(){});
                             return extendedErrorResponse.getResponseObject();
 
                         default:

@@ -1,17 +1,19 @@
 /*
- * Copyright 2020 Wultra s.r.o.
+ * PowerAuth Web Flow and related software components
+ * Copyright (C) 2020 Wultra s.r.o.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package io.getlime.security.powerauth.app.nextstep.converter;
 
@@ -25,14 +27,12 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -44,21 +44,23 @@ import java.util.Map;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Component
 public class OperationConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(OperationConverter.class);
 
-    private Audit audit;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Audit audit;
+    private final ObjectMapper objectMapper;
 
     /**
-     * Se
-     * @param audit
+     * Converter constructor.
+     * @param audit Audit interface.
+     * @param objectMapper Object mapper.
      */
     @Autowired
-    public void setAudit(Audit audit) {
+    public OperationConverter(Audit audit, ObjectMapper objectMapper) {
         this.audit = audit;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -115,7 +117,7 @@ public class OperationConverter {
         if (operation.getOperationFormData() != null) {
             OperationFormData formData = null;
             try {
-                formData = new ObjectMapper().readValue(operation.getOperationFormData(), OperationFormData.class);
+                formData = objectMapper.readValue(operation.getOperationFormData(), OperationFormData.class);
             } catch (IOException ex) {
                 logger.error("Error while deserializing operation display formData", ex);
                 audit.error("Error while deserializing operation display formData", ex);
@@ -175,12 +177,31 @@ public class OperationConverter {
             h.setAuthResult(history.getResponseResult());
             h.setMobileTokenActive(history.isMobileTokenActive());
             h.setPowerAuthOperationId(history.getPowerAuthOperationId());
+            assignAuthenticationContext(h, history);
             response.getHistory().add(h);
         }
         // set chosen authentication method
         final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory != null) {
             response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
+        }
+    }
+
+    /**
+     * In case operation history entity has serialized PowerAuth operation context, attempt to deserialize the
+     * object and assign it to the operation history in response.
+     * @param history Operation history response object.
+     * @param historyEntity Operation history entity.
+     */
+    private void assignAuthenticationContext(OperationHistory history, OperationHistoryEntity historyEntity) {
+        if (history != null && historyEntity.getPowerAuthAuthenticationContext() != null) {
+            try {
+                final PAAuthenticationContext authenticationContext = objectMapper.readValue(historyEntity.getPowerAuthAuthenticationContext(), PAAuthenticationContext.class);
+                history.setPaAuthenticationContext(authenticationContext);
+            } catch (IOException ex) {
+                logger.error("Error while deserializing authentication context", ex);
+                audit.error("Error while deserializing authentication context", ex);
+            }
         }
     }
 
