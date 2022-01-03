@@ -89,6 +89,19 @@ export function authenticate(username, organizationId) {
             }
             return null;
         }).catch((error) => {
+            // Handle request validation errors
+            if (error.response.status === 400 && error.response.data.message !== undefined) {
+                dispatch({
+                    type: "SHOW_SCREEN_LOGIN_SCA",
+                    payload: {
+                        loading: false,
+                        error: true,
+                        message: error.response.data.message,
+                        remainingAttempts: error.response.data.remainingAttempts
+                    }
+                });
+                return;
+            }
             dispatchError(dispatch, error);
         })
     }
