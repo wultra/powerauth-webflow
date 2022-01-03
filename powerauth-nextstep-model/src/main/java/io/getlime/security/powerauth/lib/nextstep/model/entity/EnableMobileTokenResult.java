@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Result of enabling mobile token.
@@ -26,6 +27,7 @@ import lombok.Data;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class EnableMobileTokenResult {
 
