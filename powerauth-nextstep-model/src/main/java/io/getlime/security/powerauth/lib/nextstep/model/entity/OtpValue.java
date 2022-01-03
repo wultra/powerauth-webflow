@@ -20,6 +20,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * OTP value stored in database, optionally encrypted.
@@ -27,6 +28,7 @@ import lombok.Data;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class OtpValue {
 
