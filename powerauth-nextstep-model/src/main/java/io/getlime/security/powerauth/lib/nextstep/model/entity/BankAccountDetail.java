@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -31,6 +32,7 @@ import java.math.BigDecimal;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class BankAccountDetail {
 
