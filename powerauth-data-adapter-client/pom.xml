@@ -24,13 +24,13 @@
 
     <name>powerauth-data-adapter-client</name>
     <artifactId>powerauth-data-adapter-client</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <packaging>jar</packaging>
 
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.2.0</version>
+        <version>1.2.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -46,12 +46,12 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-data-adapter-model</artifactId>
-            <version>1.2.0</version>
+            <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-nextstep-model</artifactId>
-            <version>1.2.0</version>
+            <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.core</groupId>
