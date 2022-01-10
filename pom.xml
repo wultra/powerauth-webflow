@@ -101,7 +101,7 @@
         <jackson.version>2.13.1</jackson.version>
         <zxing.version>3.4.1</zxing.version>
         <passay.version>1.6.1</passay.version>
-        <springdoc-openapi.version>1.6.2</springdoc-openapi.version>
+        <springdoc-openapi.version>1.6.3</springdoc-openapi.version>
         <guava.version>31.0.1-jre</guava.version>
         <moneta.version>1.1</moneta.version>
         <owasp-java-html-sanitizer.version>20211018.2</owasp-java-html-sanitizer.version>
