@@ -17,6 +17,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -66,6 +67,7 @@ public class OperationAfsActionEntity implements Serializable {
     private Date timestampCreated;
 
     @ToString.Exclude
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "operation_id", referencedColumnName = "operation_id", updatable = false, nullable = false)
     private OperationEntity operation;
