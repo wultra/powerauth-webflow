@@ -63,7 +63,7 @@ public class WebSocketDisconnectListener implements ApplicationListener<SessionD
             // Operation does not exist, nothing to do
             return;
         }
-        if (closeStatus == CloseStatus.NO_CLOSE_FRAME) {
+        if (CloseStatus.NO_CLOSE_FRAME.equalsCode(closeStatus)) {
             // CloseStatus NO_CLOSE_FRAME is sent when WebView in mobile application gets hibernated, we should
             // not cancel the operation in this case because the user activity may resume later.
             return;
