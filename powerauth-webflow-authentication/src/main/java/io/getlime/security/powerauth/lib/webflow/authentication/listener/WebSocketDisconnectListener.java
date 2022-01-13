@@ -25,6 +25,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.service.Operatio
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 /**
@@ -56,9 +57,15 @@ public class WebSocketDisconnectListener implements ApplicationListener<SessionD
     @Override
     public void onApplicationEvent(SessionDisconnectEvent sessionDisconnectEvent) {
         String sessionId = sessionDisconnectEvent.getSessionId();
+        CloseStatus closeStatus = sessionDisconnectEvent.getCloseStatus();
         String operationId = operationSessionService.lookupOperationIdByWebSocketSessionId(sessionId);
         if (operationId == null) {
             // Operation does not exist, nothing to do
+            return;
+        }
+        if (closeStatus == CloseStatus.NO_CLOSE_FRAME) {
+            // CloseStatus NO_CLOSE_FRAME is sent when WebView in mobile application gets hibernated, we should
+            // not cancel the operation in this case because the user activity may resume later.
             return;
         }
         // Cancel operation due to interrupted operation
