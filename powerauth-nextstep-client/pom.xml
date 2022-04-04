@@ -25,14 +25,14 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.2.2</version>
+        <version>1.2.5</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>powerauth-nextstep-client</artifactId>
     <name>powerauth-nextstep-client</name>
     <groupId>io.getlime.security</groupId>
-    <version>1.2.2</version>
+    <version>1.2.5</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-nextstep-model</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.5</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.core</groupId>
