@@ -66,7 +66,7 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-push-client</artifactId>
-            <version>${powerauth-push.version}</version>
+            <version>${powerauth.version}</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>

@@ -115,7 +115,7 @@ public class PowerAuthOperationService {
             request.setTemplateName(mappingResponse.getTemplateName());
             final Map<String, String> parameters = new LinkedHashMap<>();
             parameters.put(PARAMETER_OPERATION_DATA, mappingResponse.getOperationData());
-            request.setParameters(parameters);
+            request.getParameters().putAll(parameters);
 
             // Create PowerAuth operation and store PA operation ID
             final OperationDetailResponse paResponse = powerAuthClient.createOperation(request);
