@@ -25,12 +25,12 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.2.5</version>
+        <version>1.2.6</version>
     </parent>
 
     <name>powerauth-tpp-engine-client</name>
     <artifactId>powerauth-tpp-engine-client</artifactId>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-tpp-engine-model</artifactId>
-            <version>1.2.5</version>
+            <version>1.2.6</version>
         </dependency>
     </dependencies>
 
