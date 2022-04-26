@@ -124,7 +124,7 @@ public class TppEngineClient {
         params.put("userId", Collections.singletonList(userId));
         params.put("consentId", Collections.singletonList(consentId));
         params.put("clientId", Collections.singletonList(clientId));
-        return getObjectImpl("/consent", params, UserConsentDetailResponse.class);
+        return getObjectImpl("/user/consent", params, UserConsentDetailResponse.class);
     }
 
     /**
