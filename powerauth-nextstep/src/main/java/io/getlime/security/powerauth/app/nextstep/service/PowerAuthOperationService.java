@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -110,12 +111,12 @@ public class PowerAuthOperationService {
             final GetPAOperationMappingResponse mappingResponse = dataAdapterClient.getPAOperationMapping(userId, organizationId, authMethod, operationContext).getResponseObject();
             final OperationCreateRequest request = new OperationCreateRequest();
             request.setUserId(operation.getUserId());
-            request.setApplicationId(status.getApplicationId());
+            request.setApplications(Collections.singletonList(status.getApplicationId()));
             request.setExternalId(operation.getOperationId());
             request.setTemplateName(mappingResponse.getTemplateName());
             final Map<String, String> parameters = new LinkedHashMap<>();
             parameters.put(PARAMETER_OPERATION_DATA, mappingResponse.getOperationData());
-            request.setParameters(parameters);
+            request.getParameters().putAll(parameters);
 
             // Create PowerAuth operation and store PA operation ID
             final OperationDetailResponse paResponse = powerAuthClient.createOperation(request);

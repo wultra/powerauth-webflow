@@ -95,7 +95,7 @@ public class PushMessageService {
     public MobileTokenInitResponse sendStepInitPushMessage(GetOperationDetailResponse operation, AuthMethod authMethod) {
         final MobileTokenInitResponse initResponse = new MobileTokenInitResponse();
         String activationId;
-        Long applicationId;
+        String applicationId;
         try {
             activationId = getActivationId(operation);
         } catch (NextStepClientException | ActivationNotConfiguredException ex) {
@@ -144,7 +144,7 @@ public class PushMessageService {
         try {
             String activationId = getActivationId(operation);
             PushMessage message = createAuthStepFinishedPushMessage(operation, activationId, statusMessage, authMethod);
-            Long applicationId = getApplicationId(activationId);
+            String applicationId = getApplicationId(activationId);
             logger.info("Send step finished push message, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             pushServerClient.sendPushMessage(applicationId, message);
         } catch (PushServerClientException ex) {
@@ -247,7 +247,7 @@ public class PushMessageService {
      * @return Application ID.
      * @throws ActivationNotActiveException Thrown when activation is not active.
      */
-    private Long getApplicationId(String activationId) throws ActivationNotActiveException {
+    private String getApplicationId(String activationId) throws ActivationNotActiveException {
         GetActivationStatusResponse activationStatusResponse;
         try {
             activationStatusResponse = powerAuthClient.getActivationStatus(activationId);
