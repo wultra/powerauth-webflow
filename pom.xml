@@ -8,7 +8,7 @@
 
     <groupId>io.getlime.security</groupId>
     <artifactId>powerauth-webflow-parent</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -108,8 +108,8 @@
         <junit.version>5.8.2</junit.version>
         <spring-context.version>5.3.20</spring-context.version>
         <wultra-java-core.version>1.5.2</wultra-java-core.version>
-        <powerauth-java-crypto.version>1.3.0</powerauth-java-crypto.version>
-        <powerauth.version>1.3.0</powerauth.version>
+        <powerauth-java-crypto.version>1.4.0-SNAPSHOT</powerauth-java-crypto.version>
+        <powerauth.version>1.4.0-SNAPSHOT</powerauth.version>
     </properties>
 
     <build>
