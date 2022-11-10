@@ -565,7 +565,8 @@ CREATE TABLE tpp_detail (
   tpp_website           TEXT NULL,                                   -- TPP website, if available.
   tpp_phone             VARCHAR(256) NULL,                           -- TPP phone number, if available.
   tpp_email             VARCHAR(256) NULL,                           -- TPP e-mail, if available.
-  tpp_logo              TEXT NULL                                    -- TPP logo, if available.
+  tpp_logo              TEXT NULL,                                   -- TPP logo, if available.
+  tpp_blocked           BOOLEAN DEFAULT FALSE NOT NULL               -- Indication if this TPP provider is blocked or not.
 );
 
 CREATE TABLE tpp_app_detail (

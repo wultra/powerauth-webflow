@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.app.tppengine.converter.TppAppConverter;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppAppNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.UnableToCreateAppException;
+import io.getlime.security.powerauth.app.tppengine.model.entity.TppInfo;
 import io.getlime.security.powerauth.app.tppengine.model.request.CreateTppAppRequest;
 import io.getlime.security.powerauth.app.tppengine.model.response.TppAppDetailResponse;
 import io.getlime.security.powerauth.app.tppengine.repository.OAuthAccessTokenRepository;
@@ -32,6 +33,8 @@ import io.getlime.security.powerauth.app.tppengine.repository.TppRepository;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.OAuthClientDetailsEntity;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppAppDetailEntity;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,6 +49,8 @@ import java.util.*;
  */
 @Service
 public class TppService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TppService.class);
 
     private final TppRepository tppRepository;
     private final TppAppDetailRepository appDetailRepository;
@@ -353,6 +358,44 @@ public class TppService {
             throw new TppAppNotFoundException(clientId);
         }
 
+    }
+
+    /**
+     * Block a TPP.
+     * @param tppLicense License info of a TPP party that owns the app.
+     * @throws TppNotFoundException In case TPP was not found.
+     */
+    @Transactional
+    public TppInfo blockTpp(String tppLicense) throws TppNotFoundException {
+        return changeBlockedFlag(tppLicense, true);
+    }
+
+    /**
+     * Unblock a TPP.
+     * @param tppLicense License info of a TPP party that owns the app.
+     * @throws TppNotFoundException In case TPP was not found.
+     */
+    @Transactional
+    public TppInfo unblockTpp(String tppLicense) throws TppNotFoundException {
+        return changeBlockedFlag(tppLicense, false);
+    }
+
+    /**
+     * Change blocked flag of a TPP entity
+     * @param tppLicense TPP license info.
+     * @param blocked Blocked flag
+     * @return TPP info, in case the TPP entity was found.
+     * @throws TppNotFoundException In case that TPP entity is not found.
+     */
+    private TppInfo changeBlockedFlag(String tppLicense, boolean blocked) throws TppNotFoundException {
+        TppEntity tppEntity = getTppEntity(tppLicense);
+        if (tppEntity.isBlocked() == blocked) {
+            logger.info("TPP with id: {} is already {}", tppEntity.getTppId(), tppEntity.isBlocked() ? "blocked" : "unblocked");
+        } else {
+            tppEntity.setBlocked(blocked);
+            logger.info("Changing TPP with id: {} to: {}", tppEntity.getTppId(), tppEntity.isBlocked() ? "blocked" : "unblocked");
+        }
+        return TppAppConverter.fromTppEntity(tppEntity);
     }
 
     /**

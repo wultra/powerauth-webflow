@@ -64,6 +64,9 @@ public class TppEntity implements Serializable {
     @Column(name = "tpp_logo")
     private byte[] tppLogo;
 
+    @Column(name = "tpp_blocked")
+    private boolean blocked;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "tpp")
     @OrderBy("app_name")
     private List<TppAppDetailEntity> applications;
@@ -141,6 +144,14 @@ public class TppEntity implements Serializable {
 
     public void setTppLogo(byte[] tppLogo) {
         this.tppLogo = tppLogo;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     public List<TppAppDetailEntity> getApplications() {
