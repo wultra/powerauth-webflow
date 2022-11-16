@@ -560,7 +560,7 @@ CREATE TABLE tpp_app_detail (
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table audit_log stores auditing information
-CREATE TABLE audit_log (
+CREATE TABLE IF NOT EXISTS audit_log (
     audit_log_id       VARCHAR(36) PRIMARY KEY,
     application_name   VARCHAR(256) NOT NULL,
     audit_level        VARCHAR(32) NOT NULL,
@@ -577,7 +577,7 @@ CREATE TABLE audit_log (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table audit_param stores auditing parameters
-CREATE TABLE audit_param (
+CREATE TABLE IF NOT EXISTS audit_param (
     audit_log_id       VARCHAR(36),
     timestamp_created  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     param_key          VARCHAR(256),
@@ -619,13 +619,13 @@ CREATE INDEX ns_authentication_timestamp_created ON ns_authentication (timestamp
 CREATE UNIQUE INDEX ns_hashing_config_name ON ns_hashing_config (name);
 CREATE UNIQUE INDEX ns_user_alias_unique ON ns_user_alias (user_id, name);
 CREATE UNIQUE INDEX ns_user_role_unique ON ns_user_role (user_id, role_id);
-CREATE INDEX audit_log_timestamp ON audit_log (timestamp_created);
-CREATE INDEX audit_log_application ON audit_log (application_name);
-CREATE INDEX audit_log_level ON audit_log (audit_level);
-CREATE INDEX audit_log_type ON audit_log (audit_type);
-CREATE INDEX audit_param_log ON audit_param (audit_log_id);
-CREATE INDEX audit_param_timestamp ON audit_param (timestamp_created);
-CREATE INDEX audit_param_key ON audit_param (param_key);
+CREATE INDEX IF NOT EXISTS audit_log_timestamp ON audit_log (timestamp_created);
+CREATE INDEX IF NOT EXISTS audit_log_application ON audit_log (application_name);
+CREATE INDEX IF NOT EXISTS audit_log_level ON audit_log (audit_level);
+CREATE INDEX IF NOT EXISTS audit_log_type ON audit_log (audit_type);
+CREATE INDEX IF NOT EXISTS audit_param_log ON audit_param (audit_log_id);
+CREATE INDEX IF NOT EXISTS audit_param_timestamp ON audit_param (timestamp_created);
+CREATE INDEX IF NOT EXISTS audit_param_key ON audit_param (param_key);
 CREATE FULLTEXT INDEX audit_param_value ON audit_param (param_value);
 
 -- Foreign keys for user identity, to be used only when all user identities are stored in Next Step
