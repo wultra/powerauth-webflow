@@ -545,7 +545,8 @@ CREATE TABLE tpp_detail (
   tpp_website           TEXT NULL,                                   -- TPP website, if available.
   tpp_phone             VARCHAR(256) NULL,                           -- TPP phone number, if available.
   tpp_email             VARCHAR(256) NULL,                           -- TPP e-mail, if available.
-  tpp_logo              BLOB NULL                                    -- TPP logo, if available.
+  tpp_logo              BLOB NULL,                                   -- TPP logo, if available.
+  tpp_blocked           BOOLEAN NOT NULL DEFAULT FALSE               -- Indication if this TPP provider is blocked or not.
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE tpp_app_detail (
