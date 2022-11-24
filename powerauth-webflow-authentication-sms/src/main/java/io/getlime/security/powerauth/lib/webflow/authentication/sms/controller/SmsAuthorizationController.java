@@ -17,14 +17,20 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.sms.controller;
 
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAuthInstrument;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.UserAccountStatusConverter;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AfsResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthStepOptions;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifyCertificateResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
@@ -42,8 +48,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResult
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthorizationOtpDeliveryResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.AuthInstrumentConverter;
-import io.getlime.security.powerauth.lib.webflow.authentication.repository.CertificateVerificationRepository;
-import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.CertificateVerificationEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.request.SmsAuthorizationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.InitSmsAuthorizationResponse;
@@ -79,28 +83,29 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     private static final Integer OPERATION_CONFIG_TEMPLATE_APPROVAL = 1;
 
     private final NextStepClient nextStepClient;
+    private final DataAdapterClient dataAdapterClient;
     private final WebFlowServicesConfiguration configuration;
     private final AfsIntegrationService afsIntegrationService;
     private final HttpSession httpSession;
-    private final CertificateVerificationRepository certificateVerificationRepository;
 
     private final AuthInstrumentConverter authInstrumentConverter = new AuthInstrumentConverter();
+    private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
 
     /**
      * Controller constructor.
      * @param nextStepClient Next Step client.
+     * @param dataAdapterClient Data Adapter client.
      * @param configuration Web Flow configuration.
      * @param afsIntegrationService Anti-fraud system integration service.
      * @param httpSession HTTP session.
-     * @param certificateVerificationRepository Certificate verification repository.
      */
     @Autowired
-    public SmsAuthorizationController(NextStepClient nextStepClient, WebFlowServicesConfiguration configuration, AfsIntegrationService afsIntegrationService, HttpSession httpSession, CertificateVerificationRepository certificateVerificationRepository) {
+    public SmsAuthorizationController(NextStepClient nextStepClient, DataAdapterClient dataAdapterClient, WebFlowServicesConfiguration configuration, AfsIntegrationService afsIntegrationService, HttpSession httpSession) {
         this.nextStepClient = nextStepClient;
+        this.dataAdapterClient = dataAdapterClient;
         this.configuration = configuration;
         this.afsIntegrationService = afsIntegrationService;
         this.httpSession = httpSession;
-        this.certificateVerificationRepository = certificateVerificationRepository;
     }
 
     /**
@@ -129,6 +134,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 }
                 throw new AuthenticationFailedException("Authentication failed", "login.authenticationFailed");
             }
+
             final String otpId = getOtpIdFromHttpSession();
             GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(operation.getOrganizationId()).getResponseObject();
             String otpName = organization.getDefaultOtpName();
@@ -177,6 +183,12 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             }
             if (smsAuthorizationResult == null) {
                 // Otherwise 2FA authentication is performed
+
+                // Handle authentication using qualified certificate first
+                 if (getApprovalByCertificateEnabledFromHttpSession() && request.getAuthInstruments().contains(AuthInstrument.QUALIFIED_CERTIFICATE)) {
+                     return handleAuthenticationUsingQualifiedCertificate(request, operation, userId);
+                 }
+
                 List<AuthInstrument> authInstruments = new ArrayList<>();
                 authInstruments.add(AuthInstrument.OTP_KEY);
                 authInstruments.add(AuthInstrument.CREDENTIAL);
@@ -237,6 +249,29 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             logger.error("Error occurred in Next Step server", ex);
             throw new AuthStepException("SMS authentication failed", ex, "error.communication");
         }
+    }
+
+    private AuthResultDetail handleAuthenticationUsingQualifiedCertificate(SmsAuthorizationRequest request, GetOperationDetailResponse operation, String userId) throws AuthStepException {
+        final String certificate = request.getCertificate();
+        final String signature = request.getSignature();
+        final FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+        final String organizationId = operation.getOrganizationId();
+        final ApplicationContext applicationContext = operation.getApplicationContext();
+        final OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
+        final AccountStatus accountStatusDA = statusConverter.fromUserAccountStatus(operation.getAccountStatus());
+        try {
+            boolean approvalByCertificateSucceeded = verifySignatureUsingQualifiedCertificate(operation.getOperationId(), userId, organizationId, certificate, signature, accountStatusDA, operationContext);
+            if (approvalByCertificateSucceeded) {
+                logger.info("Step authentication succeeded using signature created by qualified certificate, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+            }
+            cleanHttpSession();
+            return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false, null);
+        } catch (NextStepClientException | DataAdapterClientErrorException ex) {
+            logger.error(ex.getMessage(), ex);
+            throw new AuthStepException("Certificate authentication failed", ex, "error.communication");
+        }
+
+        // TODO - do we need OTP? Disabled for now.
     }
 
     /**
@@ -315,9 +350,10 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     /**
      * Get initial message sent flag from HTTP session.
      */
-    private Boolean getInitialMessageSentFromHttpSession() {
+    private boolean getInitialMessageSentFromHttpSession() {
         synchronized (httpSession.getServletContext()) {
-            return (Boolean) httpSession.getAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
+            Boolean initialMessageSent = (Boolean) httpSession.getAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
+            return initialMessageSent != null && initialMessageSent;
         }
     }
 
@@ -327,6 +363,14 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     private AuthStepOptions getAuthStepOptionsFromHttpSession() {
         synchronized (httpSession.getServletContext()) {
             return (AuthStepOptions) httpSession.getAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
+        }
+    }
+
+    private boolean getApprovalByCertificateEnabledFromHttpSession() {
+        synchronized (httpSession.getServletContext()) {
+            Boolean certificateEnabled = (Boolean) httpSession.getAttribute(HttpSessionAttributeNames.APPROVAL_BY_CERTIFICATE_ENABLED);
+            System.out.println("Get from HTTP session: " + certificateEnabled);
+            return certificateEnabled != null && certificateEnabled;
         }
     }
 
@@ -340,6 +384,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             httpSession.removeAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
             httpSession.removeAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
             httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
+            httpSession.removeAttribute(HttpSessionAttributeNames.APPROVAL_BY_CERTIFICATE_ENABLED);
         }
     }
 
@@ -360,6 +405,9 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         initResponse.setSmsOtpEnabled(true);
         initResponse.setPasswordEnabled(true);
 
+        // Enable authorization using certificate in case it has been enabled
+        initResponse.setCertificateEnabled(getApprovalByCertificateEnabledFromHttpSession());
+
         String username = null;
         if (authMethod == AuthMethod.LOGIN_SCA) {
             // Add username for LOGIN_SCA method
@@ -374,18 +422,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             return initResponse;
         }
 
-        if (isCertificateUsedForAuthentication(operation.getOperationId())) {
-
-            // Currently AFS integration and client certificate authentication are exclusive
-            logger.debug("Disabling password verification due to client TLS certificate usage in INIT step of authentication method: {}, operation ID: {}", authMethod, operation.getOperationId());
-            AuthStepOptions authStepOptions = new AuthStepOptions();
-            authStepOptions.setPasswordRequired(false);
-            authStepOptions.setSmsOtpRequired(true);
-            updateAuthStepOptionsInHttpSession(authStepOptions);
-            initResponse.setSmsOtpEnabled(true);
-            initResponse.setPasswordEnabled(false);
-
-        } else if (configuration.isAfsEnabled()) {
+        if (configuration.isAfsEnabled()) {
 
             AfsAction afsAction = determineAfsActionInit(authMethod, operation.getOperationName());
 
@@ -417,8 +454,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         try {
             if (initResponse.isSmsOtpEnabled()) {
                 initResponse.setResendDelay(configuration.getSmsResendDelay());
-                Boolean initialMessageSent = getInitialMessageSentFromHttpSession();
-                if (initialMessageSent != null && initialMessageSent) {
+                if (getInitialMessageSentFromHttpSession()) {
                     initResponse.setResult(AuthStepResult.CONFIRMED);
                     return initResponse;
                 }
@@ -736,13 +772,51 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     }
 
     /**
-     * Whether client TLS certificate is used for authentication.
+     * Authenticate with signature created by qualified certificate using Data Adapter.
      * @param operationId Operation ID.
-     * @return Whether client TLS certificate is used for authentication.
+     * @param userId User ID.
+     * @param organizationId Organization ID.
+     * @param certificate Certificate in PEM format.
+     * @param signature Signature created using qualified certificate.
+     * @param accountStatus Account status.
+     * @param operationContext Operation context.
+     * @return Whether authentication succeeded.
+     * @throws DataAdapterClientErrorException In case communication with Data Adapter fails.
+     * @throws NextStepClientException In case communication with Next Step service fails.
+     * @throws AuthStepException In case step authentication fails.
      */
-    private boolean isCertificateUsedForAuthentication(String operationId) {
-        CertificateVerificationEntity.CertificateVerificationKey key = new CertificateVerificationEntity.CertificateVerificationKey(operationId, AuthMethod.APPROVAL_SCA);
-        return certificateVerificationRepository.findByCertificateVerificationKey(key).isPresent();
+    private boolean verifySignatureUsingQualifiedCertificate(String operationId, String userId, String organizationId, String certificate, String signature, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepClientException, AuthStepException {
+        ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyCertificate(userId, organizationId, certificate, signature, getAuthMethodName(), accountStatus, operationContext);
+        VerifyCertificateResponse certResponse = objectResponseCert.getResponseObject();
+        CertificateVerificationResult verificationResult = certResponse.getCertificateVerificationResult();
+        if (verificationResult == CertificateVerificationResult.SUCCEEDED) {
+            return true;
+        }
+        logger.debug("Step authentication failed with signature using qualified certificate, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
+        List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.QUALIFIED_CERTIFICATE);
+        AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null, null);
+        if (response.getAuthResult() == AuthResult.FAILED) {
+            // FAILED result instead of CONTINUE means the authentication method is failed
+            throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
+        }
+        Integer remainingAttemptsDA = certResponse.getRemainingAttempts();
+        boolean showRemainingAttempts = certResponse.getShowRemainingAttempts();
+        UserAccountStatus userAccountStatus = statusConverter.fromAccountStatus(certResponse.getAccountStatus());
+
+        String errorMessage = "login.authenticationFailed";
+        if (certResponse.getErrorMessage() != null) {
+            errorMessage = certResponse.getErrorMessage();
+        }
+
+        AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
+        if (showRemainingAttempts) {
+            GetOperationDetailResponse updatedOperation = getOperation();
+            Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
+            Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
+            authEx.setRemainingAttempts(remainingAttempts);
+        }
+        authEx.setAccountStatus(userAccountStatus);
+        throw authEx;
     }
 
 }

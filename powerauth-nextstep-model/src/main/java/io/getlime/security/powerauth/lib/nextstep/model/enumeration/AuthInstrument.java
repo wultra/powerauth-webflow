@@ -47,6 +47,11 @@ public enum AuthInstrument {
     /**
      * TLS client certificate is used for authentication / authorization.
      */
-    CLIENT_CERTIFICATE
+    CLIENT_CERTIFICATE,
+
+    /**
+     * Qualified certificate is used for authentication / authorization.
+     */
+    QUALIFIED_CERTIFICATE
 
 }

@@ -55,17 +55,7 @@ export default class ApprovalSca extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        const dispatch = this.props.dispatch;
-        if (this.props.context.clientCertificateUsed) {
-            const certificateVerificationUrl = this.props.context.clientCertificateVerificationUrl;
-            const callbackOnSuccess = function() {
-                // Authentication is performed using client certificate
-                dispatch(confirm());
-            };
-            dispatch(checkClientCertificate(certificateVerificationUrl, callbackOnSuccess));
-        } else {
-            dispatch(confirm());
-        }
+        this.props.dispatch(confirm());
     }
 
     handleCancel(event) {
@@ -81,11 +71,6 @@ export default class ApprovalSca extends React.Component {
                         <Panel>
                             <OperationTimeout timeoutCheckActive="true"/>
                             <OperationDetail/>
-                            {(this.props.context.clientCertificateUsed) ? (
-                                <div>
-                                    <FormattedMessage id="clientCertificate.approval"/>
-                                </div>
-                            ): undefined}
                             <div className="auth-actions">
                                 <div className="row buttons">
                                     <div className="col-xs-6">

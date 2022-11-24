@@ -55,7 +55,7 @@ export function init(component) {
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
-                // Handle  error when message delivery fails, another SMS message can be sent later.
+                // Handle error when message delivery fails, another SMS message can be sent later.
                 dispatch({
                     type: getActionType(component),
                     payload: {
@@ -65,6 +65,7 @@ export function init(component) {
                         message: response.data.message,
                         passwordEnabled: response.data.passwordEnabled,
                         smsOtpEnabled: response.data.smsOtpEnabled,
+                        certificateEnabled: response.data.certificateEnabled,
                         username: response.data.username,
                         resendDelay: response.data.resendDelay
                     }
@@ -80,6 +81,7 @@ export function init(component) {
                     message: response.data.message,
                     passwordEnabled: response.data.passwordEnabled,
                     smsOtpEnabled: response.data.smsOtpEnabled,
+                    certificateEnabled: response.data.certificateEnabled,
                     username: response.data.username,
                     resendDelay: response.data.resendDelay
                 }
@@ -156,7 +158,9 @@ export function authenticate(userAuthCode, userPassword, component) {
         });
         axios.post("./api/auth/sms/authenticate", {
             authCode: userAuthCode,
-            password: userPassword
+            password: userPassword,
+            certificate: 'test1',
+            signature: 'test2'
         }, {
             headers: {
                 'X-OPERATION-HASH': operationHash,

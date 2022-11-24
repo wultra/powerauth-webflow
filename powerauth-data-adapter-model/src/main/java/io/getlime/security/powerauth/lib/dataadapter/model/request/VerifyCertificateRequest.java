@@ -29,9 +29,14 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 public class VerifyCertificateRequest {
 
     /**
-     * Client TLS certificate in PEM format.
+     * Certificate in PEM format.
      */
-    private String clientCertificate;
+    private String certificate;
+
+    /**
+     * Signature created with certificate for verification.
+     */
+    private String signature;
 
     /**
      * Authentication method requesting certificate verification.
@@ -65,38 +70,56 @@ public class VerifyCertificateRequest {
     }
 
     /**
-     * Constructor with message ID, authorization code and operation context.
+     * Constructor with all parameters.
      * @param userId User ID.
      * @param organizationId Organization ID.
-     * @param clientCertificate Client TLS certificate.
+     * @param certificate Certificate in PEM format.
+     * @param signature Signature created by certificate.
      * @param authMethod Authentication method requesting certificate verification.
      * @param accountStatus Current user account status.
      * @param operationContext Operation context.
      */
-    public VerifyCertificateRequest(String userId, String organizationId, String clientCertificate, AuthMethod authMethod,
-                                    AccountStatus accountStatus, OperationContext operationContext) {
+    public VerifyCertificateRequest(String userId, String organizationId, String certificate, String signature,
+                                    AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) {
         this.userId = userId;
         this.organizationId = organizationId;
-        this.clientCertificate = clientCertificate;
+        this.certificate = certificate;
+        this.signature = signature;
         this.authMethod = authMethod;
         this.accountStatus = accountStatus;
         this.operationContext = operationContext;
     }
 
     /**
-     * Get client TLS certificate.
-     * @return Client TLS certificate.
+     * Get certificate in PEM format.
+     * @return Certificate.
      */
-    public String getClientCertificate() {
-        return clientCertificate;
+    public String getCertificate() {
+        return certificate;
     }
 
     /**
-     * Set client TLS certificate.
-     * @param clientCertificate Client TLS certificate.
+     * Set certificate in PEM format.
+     * @param certificate Certificate.
      */
-    public void setClientCertificate(String clientCertificate) {
-        this.clientCertificate = clientCertificate;
+    public void setCertificate(String certificate) {
+        this.certificate = certificate;
+    }
+
+    /**
+     * Get signature created using certificate.
+     * @return Signature.
+     */
+    public String getSignature() {
+        return signature;
+    }
+
+    /**
+     * Set signature created using certificate.
+     * @param signature Signature.
+     */
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
     /**

@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepReq
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,12 @@ public class SmsAuthorizationRequest extends AuthStepRequest {
 
     @Pattern(regexp = "^$|^.{4,128}$", message = "login.authenticationFailed")
     private String password;
+
+    @Size(min = 1, max = 32000)
+    private String certificate;
+
+    @Size(min = 1, max = 100)
+    private String signature;
 
     @NotNull(message = "error.invalidRequest")
     private List<AuthInstrument> authInstruments = new ArrayList<>();
@@ -71,6 +78,38 @@ public class SmsAuthorizationRequest extends AuthStepRequest {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    /**
+     * Get certificate in PEM format.
+     * @return Certificate in PEM format.
+     */
+    public String getCertificate() {
+        return certificate;
+    }
+
+    /**
+     * Set certificate in PEM format.
+     * @param certificate Certificate in PEM format.
+     */
+    public void setCertificate(String certificate) {
+        this.certificate = certificate;
+    }
+
+    /**
+     * Get signature created by certificate.
+     * @return Signature created by certificate.
+     */
+    public String getSignature() {
+        return signature;
+    }
+
+    /**
+     * Set signature created by certificate.
+     * @param signature Signature created by certificate.
+     */
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
     @Override

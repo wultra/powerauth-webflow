@@ -249,15 +249,16 @@ public class DataAdapterClient {
      *
      * @param userId User ID for this authentication request.
      * @param organizationId Organization ID for this authentication request.
-     * @param clientCertificate Client TLS certificate.
+     * @param certificate Certificate in PEM format.
+     * @param signature Signature created using certificate.
      * @param authMethod Authentication method.
      * @param accountStatus Current user account status.
      * @param operationContext Operation context.
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails or authentication/authorization fails.
      */
-    public ObjectResponse<VerifyCertificateResponse> verifyClientCertificate(String userId, String organizationId, String clientCertificate, AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException {
-        VerifyCertificateRequest request = new VerifyCertificateRequest(userId, organizationId, clientCertificate, authMethod, accountStatus, operationContext);
+    public ObjectResponse<VerifyCertificateResponse> verifyCertificate(String userId, String organizationId, String certificate, String signature, AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException {
+        VerifyCertificateRequest request = new VerifyCertificateRequest(userId, organizationId, certificate, signature, authMethod, accountStatus, operationContext);
         return postObjectImpl("/api/auth/certificate/verify", new ObjectRequest<>(request), VerifyCertificateResponse.class);
     }
 

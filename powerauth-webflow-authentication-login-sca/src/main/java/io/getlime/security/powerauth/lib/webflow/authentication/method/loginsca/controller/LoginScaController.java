@@ -391,7 +391,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @throws AuthStepException In case step authentication fails.
      */
     private boolean verifyClientCertificate(String operationId, String userId, String organizationId, String clientCertificate, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepClientException, AuthStepException {
-        ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyClientCertificate(userId, organizationId, clientCertificate, getAuthMethodName(), accountStatus, operationContext);
+        ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyCertificate(userId, organizationId, clientCertificate, null, getAuthMethodName(), accountStatus, operationContext);
         VerifyCertificateResponse certResponse = objectResponseCert.getResponseObject();
         CertificateVerificationResult verificationResult = certResponse.getCertificateVerificationResult();
         if (verificationResult == CertificateVerificationResult.SUCCEEDED) {
