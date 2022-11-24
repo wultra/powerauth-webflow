@@ -109,13 +109,12 @@ function loadKeyStoreAndSignMessage(content, cbSuccess, cbError) {
             ThrowICAPKIServiceNotRunning();
         }
         const cb = function cb(count) {
-            console.log("COUNT: " + count);
-            if (count < 1) {
+            if (count === undefined || count < 1) {
                 cbError("signer.error.certificate.notFound");
                 return;
             }
             // first certificate and use it for signing
-            loadCertificateAndSignMessage(content, cbSuccess);
+            loadCertificateAndSignMessage(content, cbSuccess, cbError);
         };
         // Flags for certificates which can be used for signing
         const flags = ICAClientSign.CERTLOAD_SIGNING_FLAG | ICAClientSign.CERTLOAD_QUALIFIED_FLAG;

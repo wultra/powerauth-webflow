@@ -95,6 +95,7 @@ export default class SmsComponent extends React.Component {
         // Skip initialization in case it was already done
         if (this.state.signerReady) {
             chooseCertificateAndSignMessage();
+            return;
         }
 
         // Initialization, certificate choice and signing
@@ -104,9 +105,6 @@ export default class SmsComponent extends React.Component {
                     cbNotReady();
                 }
             };
-            ControlObj.cbAfterHostException = function() {
-                ICAPKIService.SetObjectState(2);
-            }
             loadICASigner(cbSuccess, cbError);
         } catch (ex) {
             console.error(ex);
