@@ -184,15 +184,19 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             if (smsAuthorizationResult == null) {
                 // Otherwise 2FA authentication is performed
 
-                // Handle authentication using qualified certificate first
-                 if (getApprovalByCertificateEnabledFromHttpSession() && request.getAuthInstruments().contains(AuthInstrument.QUALIFIED_CERTIFICATE)) {
-                     return handleAuthenticationUsingQualifiedCertificate(request, operation, userId);
-                 }
-
                 List<AuthInstrument> authInstruments = new ArrayList<>();
                 authInstruments.add(AuthInstrument.OTP_KEY);
-                authInstruments.add(AuthInstrument.CREDENTIAL);
+                if (request.getSignedMessage() != null) {
+                    authInstruments.add(AuthInstrument.QUALIFIED_CERTIFICATE);
+                } else {
+                    authInstruments.add(AuthInstrument.CREDENTIAL);
+                }
                 request.setAuthInstruments(authInstruments);
+
+                // Handle authentication using qualified certificate first
+                if (getApprovalByCertificateEnabledFromHttpSession() && authInstruments.contains(AuthInstrument.QUALIFIED_CERTIFICATE)) {
+                    return handleAuthenticationUsingQualifiedCertificateAndOtp(request, operation, userId, authMethod);
+                }
 
                 PasswordProtectionType passwordProtectionType = configuration.getPasswordProtection();
                 String cipherTransformation = configuration.getCipherTransformation();
@@ -251,27 +255,23 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         }
     }
 
-    private AuthResultDetail handleAuthenticationUsingQualifiedCertificate(SmsAuthorizationRequest request, GetOperationDetailResponse operation, String userId) throws AuthStepException {
-        final String certificate = request.getCertificate();
-        final String signature = request.getSignature();
+    private AuthResultDetail handleAuthenticationUsingQualifiedCertificateAndOtp(SmsAuthorizationRequest request, GetOperationDetailResponse operation, String userId, AuthMethod authMethod) throws AuthStepException {
+        final String signedMessage = request.getSignedMessage();
+        final String authCode = request.getAuthCode();
         final FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
         final String organizationId = operation.getOrganizationId();
         final ApplicationContext applicationContext = operation.getApplicationContext();
         final OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
         final AccountStatus accountStatusDA = statusConverter.fromUserAccountStatus(operation.getAccountStatus());
         try {
-            boolean approvalByCertificateSucceeded = verifySignatureUsingQualifiedCertificate(operation.getOperationId(), userId, organizationId, certificate, signature, accountStatusDA, operationContext);
-            if (approvalByCertificateSucceeded) {
-                logger.info("Step authentication succeeded using signature created by qualified certificate, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-            }
-            cleanHttpSession();
-            return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false, null);
-        } catch (NextStepClientException | DataAdapterClientErrorException ex) {
-            logger.error(ex.getMessage(), ex);
-            throw new AuthStepException("Certificate authentication failed", ex, "error.communication");
+            return verifySignatureUsingQualifiedCertificateAndOtp(operation.getOperationId(), userId, organizationId, signedMessage, authCode, authMethod, accountStatusDA, operationContext);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred in Next Step server", ex);
+            throw new AuthStepException("Authentication failed in Next Step service", ex, "error.communication");
+        } catch (DataAdapterClientErrorException ex) {
+            logger.error("Error occurred in Data Adapter", ex);
+            throw new AuthStepException("Authentication failed in Data Adapter service", ex, "error.communication");
         }
-
-        // TODO - do we need OTP? Disabled for now.
     }
 
     /**
@@ -776,8 +776,8 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @param operationId Operation ID.
      * @param userId User ID.
      * @param organizationId Organization ID.
-     * @param certificate Certificate in PEM format.
-     * @param signature Signature created using qualified certificate.
+     * @param signedMessage Signed message created using qualified certificate, including the certificate.
+     * @param authCode OTP authorization code.
      * @param accountStatus Account status.
      * @param operationContext Operation context.
      * @return Whether authentication succeeded.
@@ -785,34 +785,53 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws NextStepClientException In case communication with Next Step service fails.
      * @throws AuthStepException In case step authentication fails.
      */
-    private boolean verifySignatureUsingQualifiedCertificate(String operationId, String userId, String organizationId, String certificate, String signature, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepClientException, AuthStepException {
-        ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyCertificate(userId, organizationId, certificate, signature, getAuthMethodName(), accountStatus, operationContext);
-        VerifyCertificateResponse certResponse = objectResponseCert.getResponseObject();
-        CertificateVerificationResult verificationResult = certResponse.getCertificateVerificationResult();
-        if (verificationResult == CertificateVerificationResult.SUCCEEDED) {
-            return true;
+    private AuthResultDetail verifySignatureUsingQualifiedCertificateAndOtp(String operationId, String userId, String organizationId, String signedMessage, String authCode, AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepClientException, AuthStepException {
+        // Certificate parameter is null, qualified certificate is included in signedMessage, verification is done using Data Adapter
+        final ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyCertificate(userId, organizationId, null, signedMessage, getAuthMethodName(), accountStatus, operationContext);
+        final VerifyCertificateResponse certResponse = objectResponseCert.getResponseObject();
+        final CertificateVerificationResult certificateVerificationResult = certResponse.getCertificateVerificationResult();
+
+        // OTP verification is done using Next Step
+        final String otpId = getOtpIdFromHttpSession();
+        final OtpAuthenticationResponse otpResponse = nextStepClient.authenticateWithOtp(otpId, operationId, authCode, true, authMethod).getResponseObject();
+        final AuthenticationResult otpAuthorizationResult = otpResponse.getAuthenticationResult();
+
+        if (otpResponse.isOperationFailed()) {
+            logger.info("Step authentication failed for certificate and OTP verification (2FA) due to failed operation, operation ID: {}, authentication method: {}", operationId, authMethod);
+            throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
         }
-        logger.debug("Step authentication failed with signature using qualified certificate, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
-        List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.QUALIFIED_CERTIFICATE);
-        AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null, null);
+        if (otpAuthorizationResult == AuthenticationResult.SUCCEEDED && certificateVerificationResult == CertificateVerificationResult.SUCCEEDED) {
+            cleanHttpSession();
+            logger.info("Step authentication succeeded for certificate and OTP verification (2FA), operation ID: {}, authentication method: {}", operationId, authMethod);
+            return new AuthResultDetail(userId, organizationId, true, null);
+        }
+        logger.info("Step authentication failed for certificate and OTP verification (2FA), operation ID: {}, authentication method: {}, certificate verification result: {}, OTP verification result: {}", operationId, getAuthMethodName().toString(), certificateVerificationResult, otpAuthorizationResult);
+
+        final List<AuthInstrument> authInstruments = List.of(AuthInstrument.QUALIFIED_CERTIFICATE, AuthInstrument.OTP_KEY);
+        final AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null, null);
         if (response.getAuthResult() == AuthResult.FAILED) {
             // FAILED result instead of CONTINUE means the authentication method is failed
             throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
         }
-        Integer remainingAttemptsDA = certResponse.getRemainingAttempts();
-        boolean showRemainingAttempts = certResponse.getShowRemainingAttempts();
-        UserAccountStatus userAccountStatus = statusConverter.fromAccountStatus(certResponse.getAccountStatus());
+
+        // Merge results of authentication using the two factors
+        final Integer remainingAttemptsDA = Math.min(certResponse.getRemainingAttempts(), otpResponse.getRemainingAttempts());
+        final boolean showRemainingAttempts = certResponse.getShowRemainingAttempts() && otpResponse.isShowRemainingAttempts();
+        final UserAccountStatus userAccountStatus = statusConverter.fromAccountStatus(certResponse.getAccountStatus());
 
         String errorMessage = "login.authenticationFailed";
         if (certResponse.getErrorMessage() != null) {
             errorMessage = certResponse.getErrorMessage();
         }
+        if (otpResponse.getErrorMessage() != null) {
+            errorMessage = otpResponse.getErrorMessage();
+        }
 
-        AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
+        final AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
         if (showRemainingAttempts) {
-            GetOperationDetailResponse updatedOperation = getOperation();
-            Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-            Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
+            final GetOperationDetailResponse updatedOperation = getOperation();
+            final Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
+            final Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
             authEx.setRemainingAttempts(remainingAttempts);
         }
         authEx.setAccountStatus(userAccountStatus);

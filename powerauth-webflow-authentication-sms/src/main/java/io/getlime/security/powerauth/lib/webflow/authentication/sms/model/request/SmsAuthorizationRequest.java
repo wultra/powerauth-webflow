@@ -40,10 +40,7 @@ public class SmsAuthorizationRequest extends AuthStepRequest {
     private String password;
 
     @Size(min = 1, max = 32000)
-    private String certificate;
-
-    @Size(min = 1, max = 100)
-    private String signature;
+    private String signedMessage;
 
     @NotNull(message = "error.invalidRequest")
     private List<AuthInstrument> authInstruments = new ArrayList<>();
@@ -81,35 +78,19 @@ public class SmsAuthorizationRequest extends AuthStepRequest {
     }
 
     /**
-     * Get certificate in PEM format.
-     * @return Certificate in PEM format.
+     * Get signed message created using qualified certificate.
+     * @return Signed message created using qualified certificate.
      */
-    public String getCertificate() {
-        return certificate;
+    public String getSignedMessage() {
+        return signedMessage;
     }
 
     /**
-     * Set certificate in PEM format.
-     * @param certificate Certificate in PEM format.
+     * Set signed message created using qualified certificate.
+     * @param signedMessage Signed message created using qualified certificate.
      */
-    public void setCertificate(String certificate) {
-        this.certificate = certificate;
-    }
-
-    /**
-     * Get signature created by certificate.
-     * @return Signature created by certificate.
-     */
-    public String getSignature() {
-        return signature;
-    }
-
-    /**
-     * Set signature created by certificate.
-     * @param signature Signature created by certificate.
-     */
-    public void setSignature(String signature) {
-        this.signature = signature;
+    public void setSignedMessage(String signedMessage) {
+        this.signedMessage = signedMessage;
     }
 
     @Override

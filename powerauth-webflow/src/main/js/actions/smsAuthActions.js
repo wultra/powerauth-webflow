@@ -145,7 +145,7 @@ export function resend(component) {
  * @param component Component requesting the action.
  * @returns {Function} No return value.
  */
-export function authenticate(userAuthCode, userPassword, component) {
+export function authenticate(userAuthCode, userPassword, signedMessage, component) {
     return function (dispatch) {
         dispatch({
             type: getActionType(component),
@@ -159,8 +159,7 @@ export function authenticate(userAuthCode, userPassword, component) {
         axios.post("./api/auth/sms/authenticate", {
             authCode: userAuthCode,
             password: userPassword,
-            certificate: 'test1',
-            signature: 'test2'
+            signedMessage: signMessage
         }, {
             headers: {
                 'X-OPERATION-HASH': operationHash,

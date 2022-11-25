@@ -29,14 +29,14 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 public class VerifyCertificateRequest {
 
     /**
-     * Certificate in PEM format.
+     * Certificate in PEM format for client TLS authentication.
      */
     private String certificate;
 
     /**
-     * Signature created with certificate for verification.
+     * Signed message created using qualified certificate, including the certificate.
      */
-    private String signature;
+    private String signedMessage;
 
     /**
      * Authentication method requesting certificate verification.
@@ -73,18 +73,18 @@ public class VerifyCertificateRequest {
      * Constructor with all parameters.
      * @param userId User ID.
      * @param organizationId Organization ID.
-     * @param certificate Certificate in PEM format.
-     * @param signature Signature created by certificate.
+     * @param certificate Certificate in PEM format for client TLS authentication.
+     * @param signedMessage Signed message created using qualified certificate, including the certificate.
      * @param authMethod Authentication method requesting certificate verification.
      * @param accountStatus Current user account status.
      * @param operationContext Operation context.
      */
-    public VerifyCertificateRequest(String userId, String organizationId, String certificate, String signature,
+    public VerifyCertificateRequest(String userId, String organizationId, String certificate, String signedMessage,
                                     AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) {
         this.userId = userId;
         this.organizationId = organizationId;
         this.certificate = certificate;
-        this.signature = signature;
+        this.signedMessage = signedMessage;
         this.authMethod = authMethod;
         this.accountStatus = accountStatus;
         this.operationContext = operationContext;
@@ -110,16 +110,16 @@ public class VerifyCertificateRequest {
      * Get signature created using certificate.
      * @return Signature.
      */
-    public String getSignature() {
-        return signature;
+    public String getSignedMessage() {
+        return signedMessage;
     }
 
     /**
      * Set signature created using certificate.
-     * @param signature Signature.
+     * @param signedMessage Signature.
      */
-    public void setSignature(String signature) {
-        this.signature = signature;
+    public void setSignedMessage(String signedMessage) {
+        this.signedMessage = signedMessage;
     }
 
     /**
