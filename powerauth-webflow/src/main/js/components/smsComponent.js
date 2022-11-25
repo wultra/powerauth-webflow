@@ -37,11 +37,11 @@ export default class SmsComponent extends React.Component {
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.updateButtonState = this.updateButtonState.bind(this);
-        this.approveWithCertificate = this.approveWithCertificate.bind(this);
         this.signerInitSucceeded = this.signerInitSucceeded.bind(this);
         this.signerInitFailed = this.signerInitFailed.bind(this);
         this.signerInitNotReady = this.signerInitNotReady.bind(this);
         this.chooseCertificateAndSignMessage = this.chooseCertificateAndSignMessage.bind(this);
+        this.approveWithCertificate = this.approveWithCertificate.bind(this);
         this.approvalWithCertificateSucceeded = this.approvalWithCertificateSucceeded.bind(this);
         this.approvalWithCertificateFailed = this.approvalWithCertificateFailed.bind(this);
         this.state = {authCode: '', password: '', confirmDisabled: true, signerReady: false, signerInitFailed: false, signerError: null, signedMessage: null};
@@ -64,7 +64,7 @@ export default class SmsComponent extends React.Component {
         }
         let disabled = false;
         if (this.props.passwordEnabled) {
-            // Allow empty password in case signature of data is present
+            // Disable password field in case signature of data is present, the certificate replaces the password
             if (this.state.password.length === 0 && !this.state.signedMessage) {
                 disabled = true;
             }
@@ -83,6 +83,23 @@ export default class SmsComponent extends React.Component {
                 this.setState({confirmDisabled: false});
             }
         }
+    }
+
+    signerInitSucceeded() {
+        this.setState({signerReady: true});
+        this.chooseCertificateAndSignMessage();
+    }
+
+    signerInitNotReady() {
+        this.setState({signerReady: false});
+    }
+
+    chooseCertificateAndSignMessage() {
+        const data = this.props.data;
+        const cbSuccessApproval = this.approvalWithCertificateSucceeded;
+        const cbError = this.approvalWithCertificateFailed;
+        const encodedData = encodeToBase64(data);
+        loadKeyStoreAndSignMessage(encodedData, cbSuccessApproval, cbError);
     }
 
     approveWithCertificate() {
@@ -112,23 +129,6 @@ export default class SmsComponent extends React.Component {
         }
     }
 
-    signerInitSucceeded() {
-        this.setState({signerReady: true});
-        this.chooseCertificateAndSignMessage();
-    }
-
-    signerInitNotReady() {
-        this.setState({signerReady: false});
-    }
-
-    chooseCertificateAndSignMessage() {
-        const data = this.props.data;
-        const cbSuccessApproval = this.approvalWithCertificateSucceeded;
-        const cbError = this.approvalWithCertificateFailed;
-        const encodedData = encodeToBase64(data);
-        loadKeyStoreAndSignMessage(encodedData, cbSuccessApproval, cbError);
-    }
-
     approvalWithCertificateSucceeded(signedMessage) {
         this.setState({signedMessage: signedMessage, signerError: null});
     }
@@ -143,7 +143,7 @@ export default class SmsComponent extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.dispatch(authenticate(this.state.authCode, this.state.password, this.props.parentComponent));
+        this.props.dispatch(authenticate(this.state.authCode, this.state.password, this.state.signedMessage, this.props.parentComponent));
         this.setState({authCode: '', password: ''});
     }
 
