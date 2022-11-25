@@ -369,7 +369,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     private boolean getApprovalByCertificateEnabledFromHttpSession() {
         synchronized (httpSession.getServletContext()) {
             Boolean certificateEnabled = (Boolean) httpSession.getAttribute(HttpSessionAttributeNames.APPROVAL_BY_CERTIFICATE_ENABLED);
-            System.out.println("Get from HTTP session: " + certificateEnabled);
             return certificateEnabled != null && certificateEnabled;
         }
     }

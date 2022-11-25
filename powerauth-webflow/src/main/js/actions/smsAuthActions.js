@@ -142,6 +142,7 @@ export function resend(component) {
  * Perform SMS authentication.
  * @param userAuthCode User supplied code.
  * @param userPassword User supplied password.
+ * @param signedMessage Message signed using qualified certificate.
  * @param component Component requesting the action.
  * @returns {Function} No return value.
  */
@@ -159,7 +160,7 @@ export function authenticate(userAuthCode, userPassword, signedMessage, componen
         axios.post("./api/auth/sms/authenticate", {
             authCode: userAuthCode,
             password: userPassword,
-            signedMessage: signMessage
+            signedMessage: signedMessage
         }, {
             headers: {
                 'X-OPERATION-HASH': operationHash,
