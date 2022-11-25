@@ -191,7 +191,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
             CredentialAuthenticationResponse authResponse = nextStepClient.authenticateWithCredential(credentialName, userId, protectedPassword, operation.getOperationId(), true, AuthMethod.USERNAME_PASSWORD_AUTH).getResponseObject();
             if (authResponse.isOperationFailed()) {
-                logger.info("Step authentication failed due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+                logger.info("Step authentication maximum attempts reached due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
             }
             if (authResponse.getAuthenticationResult() == AuthenticationResult.SUCCEEDED) {

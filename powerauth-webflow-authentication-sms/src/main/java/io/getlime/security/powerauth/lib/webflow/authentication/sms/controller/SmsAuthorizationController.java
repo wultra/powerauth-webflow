@@ -166,7 +166,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     // Only SMS authorization is required, skip password verification
                     OtpAuthenticationResponse otpResponse = nextStepClient.authenticateWithOtp(otpId, operationId, authCode, true, authMethod).getResponseObject();
                     if (otpResponse.isOperationFailed()) {
-                        logger.info("Step authentication failed (1FA) due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
+                        logger.info("Step authentication maximum attempts reached (1FA) due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
                         throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
                     }
                     smsAuthorizationResult = otpResponse.getAuthenticationResult();
@@ -222,7 +222,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 String protectedPassword = passwordProtection.protect(request.getPassword());
                 CombinedAuthenticationResponse authResponse = nextStepClient.authenticateCombined(credentialName, userId, protectedPassword, otpId, operationId, authCode, true, authMethod).getResponseObject();
                 if (authResponse.isOperationFailed()) {
-                    logger.info("Step authentication failed (2FA) due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
+                    logger.info("Step authentication maximum attempts reached for credential and OTP verification (2FA) due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
                     throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
                 }
                 if (authResponse.getAuthenticationResult() == AuthenticationResult.SUCCEEDED) {
@@ -785,6 +785,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException In case step authentication fails.
      */
     private AuthResultDetail verifySignatureUsingQualifiedCertificateAndOtp(String operationId, String userId, String organizationId, String signedMessage, String authCode, AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepClientException, AuthStepException {
+        final List<AuthInstrument> authInstruments = List.of(AuthInstrument.OTP_KEY, AuthInstrument.QUALIFIED_CERTIFICATE);
         // Certificate parameter is null, qualified certificate is included in signedMessage, verification is done using Data Adapter
         final ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyCertificate(userId, organizationId, null, signedMessage, getAuthMethodName(), accountStatus, operationContext);
         final VerifyCertificateResponse certResponse = objectResponseCert.getResponseObject();
@@ -792,29 +793,38 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
         // OTP verification is done using Next Step
         final String otpId = getOtpIdFromHttpSession();
-        final OtpAuthenticationResponse otpResponse = nextStepClient.authenticateWithOtp(otpId, operationId, authCode, true, authMethod).getResponseObject();
+        final OtpAuthenticationResponse otpResponse = nextStepClient.authenticateWithOtp(otpId, operationId, authCode, false, authMethod).getResponseObject();
         final AuthenticationResult otpAuthorizationResult = otpResponse.getAuthenticationResult();
 
-        if (otpResponse.isOperationFailed()) {
-            logger.info("Step authentication failed for certificate and OTP verification (2FA) due to failed operation, operation ID: {}, authentication method: {}", operationId, authMethod);
-            throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
-        }
         if (otpAuthorizationResult == AuthenticationResult.SUCCEEDED && certificateVerificationResult == CertificateVerificationResult.SUCCEEDED) {
+            authorize(operationId, userId, organizationId, authInstruments, null, null);
             cleanHttpSession();
             logger.info("Step authentication succeeded for certificate and OTP verification (2FA), operation ID: {}, authentication method: {}", operationId, authMethod);
             return new AuthResultDetail(userId, organizationId, true, null);
         }
         logger.info("Step authentication failed for certificate and OTP verification (2FA), operation ID: {}, authentication method: {}, certificate verification result: {}, OTP verification result: {}", operationId, getAuthMethodName().toString(), certificateVerificationResult, otpAuthorizationResult);
 
-        final List<AuthInstrument> authInstruments = List.of(AuthInstrument.QUALIFIED_CERTIFICATE, AuthInstrument.OTP_KEY);
-        final AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null, null);
+        if (otpResponse.isOperationFailed()) {
+            logger.info("Step authentication maximum attempts reached OTP verification (2FA) due to failed operation, operation ID: {}, authentication method: {}", operationId, authMethod);
+            throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
+        }
+
+        final AuthOperationResponse response = failAuthorization(operationId, userId, List.of(AuthInstrument.OTP_KEY, AuthInstrument.QUALIFIED_CERTIFICATE), null, null);
         if (response.getAuthResult() == AuthResult.FAILED) {
+            logger.info("Step authentication maximum attempts reached for certificate verification (2FA) due to failed operation, operation ID: {}, authentication method: {}", operationId, authMethod);
             // FAILED result instead of CONTINUE means the authentication method is failed
             throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
         }
 
         // Merge results of authentication using the two factors
-        final Integer remainingAttemptsDA = Math.min(certResponse.getRemainingAttempts(), otpResponse.getRemainingAttempts());
+        final Integer remainingAttemptsDA;
+        if (certResponse.getRemainingAttempts() != null && otpResponse.getRemainingAttempts() != null) {
+            remainingAttemptsDA = Math.min(certResponse.getRemainingAttempts(), otpResponse.getRemainingAttempts());
+        } else if (certResponse.getRemainingAttempts() != null) {
+            remainingAttemptsDA = certResponse.getRemainingAttempts();
+        } else {
+            remainingAttemptsDA = otpResponse.getRemainingAttempts();
+        }
         final boolean showRemainingAttempts = certResponse.getShowRemainingAttempts() && otpResponse.isShowRemainingAttempts();
         final UserAccountStatus userAccountStatus = statusConverter.fromAccountStatus(certResponse.getAccountStatus());
 
