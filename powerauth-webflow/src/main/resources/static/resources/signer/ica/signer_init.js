@@ -2,10 +2,10 @@
 // and the Control Object is initialized. The signer component is not initialized yet, it is pending choice of
 // approval by certificate and subsequent call of method loadICASigner().
 
-// 0 - turned off, 1 - error, 2 - warning, 3 - info, 4 - log/debug
+// Logging level: 0 - turned off, 1 - error, 2 - warning, 3 - info, 4 - log/debug
 loggingLevel = 4;
 
-// Init control object
+// Init control object for signer
 ControlObj.init();
 
 let idTestInitExtension;
@@ -33,25 +33,25 @@ const supportedBrowser = [
     {name: "Opera", minimalVersion: "30"}
 ];
 
-// After html is ready
+// The method should be called after HTML is rendered
 function loadICASigner(cbSuccess, cbError) {
     let counterEx = 0;
-    // Max test init extension
+    // Max attempt count for test init extension
     const maxCountEx = 4;
 
     let counterHost = 0;
-    // Max test init host
+    // Max attempt count for test init host
     let maxCountHost = 15;
-    // Max test init host when there is host update
+    // Max test init host when host is being updated
     const maxCountHostUpdate = 30;
-    // test init ICAPKIServiceHost
+    // Test init ICAPKIServiceHost
     const testInitHost = function () {
-        // increase time when host updating
+        // Increase number of attempts when host is being updated
         if (ControlObj.updateStarted) {
             maxCountHost = maxCountHostUpdate;
         }
         counterHost++;
-        // if host init finishes
+        // If the host init finishes
         if (ControlObj.finishInitHost) {
             clearInterval(idTestInitHost);
             if (ControlObj.initHost) {
@@ -67,19 +67,19 @@ function loadICASigner(cbSuccess, cbError) {
             cbError("signer.error.init.host.failed");
         }
     };
-    // test init ICAPKIServiceExtension
+    // Test init ICAPKIServiceExtension
     const testInitExtension = function () {
         counterEx++;
         if (counterEx > 1) {
+            // Show error that communication with plug-in failed early to the user
             cbError("signer.error.init.extension.failed");
         }
         // If extension init finishes
         if (ControlObj.finishInitExtension) {
-            // Extension is ready
+            // Extension initialization is finished
             clearInterval(idTestInitExtension);
             if (ControlObj.initExtension) {
-                // Extension is installed
-                // Control Host state every second for maxCountHost
+                // Extension is now installed, control host state every second for maxCountHost
                 idTestInitHost = setInterval(testInitHost, 1000);
             } else {
                 // Extension is not installed
@@ -128,17 +128,17 @@ function loadKeyStoreAndSignMessage(content, cbSuccess, cbError) {
 
 // Load first certificate found in the keystore and set it for signing
 function loadCertificateAndSignMessage(content, cbSuccess, cbError) {
-    const cb = function cb(certIndex, pem) {
+    const cbCert = function cb(certIndex, pem) {
         if (pem == null) {
             cbError("signer.error.certificate.notFound");
             return;
         }
-        const cb2 = function cb() {
+        const cbSuccess = function cb() {
             signMessage(content, cbSuccess, cbError);
         };
-        ICAClientSign.signerSetCertificate(cb2, pem);
+        ICAClientSign.signerSetCertificate(cbSuccess, pem);
     }
-    ICAClientSign.certificateEnumerateStore(cb, 0);
+    ICAClientSign.certificateEnumerateStore(cbCert, 0);
 }
 
 // Sign content using CMS in detached mode, content should be Base-64 encoded
@@ -185,20 +185,20 @@ function GetExceptionMessage(ex) {
 }
 
 // Exception thrown in case ICAPKIService is not in ready state
-function ObjectNotReadyException(err_code, err_msg) {
-    this.name = "ObjectNotReadyException";
+function ICAPKIServiceNotReadyException(err_code, err_msg) {
+    this.name = "ICAPKIServiceNotReadyException";
     this.number = err_code;
     this.message = err_msg;
 }
 
 // Exception thrown in case ICAPKIService is not running
-function ObjectNotRunningException() {
-    this.name = "ObjectNotRunningException";
+function ICAPKIServiceNotRunningException() {
+    this.name = "ICAPKIServiceNotRunningException";
     this.number = -1;
     this.message = "ICAPKIService is not running";
 }
 
-// Error handling
+// Error handling callback method triggered by ICA signer
 function ProcException(msg, ex) {
     let err_msg = ex.name + "\n";
     err_msg += "Message: " + GetExceptionMessage(ex) + "\n";
@@ -226,13 +226,13 @@ function CheckICAPKIServiceState() {
             const err_code = -1;
             let err_msg = "";
             err_msg += ", " + state_msg;
-            ThrowObjectNotReady(err_code, err_msg);
+            ThrowICAPKIServiceNotReady(err_code, err_msg);
         }
     }
     return running;
 }
 
-// GetObjectStateMsg - convert state to message
+// GetObjectStateMsg - convert object state to message
 function GetObjectStateMsg(state) {
     let message;
     switch (state) {
@@ -260,10 +260,12 @@ function GetObjectStateMsg(state) {
     return message;
 }
 
-function ThrowObjectNotReady(code, message) {
-    throw new ObjectNotReadyException(code, message);
+// Throw exception when ICA PKI service is not ready
+function ThrowICAPKIServiceNotReady(code, message) {
+    throw new ICAPKIServiceNotReadyException(code, message);
 }
 
+// Throw exception when ICA PKI service is not running
 function ThrowICAPKIServiceNotRunning() {
-    throw new ObjectNotRunningException();
+    throw new ICAPKIServiceNotRunningException();
 }
