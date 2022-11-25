@@ -134,9 +134,9 @@ function loadCertificateAndSignMessage(content, cbSuccess, cbError) {
             return;
         }
         const cbSignSuccess = function cb() {
-            signMessage(content, cbSignSuccess, cbError);
+            signMessage(content, cbSuccess, cbError);
         };
-        ICAClientSign.signerSetCertificate(cbSuccess, pem);
+        ICAClientSign.signerSetCertificate(cbSignSuccess, pem);
     }
     ICAClientSign.certificateEnumerateStore(cbCert, 0);
 }
