@@ -167,7 +167,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
             final boolean approvalByCertificateEnabled = initResponse.getCertificateAuthenticationMode() == CertificateAuthenticationMode.ENABLED;
             setApprovalByCertificateEnabled(approvalByCertificateEnabled);
 
-            logger.debug("Step init succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+            logger.debug("Step init succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName());
             return new ApprovalScaInitResponse();
 
         } catch (NextStepClientException ex) {
