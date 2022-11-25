@@ -133,10 +133,10 @@ function loadCertificateAndSignMessage(content, cbSuccess, cbError) {
             cbError("signer.error.certificate.notFound");
             return;
         }
-        const cbSignSuccess = function cb() {
+        const cbCertSet = function cb() {
             signMessage(content, cbSuccess, cbError);
         };
-        ICAClientSign.signerSetCertificate(cbSignSuccess, pem);
+        ICAClientSign.signerSetCertificate(cbCertSet, pem);
     }
     ICAClientSign.certificateEnumerateStore(cbCert, 0);
 }
