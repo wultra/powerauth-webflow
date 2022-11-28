@@ -391,33 +391,34 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @throws AuthStepException In case step authentication fails.
      */
     private boolean verifyClientCertificate(String operationId, String userId, String organizationId, String clientCertificate, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepClientException, AuthStepException {
-        ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyCertificate(userId, organizationId, clientCertificate, null, getAuthMethodName(), accountStatus, operationContext);
-        VerifyCertificateResponse certResponse = objectResponseCert.getResponseObject();
-        CertificateVerificationResult verificationResult = certResponse.getCertificateVerificationResult();
+        final ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyCertificate(userId, organizationId, clientCertificate, null,
+                AuthInstrument.CLIENT_CERTIFICATE, getAuthMethodName(), accountStatus, operationContext);
+        final VerifyCertificateResponse certResponse = objectResponseCert.getResponseObject();
+        final CertificateVerificationResult verificationResult = certResponse.getCertificateVerificationResult();
         if (verificationResult == CertificateVerificationResult.SUCCEEDED) {
             return true;
         }
         logger.debug("Step authentication failed with client certificate, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
-        List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.CLIENT_CERTIFICATE);
-        AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null, null);
-        Integer remainingAttemptsDA = certResponse.getRemainingAttempts();
+        final List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.CLIENT_CERTIFICATE);
+        final AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null, null);
+        final Integer remainingAttemptsDA = certResponse.getRemainingAttempts();
         if (response.getAuthResult() == AuthResult.FAILED || (remainingAttemptsDA != null && remainingAttemptsDA == 0)) {
             // FAILED result instead of CONTINUE means the authentication method is failed
             throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
         }
-        boolean showRemainingAttempts = certResponse.getShowRemainingAttempts();
-        UserAccountStatus userAccountStatus = statusConverter.fromAccountStatus(certResponse.getAccountStatus());
+        final boolean showRemainingAttempts = certResponse.getShowRemainingAttempts();
+        final UserAccountStatus userAccountStatus = statusConverter.fromAccountStatus(certResponse.getAccountStatus());
 
         String errorMessage = "login.authenticationFailed";
         if (certResponse.getErrorMessage() != null) {
             errorMessage = certResponse.getErrorMessage();
         }
 
-        AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
+        final AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
         if (showRemainingAttempts) {
-            GetOperationDetailResponse updatedOperation = getOperation();
-            Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-            Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
+            final GetOperationDetailResponse updatedOperation = getOperation();
+            final Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
+            final Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
             authEx.setRemainingAttempts(remainingAttempts);
         }
         authEx.setAccountStatus(userAccountStatus);

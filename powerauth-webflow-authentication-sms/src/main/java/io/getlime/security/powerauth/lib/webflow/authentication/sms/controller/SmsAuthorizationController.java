@@ -787,7 +787,8 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     private AuthResultDetail verifySignatureUsingQualifiedCertificateAndOtp(String operationId, String userId, String organizationId, String signedMessage, String authCode, AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepClientException, AuthStepException {
         final List<AuthInstrument> authInstruments = List.of(AuthInstrument.OTP_KEY, AuthInstrument.QUALIFIED_CERTIFICATE);
         // Certificate parameter is null, qualified certificate is included in signedMessage, verification is done using Data Adapter
-        final ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyCertificate(userId, organizationId, null, signedMessage, getAuthMethodName(), accountStatus, operationContext);
+        final ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyCertificate(userId, organizationId, null, signedMessage,
+                AuthInstrument.QUALIFIED_CERTIFICATE, getAuthMethodName(), accountStatus, operationContext);
         final VerifyCertificateResponse certResponse = objectResponseCert.getResponseObject();
         final CertificateVerificationResult certificateVerificationResult = certResponse.getCertificateVerificationResult();
 
