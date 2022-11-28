@@ -195,7 +195,7 @@ public class HomeController {
         model.put("passwordMaxLength", webFlowConfig.getPasswordMaxLength());
         model.put("smsOtpMaxLength", webFlowConfig.getSmsOtpMaxLength());
         model.put("approvalCertificateEnabled", webFlowConfig.isApprovalCertificateEnabled());
-        model.put("approvalCertificateSigner", webFlowConfig.getApprovalCertificateSigner());
+        model.put("approvalCertificateSigner", webFlowConfig.getApprovalCertificateSigner().toString());
         model.put("icaConfigurationUrl", webFlowConfig.getIcaConfigurationUrl());
         model.put("icaExtensionIDChrome", webFlowConfig.getIcaExtensionIDChrome());
         model.put("icaExtensionIDOpera", webFlowConfig.getIcaExtensionIDOpera());

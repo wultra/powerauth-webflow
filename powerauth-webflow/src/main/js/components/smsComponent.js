@@ -18,7 +18,7 @@
 import {Button, FormControl, FormGroup} from "react-bootstrap";
 import {FormattedMessage} from "react-intl";
 import React from "react";
-import {authenticate} from "../actions/smsAuthActions";
+import {authenticate, initializeICAClientSign} from "../actions/smsAuthActions";
 import {connect} from "react-redux";
 
 /**
@@ -45,6 +45,12 @@ export default class SmsComponent extends React.Component {
         this.approvalWithCertificateSucceeded = this.approvalWithCertificateSucceeded.bind(this);
         this.approvalWithCertificateFailed = this.approvalWithCertificateFailed.bind(this);
         this.state = {authCode: '', password: '', confirmDisabled: true, signerReady: false, signerInitFailed: false, signerError: null, signedMessage: null};
+    }
+
+    componentDidMount() {
+        if (approvalCertificateEnabled && approvalCertificateSigner === 'ICA_CLIENT_SIGN') {
+            initializeICAClientSign();
+        }
     }
 
     handleAuthCodeChange(event) {

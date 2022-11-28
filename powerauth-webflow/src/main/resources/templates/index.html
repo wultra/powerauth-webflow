@@ -31,27 +31,6 @@
         <!-- AFS integration -->
         <script type="text/javascript" th:src="${afs_js_snippet_url}" async="async"></script>
     </th:block>
-    <th:block th:if="${approvalCertificateEnabled}">
-        <th:block th:if="${approvalCertificateSigner.name() == 'ICA_CLIENT_SIGN'}">
-            <!-- ICAClientSign.js integration -->
-            <script type="text/javascript" th:src="@{./resources/signer/ica/ICAPKIService.js}" th:charset="UTF-8"></script>
-            <script type="text/javascript" th:inline="javascript">
-                /*<![CDATA[*/
-                if (((Object.getOwnPropertyDescriptor && Object.getOwnPropertyDescriptor(window, "ActiveXObject")) || ("ActiveXObject" in window)) === false ) {
-                    document.write('<scr' + 'ipt type="text/javascript" src="./resources/signer/ica/ICAClientSign.js" charset="UTF-8"></scr' + 'ipt>'); }
-                /*]]>*/
-            </script>
-            <script type="text/javascript" th:src="@{./resources/signer/ica/control.js}" th:charset="UTF-8"></script>
-            <script type="text/javascript" th:src="@{./resources/signer/ica/signer_init.js}" th:charset="UTF-8"></script>
-            <!-- ActiveX code start-->
-            <script for="ICAPKIServiceControl" event="MessageReady()" th:inline="javascript">
-                /*<![CDATA[*/
-                ICAPKIService.LoadActiveXPendingMessages();
-                /*]]>*/
-            </script>
-            <!-- ActiveX code end -->
-        </th:block>
-    </th:block>
 </head>
 <body>
 
@@ -73,6 +52,8 @@
     var consentPanelLimitCharacters = [[${consentPanelLimitCharacters}]];
 
     // ICAClientSign configuration
+    const approvalCertificateEnabled = [[${approvalCertificateEnabled}]];
+    const approvalCertificateSigner = [[${approvalCertificateSigner}]];
     const icaConfigurationUrl = [[${icaConfigurationUrl}]];
     // Following variable names must not be changed, they are expected by ICAClientSign.js exactly like this
     const extensionIDChrome = [[${icaExtensionIDChrome}]];

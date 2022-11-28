@@ -280,6 +280,41 @@ export function cancel(component) {
 }
 
 /**
+ * Initialize the ICA signer library.
+ */
+export function initializeICAClientSign() {
+    if (!document.getElementById('ICAPKIService')) {
+        const head = document.head;
+        const script = document.createElement('script');
+        script.src = './resources/signer/ica/ICAPKIService.js';
+        script.type = 'text/javascript';
+        script.id = 'ICAPKIService';
+        head.appendChild(script);
+        script.onload = () => {
+            const script = document.createElement('script');
+            script.src = './resources/signer/ica/ICAClientSign.js';
+            script.type = 'text/javascript';
+            script.id = 'ICAClientSign';
+            head.appendChild(script);
+            script.onload = () => {
+                const script = document.createElement('script');
+                script.src = './resources/signer/ica/control.js';
+                script.type = 'text/javascript';
+                script.id = 'control';
+                head.appendChild(script);
+                script.onload = () => {
+                    const script = document.createElement('script');
+                    script.src = './resources/signer/ica/signer_init.js';
+                    script.type = 'text/javascript';
+                    script.id = 'signer_init';
+                    head.appendChild(script);
+                }
+            }
+        }
+    }
+}
+
+/**
  * Get action type to dispatch for given component.
  * @param component Component name.
  * @returns {string|null} Action type.
