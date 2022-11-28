@@ -49,6 +49,7 @@ public class TppAppConverter {
         tpp.setWebsite(tppEntity.getTppWebsite());
         tpp.setEmail(tppEntity.getTppEmail());
         tpp.setPhone(tppEntity.getTppPhone());
+        tpp.setBlocked(tppEntity.isBlocked());
         return tpp;
     }
 

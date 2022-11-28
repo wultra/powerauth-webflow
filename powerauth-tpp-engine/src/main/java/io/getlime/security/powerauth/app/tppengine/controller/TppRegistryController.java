@@ -24,6 +24,7 @@ import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppAppNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.UnableToCreateAppException;
+import io.getlime.security.powerauth.app.tppengine.model.entity.TppInfo;
 import io.getlime.security.powerauth.app.tppengine.model.request.CreateTppAppRequest;
 import io.getlime.security.powerauth.app.tppengine.model.response.TppAppDetailResponse;
 import io.getlime.security.powerauth.app.tppengine.model.validator.CreateTppAppRequestValidator;
@@ -110,6 +111,18 @@ public class TppRegistryController {
             @RequestParam("tppLicense") String tppLicense) throws TppNotFoundException, TppAppNotFoundException {
         tppService.deleteApp(clientId, tppLicense);
         return new Response();
+    }
+
+    @RequestMapping(value = "block", method = RequestMethod.POST)
+    public ObjectResponse<TppInfo> blockTpp(@RequestParam("tppLicense") String tppLicense) throws TppNotFoundException {
+        final TppInfo tppInfo = tppService.blockTpp(tppLicense);
+        return new ObjectResponse<>(tppInfo);
+    }
+
+    @RequestMapping(value = "unblock", method = RequestMethod.POST)
+    public ObjectResponse<TppInfo> unblockTpp(@RequestParam("tppLicense") String tppLicense) throws TppNotFoundException {
+        final TppInfo tppInfo = tppService.unblockTpp(tppLicense);
+        return new ObjectResponse<>(tppInfo);
     }
 
 }
