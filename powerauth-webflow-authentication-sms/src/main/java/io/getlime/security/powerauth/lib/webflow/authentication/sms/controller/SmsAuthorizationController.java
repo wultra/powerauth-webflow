@@ -65,6 +65,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -785,7 +786,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException In case step authentication fails.
      */
     private AuthResultDetail verifySignatureUsingQualifiedCertificateAndOtp(String operationId, String userId, String organizationId, String signedMessage, String authCode, AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepClientException, AuthStepException {
-        final List<AuthInstrument> authInstruments = List.of(AuthInstrument.OTP_KEY, AuthInstrument.QUALIFIED_CERTIFICATE);
+        final List<AuthInstrument> authInstruments = Arrays.asList(AuthInstrument.OTP_KEY, AuthInstrument.QUALIFIED_CERTIFICATE);
         // Certificate parameter is null, qualified certificate is included in signedMessage, verification is done using Data Adapter
         final ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyCertificate(userId, organizationId, null, signedMessage,
                 AuthInstrument.QUALIFIED_CERTIFICATE, getAuthMethodName(), accountStatus, operationContext);
@@ -810,7 +811,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
         }
 
-        final AuthOperationResponse response = failAuthorization(operationId, userId, List.of(AuthInstrument.OTP_KEY, AuthInstrument.QUALIFIED_CERTIFICATE), null, null);
+        final AuthOperationResponse response = failAuthorization(operationId, userId, Arrays.asList(AuthInstrument.OTP_KEY, AuthInstrument.QUALIFIED_CERTIFICATE), null, null);
         if (response.getAuthResult() == AuthResult.FAILED) {
             logger.info("Step authentication maximum attempts reached for certificate verification (2FA) due to failed operation, operation ID: {}, authentication method: {}", operationId, authMethod);
             // FAILED result instead of CONTINUE means the authentication method is failed
