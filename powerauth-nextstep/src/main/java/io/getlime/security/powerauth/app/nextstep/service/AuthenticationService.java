@@ -833,7 +833,7 @@ public class AuthenticationService {
             logger.info("Credential verification failed because temporary credential is expired, user ID: {}, credential definition name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
             return AuthenticationResult.FAILED;
         }
-        final CredentialAuthenticationMode authModeResolved = Objects.requireNonNullElse(authenticationMode, CredentialAuthenticationMode.MATCH_EXACT);
+        final CredentialAuthenticationMode authModeResolved = authenticationMode != null ? authenticationMode : CredentialAuthenticationMode.MATCH_EXACT;
         switch (authModeResolved) {
             case MATCH_EXACT:
                 final boolean credentialMatched = credentialProtectionService.verifyCredential(credentialValue, credential);
@@ -949,7 +949,8 @@ public class AuthenticationService {
                 return null;
             }
             try {
-                final List<AuthStep> authSteps = objectMapper.readValue(currentHistory.getResponseSteps(), new TypeReference<>() {});
+
+                final List<AuthStep> authSteps = objectMapper.readValue(currentHistory.getResponseSteps(), new TypeReference<List<AuthStep>>() {});
                 if (authSteps.size() != 1) {
                     throw new InvalidRequestException("Authentication method could not be determined " +
                             "during credential authentication, operation ID: " + operation.getOperationId());

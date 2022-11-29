@@ -61,13 +61,7 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>11</source>
-                    <target>11</target>
-                    <compilerArgs>
-                        <arg>--add-exports</arg>
-                        <arg>java.base/sun.security.util=ALL-UNNAMED</arg>
-                        <arg>--add-exports</arg>
-                        <arg>java.base/sun.security.x509=ALL-UNNAMED</arg>
-                    </compilerArgs>
+                    <target>8</target>
                 </configuration>
             </plugin>
             <plugin>
