@@ -9,15 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    container: ghcr.io/wultra/server_jdk_8_ubuntu:u202
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 11
-        uses: oracle-actions/setup-java@v1
-        with:
-          website: oracle.com
-          release: 11
-          cache: maven
       - run: mvn --batch-mode package
       - run: mkdir staging && cp target/*.war staging
       - uses: actions/upload-artifact@v3
