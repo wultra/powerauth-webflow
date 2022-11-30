@@ -1,0 +1,20 @@
+name: Package with Maven and JDK 8
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 8
+        uses: oracle-actions/setup-java@v1
+        with:
+          website: oracle.com
+          release: 8
+          cache: maven
+      - run: mvn --batch-mode package
+      - run: mkdir staging && cp target/*.war staging
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Package
+          path: staging
