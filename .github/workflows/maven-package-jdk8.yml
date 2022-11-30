@@ -12,12 +12,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 8
-        uses: oracle-actions/setup-java@v1
+      - name: Run maven script
+        uses: guillonapa/action-maven-cli/jdk8@master
         with:
-          website: oracle.com
-          release: 8
-      - run: mvn --batch-mode package
+          lifecycle: 'clean package'
       - run: mkdir staging && cp target/*.war staging
       - uses: actions/upload-artifact@v3
         with:
