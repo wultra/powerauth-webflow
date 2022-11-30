@@ -22,7 +22,9 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DLSequence;
-import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
+import org.bouncycastle.asn1.x500.RDN;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
@@ -38,7 +40,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Vector;
 
 /**
  * Class to parse PSD2 certificates issued by I.CA certificate authority (Czech Republic).
@@ -60,7 +61,6 @@ public class ICACertificateParser implements ICertificateParser {
      * @return Structured certificate information.
      * @throws CertificateException In case certificate cannot be parsed (or in rare case X.509 is not supported).
      */
-    @SuppressWarnings("unchecked")
     public CertInfo parse(String certificatePem) throws CertificateException {
 
         // Check for null certificate value
@@ -134,10 +134,7 @@ public class ICACertificateParser implements ICertificateParser {
                     }
                 }
             }
-
-            final X509Name x509Name = (X509Name) cert.getSubjectDN();
-            final Vector<ASN1ObjectIdentifier> oids = x509Name.getOIDs();
-
+            final X500Name x500Name = new X500Name(cert.getSubjectDN().toString());
             String country = null;
             String serialNumber = null;
             String commonName = null;
@@ -148,9 +145,10 @@ public class ICACertificateParser implements ICertificateParser {
             String zipCode = null;
             String region = null;
             String website = null;
-            for (ASN1ObjectIdentifier asn1oid: oids) {
-                final String oid = asn1oid.toString();
-                final String val = x509Name.getValues(asn1oid).get(0).toString();
+            for (RDN rdn: x500Name.getRDNs()) {
+                final AttributeTypeAndValue attr = rdn.getFirst();
+                final String oid = attr.getType().getId();
+                final String val = attr.getValue().toString();
 
                 switch (oid) {
                     case "2.5.4.6": {   //    C=CZ => 2.5.4.6
