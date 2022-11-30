@@ -55,7 +55,7 @@ export function init(component) {
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
-                // Handle  error when message delivery fails, another SMS message can be sent later.
+                // Handle error when message delivery fails, another SMS message can be sent later.
                 dispatch({
                     type: getActionType(component),
                     payload: {
@@ -65,6 +65,7 @@ export function init(component) {
                         message: response.data.message,
                         passwordEnabled: response.data.passwordEnabled,
                         smsOtpEnabled: response.data.smsOtpEnabled,
+                        certificateEnabled: response.data.certificateEnabled,
                         username: response.data.username,
                         resendDelay: response.data.resendDelay
                     }
@@ -80,6 +81,7 @@ export function init(component) {
                     message: response.data.message,
                     passwordEnabled: response.data.passwordEnabled,
                     smsOtpEnabled: response.data.smsOtpEnabled,
+                    certificateEnabled: response.data.certificateEnabled,
                     username: response.data.username,
                     resendDelay: response.data.resendDelay
                 }
@@ -140,10 +142,11 @@ export function resend(component) {
  * Perform SMS authentication.
  * @param userAuthCode User supplied code.
  * @param userPassword User supplied password.
+ * @param signedMessage Message signed using qualified certificate.
  * @param component Component requesting the action.
  * @returns {Function} No return value.
  */
-export function authenticate(userAuthCode, userPassword, component) {
+export function authenticate(userAuthCode, userPassword, signedMessage, component) {
     return function (dispatch) {
         dispatch({
             type: getActionType(component),
@@ -156,7 +159,8 @@ export function authenticate(userAuthCode, userPassword, component) {
         });
         axios.post("./api/auth/sms/authenticate", {
             authCode: userAuthCode,
-            password: userPassword
+            password: userPassword,
+            signedMessage: signedMessage
         }, {
             headers: {
                 'X-OPERATION-HASH': operationHash,
@@ -272,6 +276,41 @@ export function cancel(component) {
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
+    }
+}
+
+/**
+ * Initialize the ICA signer library.
+ */
+export function initializeICAClientSign() {
+    if (!document.getElementById('ICAPKIService')) {
+        const head = document.head;
+        const script = document.createElement('script');
+        script.src = './resources/signer/ica/ICAPKIService.js';
+        script.type = 'text/javascript';
+        script.id = 'ICAPKIService';
+        head.appendChild(script);
+        script.onload = () => {
+            const script = document.createElement('script');
+            script.src = './resources/signer/ica/ICAClientSign.js';
+            script.type = 'text/javascript';
+            script.id = 'ICAClientSign';
+            head.appendChild(script);
+            script.onload = () => {
+                const script = document.createElement('script');
+                script.src = './resources/signer/ica/control.js';
+                script.type = 'text/javascript';
+                script.id = 'control';
+                head.appendChild(script);
+                script.onload = () => {
+                    const script = document.createElement('script');
+                    script.src = './resources/signer/ica/signer_init.js';
+                    script.type = 'text/javascript';
+                    script.id = 'signer_init';
+                    head.appendChild(script);
+                }
+            }
+        }
     }
 }
 

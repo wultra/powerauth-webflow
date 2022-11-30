@@ -43,7 +43,7 @@ export default class SmsAuthorization extends React.Component {
         this.storeRemainingAttempts = this.storeRemainingAttempts.bind(this);
         this.handleSmsResend = this.handleSmsResend.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
-        this.state = {passwordEnabled: null, smsOtpEnabled: null, username: null, resendEnabled: false, initialized: false, error: null, message: null, remainingAttempts: null};
+        this.state = {passwordEnabled: null, smsOtpEnabled: null, certificateEnabled: null, username: null, resendEnabled: false, initialized: false, error: null, message: null, data: null, remainingAttempts: null};
     }
 
     componentWillMount() {
@@ -56,8 +56,12 @@ export default class SmsAuthorization extends React.Component {
             this.setState({passwordEnabled: props.context.passwordEnabled});
             // Store information whether SMS authorization is enabled
             this.setState({smsOtpEnabled: props.context.smsOtpEnabled});
+            // Store information whether approval using certificate is enabled
+            this.setState({certificateEnabled: props.context.certificateEnabled});
             // Store username for LOGIN_SCA step
             this.setState({username: props.context.username});
+            // Store data for signing
+            this.setState({data: props.context.data});
             // Set the component to initialized state
             this.setState({initialized: true});
         }
@@ -118,8 +122,8 @@ export default class SmsAuthorization extends React.Component {
                     <SmsComponent username={this.state.username} passwordEnabled={this.state.passwordEnabled}
                                   smsOtpEnabled={this.state.smsOtpEnabled} resendEnabled={this.state.resendEnabled}
                                   smsResendCallback={this.handleSmsResend} cancelCallback={this.handleCancel} parentComponent="SMS"
-                                  message={this.state.message} error={this.state.error} remainingAttempts={this.state.remainingAttempts}
-                                  initialized={this.state.initialized}/>
+                                  message={this.state.message} data={this.state.data} error={this.state.error} remainingAttempts={this.state.remainingAttempts}
+                                  certificateEnabled={this.state.certificateEnabled} initialized={this.state.initialized}/>
                 </Panel>
                 {this.props.context.loading ? <Spinner/> : undefined}
             </div>

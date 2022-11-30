@@ -22,31 +22,27 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
-import io.getlime.security.powerauth.lib.dataadapter.model.converter.UserAccountStatusConverter;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.CertificateAuthenticationMode;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.CertificateVerificationResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.InitAuthMethodResponse;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifyCertificateResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.request.ApprovalScaAuthRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.request.ApprovalScaInitRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.response.ApprovalScaAuthResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.response.ApprovalScaInitResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
-import io.getlime.security.powerauth.lib.webflow.authentication.repository.CertificateVerificationRepository;
-import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.CertificateVerificationEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import org.slf4j.Logger;
@@ -58,8 +54,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Controller for initialization of SCA approval.
@@ -78,10 +72,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
     private final NextStepClient nextStepClient;
     private final AuthMethodQueryService authMethodQueryService;
     private final AuthenticationManagementService authenticationManagementService;
-    private final CertificateVerificationRepository certificateVerificationRepository;
     private final HttpSession httpSession;
-
-    private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
 
     /**
      * Controller constructor.
@@ -89,16 +80,14 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
      * @param nextStepClient Next Step client.
      * @param authMethodQueryService Service for querying authentication methods.
      * @param authenticationManagementService Authentication management service.
-     * @param certificateVerificationRepository Certificate verification repository.
      * @param httpSession HTTP session.
      */
     @Autowired
-    public ApprovalScaController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, CertificateVerificationRepository certificateVerificationRepository, HttpSession httpSession) {
+    public ApprovalScaController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, HttpSession httpSession) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
         this.authMethodQueryService = authMethodQueryService;
         this.authenticationManagementService = authenticationManagementService;
-        this.certificateVerificationRepository = certificateVerificationRepository;
         this.httpSession = httpSession;
     }
 
@@ -116,34 +105,6 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
         if (userId == null) {
             // At this point user ID must be known, method cannot continue
             throw new InvalidRequestException("User ID is missing");
-        }
-        String organizationId = operation.getOrganizationId();
-
-        if (isCertificateUsedForAuthentication(operation.getOperationId())) {
-            String clientCertificate = getClientCertificateFromHttpSession();
-            FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-            AccountStatus accountStatus = statusConverter.fromUserAccountStatus(operation.getAccountStatus());
-            ApplicationContext applicationContext = operation.getApplicationContext();
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
-            try {
-                boolean userAuthenticatedUsingCertificate = verifyClientCertificate(operation.getOperationId(), userId, organizationId, clientCertificate, accountStatus, operationContext);
-                if (userAuthenticatedUsingCertificate) {
-                    logger.info("Step authentication succeeded with client certificate, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-                }
-            } catch (NextStepClientException | DataAdapterClientErrorException ex) {
-                logger.error(ex.getMessage(), ex);
-                // Send error to client
-                ApprovalScaAuthResponse response = new ApprovalScaAuthResponse();
-                response.setResult(AuthStepResult.AUTH_FAILED);
-                if (ex instanceof DataAdapterClientErrorException) {
-                    DataAdapterClientErrorException ex2 = (DataAdapterClientErrorException) ex;
-                    response.setRemainingAttempts(ex2.getError().getRemainingAttempts());
-                    response.setMessage(ex2.getError().getMessage());
-                } else {
-                    response.setMessage("error.communication");
-                }
-                return response;
-            }
         }
 
         ApprovalScaAuthResponse response = new ApprovalScaAuthResponse();
@@ -200,15 +161,14 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             ApplicationContext applicationContext = operation.getApplicationContext();
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
-            ObjectResponse<InitAuthMethodResponse> objectResponse = dataAdapterClient.initAuthMethod(operation.getUserId(), operation.getOrganizationId(), AuthMethod.LOGIN_SCA, operationContext);
+            ObjectResponse<InitAuthMethodResponse> objectResponse = dataAdapterClient.initAuthMethod(operation.getUserId(), operation.getOrganizationId(), AuthMethod.APPROVAL_SCA, operationContext);
             InitAuthMethodResponse initResponse = objectResponse.getResponseObject();
-            // In case client TLS certificate was used during SCA login, use the client TLS certificate for authentication during payment
-            if (initResponse.getCertificateAuthenticationMode() == CertificateAuthenticationMode.ENABLED
-                    && isCertificateUsedForAuthentication(operation.getOperationId())) {
-                String certificateVerificationUrl = initResponse.getCertificateVerificationUrl();
-                logger.debug("Step init succeeded with client certificate, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-                return new ApprovalScaInitResponse(true, certificateVerificationUrl);
-            }
+
+            final boolean approvalByCertificateEnabled = initResponse.getCertificateAuthenticationMode() == CertificateAuthenticationMode.ENABLED;
+            setApprovalByCertificateEnabled(approvalByCertificateEnabled);
+
+            logger.debug("Step init succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName());
+            return new ApprovalScaInitResponse();
 
         } catch (NextStepClientException ex) {
             logger.error("Error occurred in Next Step server", ex);
@@ -217,11 +177,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
             logger.error("Error occurred in Data Adapter", ex);
             throw new CommunicationFailedException("Communication with Data Adapter service failed");
         }
-
-        logger.debug("Step init succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        return new ApprovalScaInitResponse();
     }
-
 
     /**
      * Get current authentication method name.
@@ -256,71 +212,10 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
         }
     }
 
-    /**
-     * Whether client TLS certificate is used for authentication.
-     * @param operationId Operation ID.
-     * @return Whether client TLS certificate is used for authentication.
-     */
-    private boolean isCertificateUsedForAuthentication(String operationId) {
-        CertificateVerificationEntity.CertificateVerificationKey key = new CertificateVerificationEntity.CertificateVerificationKey(operationId, AuthMethod.LOGIN_SCA);
-        return certificateVerificationRepository.findByCertificateVerificationKey(key).isPresent();
-    }
-
-    /**
-     * Get client TLS certificate from HTTP session.
-     * @return Client certificate.
-     */
-    private String getClientCertificateFromHttpSession() {
+    private void setApprovalByCertificateEnabled(boolean approvalByCertificateEnabled) {
         synchronized (httpSession.getServletContext()) {
-            return (String) httpSession.getAttribute(HttpSessionAttributeNames.CLIENT_CERTIFICATE);
+            httpSession.setAttribute(HttpSessionAttributeNames.APPROVAL_BY_CERTIFICATE_ENABLED, approvalByCertificateEnabled);
         }
-    }
-
-    /**
-     * Authenticate client TLS certificate using Data Adapter.
-     * @param operationId Operation ID.
-     * @param userId User ID.
-     * @param organizationId Organization ID.
-     * @param clientCertificate Client TLS certificate.
-     * @param accountStatus Account status.
-     * @param operationContext Operation context.
-     * @return Whether authentication using client TLS certificate succeeded.
-     * @throws DataAdapterClientErrorException In case communication with Data Adapter fails.
-     * @throws NextStepClientException In case communication with Next Step service fails.
-     * @throws AuthStepException In case step authentication fails.
-     */
-    private boolean verifyClientCertificate(String operationId, String userId, String organizationId, String clientCertificate, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepClientException, AuthStepException {
-        ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyClientCertificate(userId, organizationId, clientCertificate, getAuthMethodName(), accountStatus, operationContext);
-        VerifyCertificateResponse certResponse = objectResponseCert.getResponseObject();
-        CertificateVerificationResult verificationResult = certResponse.getCertificateVerificationResult();
-        if (verificationResult == CertificateVerificationResult.SUCCEEDED) {
-            return true;
-        }
-        logger.debug("Step authentication failed with client certificate, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
-        List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.CLIENT_CERTIFICATE);
-        AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null, null);
-        if (response.getAuthResult() == AuthResult.FAILED) {
-            // FAILED result instead of CONTINUE means the authentication method is failed
-            throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
-        }
-        Integer remainingAttemptsDA = certResponse.getRemainingAttempts();
-        boolean showRemainingAttempts = certResponse.getShowRemainingAttempts();
-        UserAccountStatus userAccountStatus = statusConverter.fromAccountStatus(certResponse.getAccountStatus());
-
-        String errorMessage = "login.authenticationFailed";
-        if (certResponse.getErrorMessage() != null) {
-            errorMessage = certResponse.getErrorMessage();
-        }
-
-        AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
-        if (showRemainingAttempts) {
-            GetOperationDetailResponse updatedOperation = getOperation();
-            Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-            Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
-            authEx.setRemainingAttempts(remainingAttempts);
-        }
-        authEx.setAccountStatus(userAccountStatus);
-        throw authEx;
     }
 
 }

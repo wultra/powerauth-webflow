@@ -194,6 +194,14 @@ public class HomeController {
         model.put("usernameMaxLength", webFlowConfig.getUsernameMaxLength());
         model.put("passwordMaxLength", webFlowConfig.getPasswordMaxLength());
         model.put("smsOtpMaxLength", webFlowConfig.getSmsOtpMaxLength());
+        model.put("approvalCertificateEnabled", webFlowConfig.isApprovalCertificateEnabled());
+        model.put("approvalCertificateSigner", webFlowConfig.getApprovalCertificateSigner().toString());
+        model.put("icaConfigurationUrl", webFlowConfig.getIcaConfigurationUrl());
+        model.put("icaExtensionIDChrome", webFlowConfig.getIcaExtensionIDChrome());
+        model.put("icaExtensionIDOpera", webFlowConfig.getIcaExtensionIDOpera());
+        model.put("icaExtensionIDEdge", webFlowConfig.getIcaExtensionIDEdge());
+        model.put("icaExtensionIDFirefox", webFlowConfig.getIcaExtensionIDFirefox());
+        model.put("icaExtensionInstallURLFirefox", webFlowConfig.getIcaExtensionInstallURLFirefox());
         logger.info("The /authenticate request succeeded");
         return "index";
     }
@@ -377,5 +385,6 @@ public class HomeController {
         httpSession.removeAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
         httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
         httpSession.removeAttribute(HttpSessionAttributeNames.CLIENT_CERTIFICATE);
+        httpSession.removeAttribute(HttpSessionAttributeNames.APPROVAL_BY_CERTIFICATE_ENABLED);
     }
 }

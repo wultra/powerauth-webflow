@@ -249,11 +249,8 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
      */
     private boolean getConsentSkippedFromHttpSession() {
         synchronized (httpSession.getServletContext()) {
-            Object consentSkipped = httpSession.getAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
-            if (consentSkipped == null) {
-                return false;
-            }
-            return (boolean) consentSkipped;
+            Boolean consentSkipped = (Boolean) httpSession.getAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
+            return consentSkipped != null && consentSkipped;
         }
     }
 

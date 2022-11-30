@@ -29,6 +29,7 @@ public class InitSmsAuthorizationResponse extends AuthStepResponse {
     private String username;
     private boolean passwordEnabled;
     private boolean smsOtpEnabled;
+    private boolean certificateEnabled;
     private int resendDelay;
 
     /**
@@ -93,5 +94,21 @@ public class InitSmsAuthorizationResponse extends AuthStepResponse {
      */
     public void setResendDelay(int resendDelay) {
         this.resendDelay = resendDelay;
+    }
+
+    /**
+     * Get whether authorization using certificate is enabled.
+     * @return Whether authorization using certificate is enabled.
+     */
+    public boolean isCertificateEnabled() {
+        return certificateEnabled;
+    }
+
+    /**
+     * Set whether authorization using certificate is enabled.
+     * @param certificateEnabled Whether authorization using certificate is enabled.
+     */
+    public void setCertificateEnabled(boolean certificateEnabled) {
+        this.certificateEnabled = certificateEnabled;
     }
 }

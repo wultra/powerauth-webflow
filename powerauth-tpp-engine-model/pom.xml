@@ -60,14 +60,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                    <compilerArgs>
-                        <arg>--add-exports</arg>
-                        <arg>java.base/sun.security.util=ALL-UNNAMED</arg>
-                        <arg>--add-exports</arg>
-                        <arg>java.base/sun.security.x509=ALL-UNNAMED</arg>
-                    </compilerArgs>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -77,10 +71,6 @@
                 <configuration>
                     <failOnError>false</failOnError>
                     <detectOfflineLinks>false</detectOfflineLinks>
-                    <additionalOptions>
-                        <option>--add-exports</option>
-                        <option>java.base/sun.security.x509=ALL-UNNAMED</option>
-                    </additionalOptions>
                 </configuration>
                 <executions>
                     <execution>

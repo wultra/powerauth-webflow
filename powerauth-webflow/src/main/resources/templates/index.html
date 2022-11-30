@@ -29,12 +29,12 @@
     <link rel="stylesheet" href="./ext-resources/css/customization.css"/>
     <th:block th:if="${afs_js_snippet_url != null and !afs_js_snippet_url.empty}">
         <!-- AFS integration -->
-        <script th:src="${afs_js_snippet_url}" async="async"></script>
+        <script type="text/javascript" th:src="${afs_js_snippet_url}" async="async"></script>
     </th:block>
 </head>
 <body>
 
-<script th:inline="javascript">
+<script type="text/javascript" th:inline="javascript">
     /*<![CDATA[*/
     var lang = [[${lang}]];
 
@@ -50,6 +50,18 @@
     var showAndroidSecurityWarning = [[${showAndroidSecurityWarning}]];
     var consentPanelLimitEnabled = [[${consentPanelLimitEnabled}]];
     var consentPanelLimitCharacters = [[${consentPanelLimitCharacters}]];
+
+    // ICAClientSign configuration
+    const approvalCertificateEnabled = [[${approvalCertificateEnabled}]];
+    const approvalCertificateSigner = [[${approvalCertificateSigner}]];
+    const icaConfigurationUrl = [[${icaConfigurationUrl}]];
+    // Following variable names must not be changed, they are expected by ICAClientSign.js exactly like this
+    const extensionIDChrome = [[${icaExtensionIDChrome}]];
+    const extensionIDOpera = [[${icaExtensionIDOpera}]];
+    const extensionIDEdge = [[${icaExtensionIDEdge}]];
+    const extensionIDFirefox = [[${icaExtensionIDFirefox}]];
+    const extensionInstallURLFirefox = [[${icaExtensionInstallURLFirefox}]];
+
     window.onbeforeunload = function() {
         // Modern browsers do not allow custom messages, so text will be only shown in old browsers.
         // Note that the onbeforeunload dialog does not appear in case user does no action, see:

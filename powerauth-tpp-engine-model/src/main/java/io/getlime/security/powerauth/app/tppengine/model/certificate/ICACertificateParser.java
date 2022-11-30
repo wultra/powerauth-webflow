@@ -22,19 +22,23 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DLSequence;
+import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
+import org.bouncycastle.asn1.x500.RDN;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
-import sun.security.x509.AVA;
-import sun.security.x509.X500Name;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMParser;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -79,11 +83,12 @@ public class ICACertificateParser implements ICertificateParser {
                 .replace("-----BEGIN\nCERTIFICATE-----", "-----BEGIN CERTIFICATE-----")
                 .replace("-----END\nCERTIFICATE-----", "-----END CERTIFICATE-----");
 
-        final CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        final ByteArrayInputStream bais = new ByteArrayInputStream(certificatePem.getBytes(StandardCharsets.UTF_8));
-        X509Certificate cert = (X509Certificate) cf.generateCertificate(bais);
 
         try {
+            final ByteArrayInputStream bais = new ByteArrayInputStream(certificatePem.getBytes(StandardCharsets.UTF_8));
+            PEMParser pemParser = new PEMParser(new InputStreamReader(bais));
+            JcaX509CertificateConverter x509Converter = new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider());
+            X509Certificate cert = x509Converter.getCertificate((X509CertificateHolder) pemParser.readObject());
             final byte[] qcStatement = cert.getExtensionValue("1.3.6.1.5.5.7.1.3");
             if (qcStatement == null) {
                 throw new CertificateException("Unable to extract PSD2 mandates.");
@@ -129,9 +134,7 @@ public class ICACertificateParser implements ICertificateParser {
                     }
                 }
             }
-
-
-            final List<AVA> avaList = ((X500Name) cert.getSubjectDN()).allAvas();
+            final X500Name x500Name = new X500Name(cert.getSubjectDN().toString());
             String country = null;
             String serialNumber = null;
             String commonName = null;
@@ -142,9 +145,10 @@ public class ICACertificateParser implements ICertificateParser {
             String zipCode = null;
             String region = null;
             String website = null;
-            for (AVA ava: avaList) {
-                final String oid = ava.getObjectIdentifier().toString();
-                final String val = ava.getValueString();
+            for (RDN rdn: x500Name.getRDNs()) {
+                final AttributeTypeAndValue attr = rdn.getFirst();
+                final String oid = attr.getType().getId();
+                final String val = attr.getValue().toString();
 
                 switch (oid) {
                     case "2.5.4.6": {   //    C=CZ => 2.5.4.6
