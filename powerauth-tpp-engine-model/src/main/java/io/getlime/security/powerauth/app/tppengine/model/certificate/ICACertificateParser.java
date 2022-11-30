@@ -61,7 +61,6 @@ public class ICACertificateParser implements ICertificateParser {
      * @return Structured certificate information.
      * @throws CertificateException In case certificate cannot be parsed (or in rare case X.509 is not supported).
      */
-    @SuppressWarnings("unchecked")
     public CertInfo parse(String certificatePem) throws CertificateException {
 
         // Check for null certificate value
