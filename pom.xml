@@ -108,7 +108,7 @@
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
         <junit.version>5.8.2</junit.version>
         <spring-context.version>5.3.20</spring-context.version>
-        <wultra-java-core.version>1.5.2</wultra-java-core.version>
+        <wultra-java-core.version>1.6.0-SNAPSHOT</wultra-java-core.version>
         <powerauth-java-crypto.version>1.4.0-SNAPSHOT</powerauth-java-crypto.version>
         <powerauth.version>1.4.0-SNAPSHOT</powerauth.version>
     </properties>
