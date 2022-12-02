@@ -6,8 +6,8 @@
 const extensionsSettings = new Array({
     name: extensionOwner,
     extensionIDChrome: extensionIDChrome,
-    extensionIDEdge: extensionIDOpera,
-    extensionIDOpera: extensionIDEdge,
+    extensionIDEdge: extensionIDEdge,
+    extensionIDOpera: extensionIDOpera,
     extensionIDFirefox: extensionIDFirefox,
     extensionInstallURLFirefox: extensionInstallURLFirefox,
     isDefault: true // The isDefault parameter overrides parsing of extensionOwner from URL
