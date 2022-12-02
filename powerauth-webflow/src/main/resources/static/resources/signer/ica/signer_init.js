@@ -12,9 +12,10 @@ const extensionsSettings = new Array({
     extensionInstallURLFirefox: extensionInstallURLFirefox,
     isDefault: true // The isDefault parameter overrides parsing of extensionOwner from URL
 });
-const configURLs = new Array(
-    {library: "ICAClientSign", url: icaConfigurationUrl}
-);
+const configURLs = new Array({
+    library: "ICAClientSign",
+    url: icaConfigurationUrl
+});
 ControlObj.init(extensionsSettings, configURLs);
 
 // Logging level: 0 - turned off, 1 - error, 2 - warning, 3 - info, 4 - log/debug
