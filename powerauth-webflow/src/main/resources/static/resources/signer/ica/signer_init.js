@@ -2,11 +2,23 @@
 // and the Control Object is initialized. The signer component is not initialized yet, it is pending choice of
 // approval by certificate and subsequent call of method loadICASigner().
 
-// Logging level: 0 - turned off, 1 - error, 2 - warning, 3 - info, 4 - log/debug
-loggingLevel = 4;
+// Init control object for signer with configuration received from Web Flow backend
+const extensionsSettings = new Array({
+    name: extensionOwner,
+    extensionIDChrome: extensionIDChrome,
+    extensionIDEdge: extensionIDOpera,
+    extensionIDOpera: extensionIDEdge,
+    extensionIDFirefox: extensionIDFirefox,
+    extensionInstallURLFirefox: extensionInstallURLFirefox,
+    isDefault: true // The isDefault parameter overrides parsing of extensionOwner from URL
+});
+const configURLs = new Array(
+    {library: "ICAClientSign", url: icaConfigurationUrl}
+);
+ControlObj.init(extensionsSettings, configURLs);
 
-// Init control object for signer
-ControlObj.init();
+// Logging level: 0 - turned off, 1 - error, 2 - warning, 3 - info, 4 - log/debug
+ICAPKIService.loggingLevel = icaLogLevel;
 
 let idTestInitExtension;
 let idTestInitHost;
@@ -15,22 +27,23 @@ let idTestInitHost;
 const supportedOs = [
     {name: "Windows 10"},
     {name: "Windows 8.1"},
-    {name: "Windows 8.0"},
+    {name: "Windows 8"},
     {name: "Windows 7"},
     {name: "macOS 10.12"},
     {name: "macOS 10.13"},
     {name: "macOS 10.14"},
     {name: "macOS 10.15"},
-    {name: "macOS 11"}
+    {name: "macOS 11"},
+    {name: "macOS 12"}
 ];
 
 // Supported browsers
 const supportedBrowser = [
-    {name: "Firefox", minimalVersion: "50"},
-    {name: "IE", minimalVersion: "10"},
-    {name: "Chrome", minimalVersion: "45"},
-    {name: "Edge", minimalVersion: "79"},
-    {name: "Opera", minimalVersion: "30"}
+    {name: "Firefox", minimalVersion: "104"},
+    {name: "Chrome", minimalVersion: "104"},
+    {name: "Edge", minimalVersion: "104"},
+    {name: "Opera", minimalVersion: "90"},
+    {name: "Safari", minimalVersion: "14"}
 ];
 
 // The method should be called after HTML is rendered

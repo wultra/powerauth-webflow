@@ -1,0 +1,70 @@
+<ICAPKIServiceLibraryConfig Version="0.1">
+
+	<AllowedExtensions Spec="enum">
+		<Extension Id="fdolcjnejgbpoadihncaggiicpkhjchl" Name="ICA Chrome" />
+		<Extension Id="kchhpancoebhkdgdafnifpkcacaopncp" Name="ICA Edge" />
+		<Extension Id="lbdolmcpegiinogjamobnidmhoggcmho" Name="ICA Opera" />
+		<Extension Id="icapkiservice@ica.cz" Name="ICA Firefox" />
+		
+		<Extension Id="eahecpanklnlonjjlojnjjcigcbflego" Name="ČSOB ČR Chrome" />
+		<Extension Id="gloanjaooihceakkecephipccmhbnead" Name="ČSOB ČR Edge" />
+		<Extension Id="onoplndjhnkihmalpbmlolgadonjpifh" Name="ČSOB ČR Opera" />
+		<Extension Id="icapkiservice@csob.cz" Name="ČSOB ČR Firefox" />
+		
+		<Extension Id="keajcofpfbehkilblmcicgkdffacogbd" Name="ČSOB SR Chrome" />
+		<Extension Id="icapkiservice@csob.sk" Name="ČSOB SR Firefox" />
+
+		<Extension Id="fgelgbhmdpeipcngganbpabhhccalapg" Name="Sberbank Chrome" />
+		<Extension Id="lkdgplffifmmefehabdkmfeckeafcebl" Name="Sberbank Edge" />
+		<Extension Id="emppaeenjldlghecpgkkfpmiglmplimn" Name="Sberbank Opera" />
+		<Extension Id="icapkiservice@sberbank.cz" Name="Sberbank Firefox" />
+		
+		<Extension Id="hdbmbdpobhimeabanajlbkinlhkoflpk" Name="ČNB Chrome" />
+		<Extension Id="hlaepfiibpjcgbjhnebnlninminjfchd" Name="ČNB Edge" />
+		<Extension Id="iaafkmelnilmbaipeiplbgpkamooffnk" Name="ČNB Opera" />
+		<Extension Id="icapkiservice@cnb.cz" Name="ČNB Firefox" />
+		
+		<Extension Id="pnofkpnfmljeoipnjheegodoeeihphfa" Name="NKČR Chrome" />
+		<Extension Id="eibobahjmomkemenbbacdfillcfgjiek" Name="NKČR Edge" />
+		<Extension Id="bafbkjhaemcbfocoenhdfejdliabelbd" Name="NKČR Opera" />
+		<Extension Id="icapkiservice@nkcr.cz" Name="NKČR Firefox" />
+		
+		<Extension Id="nbjmjacokmgdabnafjgnkifabbjmefbf" Name="FNPM Chrome a Edge" />
+	</AllowedExtensions>
+
+	<LibraryInfo>
+		<LibraryName>ICAClientSign</LibraryName>
+		<LibraryVersion>5.1.0.0</LibraryVersion>
+	</LibraryInfo>
+
+	<LibrarySettings>
+		<LibraryReturnValues>
+			<Error Type="APP_OK" Value="0" />
+			<Error Type="MORE_DATA" Value="8002" />
+		</LibraryReturnValues>
+	</LibrarySettings>
+
+	<Platform Architecture="x86" OS="Windows">
+		<LibraryURL>ICAClientSignExt_v5100.zip</LibraryURL>
+		<LibraryFiles>
+			<File Hash="A5337EF1F5A0DFE4DC8FA6B4F3EF847A53624800B5928A0EEEF5B888CEECAABC">FreeSans.ttf</File>
+			<File Hash="25F06FD6D44309FEFFC139F3E17DBCE68FBF611D46022536AB966031C85A3EEE" IsMainFile="true">IcaClientSignExt.dll</File>
+			<File Hash="736CC5590ADEA6F030F014033A2481BEEEBEACFDD6A183011FF68F2081EF09D2">iconv.dll</File>
+			<File Hash="85D4AF74828E3E6C918A861768E61907B44EEE0F6DAC01D7C84F88E005E67098">schemas/XAdES.xsd</File>
+			<File Hash="AC4F51A437BA91E8A8F87368E91D0A456A24941D07D1CD982101E5A0DBF10EBD">schemas/XAdESv141.xsd</File>
+			<File Hash="35CF8197DA812C85E40D57891B35C94187569ED474A2DAC813CE5090DAFCD35C">schemas/xmldsig-core-schema.xsd</File>
+		</LibraryFiles>
+	</Platform>
+	<Platform Architecture="x64" OS="Mac">
+		<LibraryURL>ICAClientSignExt_v5100_macos.zip</LibraryURL>
+		<LibraryFiles>
+			<File Hash="61436DAAB0B42DC0780E7CCC1F8E4C06EDE91293B748E32BF1DC6D5B5EF07E37">ICAGUIDialogsApp.app/Contents/MacOS/ICAGUIDialogsApp</File>
+			<File Hash="A5337EF1F5A0DFE4DC8FA6B4F3EF847A53624800B5928A0EEEF5B888CEECAABC">FreeSans.ttf</File>
+			<File Hash="F66BAA4666025DE42A0848790B9356E91A9703534054730EC2EC75BFBD3412C3" IsMainFile="true">libICAClientSignExt.dylib</File>
+			<File Hash="570A1B8CAF85E71FA9282626A098F9A33DFC12FD122062343416EAF8FD3CAD4F">libICAGUIDialogs.dylib</File>
+			<File Hash="85D4AF74828E3E6C918A861768E61907B44EEE0F6DAC01D7C84F88E005E67098">schemas/XAdES.xsd</File>
+			<File Hash="AC4F51A437BA91E8A8F87368E91D0A456A24941D07D1CD982101E5A0DBF10EBD">schemas/XAdESv141.xsd</File>
+			<File Hash="35CF8197DA812C85E40D57891B35C94187569ED474A2DAC813CE5090DAFCD35C">schemas/xmldsig-core-schema.xsd</File>
+		</LibraryFiles>
+	</Platform>
+</ICAPKIServiceLibraryConfig>
