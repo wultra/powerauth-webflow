@@ -197,6 +197,8 @@ public class HomeController {
         model.put("approvalCertificateEnabled", webFlowConfig.isApprovalCertificateEnabled());
         model.put("approvalCertificateSigner", webFlowConfig.getApprovalCertificateSigner().toString());
         model.put("icaConfigurationUrl", webFlowConfig.getIcaConfigurationUrl());
+        model.put("icaLogLevel", webFlowConfig.getIcaLogLevel());
+        model.put("icaExtensionOwner", webFlowConfig.getIcaExtensionOwner());
         model.put("icaExtensionIDChrome", webFlowConfig.getIcaExtensionIDChrome());
         model.put("icaExtensionIDOpera", webFlowConfig.getIcaExtensionIDOpera());
         model.put("icaExtensionIDEdge", webFlowConfig.getIcaExtensionIDEdge());

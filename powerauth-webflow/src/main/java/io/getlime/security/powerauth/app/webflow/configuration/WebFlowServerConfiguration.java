@@ -138,6 +138,18 @@ public class WebFlowServerConfiguration {
     private String icaConfigurationUrl;
 
     /**
+     * ICA extension log level.
+     */
+    @Value("${powerauth.webflow.approval.certificate.signer.ica.logLevel:1}")
+    private String icaLogLevel;
+
+    /**
+     * ICA extension owner name.
+     */
+    @Value("${powerauth.webflow.approval.certificate.signer.ica.extensionOwner:}")
+    private String icaExtensionOwner;
+
+    /**
      * ICA extension ID for Google Chrome.
      */
     @Value("${powerauth.webflow.approval.certificate.signer.ica.extensionIDChrome:}")
@@ -305,6 +317,22 @@ public class WebFlowServerConfiguration {
      */
     public String getIcaConfigurationUrl() {
         return icaConfigurationUrl;
+    }
+
+    /**
+     * Get ICA extension log level.
+     * @return ICA extension log level.
+     */
+    public String getIcaLogLevel() {
+        return icaLogLevel;
+    }
+
+    /**
+     * Get ICA extension owner name.
+     * @return ICA extension owner name.
+     */
+    public String getIcaExtensionOwner() {
+        return icaExtensionOwner;
     }
 
     /**

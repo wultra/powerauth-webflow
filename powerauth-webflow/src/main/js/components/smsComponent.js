@@ -104,7 +104,7 @@ export default class SmsComponent extends React.Component {
         const data = this.props.data;
         const cbSuccessApproval = this.approvalWithCertificateSucceeded;
         const cbError = this.approvalWithCertificateFailed;
-        const encodedData = encodeToBase64(data);
+        const encodedData = window.btoa(data);
         loadKeyStoreAndSignMessage(encodedData, cbSuccessApproval, cbError);
     }
 
