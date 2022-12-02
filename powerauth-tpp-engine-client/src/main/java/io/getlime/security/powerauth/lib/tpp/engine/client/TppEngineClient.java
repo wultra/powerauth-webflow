@@ -18,6 +18,8 @@
 
 package io.getlime.security.powerauth.lib.tpp.engine.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -75,7 +77,7 @@ public class TppEngineClient {
             config.setObjectMapper(objectMapper);
             restClient = new DefaultRestClient(config);
         } catch (RestClientException ex) {
-            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "Rest client initialization failed."));
+            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(Error.Code.ERROR_GENERIC, "Rest client initialization failed."));
             logError(ex2);
             throw ex2;
         }
@@ -91,7 +93,7 @@ public class TppEngineClient {
         try {
             restClient = new DefaultRestClient(restClientConfiguration);
         } catch (RestClientException ex) {
-            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "Rest client initialization failed."));
+            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(Error.Code.ERROR_GENERIC, "Rest client initialization failed."));
             logError(ex2);
             throw ex2;
         }
@@ -260,7 +262,7 @@ public class TppEngineClient {
         try {
             return restClient.get(path, queryParams, null, typeReference).getBody();
         } catch (RestClientException ex) {
-            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP GET request failed."));
+            final TppEngineClientException ex2 = createTppEngineClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -279,7 +281,7 @@ public class TppEngineClient {
         try {
             return restClient.getObject(path, queryParams, null, responseType);
         } catch (RestClientException ex) {
-            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP GET request failed."));
+            final TppEngineClientException ex2 = createTppEngineClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -297,7 +299,7 @@ public class TppEngineClient {
         try {
             return restClient.postObject(path, request);
         } catch (RestClientException ex) {
-            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+            final TppEngineClientException ex2 = createTppEngineClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -316,7 +318,7 @@ public class TppEngineClient {
         try {
             return restClient.postObject(path, request, responseType);
         } catch (RestClientException ex) {
-            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+            TppEngineClientException ex2 = createTppEngineClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -336,7 +338,7 @@ public class TppEngineClient {
         try {
             return restClient.putObject(path, request, queryParams, null, responseType);
         } catch (RestClientException ex) {
-            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP PUT request failed."));
+            final TppEngineClientException ex2 = createTppEngineClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -354,7 +356,7 @@ public class TppEngineClient {
         try {
             return restClient.deleteObject(path, queryParams, null);
         } catch (RestClientException ex) {
-            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP DELETE request failed."));
+            final TppEngineClientException ex2 = createTppEngineClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -373,13 +375,33 @@ public class TppEngineClient {
         }
     }
 
+    private static TppEngineClientException createTppEngineClientException(final RestClientException e) {
+        return new TppEngineClientException(e, resolveTppEngineError(e));
+    }
+
+    private static TppEngineError resolveTppEngineError(final RestClientException e) {
+        // TODO (racansky, 2022-12-02) workaround until https://github.com/wultra/lime-java-core/issues/32
+        if (e.getErrorResponse() == null || e.getErrorResponse().getResponseObject() == null) {
+            try {
+                return new ObjectMapper().readValue(e.getResponse(), new TypeReference<ObjectResponse<TppEngineError>>(){})
+                        .getResponseObject();
+            } catch (JsonProcessingException ex2) {
+                logger.debug("Problem to deserialize error response", ex2);
+                return new TppEngineError(resolveErrorCode(e), e.getMessage());
+            }
+        }
+
+        final Error error = e.getErrorResponse().getResponseObject();
+        return new TppEngineError(error.getCode(), error.getMessage());
+    }
+
     /**
      * Resolve error code based on HTTP status code from REST client exception.
      */
-    private String resolveErrorCode(RestClientException ex) {
+    private static String resolveErrorCode(RestClientException ex) {
         if (ex.getStatusCode() == null) {
             // REST client errors, response not received
-            return TppEngineError.Code.ERROR_GENERIC;
+            return Error.Code.ERROR_GENERIC;
         }
         if (ex.getStatusCode().is4xxClientError()) {
             // Errors caused by invalid TPP engine client requests
