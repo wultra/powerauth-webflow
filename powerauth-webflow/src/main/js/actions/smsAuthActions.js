@@ -304,7 +304,7 @@ export function initializeICAClientSign() {
                 head.appendChild(script);
                 script.onload = () => {
                     const script = document.createElement('script');
-                    script.src = './resources/signer/ica/signer_init.js';
+                    script.src = './resources/signer/ica/signer.js';
                     script.type = 'text/javascript';
                     script.id = 'signer_init';
                     head.appendChild(script);
