@@ -115,44 +115,44 @@ function loadICASigner(cbSuccess, cbError) {
     }
 }
 
-// Load keystore and use the first certificate which is found for signing
-// TODO - support for multiple certificates with certificate choice before signing
-function loadKeyStoreAndSignMessage(content, cbSuccess, cbError) {
+// Load keystore, filter only certificates which can be used for signing
+function loadKeyStore(cbSuccess, cbError) {
     try {
         if (!IsICAPKIServiceRunning()) {
             ThrowICAPKIServiceNotRunning();
         }
-        const cb = function cb(count) {
-            if (count === undefined || count < 1) {
-                cbError("signer.error.certificate.notFound");
-                return;
-            }
-            // first certificate and use it for signing
-            loadCertificateAndSignMessage(content, cbSuccess, cbError);
-        };
+        // Load certificates from key store, cardstore is disabled, extract required items
+        const requiredItems = ["SN_DEC", "CN", "NOTAFTER", "ISSUER_DN"];
+        const jsonFilter = JSON.stringify({SubjectNames: [], SerialNumbers: {}, ValueTypes: requiredItems});
         // Flags for certificates which can be used for signing
         const flags = ICAClientSign.CERTLOAD_SIGNING_FLAG | ICAClientSign.CERTLOAD_QUALIFIED_FLAG;
-        // Load certificates from key store, cardstore is disabled
-        ICAClientSign.certificateLoadUserKeyStore(cb, false, flags);
+        ICAClientSign.certLoadUserKeyStoreJSONAsync(false, jsonFilter, flags)
+            .then((result) => {
+                cbSuccess(result)
+            })
+            .catch(() => {
+                cbError("signer.error.certificate.notFound")
+            });
     } catch (ex) {
-        ProcException("certificateLoadUserKeyStore error", ex);
+        ProcException("certLoadUserKeyStoreJSONAsync error", ex);
         cbError("signer.error.certificate.notFound");
     }
 }
 
-// Load first certificate found in the keystore and set it for signing
-function loadCertificateAndSignMessage(content, cbSuccess, cbError) {
-    const cbCert = function cb(certIndex, pem) {
-        if (pem == null) {
-            cbError("signer.error.certificate.notFound");
-            return;
+// Set chosen certificate PEM for signing
+function setChosenCertificate(pem, cbError) {
+    try {
+        if (!IsICAPKIServiceRunning()) {
+            ThrowICAPKIServiceNotRunning();
         }
-        const cbCertSet = function cb() {
-            signMessage(content, cbSuccess, cbError);
-        };
-        ICAClientSign.signerSetCertificate(cbCertSet, pem);
+        ICAClientSign.signerSetCertificateAsync(pem)
+            .catch(() => {
+                cbError("signer.error.certificate.notFound")
+            });
+    } catch (ex) {
+        ProcException("signerSetCertificateAsync error", ex);
+        cbError("signer.error.certificate.notFound");
     }
-    ICAClientSign.certificateEnumerateStore(cbCert, 0);
 }
 
 // Sign content using CMS in detached mode, content should be Base-64 encoded
@@ -161,10 +161,13 @@ function signMessage(content, cbSuccess, cbError) {
         if (!IsICAPKIServiceRunning()) {
             ThrowICAPKIServiceNotRunning();
         }
-        const cb = function cb(msg) {
-            cbSuccess(msg);
-        };
-        ICAClientSign.signCmsDetached(cb, content);
+        ICAClientSign.signCmsDetachedAsync(content)
+            .then(result => {
+                cbSuccess(result);
+            })
+            .catch(() => {
+                cbError("signer.result.failed")
+            });
     } catch (ex) {
         ProcException("signCmsDetached error", ex);
         cbError("signer.result.failed");

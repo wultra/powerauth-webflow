@@ -1,6 +1,6 @@
 /*
  * PowerAuth Web Flow and related software components
- * Copyright (C) 2017 Wultra s.r.o.
+ * Copyright (C) 2022 Wultra s.r.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,9 +19,9 @@ import React from 'react';
 import Select from 'react-select';
 
 /**
- * Select UI component for bank account choice.
+ * Select UI component for certificates.
  */
-export default class BankAccountSelect extends React.Component {
+export default class CertificateSelect extends React.Component {
 
     constructor() {
         super();
@@ -36,10 +36,10 @@ export default class BankAccountSelect extends React.Component {
         return (
             <div className="section">
                 <Select
-                    optionComponent={BankAccountOption}
-                    options={this.props.bankAccounts}
-                    value={this.props.chosenBankAccount}
-                    valueComponent={BankAccountValue}
+                    optionComponent={CertificateOption}
+                    options={this.props.certificates}
+                    value={this.props.chosenCertificate}
+                    valueComponent={CertificateValue}
                     disabled={this.props.choiceDisabled}
                     clearable={false}
                     searchable={false}
@@ -51,7 +51,7 @@ export default class BankAccountSelect extends React.Component {
     }
 }
 
-class BankAccountOption extends React.Component {
+class CertificateOption extends React.Component {
 
     constructor() {
         super();
@@ -74,52 +74,45 @@ class BankAccountOption extends React.Component {
         if (this.props.isFocused) return;
         this.props.onFocus(this.props.option, event);
     }
+
     render() {
-        const bankAccount = this.props.option;
+        const certificate = this.props.option;
         return (
             <div className={this.props.className}
                  onMouseMove={this.handleMouseMove}
                  onMouseDown={this.handleMouseDown}
                  onMouseEnter={this.handleMouseEnter}>
-                {formatBankAccount(bankAccount)}
+                {formatCertificate(certificate)}
             </div>
         );
     }
 }
 
-class BankAccountValue extends React.Component {
+class CertificateValue extends React.Component {
     render() {
-        const bankAccount = this.props.value;
+        const certificate = this.props.value;
         return (
             <div className="Select-value">
                 <div className="Select-value-label">
-                    {formatBankAccount(bankAccount)}
+                    {formatCertificate(certificate)}
                 </div>
             </div>
         );
     }
 }
 
-function formatBankAccount(bankAccount) {
+function formatCertificate(certificate) {
     return (
         <div>
             <table width="100%">
                 <tbody>
                 <tr>
-                    <td width="50%" className="key">{bankAccount.name}</td>
-                    <td width="50%" className="tint text-right">
-                        {bankAccount.balance} {bankAccount.currency}
-                    </td>
+                    <td width="50%" className="text-left">SN: {certificate.Value.SN_DEC}</td>
+                    <td width="50%" className="tint text-right">{certificate.Value.CN}</td>
                 </tr>
                 <tr>
-                    <td width="50%" className="message-information">{bankAccount.number}</td>
-                    <td width="50%">
-                        {(!bankAccount.usableForPayment && bankAccount.unusableForPaymentReason) ? (
-                            <div className="message-error font-tiny text-right">
-                                {bankAccount.unusableForPaymentReason}
-                            </div>
-                        ) : (undefined)}
-                    </td>
+                    <td width="50%" className="font-tiny text-left">Exp: {certificate.Value.NOTAFTER}</td>
+                    <td width="50%" className="font-tiny text-right">{certificate.Value.ISSUER_DN.match(/CN=(.+?)(,|\+|\;|$)/)[1]}</td>
                 </tr>
                 </tbody>
             </table>

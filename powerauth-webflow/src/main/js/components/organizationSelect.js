@@ -72,7 +72,7 @@ class OrganizationOption extends React.Component {
         if (this.props.isFocused) return;
         this.props.onFocus(this.props.option, event);
     }
-    render () {
+    render() {
         const organization = this.props.option;
         return (
             <div className={this.props.className}
@@ -86,7 +86,7 @@ class OrganizationOption extends React.Component {
 }
 
 class OrganizationValue extends React.Component {
-    render () {
+    render() {
         const organization = this.props.value;
         return (
             <div className="Select-value">
