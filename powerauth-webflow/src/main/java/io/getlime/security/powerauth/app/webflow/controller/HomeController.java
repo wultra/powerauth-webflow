@@ -380,14 +380,16 @@ public class HomeController {
      * or failed with a fatal error.
      */
     private void cleanHttpSession() {
-        httpSession.removeAttribute(HttpSessionAttributeNames.OTP_ID);
-        httpSession.removeAttribute(HttpSessionAttributeNames.LAST_MESSAGE_TIMESTAMP);
-        httpSession.removeAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
-        httpSession.removeAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
-        httpSession.removeAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
-        httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
-        httpSession.removeAttribute(HttpSessionAttributeNames.CLIENT_CERTIFICATE);
-        httpSession.removeAttribute(HttpSessionAttributeNames.APPROVAL_BY_CERTIFICATE_ENABLED);
-        httpSession.removeAttribute(HttpSessionAttributeNames.OPERATION_DATA_EXTERNAL);
+        synchronized (httpSession.getServletContext()) {
+            httpSession.removeAttribute(HttpSessionAttributeNames.OTP_ID);
+            httpSession.removeAttribute(HttpSessionAttributeNames.LAST_MESSAGE_TIMESTAMP);
+            httpSession.removeAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
+            httpSession.removeAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
+            httpSession.removeAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
+            httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
+            httpSession.removeAttribute(HttpSessionAttributeNames.CLIENT_CERTIFICATE);
+            httpSession.removeAttribute(HttpSessionAttributeNames.APPROVAL_BY_CERTIFICATE_ENABLED);
+            httpSession.removeAttribute(HttpSessionAttributeNames.OPERATION_DATA_EXTERNAL);
+        }
     }
 }
