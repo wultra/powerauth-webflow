@@ -29,6 +29,7 @@ public class InitAuthMethodResponse {
 
     private CertificateAuthenticationMode certificateAuthenticationMode;
     private String certificateVerificationUrl;
+    private String operationDataExternal;
 
     /**
      * Default constructor.
@@ -84,5 +85,21 @@ public class InitAuthMethodResponse {
      */
     public void setCertificateVerificationUrl(String certificateVerificationUrl) {
         this.certificateVerificationUrl = certificateVerificationUrl;
+    }
+
+    /**
+     * Get external operation data which is used for signing using certificate.
+     * @return External operation data.
+     */
+    public String getOperationDataExternal() {
+        return operationDataExternal;
+    }
+
+    /**
+     * Set external operation data which is used for signing using certificate.
+     * @param operationDataExternal External operation data.
+     */
+    public void setOperationDataExternal(String operationDataExternal) {
+        this.operationDataExternal = operationDataExternal;
     }
 }

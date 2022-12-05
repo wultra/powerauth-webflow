@@ -388,5 +388,6 @@ public class HomeController {
         httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
         httpSession.removeAttribute(HttpSessionAttributeNames.CLIENT_CERTIFICATE);
         httpSession.removeAttribute(HttpSessionAttributeNames.APPROVAL_BY_CERTIFICATE_ENABLED);
+        httpSession.removeAttribute(HttpSessionAttributeNames.OPERATION_DATA_EXTERNAL);
     }
 }

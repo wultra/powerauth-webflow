@@ -39,7 +39,7 @@ export default class TokenAuthSms extends React.Component {
         this.storeRemainingAttempts = this.storeRemainingAttempts.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.handleSmsResend = this.handleSmsResend.bind(this);
-        this.state = {passwordEnabled: null, smsOtpEnabled: null, certificateEnabled: null, username: null, error: null, message: null, data: null, remainingAttempts: null, resendEnabled: false, initialized: false};
+        this.state = {passwordEnabled: null, smsOtpEnabled: null, certificateEnabled: null, username: null, error: null, message: null, signatureDataBase64: null, remainingAttempts: null, resendEnabled: false, initialized: false};
     }
 
     componentWillMount() {
@@ -56,8 +56,8 @@ export default class TokenAuthSms extends React.Component {
             this.setState({certificateEnabled: props.context.certificateEnabled});
             // Store username for LOGIN_SCA step
             this.setState({username: props.context.username});
-            // Store data for signing
-            this.setState({data: props.context.data});
+            // Store data for signature in Base-64 format
+            this.setState({signatureDataBase64: props.context.signatureDataBase64});
             // Set the component to initialized state
             this.setState({initialized: true});
         }
@@ -113,7 +113,8 @@ export default class TokenAuthSms extends React.Component {
             <SmsComponent username={this.state.username} passwordEnabled={this.state.passwordEnabled}
                           smsOtpEnabled={this.state.smsOtpEnabled} resendEnabled={this.state.resendEnabled}
                           smsResendCallback={this.handleSmsResend} cancelCallback={this.handleCancel} parentComponent="TOKEN"
-                          message={this.state.message} data={this.state.data} error={this.state.error} remainingAttempts={this.state.remainingAttempts}
+                          message={this.state.message} signatureDataBase64={this.state.signatureDataBase64}
+                          error={this.state.error} remainingAttempts={this.state.remainingAttempts}
                           certificateEnabled={this.state.certificateEnabled} initialized={this.state.initialized}/>
         )
     }

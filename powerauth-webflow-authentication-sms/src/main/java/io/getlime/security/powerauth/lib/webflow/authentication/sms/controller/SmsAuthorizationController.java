@@ -17,6 +17,7 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.sms.controller;
 
+import com.google.common.io.BaseEncoding;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
@@ -64,6 +65,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -323,6 +325,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
     /**
      * Get OTP ID from HTTP session.
+     * @return OTP ID.
      */
     private String getOtpIdFromHttpSession() {
         synchronized (httpSession.getServletContext()) {
@@ -332,6 +335,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
     /**
      * Get username from HTTP session.
+     * @return Username.
      */
     private String getUsernameFromHttpSession() {
         synchronized (httpSession.getServletContext()) {
@@ -341,6 +345,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
     /**
      * Get last message timestamp from HTTP session.
+     * @return Last message timestamp.
      */
     private Long getLastMessageTimestampFromHttpSession() {
         synchronized (httpSession.getServletContext()) {
@@ -350,6 +355,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
     /**
      * Get initial message sent flag from HTTP session.
+     * @return Whether initial message was sent.
      */
     private boolean getInitialMessageSentFromHttpSession() {
         synchronized (httpSession.getServletContext()) {
@@ -360,6 +366,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
     /**
      * Get authentication step options from HTTP session.
+     * @return Authentication step options.
      */
     private AuthStepOptions getAuthStepOptionsFromHttpSession() {
         synchronized (httpSession.getServletContext()) {
@@ -367,10 +374,24 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         }
     }
 
+    /**
+     * Get whether approval by certificate is enabled from HTTP session.
+     * @return Whether approval by certificate is enabled.
+     */
     private boolean getApprovalByCertificateEnabledFromHttpSession() {
         synchronized (httpSession.getServletContext()) {
             Boolean certificateEnabled = (Boolean) httpSession.getAttribute(HttpSessionAttributeNames.APPROVAL_BY_CERTIFICATE_ENABLED);
             return certificateEnabled != null && certificateEnabled;
+        }
+    }
+
+    /**
+     * Get operation data external from HTTP session.
+     * @return Operation data external.
+     */
+    private String getOperationDataExternalFromHttpSession() {
+        synchronized (httpSession.getServletContext()) {
+            return (String) httpSession.getAttribute(HttpSessionAttributeNames.OPERATION_DATA_EXTERNAL);
         }
     }
 
@@ -385,6 +406,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             httpSession.removeAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
             httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
             httpSession.removeAttribute(HttpSessionAttributeNames.APPROVAL_BY_CERTIFICATE_ENABLED);
+            httpSession.removeAttribute(HttpSessionAttributeNames.OPERATION_DATA_EXTERNAL);
         }
     }
 
@@ -406,7 +428,12 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         initResponse.setPasswordEnabled(true);
 
         // Enable authorization using certificate in case it has been enabled
-        initResponse.setCertificateEnabled(getApprovalByCertificateEnabledFromHttpSession());
+        final boolean approvalWithCertificateEnabled = getApprovalByCertificateEnabledFromHttpSession();
+        final String operationDataExternal = getOperationDataExternalFromHttpSession();
+        initResponse.setCertificateEnabled(approvalWithCertificateEnabled);
+        if (approvalWithCertificateEnabled) {
+            initResponse.setSignatureDataBase64(resolveDataForSignature(operation.getOperationData(), operationDataExternal));
+        }
 
         String username = null;
         if (authMethod == AuthMethod.LOGIN_SCA) {
@@ -849,4 +876,18 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         throw authEx;
     }
 
+    /**
+     * Resolve which data should be used for signature with certificate calculation.
+     * @param operationData Operation data.
+     * @param operationDataExternal Operation data external.
+     * @return Signature data in Base-64 format.
+     */
+    private String resolveDataForSignature(String operationData, String operationDataExternal) {
+        if (operationDataExternal != null) {
+            // In case operation data external is present, use this data for calculating signature with certificate as is
+            return operationDataExternal;
+        }
+        // Otherwise, convert operation data into Base-64 and use this data for calculating signature with certificate
+        return BaseEncoding.base64().encode(operationData.getBytes(StandardCharsets.UTF_8));
+    }
 }

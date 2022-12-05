@@ -31,5 +31,6 @@ public class HttpSessionAttributeNames {
     public static final String USERNAME = "USERNAME";
     public static final String CLIENT_CERTIFICATE = "CLIENT_CERTIFICATE";
     public static final String APPROVAL_BY_CERTIFICATE_ENABLED = "APPROVAL_BY_CERTIFICATE_ENABLED";
+    public static final String OPERATION_DATA_EXTERNAL = "OPERATION_DATA_EXTERNAL";
 
 }

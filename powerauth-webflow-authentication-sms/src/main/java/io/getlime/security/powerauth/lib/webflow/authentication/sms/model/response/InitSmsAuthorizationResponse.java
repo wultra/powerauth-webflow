@@ -31,6 +31,7 @@ public class InitSmsAuthorizationResponse extends AuthStepResponse {
     private boolean smsOtpEnabled;
     private boolean certificateEnabled;
     private int resendDelay;
+    private String signatureDataBase64;
 
     /**
      * Get username for SMS authorization combined with password (optional).
@@ -110,5 +111,21 @@ public class InitSmsAuthorizationResponse extends AuthStepResponse {
      */
     public void setCertificateEnabled(boolean certificateEnabled) {
         this.certificateEnabled = certificateEnabled;
+    }
+
+    /**
+     * Get data for signature created with certificate in Base-64 format.
+     * @return Data for signature created with certificate.
+     */
+    public String getSignatureDataBase64() {
+        return signatureDataBase64;
+    }
+
+    /**
+     * Set data for signature created with certificate in Base-64 format.
+     * @param signatureDataBase64 Data for signature created with certificate.
+     */
+    public void setSignatureDataBase64(String signatureDataBase64) {
+        this.signatureDataBase64 = signatureDataBase64;
     }
 }

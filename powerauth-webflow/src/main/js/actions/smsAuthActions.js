@@ -55,7 +55,7 @@ export function init(component) {
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
-                // Handle error when message delivery fails, another SMS message can be sent later.
+                // Handle error when initialization fails.
                 dispatch({
                     type: getActionType(component),
                     payload: {
@@ -67,7 +67,8 @@ export function init(component) {
                         smsOtpEnabled: response.data.smsOtpEnabled,
                         certificateEnabled: response.data.certificateEnabled,
                         username: response.data.username,
-                        resendDelay: response.data.resendDelay
+                        resendDelay: response.data.resendDelay,
+                        signatureDataBase64: response.data.signatureDataBase64
                     }
                 });
                 return null;
@@ -83,7 +84,8 @@ export function init(component) {
                     smsOtpEnabled: response.data.smsOtpEnabled,
                     certificateEnabled: response.data.certificateEnabled,
                     username: response.data.username,
-                    resendDelay: response.data.resendDelay
+                    resendDelay: response.data.resendDelay,
+                    signatureDataBase64: response.data.signatureDataBase64
                 }
             });
             return null;
