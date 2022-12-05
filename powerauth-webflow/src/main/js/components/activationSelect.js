@@ -32,7 +32,7 @@ export default class ActivationSelect extends React.Component {
         this.props.callback(value);
     }
 
-    render () {
+    render() {
         return (
             <div className="section">
                 <Select
@@ -75,7 +75,7 @@ class ActivationOption extends React.Component {
         this.props.onFocus(this.props.option, event);
     }
 
-    render () {
+    render() {
         const activation = this.props.option;
         return (
             <div className={this.props.className}
@@ -89,7 +89,7 @@ class ActivationOption extends React.Component {
 }
 
 class ActivationValue extends React.Component {
-    render () {
+    render() {
         const activation = this.props.value;
         return (
             <div className="Select-value">

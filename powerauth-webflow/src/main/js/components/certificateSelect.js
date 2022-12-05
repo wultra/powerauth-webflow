@@ -32,7 +32,7 @@ export default class CertificateSelect extends React.Component {
         this.props.callback(value);
     }
 
-    render () {
+    render() {
         return (
             <div className="section">
                 <Select
@@ -75,7 +75,7 @@ class CertificateOption extends React.Component {
         this.props.onFocus(this.props.option, event);
     }
 
-    render () {
+    render() {
         const certificate = this.props.option;
         return (
             <div className={this.props.className}
@@ -89,7 +89,7 @@ class CertificateOption extends React.Component {
 }
 
 class CertificateValue extends React.Component {
-    render () {
+    render() {
         const certificate = this.props.value;
         return (
             <div className="Select-value">

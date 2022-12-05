@@ -32,7 +32,7 @@ export default class BankAccountSelect extends React.Component {
         this.props.callback(value);
     }
 
-    render () {
+    render() {
         return (
             <div className="section">
                 <Select
@@ -74,7 +74,7 @@ class BankAccountOption extends React.Component {
         if (this.props.isFocused) return;
         this.props.onFocus(this.props.option, event);
     }
-    render () {
+    render() {
         const bankAccount = this.props.option;
         return (
             <div className={this.props.className}
@@ -88,7 +88,7 @@ class BankAccountOption extends React.Component {
 }
 
 class BankAccountValue extends React.Component {
-    render () {
+    render() {
         const bankAccount = this.props.value;
         return (
             <div className="Select-value">
