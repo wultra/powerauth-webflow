@@ -166,6 +166,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
 
             final boolean approvalByCertificateEnabled = initResponse.getCertificateAuthenticationMode() == CertificateAuthenticationMode.ENABLED;
             setApprovalByCertificateEnabled(approvalByCertificateEnabled);
+            setOperationDataExternal(initResponse.getOperationDataExternal());
 
             logger.debug("Step init succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName());
             return new ApprovalScaInitResponse();
@@ -218,4 +219,9 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
         }
     }
 
+    private void setOperationDataExternal(String operationDataExternal) {
+        synchronized (httpSession.getServletContext()) {
+            httpSession.setAttribute(HttpSessionAttributeNames.OPERATION_DATA_EXTERNAL, operationDataExternal);
+        }
+    }
 }

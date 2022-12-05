@@ -146,12 +146,10 @@ export default class SmsComponent extends React.Component {
     }
 
     signOperationData() {
-        const data = this.props.data;
+        const signatureDataBase64 = this.props.signatureDataBase64;
         const cbSuccess = this.onSignerSucceeded;
         const cbError = this.onSignerFailed;
-        // TODO - switch to external operation data which should already be Base-64 encoded for signing
-        const encodedData = window.btoa(data);
-        signMessage(encodedData, cbSuccess, cbError);
+        signMessage(signatureDataBase64, cbSuccess, cbError);
     }
 
     onSignerInitSucceeded() {
