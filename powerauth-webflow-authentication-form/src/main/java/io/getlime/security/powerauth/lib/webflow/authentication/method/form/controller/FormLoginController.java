@@ -142,7 +142,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                     }
                 }
             } catch (NextStepClientException ex) {
-                if (ex.getNextStepError() != null && UserNotFoundException.CODE.equals(ex.getNextStepError().getCode())) {
+                if (ex.getError() != null && UserNotFoundException.CODE.equals(ex.getError().getCode())) {
                     // User ID not found using lookup
                     throw new AuthStepException("User authentication failed", "login.authenticationFailed");
                 }

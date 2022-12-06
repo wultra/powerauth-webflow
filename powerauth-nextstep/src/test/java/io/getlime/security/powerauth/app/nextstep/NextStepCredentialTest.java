@@ -376,8 +376,8 @@ public class NextStepCredentialTest extends NextStepTest {
         try {
             nextStepClient.updateCredential(userId, "TEST_CREDENTIAL", CredentialType.PERMANENT, "new username", null, null);
         } catch (NextStepClientException ex) {
-            assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
-            assertEquals(Arrays.asList(CredentialValidationFailure.USERNAME_ILLEGAL_WHITESPACE, CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
+            assertEquals(CredentialValidationFailedException.CODE, ex.getError().getCode());
+            assertEquals(Arrays.asList(CredentialValidationFailure.USERNAME_ILLEGAL_WHITESPACE, CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED), ((CredentialValidationError)ex.getError()).getValidationFailures());
             return;
         }
         Assertions.fail();
@@ -415,8 +415,8 @@ public class NextStepCredentialTest extends NextStepTest {
         try {
             nextStepClient.updateCredential(userId, "TEST_CREDENTIAL", CredentialType.PERMANENT, "x", " ", null);
         } catch (NextStepClientException ex) {
-            assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
-            assertEquals(Arrays.asList(CredentialValidationFailure.USERNAME_TOO_SHORT, CredentialValidationFailure.CREDENTIAL_EMPTY), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
+            assertEquals(CredentialValidationFailedException.CODE, ex.getError().getCode());
+            assertEquals(Arrays.asList(CredentialValidationFailure.USERNAME_TOO_SHORT, CredentialValidationFailure.CREDENTIAL_EMPTY), ((CredentialValidationError)ex.getError()).getValidationFailures());
             return;
         }
         Assertions.fail();
@@ -454,8 +454,8 @@ public class NextStepCredentialTest extends NextStepTest {
         try {
             nextStepClient.updateCredential(userId, "TEST_CREDENTIAL", CredentialType.PERMANENT, null, " ", null);
         } catch (NextStepClientException ex) {
-            assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
-            assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_EMPTY), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
+            assertEquals(CredentialValidationFailedException.CODE, ex.getError().getCode());
+            assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_EMPTY), ((CredentialValidationError)ex.getError()).getValidationFailures());
             return;
         }
         Assertions.fail();
@@ -484,8 +484,8 @@ public class NextStepCredentialTest extends NextStepTest {
         try {
             nextStepClient.updateCredential(userId2, "TEST_CREDENTIAL", CredentialType.PERMANENT, "new_username_conflict", "rg^24jG2sk", null);
         } catch (NextStepClientException ex) {
-            assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
-            assertEquals(Collections.singletonList(CredentialValidationFailure.USERNAME_ALREADY_EXISTS), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
+            assertEquals(CredentialValidationFailedException.CODE, ex.getError().getCode());
+            assertEquals(Collections.singletonList(CredentialValidationFailure.USERNAME_ALREADY_EXISTS), ((CredentialValidationError) ex.getError()).getValidationFailures());
             return;
         }
         Assertions.fail();
@@ -587,8 +587,8 @@ public class NextStepCredentialTest extends NextStepTest {
         try {
             nextStepClient.updateCredential(userId1, "TEST_CREDENTIAL", CredentialType.PERMANENT, null, "je&qd8P1", null);
         } catch (NextStepClientException ex) {
-            assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
-            assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
+            assertEquals(CredentialValidationFailedException.CODE, ex.getError().getCode());
+            assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED), ((CredentialValidationError) ex.getError()).getValidationFailures());
             return;
         }
         Assertions.fail();
@@ -615,8 +615,8 @@ public class NextStepCredentialTest extends NextStepTest {
         try {
             nextStepClient.updateCredential(userId1, "TEST_CREDENTIAL", CredentialType.PERMANENT, null, "je&qd8P1", null);
         } catch (NextStepClientException ex) {
-            assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
-            assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
+            assertEquals(CredentialValidationFailedException.CODE, ex.getError().getCode());
+            assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED), ((CredentialValidationError) ex.getError()).getValidationFailures());
             return;
         }
         Assertions.fail();

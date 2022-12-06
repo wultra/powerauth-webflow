@@ -149,7 +149,7 @@ public class NextStepUserIdentityTest extends NextStepTest {
         try {
             nextStepClient.blockUser(userId);
         } catch (NextStepClientException ex) {
-            assertEquals(UserNotActiveException.CODE, ex.getNextStepError().getCode());
+            assertEquals(UserNotActiveException.CODE, ex.getError().getCode());
         }
         UnblockUserResponse r15 = nextStepClient.unblockUser(userId).getResponseObject();
         assertEquals(userId, r15.getUserId());
@@ -157,7 +157,7 @@ public class NextStepUserIdentityTest extends NextStepTest {
         try {
             nextStepClient.unblockUser(userId);
         } catch (NextStepClientException ex) {
-            assertEquals(UserNotBlockedException.CODE, ex.getNextStepError().getCode());
+            assertEquals(UserNotBlockedException.CODE, ex.getError().getCode());
         }
     }
 

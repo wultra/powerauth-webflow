@@ -547,7 +547,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 }
             }
         } catch (NextStepClientException ex) {
-            Error nextStepError = ex.getNextStepError();
+            Error nextStepError = ex.getError();
             if (nextStepError != null) {
                 switch (nextStepError.getCode()) {
                     case OperationAlreadyFinishedException.CODE:
