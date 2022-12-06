@@ -229,7 +229,7 @@ public class TppEngineClient {
         final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("clientId", Collections.singletonList(clientId));
         params.put("tppLicense", Collections.singletonList(tppLicense));
-        return putObjectImpl("/tpp/app/renewSecret", null, params, TppAppDetailResponse.class);
+        return postObjectImpl("/tpp/app/renewSecret", null, params, TppAppDetailResponse.class);
     }
 
     /**
@@ -319,6 +319,26 @@ public class TppEngineClient {
             return restClient.postObject(path, request, responseType);
         } catch (RestClientException ex) {
             TppEngineClientException ex2 = createTppEngineClientException(ex);
+            logError(ex2);
+            throw ex2;
+        }
+    }
+
+    /**
+     * Prepare POST object response.
+     *
+     * @param path Resource path.
+     * @param request Request body.
+     * @param queryParams Query parameters.
+     * @param responseType Response type.
+     * @return Object obtained after processing the response JSON.
+     * @throws TppEngineClientException In case of network, response / JSON processing, or other IO error.
+     */
+    private <T> ObjectResponse<T> postObjectImpl(String path, ObjectRequest<?> request, MultiValueMap<String, String> queryParams, Class<T> responseType) throws TppEngineClientException {
+        try {
+            return restClient.postObject(path, request, queryParams, null, responseType);
+        } catch (RestClientException ex) {
+            final TppEngineClientException ex2 = createTppEngineClientException(ex);
             logError(ex2);
             throw ex2;
         }
