@@ -398,8 +398,7 @@ CREATE TABLE ns_otp_storage (
   timestamp_verified          TIMESTAMP,                                    -- Timestamp when one time password was verified.
   timestamp_blocked           TIMESTAMP,                                    -- Timestamp when one time password was blocked.
   timestamp_expires           TIMESTAMP,                                    -- Timestamp when one time password expires.
-  CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_definition_id) REFERENCES ns_otp_definition (otp_definition_id),
-  CONSTRAINT ns_otp_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
+  CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_definition_id) REFERENCES ns_otp_definition (otp_definition_id)
 );
 
 -- Table ns_operation stores details of Web Flow operations.
@@ -438,7 +437,6 @@ CREATE TABLE ns_authentication (
   result_credential           VARCHAR2(32 CHAR),                            -- Authentication result for credential authentication.
   result_otp                  VARCHAR2(32 CHAR),                            -- Authentication result for one time password authentication.
   timestamp_created           TIMESTAMP,                                    -- Timestamp when authentication record was created.
-  CONSTRAINT ns_auth_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id),
   CONSTRAINT ns_auth_credential_fk FOREIGN KEY (credential_id) REFERENCES ns_credential_storage (credential_id),
   CONSTRAINT ns_auth_otp_fk FOREIGN KEY (otp_id) REFERENCES ns_otp_storage (otp_id),
   CONSTRAINT ns_auth_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
