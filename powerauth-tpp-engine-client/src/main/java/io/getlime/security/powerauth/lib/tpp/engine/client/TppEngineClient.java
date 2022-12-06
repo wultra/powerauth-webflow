@@ -382,13 +382,16 @@ public class TppEngineClient {
     private static TppEngineError resolveTppEngineError(final RestClientException e) {
         // TODO (racansky, 2022-12-02) workaround until https://github.com/wultra/lime-java-core/issues/32
         if (e.getErrorResponse() == null || e.getErrorResponse().getResponseObject() == null) {
+            logger.trace("Wultra Java Core lib did not parse ErrorResponse for {}", e.getResponse());
             try {
-                return new ObjectMapper().readValue(e.getResponse(), new TypeReference<ObjectResponse<TppEngineError>>(){})
-                        .getResponseObject();
+                final ObjectResponse<TppEngineError> errorResponse = new ObjectMapper().readValue(e.getResponse(), new TypeReference<ObjectResponse<TppEngineError>>(){});
+                if (errorResponse != null && errorResponse.getResponseObject() != null) {
+                    return errorResponse.getResponseObject();
+                }
             } catch (JsonProcessingException ex2) {
                 logger.debug("Problem to deserialize error response", ex2);
-                return new TppEngineError(resolveErrorCode(e), e.getMessage());
             }
+            return new TppEngineError(resolveErrorCode(e), e.getMessage());
         }
 
         final Error error = e.getErrorResponse().getResponseObject();
