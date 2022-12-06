@@ -100,7 +100,7 @@ public class TppRegistryController {
     @RequestMapping(value = "app/renewSecret", method = RequestMethod.POST)
     public ObjectResponse<TppAppDetailResponse> updateApp(
             @RequestParam("clientId") String clientId,
-            @RequestParam("tppLicense") String tppLicense) throws UnableToCreateAppException, TppNotFoundException, TppAppNotFoundException {
+            @RequestParam("tppLicense") String tppLicense) throws TppNotFoundException, TppAppNotFoundException {
         final TppAppDetailResponse tppAppDetailResponse = tppService.renewAppSecret(clientId, tppLicense);
         return new ObjectResponse<>(tppAppDetailResponse);
     }
