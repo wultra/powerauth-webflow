@@ -274,7 +274,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         try {
             nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", "unknown_user", "secret");
         } catch (NextStepClientException ex) {
-            assertEquals(UserNotFoundException.CODE, ex.getNextStepError().getCode());
+            assertEquals(UserNotFoundException.CODE, ex.getError().getCode());
             return;
         }
         Assertions.fail();
@@ -357,7 +357,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         try {
             nextStepClient.lookupUsers(request);
         } catch (NextStepClientException ex) {
-            assertEquals(UserNotFoundException.CODE, ex.getNextStepError().getCode());
+            assertEquals(UserNotFoundException.CODE, ex.getError().getCode());
             return;
         }
         Assertions.fail();
@@ -374,7 +374,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         try {
             nextStepClient.lookupUser("testuser_unknown", "TEST_CREDENTIAL");
         } catch (NextStepClientException ex) {
-            assertEquals(UserNotFoundException.CODE, ex.getNextStepError().getCode());
+            assertEquals(UserNotFoundException.CODE, ex.getError().getCode());
             return;
         }
         Assertions.fail();
@@ -386,7 +386,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         try {
             nextStepClient.createOtp("test_user_1", "TEST_OTP", null, "TEST_DATA");
         } catch (NextStepClientException ex) {
-            assertEquals(UserNotActiveException.CODE, ex.getNextStepError().getCode());
+            assertEquals(UserNotActiveException.CODE, ex.getError().getCode());
             nextStepClient.unblockUser("test_user_1");
             return;
         }
@@ -466,7 +466,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         try {
             nextStepClient.updateCredentialCounter("test_user_1", "TEST_CREDENTIAL", AuthenticationResult.SUCCEEDED);
         } catch (NextStepClientException ex) {
-            assertEquals(CredentialNotActiveException.CODE, ex.getNextStepError().getCode());
+            assertEquals(CredentialNotActiveException.CODE, ex.getError().getCode());
             nextStepClient.unblockCredential("test_user_1", "TEST_CREDENTIAL");
             return;
         }

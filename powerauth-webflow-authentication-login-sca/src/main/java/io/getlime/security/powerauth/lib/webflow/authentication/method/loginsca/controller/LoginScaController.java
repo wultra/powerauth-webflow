@@ -188,7 +188,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                         }
                         status = userDetail.getUserIdentityStatus();
                     } catch (NextStepClientException ex) {
-                        if (ex.getNextStepError() == null || !UserNotFoundException.CODE.equals(ex.getNextStepError().getCode())) {
+                        if (ex.getError() == null || !UserNotFoundException.CODE.equals(ex.getError().getCode())) {
                             // Unexpected error occurred in Next Step
                             throw ex;
                         }

@@ -714,9 +714,9 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             result.setErrorMessage(otpResponse.getErrorMessage());
             return result;
         } catch (NextStepClientException ex) {
-            if (ex.getNextStepError() != null
-                    && (CredentialNotActiveException.CODE.equals(ex.getNextStepError().getCode())
-                        || UserNotActiveException.CODE.equals(ex.getNextStepError().getCode()))) {
+            if (ex.getError() != null
+                    && (CredentialNotActiveException.CODE.equals(ex.getError().getCode())
+                        || UserNotActiveException.CODE.equals(ex.getError().getCode()))) {
                 AuthorizationOtpDeliveryResult result = new AuthorizationOtpDeliveryResult();
                 result.setDelivered(false);
                 result.setErrorMessage("smsAuthorization.deliveryFailed");

@@ -2698,7 +2698,7 @@ public class NextStepClient {
      * @param ex Next Step client exception.
      */
     private void logError(NextStepClientException ex) {
-        Error error = ex.getNextStepError();
+        Error error = ex.getError();
         if (error != null) {
             logger.warn("Next Step REST API call failed with error code: {}", error.getCode());
         } else {

@@ -86,13 +86,14 @@ public class NextStepClientException extends Exception {
     }
 
     /**
-     * Get the original Next Step error.
-     * @return Original Next Step error.
+     * Get the error.
+     * @return Error.
      */
-    public Error getNextStepError() {
+    public Error getError() {
         final Throwable cause = getCause();
         if (!(cause instanceof RestClientException)) {
-            return null;
+            final String message = cause != null ? cause.getMessage() : "General error without explicit cause";
+            return new Error(Error.Code.ERROR_GENERIC, message);
         }
         final RestClientException ex = (RestClientException) cause;
         if (ex.getErrorResponse() == null) {
