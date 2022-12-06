@@ -18,9 +18,6 @@
 
 package io.getlime.security.powerauth.lib.nextstep.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wultra.core.rest.client.base.DefaultRestClient;
 import com.wultra.core.rest.client.base.RestClient;
 import com.wultra.core.rest.client.base.RestClientConfiguration;
@@ -35,7 +32,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.PAAuthenticationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.error.NextStepError;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -73,7 +69,7 @@ public class NextStepClient {
         try {
             restClient = new DefaultRestClient(serviceBaseUrl);
         } catch (RestClientException ex) {
-            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(Error.Code.ERROR_GENERIC, "Rest client initialization failed."));
+            NextStepClientException ex2 = new NextStepClientException("Rest client initialization failed.", ex);
             logError(ex2);
             throw ex2;
         }
@@ -88,7 +84,7 @@ public class NextStepClient {
         try {
             restClient = new DefaultRestClient(restClientConfiguration);
         } catch (RestClientException ex) {
-            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(Error.Code.ERROR_GENERIC, "Rest client initialization failed."));
+            NextStepClientException ex2 = new NextStepClientException("Rest client initialization failed.", ex);
             logError(ex2);
             throw ex2;
         }
@@ -2561,7 +2557,7 @@ public class NextStepClient {
         try {
             return restClient.get(path, queryParams, null, typeReference).getBody();
         } catch (RestClientException ex) {
-            final NextStepClientException ex2 = createNextStepClientException(ex);
+            final NextStepClientException ex2 = new NextStepClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -2579,7 +2575,7 @@ public class NextStepClient {
         try {
             return restClient.getObject(path, responseType);
         } catch (RestClientException ex) {
-            final NextStepClientException ex2 = createNextStepClientException(ex);
+            final NextStepClientException ex2 = new NextStepClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -2598,7 +2594,7 @@ public class NextStepClient {
         try {
             return restClient.getObject(path, queryParams, null, responseType);
         } catch (RestClientException ex) {
-            final NextStepClientException ex2 = createNextStepClientException(ex);
+            final NextStepClientException ex2 = new NextStepClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -2617,7 +2613,7 @@ public class NextStepClient {
         try {
             return restClient.post(path, request, typeReference).getBody();
         } catch (RestClientException ex) {
-            final NextStepClientException ex2 = createNextStepClientException(ex);
+            final NextStepClientException ex2 = new NextStepClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -2635,7 +2631,7 @@ public class NextStepClient {
         try {
             return restClient.postObject(path, request);
         } catch (RestClientException ex) {
-            final NextStepClientException ex2 = createNextStepClientException(ex);
+            final NextStepClientException ex2 = new NextStepClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -2654,7 +2650,7 @@ public class NextStepClient {
         try {
             return restClient.postObject(path, request, responseType);
         } catch (RestClientException ex) {
-            final NextStepClientException ex2 = createNextStepClientException(ex);
+            final NextStepClientException ex2 = new NextStepClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -2672,7 +2668,7 @@ public class NextStepClient {
         try {
             return restClient.putObject(path, request);
         } catch (RestClientException ex) {
-            final NextStepClientException ex2 = createNextStepClientException(ex);
+            final NextStepClientException ex2 = new NextStepClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -2691,7 +2687,7 @@ public class NextStepClient {
         try {
             return restClient.putObject(path, request, responseType);
         } catch (RestClientException ex) {
-            final NextStepClientException ex2 = createNextStepClientException(ex);
+            final NextStepClientException ex2 = new NextStepClientException(ex);
             logError(ex2);
             throw ex2;
         }
@@ -2708,50 +2704,6 @@ public class NextStepClient {
         } else {
             logger.warn(ex.getMessage(), ex);
         }
-    }
-
-    private static NextStepClientException createNextStepClientException(final RestClientException e) {
-        return new NextStepClientException(e, resolveNextStepError(e));
-    }
-
-    private static NextStepError resolveNextStepError(final RestClientException e) {
-        // TODO (racansky, 2022-12-06) workaround until https://github.com/wultra/lime-java-core/issues/32
-        if (e.getErrorResponse() == null || e.getErrorResponse().getResponseObject() == null) {
-            logger.trace("Wultra Java Core lib did not parse ErrorResponse for {}", e.getResponse());
-            try {
-                final ErrorResponse errorResponse = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).readValue(e.getResponse(), ErrorResponse.class);
-                if (errorResponse != null && errorResponse.getResponseObject() != null) {
-                    final Error error = errorResponse.getResponseObject();
-                    return new NextStepError(error.getCode(), error.getMessage());
-                }
-            } catch (JsonProcessingException ex2) {
-                logger.debug("Problem to deserialize error response", ex2);
-            }
-            return new NextStepError(resolveErrorCode(e), e.getMessage());
-        }
-
-        final Error error = e.getErrorResponse().getResponseObject();
-        return new NextStepError(error.getCode(), error.getMessage());
-    }
-
-    /**
-     * Resolve error code based on HTTP status code from REST client exception.
-     */
-    private static String resolveErrorCode(final RestClientException ex) {
-        if (ex.getStatusCode() == null) {
-            // REST client errors, response not received
-            return Error.Code.ERROR_GENERIC;
-        }
-        if (ex.getStatusCode().is4xxClientError()) {
-            // Errors caused by invalid Next Step client requests
-            return NextStepError.Code.NEXT_STEP_CLIENT_ERROR;
-        }
-        if (ex.getStatusCode().is5xxServerError()) {
-            // Internal errors in Next Step server
-            return NextStepError.Code.REMOTE_ERROR;
-        }
-        // Other errors during communication
-        return NextStepError.Code.COMMUNICATION_ERROR;
     }
 
 }

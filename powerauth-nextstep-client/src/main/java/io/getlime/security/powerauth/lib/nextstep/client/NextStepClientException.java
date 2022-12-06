@@ -28,7 +28,8 @@ import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialValidationError;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.ExtendedError;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.error.NextStepError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class representing a Next Step client exception created when calling the Next Step REST API.
@@ -37,56 +38,40 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.error.NextStepErr
  */
 public class NextStepClientException extends Exception {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Logger logger = LoggerFactory.getLogger(NextStepClientException.class);
 
-    private Error error;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Default constructor.
      */
     public NextStepClientException() {
         super();
-        this.error = new NextStepError();
-    }
-
-    /**
-     * Constructor with error.
-     * @param error Error.
-     */
-    public NextStepClientException(Error error) {
-        super(error != null ? error.getMessage() : null);
-        this.error = error;
     }
 
     /**
      * Constructor with message and error.
      * @param message Message.
-     * @param error Error.
      */
-    public NextStepClientException(String message, Error error) {
+    public NextStepClientException(String message) {
         super(message);
-        this.error = error;
     }
 
     /**
      * Constructor with message, cause and error.
      * @param message Message.
      * @param cause Cause.
-     * @param error Error.
      */
-    public NextStepClientException(String message, Throwable cause, Error error) {
+    public NextStepClientException(String message, Throwable cause) {
         super(message, cause);
-        this.error = error;
     }
 
     /**
      * Constructor with cause and error.
      * @param cause Cause.
-     * @param error Error.
      */
-    public NextStepClientException(Throwable cause, Error error) {
+    public NextStepClientException(Throwable cause) {
         super(cause);
-        this.error = error;
     }
 
     /**
@@ -95,27 +80,9 @@ public class NextStepClientException extends Exception {
      * @param cause Cause.
      * @param enableSuppression Whether suppression is enabled.
      * @param writableStackTrace Writeable stacktrace.
-     * @param error Error.
      */
-    public NextStepClientException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Error error) {
+    public NextStepClientException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
-        this.error = error;
-    }
-
-    /**
-     * Set the error.
-     * @param error Error.
-     */
-    public void setError(Error error) {
-        this.error = error;
-    }
-
-    /**
-     * Get the error.
-     * @return Error.
-     */
-    public Error getError() {
-        return error;
     }
 
     /**
@@ -123,13 +90,15 @@ public class NextStepClientException extends Exception {
      * @return Original Next Step error.
      */
     public Error getNextStepError() {
-        Throwable cause = getCause();
+        final Throwable cause = getCause();
         if (!(cause instanceof RestClientException)) {
             return null;
         }
-        RestClientException ex = (RestClientException) cause;
+        final RestClientException ex = (RestClientException) cause;
         if (ex.getErrorResponse() == null) {
+            logger.trace("Wultra Java Core lib did not parse ErrorResponse for {}", ex.getResponse());
             try {
+                // TODO (racansky, 2022-12-06) workaround until https://github.com/wultra/lime-java-core/issues/32
                 ErrorResponse errorResponse = objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).readValue(ex.getResponse(), ErrorResponse.class);
                 if (errorResponse != null && errorResponse.getResponseObject() != null) {
                     switch (errorResponse.getResponseObject().getCode()) {
@@ -146,6 +115,7 @@ public class NextStepClientException extends Exception {
                     }
                 }
             } catch (JsonProcessingException ex2) {
+                logger.debug("Problem to deserialize error response", ex2);
                 // Ignore unknown responses
                 return null;
             }
