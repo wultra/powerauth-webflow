@@ -128,4 +128,15 @@ public class ConsentOption {
     public void setValue(ConsentOptionValue value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "ConsentOption {" +
+                "id='" + id + '\'' +
+                ", descriptionHtml='" + descriptionHtml + '\'' +
+                ", required=" + required +
+                ", defaultValue=" + defaultValue +
+                ", value=" + value +
+                '}';
+    }
 }
