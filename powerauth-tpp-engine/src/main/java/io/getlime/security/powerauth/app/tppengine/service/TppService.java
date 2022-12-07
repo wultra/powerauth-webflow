@@ -206,6 +206,7 @@ public class TppService {
         oAuthClientDetailsEntity.setAuthorizedGrantTypes("authorization_code");
         oAuthClientDetailsEntity.setWebServerRedirectUri(redirectUris);
         oAuthClientDetailsEntity.setScope(scopes);
+        oAuthClientDetailsEntity.setRefreshTokenValidity(tppEngineConfiguration.getDefaultRefreshTokenValidity().getSeconds());
         oAuthClientDetailsEntity.setAccessTokenValidity(tppEngineConfiguration.getDefaultAccessTokenValidityInSeconds());
         oAuthClientDetailsEntity.setAdditionalInformation("{}");
         oAuthClientDetailsEntity.setAutoapprove("true");
