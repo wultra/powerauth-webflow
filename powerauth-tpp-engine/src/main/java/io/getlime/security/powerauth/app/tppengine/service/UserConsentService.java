@@ -167,6 +167,7 @@ public class UserConsentService {
         final boolean isApproved;
         if (consentStatusOptional.isPresent()) {
             consentStatus = consentStatusOptional.get();
+            consentStatus.setParameters(convertToJsonString(ro.getParameters()));
             consentStatus.setExternalId(ro.getExternalId());
             consentStatus.setTimestampUpdated(date);
             isApproved = true;
