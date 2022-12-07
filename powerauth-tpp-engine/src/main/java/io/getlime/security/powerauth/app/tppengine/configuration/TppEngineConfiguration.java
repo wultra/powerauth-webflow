@@ -27,6 +27,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
+
 /**
  * Configuration for the TPP Engine application.
  *
@@ -63,6 +65,13 @@ public class TppEngineConfiguration {
      */
     @Value("${powerauth.tppEngine.service.oauth2.defaultAccessTokenValidityInSeconds}")
     private Long defaultAccessTokenValidityInSeconds;
+
+    /**
+     * When a new app is created in TPP engine, this value is set as the default
+     * refresh token validity.
+     */
+    @Value("${powerauth.tppEngine.service.oauth2.defaultRefreshTokenValidity}")
+    private Duration defaultRefreshTokenValidity;
 
     /**
      * Configuration constructor.
@@ -103,6 +112,14 @@ public class TppEngineConfiguration {
      */
     public Long getDefaultAccessTokenValidityInSeconds() {
         return defaultAccessTokenValidityInSeconds;
+    }
+
+    /**
+     * Get default app refresh token validity.
+     * @return Refresh token validity.
+     */
+    public Duration getDefaultRefreshTokenValidity() {
+        return defaultRefreshTokenValidity;
     }
 
     /**
