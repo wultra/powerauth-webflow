@@ -20,6 +20,7 @@ package io.getlime.security.powerauth.app.webflow.configuration;
 
 import io.getlime.security.powerauth.app.webflow.oauth.WebFlowTokenEnhancer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -55,6 +56,9 @@ import javax.sql.DataSource;
 @Configuration
 @EnableAuthorizationServer
 public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
+
+    @Value("${powerauth.webflow.security.oauth2.supportRefreshToken}")
+    private boolean supportRefreshToken;
 
     private DataSource dataSource;
 
@@ -113,9 +117,10 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
     @Bean
     @Primary
     public AuthorizationServerTokenServices tokenServices() {
-        DefaultTokenServices tokenServices = new DefaultTokenServices();
+        final DefaultTokenServices tokenServices = new DefaultTokenServices();
         tokenServices.setTokenStore(tokenStore());
         tokenServices.setTokenEnhancer(tokenEnhancer());
+        tokenServices.setSupportRefreshToken(supportRefreshToken);
         return tokenServices;
     }
 
