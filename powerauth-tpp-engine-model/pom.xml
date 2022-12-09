@@ -29,7 +29,6 @@
 
     <name>powerauth-tpp-engine-model</name>
     <artifactId>powerauth-tpp-engine-model</artifactId>
-    <version>1.4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -37,7 +36,6 @@
         <dependency>
             <groupId>io.getlime.core</groupId>
             <artifactId>rest-model-base</artifactId>
-            <version>${wultra-java-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
