@@ -70,8 +70,6 @@ export default class SmsComponent extends React.Component {
 
     handleCertificateChoice(certificate) {
         this.setState({chosenCertificate: certificate});
-        const cbError = this.onSignerFailed;
-        setChosenCertificate(certificate.X509PEM, cbError);
     }
 
     handleSubmit(event) {
@@ -149,6 +147,7 @@ export default class SmsComponent extends React.Component {
         const signatureDataBase64 = this.props.signatureDataBase64;
         const cbSuccess = this.onSignerSucceeded;
         const cbError = this.onSignerFailed;
+        setChosenCertificate(this.state.chosenCertificate.X509PEM, cbError);
         signMessage(signatureDataBase64, cbSuccess, cbError);
     }
 
