@@ -86,13 +86,6 @@
             <artifactId>powerauth-nextstep-client</artifactId>
         </dependency>
 
-        <!-- H2 DB -->
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
         <!-- Other Dependencies -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
