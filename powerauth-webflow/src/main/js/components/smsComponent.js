@@ -116,7 +116,8 @@ export default class SmsComponent extends React.Component {
         loadKeyStore(cbSuccess, cbError);
     }
 
-    chooseCertificate() {
+    chooseCertificate(event) {
+        event.preventDefault();
         // Register callbacks which are bound to this to avoid react vs. ICA component context issues
         const cbSuccess = this.onSignerInitSucceeded;
         const cbError = this.onSignerInitFailed;
@@ -143,7 +144,8 @@ export default class SmsComponent extends React.Component {
         }
     }
 
-    signOperationData() {
+    signOperationData(event) {
+        event.preventDefault();
         const signatureDataBase64 = this.props.signatureDataBase64;
         const cbSuccess = this.onSignerSucceeded;
         const cbError = this.onSignerFailed;
