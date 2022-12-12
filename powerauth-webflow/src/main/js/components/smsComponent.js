@@ -166,7 +166,26 @@ export default class SmsComponent extends React.Component {
             return;
         }
         this.setState({certificates: certificates});
-        this.handleCertificateChoice(certificates[0]);
+        const handleCertificateChoice = this.handleCertificateChoice;
+        const cbSuccess = function(pem) {
+            let certificateIndex = 0;
+            if (pem) {
+                // Iterate through certificates and found the one which should be preselected
+                for (const [i, value] of certificates.entries()) {
+                    if (value.X509PEM === pem) {
+                        certificateIndex = i;
+                        break;
+                    }
+                }
+            }
+            handleCertificateChoice(certificates[certificateIndex]);
+        }
+        const cbError = function() {
+            // Ignore any errors and just set the first certificate
+            handleCertificateChoice(certificates[0]);
+        }
+        // Try to resolve last used certificate, otherwise set first certificate if there is no certificate preselected
+        getCertificateForPreselect(cbSuccess, cbError);
     }
 
     onSignerSucceeded(signedMessage) {

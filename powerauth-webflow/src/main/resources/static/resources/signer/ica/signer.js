@@ -155,6 +155,27 @@ function setChosenCertificate(pem, cbError) {
     }
 }
 
+// Obtain certificate which was used last time for preselection
+function getCertificateForPreselect(cbSuccess, cbError) {
+    try {
+        if (!IsICAPKIServiceRunning()) {
+            ThrowICAPKIServiceNotRunning();
+        }
+        ICAClientSign.signerGetCertificateAsync()
+            .then((pem) => {
+                cbSuccess(pem);
+            })
+            .catch(() => {
+                // Ignore business errors from signerGetCertificateAsync, e.g. certificate was not set before,
+                // or it was moved away from the certificate storage.
+                cbError();
+            });
+    } catch (ex) {
+        // Same error handling as before, errors are ignored.
+        cbError();
+    }
+}
+
 // Sign content using CMS in detached mode, content should be Base-64 encoded
 function signMessage(content, cbSuccess, cbError) {
     try {
