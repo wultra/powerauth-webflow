@@ -70,8 +70,6 @@ export default class SmsComponent extends React.Component {
 
     handleCertificateChoice(certificate) {
         this.setState({chosenCertificate: certificate});
-        const cbError = this.onSignerFailed;
-        setChosenCertificate(certificate.X509PEM, cbError);
     }
 
     handleSubmit(event) {
@@ -118,7 +116,8 @@ export default class SmsComponent extends React.Component {
         loadKeyStore(cbSuccess, cbError);
     }
 
-    chooseCertificate() {
+    chooseCertificate(event) {
+        event.preventDefault();
         // Register callbacks which are bound to this to avoid react vs. ICA component context issues
         const cbSuccess = this.onSignerInitSucceeded;
         const cbError = this.onSignerInitFailed;
@@ -145,10 +144,12 @@ export default class SmsComponent extends React.Component {
         }
     }
 
-    signOperationData() {
+    signOperationData(event) {
+        event.preventDefault();
         const signatureDataBase64 = this.props.signatureDataBase64;
         const cbSuccess = this.onSignerSucceeded;
         const cbError = this.onSignerFailed;
+        setChosenCertificate(this.state.chosenCertificate.X509PEM, cbError);
         signMessage(signatureDataBase64, cbSuccess, cbError);
     }
 
@@ -167,7 +168,26 @@ export default class SmsComponent extends React.Component {
             return;
         }
         this.setState({certificates: certificates});
-        this.handleCertificateChoice(certificates[0]);
+        const handleCertificateChoice = this.handleCertificateChoice;
+        const cbSuccess = function(pem) {
+            let certificateIndex = 0;
+            if (pem) {
+                // Iterate through certificates and found the one which should be preselected
+                for (const [i, value] of certificates.entries()) {
+                    if (value.X509PEM === pem) {
+                        certificateIndex = i;
+                        break;
+                    }
+                }
+            }
+            handleCertificateChoice(certificates[certificateIndex]);
+        }
+        const cbError = function() {
+            // Ignore any errors and just set the first certificate
+            handleCertificateChoice(certificates[0]);
+        }
+        // Try to resolve last used certificate, otherwise set first certificate if there is no certificate preselected
+        getCertificateForPreselect(cbSuccess, cbError);
     }
 
     onSignerSucceeded(signedMessage) {
