@@ -88,7 +88,11 @@ public class ICACertificateParser implements ICertificateParser {
             final ByteArrayInputStream bais = new ByteArrayInputStream(certificatePem.getBytes(StandardCharsets.UTF_8));
             PEMParser pemParser = new PEMParser(new InputStreamReader(bais));
             JcaX509CertificateConverter x509Converter = new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider());
-            X509Certificate cert = x509Converter.getCertificate((X509CertificateHolder) pemParser.readObject());
+            final X509CertificateHolder x509CertificateHolder = (X509CertificateHolder) pemParser.readObject();
+            if (x509CertificateHolder == null) {
+                throw new CertificateException("Unable to parse certificate from pem.");
+            }
+            final X509Certificate cert = x509Converter.getCertificate(x509CertificateHolder);
             final byte[] qcStatement = cert.getExtensionValue("1.3.6.1.5.5.7.1.3");
             if (qcStatement == null) {
                 throw new CertificateException("Unable to extract PSD2 mandates.");
