@@ -203,7 +203,7 @@ public class TppService {
         OAuthClientDetailsEntity oAuthClientDetailsEntity = new OAuthClientDetailsEntity();
         oAuthClientDetailsEntity.setClientId(clientId);
         oAuthClientDetailsEntity.setClientSecret(encodedClientSecret);
-        oAuthClientDetailsEntity.setAuthorizedGrantTypes("authorization_code");
+        oAuthClientDetailsEntity.setAuthorizedGrantTypes("authorization_code,refresh_token");
         oAuthClientDetailsEntity.setWebServerRedirectUri(redirectUris);
         oAuthClientDetailsEntity.setScope(scopes);
         oAuthClientDetailsEntity.setRefreshTokenValidity(tppEngineConfiguration.getDefaultRefreshTokenValidity().getSeconds());
