@@ -121,6 +121,7 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
         tokenServices.setTokenStore(tokenStore());
         tokenServices.setTokenEnhancer(tokenEnhancer());
         tokenServices.setSupportRefreshToken(supportRefreshToken);
+        tokenServices.setAuthenticationManager(authentication -> SecurityContextHolder.getContext().getAuthentication());
         return tokenServices;
     }
 
@@ -145,14 +146,13 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
     /**
      * Configures authorization server endpoints - mainly storage for OAuth 2.0.
      * @param endpoints Endpoints.
-     * @throws Exception Thrown when configuration fails.
      */
     @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints)
-            throws Exception {
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
         endpoints.authorizationCodeServices(authorizationCodeServices())
                 .tokenEnhancer(tokenEnhancer())
                 .tokenStore(tokenStore())
+                .tokenServices(tokenServices())
                 .approvalStoreDisabled();
     }
 
