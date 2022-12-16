@@ -121,7 +121,8 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
         tokenServices.setTokenStore(tokenStore());
         tokenServices.setTokenEnhancer(tokenEnhancer());
         tokenServices.setSupportRefreshToken(supportRefreshToken);
-        tokenServices.setAuthenticationManager(authentication -> SecurityContextHolder.getContext().getAuthentication());
+        tokenServices.setReuseRefreshToken(true);
+        tokenServices.setClientDetailsService(clientDetailsService());
         return tokenServices;
     }
 
