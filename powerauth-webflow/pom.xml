@@ -32,11 +32,6 @@
     <description>Federated Authentication and Authorization Server for Web</description>
     <packaging>war</packaging>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>8</java.version>
-    </properties>
-
     <dependencies>
 
         <!-- Spring Dependencies -->
@@ -114,8 +109,7 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>${bc.version}</version>
+            <artifactId>bcprov-jdk18on</artifactId>
         </dependency>
 
         <!-- PowerAuth 2.0 Web Flow Dependencies -->
@@ -140,8 +134,8 @@
             <artifactId>powerauth-webflow-authentication-mtoken</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>bcprov-jdk15on</artifactId>
                     <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk18on</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
