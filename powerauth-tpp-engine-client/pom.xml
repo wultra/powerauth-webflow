@@ -62,7 +62,6 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-tpp-engine-model</artifactId>
-            <version>1.4.0</version>
         </dependency>
     </dependencies>
 
