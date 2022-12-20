@@ -39,6 +39,7 @@
             <groupId>org.springframework.ws</groupId>
             <artifactId>spring-ws-security</artifactId>
             <exclusions>
+                <!--  TODO (racansky, 2022-12-20) in the future version of Spring security the artifact ID may change and the exclusion will not be needed -->
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
                     <artifactId>bcprov-jdk15on</artifactId>
