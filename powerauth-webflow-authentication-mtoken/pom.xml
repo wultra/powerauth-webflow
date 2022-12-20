@@ -40,8 +40,8 @@
             <artifactId>spring-ws-security</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>bcprov-jdk15on</artifactId>
                     <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

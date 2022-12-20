@@ -138,13 +138,11 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>${h2.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>${bc.version}</version>
+            <artifactId>bcprov-jdk18on</artifactId>
         </dependency>
     </dependencies>
 
