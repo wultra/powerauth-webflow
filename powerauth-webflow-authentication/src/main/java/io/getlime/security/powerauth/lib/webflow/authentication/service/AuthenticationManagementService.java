@@ -185,7 +185,7 @@ public class AuthenticationManagementService {
             final SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
             securityContext.setAuthentication(auth);
             SecurityContextHolder.setContext(securityContext);
-            logger.info("UserOperationAuthentication(userId={}) set to to security context.", auth.getUserId());
+            logger.info("UserOperationAuthentication(userId={}) set to the security context.", auth.getUserId());
         }
     }
 
