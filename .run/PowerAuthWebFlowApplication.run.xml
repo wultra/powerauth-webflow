@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PowerAuthWebFlowApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <module name="powerauth-webflow" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="io.getlime.security.powerauth.app.webflow.PowerAuthWebFlowApplication" />
+    <option name="VM_PARAMETERS" value="-Dserver.servlet.context-path=/webflow -Dserver.port=9080" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
