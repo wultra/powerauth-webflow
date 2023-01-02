@@ -48,7 +48,7 @@
     "prepare": "npm run snyk-protect"
   },
   "devDependencies": {
-    "babel-loader": "^8.2.2",
+    "babel-loader": "^8.3.0",
     "@babel/core": "^7.14.3",
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.14.4",
