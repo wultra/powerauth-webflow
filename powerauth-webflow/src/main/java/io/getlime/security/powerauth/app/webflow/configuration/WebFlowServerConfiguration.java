@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
+
 /**
  * Configuration for the Web Flow application.
  *
@@ -52,6 +54,12 @@ public class WebFlowServerConfiguration {
      */
     @Value("${powerauth.webflow.page.ext-resources.location}")
     private String resourcesLocation;
+
+    /**
+     * Cache duration for the resources.
+     */
+    @Value("${powerauth.webflow.page.ext-resources.cache-duration:1h}")
+    private Duration resourcesCacheDuration;
 
     /**
      * Dynamic page title.
@@ -204,6 +212,15 @@ public class WebFlowServerConfiguration {
      */
     public String getResourcesLocation() {
         return resourcesLocation;
+    }
+
+    /**
+     * Get the cache duration for the resources.
+     *
+     * @return Cache duration for the resources.
+     */
+    public Duration getResourcesCacheDuration() {
+        return resourcesCacheDuration;
     }
 
     /**
