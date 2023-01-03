@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="TppEngineApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="powerauth-tpp-engine" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="io.getlime.security.powerauth.app.tppengine.TppEngineApplication" />
+    <option name="VM_PARAMETERS" value="-Dserver.servlet.context-path=/tpp-engine -Dserver.port=9081" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
