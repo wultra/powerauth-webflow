@@ -2,7 +2,7 @@
   <configuration default="false" name="PowerAuthWebFlowClientApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="powerauth-webflow-client" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.getlime.security.powerauth.app.webflow.demo.PowerAuthWebFlowDemoApplication" />
-    <option name="VM_PARAMETERS" value="-Dserver.servlet.context-path=/powerauth-webflow-client -Dserver.port=9083 -Dspring.datasource.url=jdbc:postgresql://localhost:5432/powerauth -Dspring.datasource.username=powerauth -Dspring.datasource.password= -Dspring.datasource.driver-class-name=org.postgresql.Driver -Dspring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect -Dspring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false -Dspring.jpa.properties.hibernate.connection.characterEncoding=utf8 -Dspring.jpa.properties.hibernate.connection.useUnicode=true" />
+    <option name="VM_PARAMETERS" value="-Dserver.servlet.context-path=/powerauth-webflow-client -Dserver.port=9083" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
