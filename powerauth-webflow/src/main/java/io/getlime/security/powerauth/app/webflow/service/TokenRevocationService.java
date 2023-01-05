@@ -57,13 +57,14 @@ public class TokenRevocationService {
      * @throws InvalidTokenException Thrown when token is invalid.
      */
     public void revokeToken(String token, String tokenTypeHint, String clientId) throws InvalidTokenException {
-        boolean tokenRevoked;
+        boolean tokenRevoked = false;
         if (TOKEN_TYPE_HINT_ACCESS_TOKEN.equals(tokenTypeHint)) {
             tokenRevoked = revokeAccessToken(token, clientId);
         } else if (TOKEN_TYPE_HINT_REFRESH_TOKEN.equals(tokenTypeHint)) {
             tokenRevoked = revokeRefreshToken(token, clientId);
-        } else {
-            logger.debug("Token type hint is missing, attempting to revoke both access token and refresh token.");
+        }
+        if (!tokenRevoked) {
+            logger.debug("Token type hint is missing or invalid, attempting to revoke both access token and refresh token.");
             // Fallback logic, revoke all matching tokens
             tokenRevoked = revokeAccessToken(token, clientId) || revokeRefreshToken(token, clientId);
         }
