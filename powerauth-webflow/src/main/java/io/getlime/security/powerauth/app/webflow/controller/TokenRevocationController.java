@@ -62,7 +62,7 @@ public class TokenRevocationController {
      */
     @PostMapping("/token/revoke")
     @ResponseBody
-    public void revokeToken(@AuthenticationPrincipal User user, @RequestParam("token") String token, @RequestParam("token_type_hint") String tokenTypeHint) throws InvalidTokenException {
+    public void revokeToken(@AuthenticationPrincipal User user, @RequestParam("token") String token, @RequestParam(name = "token_type_hint", required = false) String tokenTypeHint) throws InvalidTokenException {
         logger.info("Revoking token: {}, token type: {}", token, tokenTypeHint);
         final String clientId = tokenRevocationAuthenticationService.checkAuthentication(user);
         tokenRevocationService.revokeToken(token, tokenTypeHint, clientId);
