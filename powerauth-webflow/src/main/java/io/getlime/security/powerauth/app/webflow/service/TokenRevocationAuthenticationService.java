@@ -56,7 +56,7 @@ public class TokenRevocationAuthenticationService {
      * @param userDetails User details.
      * @return OAuth 2.0 client ID.
      */
-    protected String getClientId(UserDetails userDetails) {
+    private String getClientId(UserDetails userDetails) {
         return userDetails.getUsername();
     }
 
