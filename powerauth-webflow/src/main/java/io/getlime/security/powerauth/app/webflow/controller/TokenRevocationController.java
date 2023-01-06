@@ -60,7 +60,7 @@ public class TokenRevocationController {
      * @param tokenTypeHint Optional hint whether token is an access token or a refresh token.
      * @throws InvalidTokenException Thrown when token is invalid.
      */
-    @PostMapping("/token/revoke")
+    @PostMapping("/oauth/token/revoke")
     @ResponseBody
     public void revokeToken(@AuthenticationPrincipal User user, @RequestParam("token") String token, @RequestParam(name = "token_type_hint", required = false) String tokenTypeHint) throws InvalidTokenException {
         logger.info("Revoking token: {}, token type: {}", token, tokenTypeHint);
