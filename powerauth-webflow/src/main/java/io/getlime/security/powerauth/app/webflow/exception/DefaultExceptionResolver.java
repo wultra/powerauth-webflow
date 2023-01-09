@@ -44,7 +44,7 @@ public class DefaultExceptionResolver {
 
     private final Logger logger = LoggerFactory.getLogger(DefaultExceptionResolver.class);
 
-    private AuthenticationManagementService authenticationManagementService;
+    private final AuthenticationManagementService authenticationManagementService;
 
     private static final AuditDetail AUDIT_DETAIL_UNEXPECTED_ERROR = new AuditDetail("UNEXPECTED_ERROR");
     private static final AuditDetail AUDIT_DETAIL_BAD_REQUEST = new AuditDetail("BAD_REQUEST");
@@ -106,7 +106,6 @@ public class DefaultExceptionResolver {
         return "redirect:/oauth/error";
     }
 
-
     /**
      * Handling of client authentication exception.
      * @param ex Exception.
@@ -120,4 +119,19 @@ public class DefaultExceptionResolver {
         final Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessageId());
         return new ErrorResponse(error);
     }
+
+    /**
+     * Handling of invalid token exception.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(InvalidTokenException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleInvalidTokenException(InvalidTokenException ex) {
+        logger.warn("Error occurred in Web Flow server: {}", ex.getMessage());
+        audit.warn("Error occurred in Web Flow server", AUDIT_DETAIL_BAD_REQUEST, ex);
+        final Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessage());
+        return new ErrorResponse(error);
+    }
+
 }
