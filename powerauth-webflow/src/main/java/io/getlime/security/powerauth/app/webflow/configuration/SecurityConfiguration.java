@@ -48,7 +48,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${powerauth.webflow.security.cors.allowOrigin:*}")
     private String corsAllowOrigin;
 
-    private final static String OAUTH2_TOKEN_REVOKE_ENDPOINT = "/token/revoke";
+    private final static String OAUTH2_TOKEN_REVOKE_ENDPOINT = "/oauth/token/revoke";
     private final static String OAUTH2_CLIENT_REALM_NAME = "oauth2/client";
 
     private final OAuth2AuthorizationServerConfiguration authConfig;
