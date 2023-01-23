@@ -100,7 +100,7 @@
         <bc.version>1.72</bc.version>
         <zxing.version>3.5.0</zxing.version>
         <passay.version>1.6.1</passay.version>
-        <springdoc-openapi.version>1.6.9</springdoc-openapi.version>
+        <springdoc-openapi.version>1.6.14</springdoc-openapi.version>
         <guava.version>31.1-jre</guava.version>
         <moneta.version>1.1</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
