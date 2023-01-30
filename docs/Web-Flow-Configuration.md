@@ -40,22 +40,14 @@ powerauth.webflow.page.title=PowerAuth Web Flow
 powerauth.webflow.page.ext-resources.location=classpath:/static/resources/
 powerauth.webflow.page.custom-css.url=
 
-# Database Configuration - MySQL
-spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
+# Database Configuration - PostgreSQL
+spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
 spring.datasource.username=powerauth
-spring.datasource.password=
-spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+spring.datasource.password=powerauth
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
-
-# Database Configuration - PostgreSQL
-#spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
-#spring.datasource.username=powerauth
-#spring.datasource.password=powerauth
-#spring.datasource.driver-class-name=org.postgresql.Driver
-#spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
-#spring.jpa.properties.hibernate.connection.characterEncoding=utf8
-#spring.jpa.properties.hibernate.connection.useUnicode=true
 
 # Database Configuration - Oracle
 #spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/powerauth
@@ -168,22 +160,14 @@ Complete configuration file:
 # Allow externalization of properties using application-ext.properties
 spring.profiles.active=ext
 
-# Database Configuration - MySQL
-spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
+# Database Configuration - PostgreSQL
+spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
-spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
-
-# Database Configuration - PostgreSQL
-#spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
-#spring.datasource.username=powerauth
-#spring.datasource.password=
-#spring.datasource.driver-class-name=org.postgresql.Driver
-#spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
-#spring.jpa.properties.hibernate.connection.characterEncoding=utf8
-#spring.jpa.properties.hibernate.connection.useUnicode=true
 
 # Database Configuration - Oracle
 #spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/powerauth
@@ -281,23 +265,14 @@ Complete configuration file:
 # Allow externalization of properties using application-ext.properties
 spring.profiles.active=ext
 
-# Database Configuration - MySQL
-spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
+# Database Configuration - PostgreSQL
+spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
 spring.datasource.username=powerauth
 spring.datasource.password=
-spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
-#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
-
-# Database Configuration - PostgreSQL
-#spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
-#spring.datasource.username=powerauth
-#spring.datasource.password=
-#spring.datasource.driver-class-name=org.postgresql.Driver
-#spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
-#spring.jpa.properties.hibernate.connection.characterEncoding=utf8
-#spring.jpa.properties.hibernate.connection.useUnicode=true
 
 # Database Configuration - Oracle
 #spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/powerauth

@@ -1,15 +1,10 @@
 # Database Table Structure
 
-Web Flow requires a database to store data. It is tested with Oracle, MySQL and PostgreSQL. It should be easily adapted to any other SQL database which supports JDBC.
+Web Flow requires a database to store data. It is tested with Oracle and PostgreSQL. It should be easily adapted to any other SQL database which supports JDBC.
 
 Web Flow can coexist with PowerAuth in the same database schema, or it can use a different database schema.
 
 ## Database Scripts
-
-### MySQL
-- [create_schema.sql](./sql/mysql/create_schema.sql) - DDL script for creating the database schema
-- [initial_data.sql](./sql/mysql/initial_data.sql) - script with initial data
-- [drop_schema.sql](./sql/mysql/drop_schema.sql) - drop schema script
 
 ### Oracle
 

@@ -150,7 +150,7 @@ This chapter describes generic behaviour which is independent on chosen operatio
 
 | parameter | value |
 |---|---|
-| URL | `jdbc:mysql://localhost:23376/powerauth` |
+| URL | `jdbc:postgresql://localhost:23376/powerauth` |
 | username | `root` |
 | password | `root` |
 | table name | `da_sms_authorization` |
