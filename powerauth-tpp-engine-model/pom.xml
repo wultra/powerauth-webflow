@@ -24,12 +24,11 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.3.0</version>
+        <version>1.4.0</version>
     </parent>
 
     <name>powerauth-tpp-engine-model</name>
     <artifactId>powerauth-tpp-engine-model</artifactId>
-    <version>1.3.0</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -37,12 +36,10 @@
         <dependency>
             <groupId>io.getlime.core</groupId>
             <artifactId>rest-model-base</artifactId>
-            <version>${wultra-java-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>${bc.version}</version>
+            <artifactId>bcpkix-jdk18on</artifactId>
         </dependency>
 
         <!-- Test dependencies -->
@@ -57,30 +54,11 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                    <compilerArgs>
-                        <arg>--add-exports</arg>
-                        <arg>java.base/sun.security.util=ALL-UNNAMED</arg>
-                        <arg>--add-exports</arg>
-                        <arg>java.base/sun.security.x509=ALL-UNNAMED</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
                     <failOnError>false</failOnError>
                     <detectOfflineLinks>false</detectOfflineLinks>
-                    <additionalOptions>
-                        <option>--add-exports</option>
-                        <option>java.base/sun.security.x509=ALL-UNNAMED</option>
-                    </additionalOptions>
                 </configuration>
                 <executions>
                     <execution>

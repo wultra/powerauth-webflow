@@ -30,6 +30,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -245,19 +246,21 @@ public class DataAdapterClient {
     }
 
     /**
-     * Verify client TLS certificate.
+     * Verify client TLS certificate or message signed using qualified certificate.
      *
      * @param userId User ID for this authentication request.
      * @param organizationId Organization ID for this authentication request.
-     * @param clientCertificate Client TLS certificate.
+     * @param certificate Certificate in PEM format for client TLS authentication.
+     * @param signedMessage Signed message created using qualified certificate, including the certificate.
+     * @param authInstrument Authentication instrument used for certificate verification.
      * @param authMethod Authentication method.
      * @param accountStatus Current user account status.
      * @param operationContext Operation context.
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails or authentication/authorization fails.
      */
-    public ObjectResponse<VerifyCertificateResponse> verifyClientCertificate(String userId, String organizationId, String clientCertificate, AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException {
-        VerifyCertificateRequest request = new VerifyCertificateRequest(userId, organizationId, clientCertificate, authMethod, accountStatus, operationContext);
+    public ObjectResponse<VerifyCertificateResponse> verifyCertificate(String userId, String organizationId, String certificate, String signedMessage, AuthInstrument authInstrument, AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException {
+        VerifyCertificateRequest request = new VerifyCertificateRequest(userId, organizationId, certificate, signedMessage, authInstrument, authMethod, accountStatus, operationContext);
         return postObjectImpl("/api/auth/certificate/verify", new ObjectRequest<>(request), VerifyCertificateResponse.class);
     }
 

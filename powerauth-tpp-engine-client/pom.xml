@@ -25,12 +25,11 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.3.0</version>
+        <version>1.4.0</version>
     </parent>
 
     <name>powerauth-tpp-engine-client</name>
     <artifactId>powerauth-tpp-engine-client</artifactId>
-    <version>1.3.0</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -39,20 +38,30 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.tomcat.embed</groupId>
+                    <artifactId>tomcat-embed-el</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Other Dependencies -->
         <dependency>
             <groupId>io.getlime.core</groupId>
             <artifactId>rest-client-base</artifactId>
-            <version>${wultra-java-core.version}</version>
         </dependency>
 
         <!-- PowerAuth 2.0 Web Flow Dependencies -->
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-tpp-engine-model</artifactId>
-            <version>1.3.0</version>
         </dependency>
     </dependencies>
 

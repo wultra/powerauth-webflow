@@ -194,6 +194,16 @@ public class HomeController {
         model.put("usernameMaxLength", webFlowConfig.getUsernameMaxLength());
         model.put("passwordMaxLength", webFlowConfig.getPasswordMaxLength());
         model.put("smsOtpMaxLength", webFlowConfig.getSmsOtpMaxLength());
+        model.put("approvalCertificateEnabled", webFlowConfig.isApprovalCertificateEnabled());
+        model.put("approvalCertificateSigner", webFlowConfig.getApprovalCertificateSigner().toString());
+        model.put("icaConfigurationUrl", webFlowConfig.getIcaConfigurationUrl());
+        model.put("icaLogLevel", webFlowConfig.getIcaLogLevel());
+        model.put("icaExtensionOwner", webFlowConfig.getIcaExtensionOwner());
+        model.put("icaExtensionIDChrome", webFlowConfig.getIcaExtensionIDChrome());
+        model.put("icaExtensionIDOpera", webFlowConfig.getIcaExtensionIDOpera());
+        model.put("icaExtensionIDEdge", webFlowConfig.getIcaExtensionIDEdge());
+        model.put("icaExtensionIDFirefox", webFlowConfig.getIcaExtensionIDFirefox());
+        model.put("icaExtensionInstallURLFirefox", webFlowConfig.getIcaExtensionInstallURLFirefox());
         logger.info("The /authenticate request succeeded");
         return "index";
     }
@@ -370,12 +380,16 @@ public class HomeController {
      * or failed with a fatal error.
      */
     private void cleanHttpSession() {
-        httpSession.removeAttribute(HttpSessionAttributeNames.OTP_ID);
-        httpSession.removeAttribute(HttpSessionAttributeNames.LAST_MESSAGE_TIMESTAMP);
-        httpSession.removeAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
-        httpSession.removeAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
-        httpSession.removeAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
-        httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
-        httpSession.removeAttribute(HttpSessionAttributeNames.CLIENT_CERTIFICATE);
+        synchronized (httpSession.getServletContext()) {
+            httpSession.removeAttribute(HttpSessionAttributeNames.OTP_ID);
+            httpSession.removeAttribute(HttpSessionAttributeNames.LAST_MESSAGE_TIMESTAMP);
+            httpSession.removeAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
+            httpSession.removeAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
+            httpSession.removeAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
+            httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
+            httpSession.removeAttribute(HttpSessionAttributeNames.CLIENT_CERTIFICATE);
+            httpSession.removeAttribute(HttpSessionAttributeNames.APPROVAL_BY_CERTIFICATE_ENABLED);
+            httpSession.removeAttribute(HttpSessionAttributeNames.OPERATION_DATA_EXTERNAL);
+        }
     }
 }

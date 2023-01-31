@@ -24,14 +24,12 @@
 
     <name>powerauth-data-adapter-client</name>
     <artifactId>powerauth-data-adapter-client</artifactId>
-    <version>1.3.0</version>
     <packaging>jar</packaging>
 
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.3.0</version>
-        <relativePath>../pom.xml</relativePath>
+        <version>1.4.0</version>
     </parent>
 
     <dependencies>
@@ -39,24 +37,22 @@
         <!-- Spring Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- PowerAuth 2.0 Web Flow Dependencies -->
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-data-adapter-model</artifactId>
-            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-nextstep-model</artifactId>
-            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.core</groupId>
             <artifactId>rest-client-base</artifactId>
-            <version>${wultra-java-core.version}</version>
         </dependency>
     </dependencies>
 

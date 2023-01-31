@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessio
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
@@ -181,8 +182,10 @@ public class AuthenticationManagementService {
     public void pendingAuthenticationToAuthentication() {
         UserOperationAuthentication auth = getPendingUserAuthentication();
         if (auth.isAuthenticated()) {
-            logger.info("Security context was set to authenticated");
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            final SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+            securityContext.setAuthentication(auth);
+            SecurityContextHolder.setContext(securityContext);
+            logger.info("UserOperationAuthentication(userId={}) set to the security context.", auth.getUserId());
         }
     }
 

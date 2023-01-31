@@ -60,6 +60,11 @@ public class TppInfo {
      */
     private String phone;
 
+    /**
+     * Indication if this TPP provider is blocked or not
+     */
+    private boolean blocked;
+
     public String getName() {
         return name;
     }
@@ -115,4 +120,13 @@ public class TppInfo {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
 }

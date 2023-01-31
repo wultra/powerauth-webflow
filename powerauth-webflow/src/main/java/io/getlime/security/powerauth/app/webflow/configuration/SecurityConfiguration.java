@@ -25,6 +25,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -46,6 +48,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${powerauth.webflow.security.cors.allowOrigin:*}")
     private String corsAllowOrigin;
 
+    private final static String OAUTH2_TOKEN_REVOKE_ENDPOINT = "/oauth/token/revoke";
+    private final static String OAUTH2_CLIENT_REALM_NAME = "oauth2/client";
+
+    private final OAuth2AuthorizationServerConfiguration authConfig;
+
+    /**
+     * Configuration class constructor.
+     * @param authConfig OAuth 2.0 authorization server configuration.
+     */
+    public SecurityConfiguration(OAuth2AuthorizationServerConfiguration authConfig) {
+        this.authConfig = authConfig;
+    }
+
     /**
      * Configure http security for OAuth 2.0 authentication, URL exceptions, CSRF tokens, etc.
      * @param http HTTP security.
@@ -54,13 +69,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .httpBasic().disable()
-                .csrf().ignoringAntMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**").and()
-                .antMatcher("/**").authorizeRequests()
-                .antMatchers("/", "/authenticate", "/authenticate/**", "/oauth/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/actuator/**", "/tls/client/**").permitAll()
-                .anyRequest().authenticated()
-                .and().exceptionHandling()
-                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/authenticate"));
+                .csrf().ignoringAntMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**", OAUTH2_TOKEN_REVOKE_ENDPOINT)
+                .and()
+                    .antMatcher(OAUTH2_TOKEN_REVOKE_ENDPOINT).httpBasic().realmName(OAUTH2_CLIENT_REALM_NAME)
+                .and()
+                    .antMatcher("/**").authorizeRequests()
+                    .antMatchers("/", "/authenticate", "/authenticate/**", "/oauth/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/actuator/**", "/tls/client/**", "/signer/**").permitAll()
+                    .anyRequest().fullyAuthenticated()
+                .and()
+                    .exceptionHandling()
+                    .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/authenticate"));
         http.cors();
     }
 
@@ -81,5 +99,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/tls/client/login", configuration);
         source.registerCorsConfiguration("/tls/client/approve", configuration);
         return source;
+    }
+
+    @Bean
+    UserDetailsService clientUserDetailsService() {
+        return new ClientDetailsUserDetailsService(authConfig.clientDetailsService());
     }
 }

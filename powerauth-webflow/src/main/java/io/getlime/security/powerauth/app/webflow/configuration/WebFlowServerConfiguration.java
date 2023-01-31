@@ -20,12 +20,15 @@ package io.getlime.security.powerauth.app.webflow.configuration;
 
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.AuditFactory;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.enumeration.CertificateSigner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.Duration;
 
 /**
  * Configuration for the Web Flow application.
@@ -51,6 +54,12 @@ public class WebFlowServerConfiguration {
      */
     @Value("${powerauth.webflow.page.ext-resources.location}")
     private String resourcesLocation;
+
+    /**
+     * Cache duration for the resources.
+     */
+    @Value("${powerauth.webflow.page.ext-resources.cache-duration:1h}")
+    private Duration resourcesCacheDuration;
 
     /**
      * Dynamic page title.
@@ -119,6 +128,66 @@ public class WebFlowServerConfiguration {
     private int consentPanelLimitCharacters;
 
     /**
+     * Whether certificate is enabled during approval.
+     */
+    @Value("${powerauth.webflow.approval.certificate.enabled:false}")
+    private boolean approvalCertificateEnabled;
+
+    /**
+     * Whether certificate is enabled during approval.
+     */
+    @Value("${powerauth.webflow.approval.certificate.signer:ICA_CLIENT_SIGN}")
+    private CertificateSigner approvalCertificateSigner;
+
+    /**
+     * ICA configuration URL.
+     */
+    @Value("${powerauth.webflow.approval.certificate.signer.ica.configurationUrl:}")
+    private String icaConfigurationUrl;
+
+    /**
+     * ICA extension log level.
+     */
+    @Value("${powerauth.webflow.approval.certificate.signer.ica.logLevel:1}")
+    private String icaLogLevel;
+
+    /**
+     * ICA extension owner name.
+     */
+    @Value("${powerauth.webflow.approval.certificate.signer.ica.extensionOwner:}")
+    private String icaExtensionOwner;
+
+    /**
+     * ICA extension ID for Google Chrome.
+     */
+    @Value("${powerauth.webflow.approval.certificate.signer.ica.extensionIDChrome:}")
+    private String icaExtensionIDChrome;
+
+    /**
+     * ICA extension ID for Opera.
+     */
+    @Value("${powerauth.webflow.approval.certificate.signer.ica.extensionIDOpera:}")
+    private String icaExtensionIDOpera;
+
+    /**
+     * ICA extension ID for Microsoft Edge.
+     */
+    @Value("${powerauth.webflow.approval.certificate.signer.ica.extensionIDEdge:}")
+    private String icaExtensionIDEdge;
+
+    /**
+     * ICA extension ID for Firefox.
+     */
+    @Value("${powerauth.webflow.approval.certificate.signer.ica.extensionIDFirefox:}")
+    private String icaExtensionIDFirefox;
+
+    /**
+     * ICA extension ID for Firefox.
+     */
+    @Value("${powerauth.webflow.approval.certificate.signer.ica.extensionInstallURLFirefox:}")
+    private String icaExtensionInstallURLFirefox;
+
+    /**
      * Configuration constructor.
      * @param auditFactory Audit factory.
      */
@@ -143,6 +212,15 @@ public class WebFlowServerConfiguration {
      */
     public String getResourcesLocation() {
         return resourcesLocation;
+    }
+
+    /**
+     * Get the cache duration for the resources.
+     *
+     * @return Cache duration for the resources.
+     */
+    public Duration getResourcesCacheDuration() {
+        return resourcesCacheDuration;
     }
 
     /**
@@ -232,6 +310,86 @@ public class WebFlowServerConfiguration {
      */
     public int getConsentPanelLimitCharacters() {
         return consentPanelLimitCharacters;
+    }
+
+    /**
+     * Get whether approval using certificate is enabled.
+     * @return Whether approval using certificate is enabled.
+     */
+    public boolean isApprovalCertificateEnabled() {
+        return approvalCertificateEnabled;
+    }
+
+    /**
+     * Get signer for approval using certificate.
+     * @return Signer for approval using certificate.
+     */
+    public CertificateSigner getApprovalCertificateSigner() {
+        return approvalCertificateSigner;
+    }
+
+    /**
+     * Get ICA configuration URL.
+     * @return ICA configuration URL.
+     */
+    public String getIcaConfigurationUrl() {
+        return icaConfigurationUrl;
+    }
+
+    /**
+     * Get ICA extension log level.
+     * @return ICA extension log level.
+     */
+    public String getIcaLogLevel() {
+        return icaLogLevel;
+    }
+
+    /**
+     * Get ICA extension owner name.
+     * @return ICA extension owner name.
+     */
+    public String getIcaExtensionOwner() {
+        return icaExtensionOwner;
+    }
+
+    /**
+     * Get ICA extension for Google Chrome.
+     * @return ICA extension for Google Chrome.
+     */
+    public String getIcaExtensionIDChrome() {
+        return icaExtensionIDChrome;
+    }
+
+    /**
+     * Get ICA extension for Opera.
+     * @return ICA extension for Opera.
+     */
+    public String getIcaExtensionIDOpera() {
+        return icaExtensionIDOpera;
+    }
+
+    /**
+     * Get ICA extension for Microsoft Edge.
+     * @return ICA extension for Microsoft Edge.
+     */
+    public String getIcaExtensionIDEdge() {
+        return icaExtensionIDEdge;
+    }
+
+    /**
+     * Get ICA extension for Firefox.
+     * @return ICA extension for Firefox.
+     */
+    public String getIcaExtensionIDFirefox() {
+        return icaExtensionIDFirefox;
+    }
+
+    /**
+     * Get ICA extension for Firefox installation URL.
+     * @return ICA extension for Firefox installation URL.
+     */
+    public String getIcaExtensionInstallURLFirefox() {
+        return icaExtensionInstallURLFirefox;
     }
 
     /**

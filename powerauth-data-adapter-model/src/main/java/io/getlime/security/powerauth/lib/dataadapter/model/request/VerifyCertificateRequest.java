@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 
 /**
@@ -29,9 +30,20 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 public class VerifyCertificateRequest {
 
     /**
-     * Client TLS certificate in PEM format.
+     * Certificate in PEM format for client TLS authentication.
      */
-    private String clientCertificate;
+    private String certificate;
+
+    /**
+     * Signed message created using qualified certificate, including the certificate.
+     */
+    private String signedMessage;
+
+    /**
+     * Authentication instrument used for certificate verification: client TLS authentication
+     * vs. signature using qualified certificate.
+     */
+    private AuthInstrument authInstrument;
 
     /**
      * Authentication method requesting certificate verification.
@@ -65,38 +77,75 @@ public class VerifyCertificateRequest {
     }
 
     /**
-     * Constructor with message ID, authorization code and operation context.
+     * Constructor with all parameters.
      * @param userId User ID.
      * @param organizationId Organization ID.
-     * @param clientCertificate Client TLS certificate.
+     * @param certificate Certificate in PEM format for client TLS authentication.
+     * @param signedMessage Signed message created using qualified certificate, including the certificate.
+     * @param authInstrument Authentication instrument used for certificate verification.
      * @param authMethod Authentication method requesting certificate verification.
      * @param accountStatus Current user account status.
      * @param operationContext Operation context.
      */
-    public VerifyCertificateRequest(String userId, String organizationId, String clientCertificate, AuthMethod authMethod,
+    public VerifyCertificateRequest(String userId, String organizationId, String certificate, String signedMessage,
+                                    AuthInstrument authInstrument, AuthMethod authMethod,
                                     AccountStatus accountStatus, OperationContext operationContext) {
         this.userId = userId;
         this.organizationId = organizationId;
-        this.clientCertificate = clientCertificate;
+        this.certificate = certificate;
+        this.signedMessage = signedMessage;
+        this.authInstrument = authInstrument;
         this.authMethod = authMethod;
         this.accountStatus = accountStatus;
         this.operationContext = operationContext;
     }
 
     /**
-     * Get client TLS certificate.
-     * @return Client TLS certificate.
+     * Get certificate in PEM format.
+     * @return Certificate.
      */
-    public String getClientCertificate() {
-        return clientCertificate;
+    public String getCertificate() {
+        return certificate;
     }
 
     /**
-     * Set client TLS certificate.
-     * @param clientCertificate Client TLS certificate.
+     * Set certificate in PEM format.
+     * @param certificate Certificate.
      */
-    public void setClientCertificate(String clientCertificate) {
-        this.clientCertificate = clientCertificate;
+    public void setCertificate(String certificate) {
+        this.certificate = certificate;
+    }
+
+    /**
+     * Get signature created using certificate.
+     * @return Signature.
+     */
+    public String getSignedMessage() {
+        return signedMessage;
+    }
+
+    /**
+     * Set signature created using certificate.
+     * @param signedMessage Signature.
+     */
+    public void setSignedMessage(String signedMessage) {
+        this.signedMessage = signedMessage;
+    }
+
+    /**
+     * Get authentication instrument used for certificate verification.
+     * @return Authentication instrument used for certificate verification.
+     */
+    public AuthInstrument getAuthInstrument() {
+        return authInstrument;
+    }
+
+    /**
+     * Set authentication instrument used for certificate verification.
+     * @param authInstrument Authentication instrument used for certificate verification.
+     */
+    public void setAuthInstrument(AuthInstrument authInstrument) {
+        this.authInstrument = authInstrument;
     }
 
     /**

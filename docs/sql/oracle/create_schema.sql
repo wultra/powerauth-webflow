@@ -398,8 +398,7 @@ CREATE TABLE ns_otp_storage (
   timestamp_verified          TIMESTAMP,                                    -- Timestamp when one time password was verified.
   timestamp_blocked           TIMESTAMP,                                    -- Timestamp when one time password was blocked.
   timestamp_expires           TIMESTAMP,                                    -- Timestamp when one time password expires.
-  CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_definition_id) REFERENCES ns_otp_definition (otp_definition_id),
-  CONSTRAINT ns_otp_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
+  CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_definition_id) REFERENCES ns_otp_definition (otp_definition_id)
 );
 
 -- Table ns_operation stores details of Web Flow operations.
@@ -438,7 +437,6 @@ CREATE TABLE ns_authentication (
   result_credential           VARCHAR2(32 CHAR),                            -- Authentication result for credential authentication.
   result_otp                  VARCHAR2(32 CHAR),                            -- Authentication result for one time password authentication.
   timestamp_created           TIMESTAMP,                                    -- Timestamp when authentication record was created.
-  CONSTRAINT ns_auth_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id),
   CONSTRAINT ns_auth_credential_fk FOREIGN KEY (credential_id) REFERENCES ns_credential_storage (credential_id),
   CONSTRAINT ns_auth_otp_fk FOREIGN KEY (otp_id) REFERENCES ns_otp_storage (otp_id),
   CONSTRAINT ns_auth_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
@@ -568,7 +566,8 @@ CREATE TABLE tpp_detail (
   tpp_website           CLOB NULL,                                        -- TPP website, if available.
   tpp_phone             VARCHAR2(256 CHAR) NULL,                          -- TPP phone number, if available.
   tpp_email             VARCHAR2(256 CHAR) NULL,                          -- TPP e-mail, if available.
-  tpp_logo              BLOB NULL                                         -- TPP logo, if available.
+  tpp_logo              BLOB NULL,                                        -- TPP logo, if available.
+  tpp_blocked           NUMBER(1) DEFAULT 0 NOT NULL                      -- Indication if this TPP provider is blocked or not.
 );
 
 CREATE TABLE tpp_app_detail (
@@ -583,7 +582,7 @@ CREATE TABLE tpp_app_detail (
 );
 
 -- Table audit_log stores auditing information
-CREATE TABLE audit_log (
+BEGIN EXECUTE IMMEDIATE 'CREATE TABLE audit_log (
     audit_log_id       VARCHAR2(36 CHAR) PRIMARY KEY,
     application_name   VARCHAR2(256 CHAR) NOT NULL,
     audit_level        VARCHAR2(32 CHAR) NOT NULL,
@@ -597,15 +596,19 @@ CREATE TABLE audit_log (
     thread_name        VARCHAR2(256 CHAR) NOT NULL,
     version            VARCHAR2(256 CHAR),
     build_time         TIMESTAMP
-);
+)';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
+/
 
 -- Table audit_param stores auditing parameters
-CREATE TABLE audit_param (
+BEGIN EXECUTE IMMEDIATE 'CREATE TABLE audit_param (
     audit_log_id       VARCHAR2(36 CHAR),
     timestamp_created  TIMESTAMP,
     param_key          VARCHAR2(256 CHAR),
     param_value        VARCHAR2(4000 CHAR)
-);
+)';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
+/
 
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
@@ -643,14 +646,38 @@ CREATE INDEX ns_authentication_timestamp_created ON ns_authentication (timestamp
 CREATE UNIQUE INDEX ns_hashing_config_name ON ns_hashing_config (name);
 CREATE UNIQUE INDEX ns_user_alias_unique ON ns_user_alias (user_id, name);
 CREATE UNIQUE INDEX ns_user_role_unique ON ns_user_role (user_id, role_id);
-CREATE INDEX audit_log_timestamp ON audit_log (timestamp_created);
-CREATE INDEX audit_log_application ON audit_log (application_name);
-CREATE INDEX audit_log_level ON audit_log (audit_level);
-CREATE INDEX audit_log_type ON audit_log (audit_type);
-CREATE INDEX audit_param_log ON audit_param (audit_log_id);
-CREATE INDEX audit_param_timestamp ON audit_param (timestamp_created);
-CREATE INDEX audit_param_key ON audit_param (param_key);
-CREATE INDEX audit_param_value ON audit_param (param_value);
+
+BEGIN EXECUTE IMMEDIATE 'CREATE INDEX audit_log_timestamp ON audit_log (timestamp_created)';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
+/
+
+BEGIN EXECUTE IMMEDIATE 'CREATE INDEX audit_log_application ON audit_log (application_name)';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
+/
+
+BEGIN EXECUTE IMMEDIATE 'CREATE INDEX audit_log_level ON audit_log (audit_level)';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
+/
+
+BEGIN EXECUTE IMMEDIATE 'CREATE INDEX audit_log_type ON audit_log (audit_type)';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
+/
+
+BEGIN EXECUTE IMMEDIATE 'CREATE INDEX audit_param_log ON audit_param (audit_log_id)';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
+/
+
+BEGIN EXECUTE IMMEDIATE 'CREATE INDEX audit_param_timestamp ON audit_param (timestamp_created)';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
+/
+
+BEGIN EXECUTE IMMEDIATE 'CREATE INDEX audit_param_key ON audit_param (param_key)';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
+/
+
+BEGIN EXECUTE IMMEDIATE 'CREATE INDEX audit_param_value ON audit_param (param_value)';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
+/
 
 -- Foreign keys for user identity, to be used only when all user identities are stored in Next Step
 -- ALTER TABLE ns_operation ADD CONSTRAINT ns_operation_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);

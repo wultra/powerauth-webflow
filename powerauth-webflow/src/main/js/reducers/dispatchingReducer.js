@@ -100,10 +100,12 @@ function mergeContext(actionType, oldContext, newContext) {
             break;
         case "SHOW_SCREEN_LOGIN_SCA":
             mergeOrganizations(oldContext, newContext);
+            mergeData(oldContext, newContext);
             mergeCertificateData(oldContext, newContext);
             break;
         case "SHOW_SCREEN_APPROVAL_SCA":
-            mergeCertificateData(oldContext, newContext);
+            mergeData(oldContext, newContext);
+            mergeSignData(oldContext, newContext);
             break;
         case "SHOW_SCREEN_OPERATION_REVIEW":
             mergeAuthMethods(oldContext, newContext);
@@ -158,6 +160,13 @@ function mergeData(oldContext, newContext) {
     // operation data needs to remain in context
     if (oldContext.data !== undefined && newContext.data === undefined) {
         newContext.data = oldContext.data;
+    }
+}
+
+function mergeSignData(oldContext, newContext) {
+    // signatureDataBase64 need to remain in context
+    if (oldContext.signatureDataBase64 !== undefined && newContext.signatureDataBase64 === undefined) {
+        newContext.signatureDataBase64 = oldContext.signatureDataBase64;
     }
 }
 

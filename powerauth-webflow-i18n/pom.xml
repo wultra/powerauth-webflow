@@ -24,30 +24,26 @@
     <artifactId>powerauth-webflow-i18n</artifactId>
     <groupId>io.getlime.security</groupId>
     <description>PowerAuth 2.0 Next Step Server</description>
-    <version>1.3.0</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>1.3.0</version>
-        <relativePath>../pom.xml</relativePath>
+        <version>1.4.0</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>${spring-context.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
     </dependencies>
 
@@ -60,9 +56,9 @@
             <dependencies>
                 <!-- JDK 9 dependencies -->
                 <dependency>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>javax.annotation-api</artifactId>
-                    <version>${javax.annotation.version}</version>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
+                    <version>${jakarta-annotation.version}</version>
                     <!-- Library should be provided by runtime, otherwise there would be conflicts with jar bundled in war. -->
                     <scope>provided</scope>
                 </dependency>

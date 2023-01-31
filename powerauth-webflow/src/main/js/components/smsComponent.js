@@ -18,8 +18,9 @@
 import {Button, FormControl, FormGroup} from "react-bootstrap";
 import {FormattedMessage} from "react-intl";
 import React from "react";
-import {authenticate} from "../actions/smsAuthActions";
+import {authenticate, initializeICAClientSign} from "../actions/smsAuthActions";
 import {connect} from "react-redux";
+import CertificateSelect from "./certificateSelect";
 
 /**
  * Embeddable SMS authorization component.
@@ -35,9 +36,25 @@ export default class SmsComponent extends React.Component {
         super();
         this.handleAuthCodeChange = this.handleAuthCodeChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
+        this.handleCertificateChoice = this.handleCertificateChoice.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.updateButtonState = this.updateButtonState.bind(this);
-        this.state = {authCode: '', password: '', confirmDisabled: true};
+        this.loadUserKeystore = this.loadUserKeystore.bind(this);
+        this.chooseCertificate = this.chooseCertificate.bind(this);
+        this.signOperationData = this.signOperationData.bind(this);
+        this.onSignerInitSucceeded = this.onSignerInitSucceeded.bind(this);
+        this.onSignerInitFailed = this.onSignerInitFailed.bind(this);
+        this.onSignerNotReady = this.onSignerNotReady.bind(this);
+        this.onCertificatesLoaded = this.onCertificatesLoaded.bind(this);
+        this.onSignerSucceeded = this.onSignerSucceeded.bind(this);
+        this.onSignerFailed = this.onSignerFailed.bind(this);
+        this.state = {authCode: '', password: '', confirmDisabled: true, signerReady: false, signerInitFailed: false, signerError: null, certificates: null, chosenCertificate: null, signedMessage: null};
+    }
+
+    componentDidMount() {
+        if (approvalCertificateEnabled && approvalCertificateSigner === 'ICA_CLIENT_SIGN') {
+            initializeICAClientSign();
+        }
     }
 
     handleAuthCodeChange(event) {
@@ -51,13 +68,24 @@ export default class SmsComponent extends React.Component {
         this.setState({password: event.target.value}, this.updateButtonState);
     }
 
+    handleCertificateChoice(certificate) {
+        this.setState({chosenCertificate: certificate});
+    }
+
+    handleSubmit(event) {
+        event.preventDefault();
+        this.props.dispatch(authenticate(this.state.authCode, this.state.password, this.state.signedMessage, this.props.parentComponent));
+        this.setState({authCode: '', password: ''});
+    }
+
     updateButtonState() {
         if (!this.props.initialized) {
             return;
         }
         let disabled = false;
         if (this.props.passwordEnabled) {
-            if (this.state.password.length === 0) {
+            // Disable password field in case signature of data is present, the certificate replaces the password
+            if (this.state.password.length === 0 && !this.state.signedMessage) {
                 disabled = true;
             }
         }
@@ -77,10 +105,101 @@ export default class SmsComponent extends React.Component {
         }
     }
 
-    handleSubmit(event) {
+    loadUserKeystore() {
+        this.setState({signerError: null, certificates: null, chosenCertificate: null});
+        const onCertificatesLoaded = this.onCertificatesLoaded;
+        const cbSuccess = function(jsonCerts) {
+            const certs = JSON.parse(jsonCerts);
+            onCertificatesLoaded(certs.Certificates);
+        }
+        const cbError = this.onSignerFailed;
+        loadKeyStore(cbSuccess, cbError);
+    }
+
+    chooseCertificate(event) {
         event.preventDefault();
-        this.props.dispatch(authenticate(this.state.authCode, this.state.password, this.props.parentComponent));
-        this.setState({authCode: '', password: ''});
+        // Register callbacks which are bound to this to avoid react vs. ICA component context issues
+        const cbSuccess = this.onSignerInitSucceeded;
+        const cbError = this.onSignerInitFailed;
+        const cbNotReady = this.onSignerNotReady;
+        const loadUserKeystore = this.loadUserKeystore;
+
+        // Skip initialization in case it was already done
+        if (this.state.signerReady) {
+            loadUserKeystore();
+            return;
+        }
+
+        // Initialization, certificate choice and signing
+        try {
+            ControlObj.cbOnStateChanged = function(state, isReady) {
+                if (!isReady) {
+                    cbNotReady();
+                }
+            };
+            loadICASigner(cbSuccess, cbError);
+        } catch (ex) {
+            console.error(ex);
+            cbError( "signer.error.unknown")
+        }
+    }
+
+    signOperationData(event) {
+        event.preventDefault();
+        const signatureDataBase64 = this.props.signatureDataBase64;
+        const cbSuccess = this.onSignerSucceeded;
+        const cbError = this.onSignerFailed;
+        setChosenCertificate(this.state.chosenCertificate.X509PEM, cbError);
+        signMessage(signatureDataBase64, cbSuccess, cbError);
+    }
+
+    onSignerInitSucceeded() {
+        this.setState({signerReady: true});
+        this.loadUserKeystore();
+    }
+
+    onSignerNotReady() {
+        this.setState({signerReady: false});
+    }
+
+    onCertificatesLoaded(certificates) {
+        if (!certificates) {
+            this.onSignerFailed("signer.error.certificate.notFound");
+            return;
+        }
+        this.setState({certificates: certificates});
+        const handleCertificateChoice = this.handleCertificateChoice;
+        const cbSuccess = function(pem) {
+            let certificateIndex = 0;
+            if (pem) {
+                // Iterate through certificates and found the one which should be preselected
+                for (const [i, value] of certificates.entries()) {
+                    if (value.X509PEM === pem) {
+                        certificateIndex = i;
+                        break;
+                    }
+                }
+            }
+            handleCertificateChoice(certificates[certificateIndex]);
+        }
+        const cbError = function() {
+            // Ignore any errors and just set the first certificate
+            handleCertificateChoice(certificates[0]);
+        }
+        // Try to resolve last used certificate, otherwise set first certificate if there is no certificate preselected
+        getCertificateForPreselect(cbSuccess, cbError);
+    }
+
+    onSignerSucceeded(signedMessage) {
+        this.setState({signedMessage: signedMessage, signerError: null, certificates: null, chosenCertificate: null});
+    }
+
+    onSignerInitFailed(errorMessage) {
+        this.setState({signerError: errorMessage, signerInitFailed: true, certificates: null, chosenCertificate: null})
+    }
+
+    onSignerFailed(errorMessage) {
+        this.setState({signerError: errorMessage, signedMessage: null, certificates: null, chosenCertificate: null});
     }
 
     render() {
@@ -123,7 +242,71 @@ export default class SmsComponent extends React.Component {
                         ) : (
                             undefined
                         )}
-                        {(this.props.passwordEnabled) ? (
+                        {(this.props.certificateEnabled) ? (
+                            <div>
+                                {(this.state.signerError) ? (
+                                    <FormGroup className="message-error">
+                                        <FormattedMessage id={this.state.signerError}/>
+                                    </FormGroup>
+                                ) : (
+                                    undefined
+                                )}
+                                {(this.state.signedMessage) ? (
+                                    <FormGroup className="message-information">
+                                        <FormattedMessage id="signer.result.success"/>
+                                    </FormGroup>
+                                ) : (
+                                    <div>
+                                        {(!this.state.signerInitFailed) ? (
+                                            <FormGroup>
+                                                <div className="attribute row">
+                                                    <div className="col-xs-6 client-certificate-label">
+                                                        <FormattedMessage id="qualifiedCertificate.approve"/>
+                                                    </div>
+                                                    <div className="col-xs-6">
+                                                        <a href="#" onClick={this.chooseCertificate} className="btn btn-lg btn-default">
+                                                            <FormattedMessage id="qualifiedCertificate.choose"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
+                                        ) : (
+                                            undefined
+                                        )}
+                                    </div>
+                                )}
+                                {(this.state.certificates) ? (
+                                    <div>
+                                        <FormGroup>
+                                            <div className="attribute row">
+                                                <div className="col-xs-12">
+                                                    <CertificateSelect
+                                                        certificates={this.state.certificates}
+                                                        chosenCertificate={this.state.chosenCertificate}
+                                                        choiceDisabled={this.state.certificates.length < 2}
+                                                        callback={this.handleCertificateChoice}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="attribute row">
+                                                <div className="col-xs-6 pull-right">
+                                                    <a href="#" onClick={this.signOperationData}
+                                                       className="btn btn-lg btn-default">
+                                                        <FormattedMessage id="qualifiedCertificate.sign"/>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
+                                    </div>
+                                ) : (
+                                    undefined
+                                )}
+                                <hr/>
+                            </div>
+                        ) : (
+                            undefined
+                        )}
+                        {(this.props.passwordEnabled && !this.state.signedMessage) ? (
                             <div>
                                 <FormGroup>
                                     <div className="attribute row">
