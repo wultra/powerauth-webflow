@@ -99,9 +99,8 @@
 
         <!-- Library for formatting monetary amounts -->
         <dependency>
-            <groupId>org.javamoney</groupId>
-            <artifactId>moneta</artifactId>
-            <version>${moneta.version}</version>
+            <groupId>org.javamoney.moneta</groupId>
+            <artifactId>moneta-core</artifactId>
         </dependency>
 
         <dependency>
