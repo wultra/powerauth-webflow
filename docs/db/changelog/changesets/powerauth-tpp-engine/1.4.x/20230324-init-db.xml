@@ -6,11 +6,31 @@
     <changeSet id="1" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
         <preConditions onFail="MARK_RAN">
             <not>
-                <sequenceExists sequenceName="es_operation_template_seq"/>
+                <sequenceExists sequenceName="tpp_detail_seq"/>
             </not>
         </preConditions>
-        <comment>Create a new sequence es_operation_template_seq</comment>
-        <createSequence sequenceName="es_operation_template_seq" cacheSize="20"/>
+        <comment>Create a new sequence tpp_detail_seq</comment>
+        <createSequence sequenceName="tpp_detail_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="2" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="tpp_user_consent_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence tpp_user_consent_seq</comment>
+        <createSequence sequenceName="tpp_user_consent_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="3" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="tpp_user_consent_history_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence tpp_user_consent_history_seq</comment>
+        <createSequence sequenceName="tpp_user_consent_history_seq" cacheSize="20" />
     </changeSet>
 
 </databaseChangeLog>

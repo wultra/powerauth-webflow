@@ -6,11 +6,131 @@
     <changeSet id="1" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
         <preConditions onFail="MARK_RAN">
             <not>
-                <sequenceExists sequenceName="es_document_result_seq"/>
+                <sequenceExists sequenceName="ns_operation_afs_seq"/>
             </not>
         </preConditions>
-        <comment>Create a new sequence es_document_result_seq</comment>
-        <createSequence sequenceName="es_document_result_seq" cacheSize="20" incrementBy="10"/>
+        <comment>Create a new sequence ns_operation_afs_seq</comment>
+        <createSequence sequenceName="ns_operation_afs_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="2" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_application_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_application_seq</comment>
+        <createSequence sequenceName="ns_application_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="3" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_credential_policy_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_credential_policy_seq</comment>
+        <createSequence sequenceName="ns_credential_policy_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="4" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_otp_policy_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_otp_policy_seq</comment>
+        <createSequence sequenceName="ns_otp_policy_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="5" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_user_contact_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_user_contact_seq</comment>
+        <createSequence sequenceName="ns_user_contact_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="6" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_user_identity_history_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_user_identity_history_seq</comment>
+        <createSequence sequenceName="ns_user_identity_history_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="7" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_role_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_role_seq</comment>
+        <createSequence sequenceName="ns_role_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="8" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_user_role_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_user_role_seq</comment>
+        <createSequence sequenceName="ns_user_role_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="9" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_user_alias_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_user_alias_seq</comment>
+        <createSequence sequenceName="ns_user_alias_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="10" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_hashing_config_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_hashing_config_seq</comment>
+        <createSequence sequenceName="ns_hashing_config_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="11" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_credential_definition_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_credential_definition_seq</comment>
+        <createSequence sequenceName="ns_credential_definition_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="12" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_otp_definition_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_otp_definition_seq</comment>
+        <createSequence sequenceName="ns_otp_definition_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="13" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_credential_history_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_credential_history_seq</comment>
+        <createSequence sequenceName="ns_credential_history_seq" cacheSize="20" />
     </changeSet>
 
 </databaseChangeLog>
