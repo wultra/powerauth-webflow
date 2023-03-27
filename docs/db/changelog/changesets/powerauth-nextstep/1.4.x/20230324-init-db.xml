@@ -140,25 +140,25 @@
             </not>
         </preConditions>
         <comment>Create a new table ns_auth_method</comment>
-        <createTable tableName="ns_auth_method">
-            <column name="auth_method" type="varchar(32)">
+        <createTable tableName="ns_auth_method" remarks="Table ns_auth_method stores configuration of authentication methods. Data in this table needs to be loaded before Web Flow is started.">
+            <column name="auth_method" type="varchar(32)" remarks="Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH, OTP_CODE.">
                 <constraints primaryKey="true" />
             </column>
-            <column name="order_number" type="integer">
+            <column name="order_number" type="integer" remarks="Order of the authentication method, incrementing value, starts with 1.">
                 <constraints nullable="false" />
             </column>
-            <column name="check_user_prefs" type="boolean" defaultValueBoolean="false">
+            <column name="check_user_prefs" type="boolean" defaultValueBoolean="false" remarks="Indication if the authentication method requires checking the user preference first.">
                 <constraints nullable="false" />
             </column>
-            <column name="user_prefs_column" type="integer" />
-            <column name="user_prefs_default" type="boolean" defaultValueBoolean="false" />
-            <column name="check_auth_fails" type="boolean" defaultValueBoolean="false">
+            <column name="user_prefs_column" type="integer" remarks="In case the previous column is 'true', this is pointer to the user preferences configuration column index." />
+            <column name="user_prefs_default" type="boolean" defaultValueBoolean="false" remarks="Default value of the user preferences, in case the per-user preference is not found." />
+            <column name="check_auth_fails" type="boolean" defaultValueBoolean="false" remarks="Indication if the methods can fail, and hence the fail count must be checked.">
                 <constraints nullable="false" />
             </column>
-            <column name="max_auth_fails" type="integer" />
-            <column name="has_user_interface" type="boolean" defaultValueBoolean="false" />
-            <column name="has_mobile_token" type="boolean" defaultValueBoolean="false" />
-            <column name="display_name_key" type="varchar(32)" />
+            <column name="max_auth_fails" type="integer" remarks="Maximum allowed number of authentication fails." />
+            <column name="has_user_interface" type="boolean" defaultValueBoolean="false" remarks="Indication of if the given method has any user interface in the web flow." />
+            <column name="has_mobile_token" type="boolean" defaultValueBoolean="false" remarks="Indication of if the given authentication method has mobile token as a part of the flow." />
+            <column name="display_name_key" type="varchar(32)" remarks="Localization key to the display name of the authentication method." />
         </createTable>
     </changeSet>
 

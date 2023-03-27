@@ -52,26 +52,26 @@
             </not>
         </preConditions>
         <comment>Create a new table wf_certificate_verification</comment>
-        <createTable tableName="wf_certificate_verification">
-            <column name="operation_id" type="varchar(256)">
+        <createTable tableName="wf_certificate_verification" remarks="Table wf_certificate_verification is used for storing information about verified client TLS certificates.">
+            <column name="operation_id" type="varchar(256)" remarks="Operation ID associated with the certificate verification.">
                 <constraints primaryKey="true" />
             </column>
-            <column name="auth_method" type="varchar(32)">
+            <column name="auth_method" type="varchar(32)" remarks="Authentication method in which the certificate authentication was used.">
                 <constraints primaryKey="true" />
             </column>
-            <column name="client_certificate_issuer" type="varchar(4000)">
+            <column name="client_certificate_issuer" type="varchar(4000)" remarks="Certificate attribute representing the certificate issuer.">
                 <constraints nullable="false" />
             </column>
-            <column name="client_certificate_subject" type="varchar(4000)">
+            <column name="client_certificate_subject" type="varchar(4000)" remarks="Certificate attribute representing the certificate subject.">
                 <constraints nullable="false" />
             </column>
-            <column name="client_certificate_sn" type="varchar(256)">
+            <column name="client_certificate_sn" type="varchar(256)" remarks="Certificate attribute representing the certificate serial number.">
                 <constraints nullable="false" />
             </column>
-            <column name="operation_data" type="text">
+            <column name="operation_data" type="text" remarks="Operation data that were included in the certificate authentication request.">
                 <constraints nullable="false" />
             </column>
-            <column name="timestamp_verified" type="timestamp" defaultValueDate="${now}">
+            <column name="timestamp_verified" type="timestamp" defaultValueDate="${now}" remarks="Timestamp of the certificate verification.">
                 <constraints nullable="false" />
             </column>
         </createTable>
