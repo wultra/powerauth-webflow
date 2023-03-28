@@ -142,7 +142,7 @@ The random encryption key can be generated using following code:
 ```java
 byte[] randomBytes = new byte[32];
 new SecureRandom().nextBytes(randomBytes);
-String encryptionKey = BaseEncoding.base64().encode(randomBytes);
+String encryptionKey = Base64.getEncoder().encodeToString(randomBytes);
 ```
 
 The symmetric key is used by both Web Flow and by the remote system which needs to decrypt the password for verification.
@@ -247,7 +247,7 @@ The random encryption key can be generated using following code:
 ```java
 byte[] randomBytes = new byte[32];
 new SecureRandom().nextBytes(randomBytes);
-String encryptionKey = BaseEncoding.base64().encode(randomBytes);
+String encryptionKey = Base64.getEncoder().encodeToString(randomBytes);
 ```
 
 <!-- begin box warning -->

@@ -17,7 +17,6 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.sms.controller;
 
-import com.google.common.io.BaseEncoding;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
@@ -66,10 +65,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Controller which provides endpoints for SMS authorization.
@@ -888,6 +884,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             return operationDataExternal;
         }
         // Otherwise, convert operation data into Base-64 and use this data for calculating signature with certificate
-        return BaseEncoding.base64().encode(operationData.getBytes(StandardCharsets.UTF_8));
+        return Base64.getEncoder().encodeToString(operationData.getBytes(StandardCharsets.UTF_8));
     }
 }

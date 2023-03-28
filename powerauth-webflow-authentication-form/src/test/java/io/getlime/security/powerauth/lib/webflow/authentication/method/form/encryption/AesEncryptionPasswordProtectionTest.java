@@ -18,7 +18,6 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.method.form.encryption;
 
-import com.google.common.io.BaseEncoding;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.AesEncryptionPasswordProtection;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.Assertions;
@@ -29,6 +28,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.util.Base64;
 
 /**
  * Test class for the AES password encryptor.
@@ -77,7 +77,7 @@ class AesEncryptionPasswordProtectionTest {
 
     private String decryptPassword(String secretKeyBase64, String cipherTransformation, String encryptedPassword) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException {
         // Read secret key from configuration
-        byte[] secretKeyBytes = BaseEncoding.base64().decode(secretKeyBase64);
+        byte[] secretKeyBytes = Base64.getDecoder().decode(secretKeyBase64);
         SecretKey secretKey = new SecretKeySpec(secretKeyBytes, "AES");
 
         // Extract IV and encrypted password and convert them to bytes
@@ -86,9 +86,9 @@ class AesEncryptionPasswordProtectionTest {
             throw new IllegalArgumentException("Invalid request");
         }
         String ivBase64 = parts[0];
-        byte[] ivBytes = BaseEncoding.base64().decode(ivBase64);
+        byte[] ivBytes = Base64.getDecoder().decode(ivBase64);
         String encryptedPasswordBase64 = parts[1];
-        byte[] encryptedPasswordBytes = BaseEncoding.base64().decode(encryptedPasswordBase64);
+        byte[] encryptedPasswordBytes = Base64.getDecoder().decode(encryptedPasswordBase64);
 
         // Decrypt password using specified cipher transformation, extracted IV and encrypted password bytes
         Cipher cipher = Cipher.getInstance(cipherTransformation, "BC");

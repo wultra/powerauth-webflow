@@ -17,7 +17,6 @@
  */
 package io.getlime.security.powerauth.app.nextstep;
 
-import com.google.common.io.BaseEncoding;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
 import io.getlime.security.powerauth.crypto.lib.model.exception.CryptoProviderException;
@@ -43,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -561,14 +561,14 @@ public class NextStepAuthenticationTest extends NextStepTest {
     public void testCredentialSuccessE2EEncryption() throws NextStepClientException, CryptoProviderException, GenericCryptoException, InvalidKeyException {
         String credentialValue = "s3cret";
         String secretKeyBase64 = nextStepServerConfiguration.getE2eEncryptionKey();
-        byte[] secretKeyBytes = BaseEncoding.base64().decode(secretKeyBase64);
+        byte[] secretKeyBytes = Base64.getDecoder().decode(secretKeyBase64);
         SecretKey secretKey = keyConvertor.convertBytesToSharedSecretKey(secretKeyBytes);
         byte[] ivBytes = keyGenerator.generateRandomBytes(16);
         // Encrypt credential bytes using random IV, secret key and transformation
         byte[] credentialBytes = credentialValue.getBytes(StandardCharsets.UTF_8);
         byte[] encryptedCredentialBytes = aes.encrypt(credentialBytes, ivBytes, secretKey, "AES/CBC/PKCS7Padding");
-        String encryptedCredentialBase64 = BaseEncoding.base64().encode(encryptedCredentialBytes);
-        String ivBase64 = BaseEncoding.base64().encode(ivBytes);
+        String encryptedCredentialBase64 = Base64.getEncoder().encodeToString(encryptedCredentialBytes);
+        String ivBase64 = Base64.getEncoder().encodeToString(ivBytes);
         String encryptedCredentialValue = ivBase64 + ":" + encryptedCredentialBase64;
         // Enable end-to-end encryption
         UpdateCredentialDefinitionRequest credentialDefinitionRequest = new UpdateCredentialDefinitionRequest();

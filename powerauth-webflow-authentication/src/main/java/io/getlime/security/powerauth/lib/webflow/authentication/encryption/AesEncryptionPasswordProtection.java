@@ -17,7 +17,6 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.encryption;
 
-import com.google.common.io.BaseEncoding;
 import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
 import io.getlime.security.powerauth.crypto.lib.util.AESEncryptionUtils;
 import io.getlime.security.powerauth.crypto.lib.util.KeyConvertor;
@@ -26,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 /**
  * AES-based protection for passwords during transfer.
@@ -72,7 +72,7 @@ public class AesEncryptionPasswordProtection implements PasswordProtection {
             }
 
             // Convert secret key from Base64 String to SecretKey
-            byte[] secretKeyBytes = BaseEncoding.base64().decode(secretKeyBase64);
+            byte[] secretKeyBytes = Base64.getDecoder().decode(secretKeyBase64);
             SecretKey secretKey = keyConvertor.convertBytesToSharedSecretKey(secretKeyBytes);
 
             // Generate random IV, the AES requires 16 bytes no matter the key size
@@ -81,10 +81,10 @@ public class AesEncryptionPasswordProtection implements PasswordProtection {
             // Encrypt password bytes using random IV, secret key and transformation
             byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
             byte[] encryptedPasswordBytes = aes.encrypt(passwordBytes, ivBytes, secretKey, cipherTransformation);
-            String encryptedPasswordBase64 = BaseEncoding.base64().encode(encryptedPasswordBytes);
+            String encryptedPasswordBase64 = Base64.getEncoder().encodeToString(encryptedPasswordBytes);
 
             // Base64 encode the IV
-            String ivBase64 = BaseEncoding.base64().encode(ivBytes);
+            String ivBase64 = Base64.getEncoder().encodeToString(ivBytes);
 
             // Return encrypted String in format [ivBase64]:[encryptedDataBase64], without square brackets
             return ivBase64 + ":" + encryptedPasswordBase64;
