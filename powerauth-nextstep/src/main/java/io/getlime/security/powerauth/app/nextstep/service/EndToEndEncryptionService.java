@@ -17,7 +17,6 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
-import com.google.common.io.BaseEncoding;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
@@ -37,6 +36,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.util.Base64;
 
 /**
  * Service which handles end-to-end encryption.
@@ -92,15 +92,15 @@ public class EndToEndEncryptionService {
         }
         try {
             // Convert secret key from Base64 String to SecretKey
-            final byte[] secretKeyBytes = BaseEncoding.base64().decode(e2eEncryptionKey);
+            final byte[] secretKeyBytes = Base64.getDecoder().decode(e2eEncryptionKey);
             final SecretKey secretKey = keyConvertor.convertBytesToSharedSecretKey(secretKeyBytes);
 
             final byte[] ivBytes = keyGenerator.generateRandomBytes(16);
             // Encrypt password bytes using random IV, secret key and transformation
             final byte[] credentialValueBytes = credentialValue.getBytes(StandardCharsets.UTF_8);
             final byte[] encryptedCredentialBytes = aes.encrypt(credentialValueBytes, ivBytes, secretKey, cipherTransformation);
-            final String encryptedCredentialBase64 = BaseEncoding.base64().encode(encryptedCredentialBytes);
-            final String ivBase64 = BaseEncoding.base64().encode(ivBytes);
+            final String encryptedCredentialBase64 = Base64.getEncoder().encodeToString(encryptedCredentialBytes);
+            final String ivBase64 = Base64.getEncoder().encodeToString(ivBytes);
             return ivBase64 + ":" + encryptedCredentialBase64;
         } catch (CryptoProviderException | InvalidKeyException | GenericCryptoException ex) {
             throw new EncryptionException(ex);
@@ -140,7 +140,7 @@ public class EndToEndEncryptionService {
         }
         try {
             // Convert secret key from Base64 String to SecretKey
-            final byte[] secretKeyBytes = BaseEncoding.base64().decode(e2eEncryptionKey);
+            final byte[] secretKeyBytes = Base64.getDecoder().decode(e2eEncryptionKey);
             final SecretKey secretKey = keyConvertor.convertBytesToSharedSecretKey(secretKeyBytes);
 
             // Decrypt encrypted credential value
@@ -148,8 +148,8 @@ public class EndToEndEncryptionService {
             if (parts.length != 2 || parts[0].isEmpty() || parts[1].isEmpty()) {
                 throw new InvalidRequestException("Invalid format of encrypted credential value");
             }
-            final byte[] iv = BaseEncoding.base64().decode(parts[0]);
-            final byte[] encryptedBytes = BaseEncoding.base64().decode(parts[1]);
+            final byte[] iv = Base64.getDecoder().decode(parts[0]);
+            final byte[] encryptedBytes = Base64.getDecoder().decode(parts[1]);
             final byte[] decryptedBytes = aes.decrypt(encryptedBytes, iv, secretKey, cipherTransformation);
             return new String(decryptedBytes, StandardCharsets.UTF_8);
         } catch (CryptoProviderException | InvalidKeyException | GenericCryptoException ex) {

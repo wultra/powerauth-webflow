@@ -18,7 +18,6 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
-import com.google.common.io.BaseEncoding;
 import com.wultra.security.powerauth.client.PowerAuthClient;
 import com.wultra.security.powerauth.client.model.enumeration.SignatureType;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
@@ -72,6 +71,7 @@ import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -139,7 +139,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         String nonce = request.getNonce();
         // data for signature is {OPERATION_ID}&{OPERATION_DATA}
         String data = operation.getOperationId() + '&' + operation.getOperationData();
-        String signatureBaseString = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", BaseEncoding.base64().decode(nonce), data.getBytes());
+        String signatureBaseString = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", Base64.getDecoder().decode(nonce), data.getBytes());
         // determine whether biometry is allowed in offline mode
         boolean biometryAllowed = isBiometryAllowedInOfflineMode(operationName);
         VerifyOfflineSignatureResponse signatureResponse;

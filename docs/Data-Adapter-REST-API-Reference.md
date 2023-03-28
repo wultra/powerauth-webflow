@@ -441,7 +441,7 @@ String originalPassword = decryptPassword(secretKeyBase64, cipherTransformation,
 // Decryption method (missing the 'throws' clause).
 private String decryptPassword(String secretKeyBase64, String cipherTransformation, String encryptedPassword) {
     // Read secret key from configuration
-    byte[] secretKeyBytes = BaseEncoding.base64().decode(secretKeyBase64);
+    byte[] secretKeyBytes = Base64.getDecoder().decode(secretKeyBase64);
     SecretKey secretKey = new SecretKeySpec(secretKeyBytes, "AES");
 
     // Extract IV and encrypted password and convert them to bytes
@@ -450,9 +450,9 @@ private String decryptPassword(String secretKeyBase64, String cipherTransformati
         throw new IllegalArgumentException("Invalid request");
     }
     String ivBase64 = parts[0];
-    byte[] ivBytes = BaseEncoding.base64().decode(ivBase64);
+    byte[] ivBytes = Base64.getDecoder().decode(ivBase64);
     String encryptedPasswordBase64 = parts[1];
-    byte[] encryptedPasswordBytes = BaseEncoding.base64().decode(encryptedPasswordBase64);
+    byte[] encryptedPasswordBytes = Base64.getDecoder().decode(encryptedPasswordBase64);
 
     // Decrypt password using specified cipher transformation, extracted IV and encrypted password bytes
     Cipher cipher = Cipher.getInstance(cipherTransformation);
