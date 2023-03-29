@@ -77,4 +77,40 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="4" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="wf_operation_session" indexName="wf_operation_hash"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index wf_operation_session(operation_hash)</comment>
+        <createIndex tableName="wf_operation_session" indexName="wf_operation_hash">
+            <column name="operation_hash"></column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="5" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="wf_operation_session" indexName="wf_websocket_session"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index wf_operation_session(websocket_session_id)</comment>
+        <createIndex tableName="wf_operation_session" indexName="wf_websocket_session">
+            <column name="websocket_session_id"></column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="6" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="wf_certificate_verification" indexName="wf_certificate_operation"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index wf_certificate_verification(operation_id)</comment>
+        <createIndex tableName="wf_operation_session" indexName="wf_certificate_operation">
+            <column name="operation_id"></column>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
