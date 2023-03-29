@@ -116,7 +116,7 @@ spring.jackson.date-format=yyyy-MM-dd'T'HH:mm:ssZ
 spring.jpa.open-in-view=false
 
 # Enable caching of static resources
-spring.resources.cache.cachecontrol.max-age=86400
+spring.web.resources.cache.cachecontrol.max-age=86400
 
 # Disable swagger-ui default petstore url
 springdoc.swagger-ui.disable-swagger-default-url=true
@@ -347,7 +347,7 @@ spring.mvc.hiddenmethod.filter.enabled=true
 logging.level.com.zaxxer.hikari.util.DriverDataSource=ERROR
 
 # Enable caching of static resources
-spring.resources.cache.cachecontrol.max-age=86400
+spring.web.resources.cache.cachecontrol.max-age=86400
 ```
 
 ## OAuth 2.0 Client Configuration
