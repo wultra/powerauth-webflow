@@ -167,4 +167,98 @@
         </createTable>
     </changeSet>
 
+    <!--  See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/JdbcClientDetailsService.java  -->
+    <changeSet id="9" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="oauth_client_details"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table oauth_client_details</comment>
+        <createTable tableName="oauth_client_details" remarks="Table oauth_client_details stores details about OAuth2 client applications. Every Web Flow client application should have a record in this table.">
+            <column name="client_id" type="varchar(256)" remarks="OAuth 2.0 protocol client ID.">
+                <constraints primaryKey="true" foreignKeyName="tpp_detail_fk" referencedTableName="tpp_detail" referencedColumnNames="tpp_id" />
+            </column>
+            <column name="resource_ids" type="varchar(256)" remarks="Identifiers of the OAuth 2.0 resource servers." />
+            <column name="client_secret" type="varchar(256)" remarks="OAuth 2.0 protocol client secret." />
+            <column name="scope" type="varchar(256)" remarks="OAuth 2.0 scopes, comma-separated values." />
+            <column name="authorized_grant_types" type="varchar(256)" remarks="OAuth 2.0 authorization grant types, comma-separated values." />
+            <column name="web_server_redirect_uri" type="varchar(256)" remarks="OAuth 2.0 redirect URIs, comma-separated values." />
+            <column name="authorities" type="varchar(256)" remarks="OAuth 2.0 resource grant authorities." />
+            <column name="access_token_validity" type="integer" remarks="Validity of the OAuth 2.0 access tokens, in seconds." />
+            <column name="refresh_token_validity" type="integer" remarks="Validity of the OAuth 2.0 refresh tokens, in seconds." />
+            <column name="additional_information" type="varchar(4000)" remarks="Field reserved for additional information about the client." />
+            <column name="autoapprove" type="varchar(256)" remarks="Flag indicating if scopes should be automatically approved." />
+        </createTable>
+    </changeSet>
+
+    <!--  See: https://docs.spring.io/spring-security/oauth/apidocs/org/springframework/security/oauth2/client/token/JdbcClientTokenServices.html  -->
+    <changeSet id="10" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="oauth_client_token"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table oauth_client_token</comment>
+        <createTable tableName="oauth_client_token" remarks="Table oauth_client_token stores OAuth2 tokens for retrieval by client applications.">
+            <column name="authentication_id" type="varchar(256)" remarks="Authentication ID related to client token.">
+                <constraints primaryKey="true" foreignKeyName="tpp_detail_fk" referencedTableName="tpp_detail" referencedColumnNames="tpp_id" />
+            </column>
+            <column name="token_id" type="varchar(256)" remarks="Token ID." />
+            <column name="token" type="${blob_type}" remarks="Token value." />
+            <column name="user_name" type="varchar(256)" remarks="Username, identification of the user." />
+            <column name="client_id" type="varchar(256)" remarks="OAuth 2.0 Client ID." />
+        </createTable>
+    </changeSet>
+
+    <!--  See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java  -->
+    <changeSet id="11" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="oauth_access_token"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table oauth_access_token</comment>
+        <createTable tableName="oauth_access_token" remarks="Table oauth_access_token stores OAuth2 access tokens.">
+            <column name="authentication_id" type="varchar(256)" remarks="Authentication ID related to client token.">
+                <constraints primaryKey="true" foreignKeyName="tpp_detail_fk" referencedTableName="tpp_detail" referencedColumnNames="tpp_id" />
+            </column>
+            <column name="token_id" type="varchar(256)" remarks="Token ID." />
+            <column name="token" type="${blob_type}" remarks="Token value." />
+            <column name="user_name" type="varchar(256)" remarks="Username, identification of the user." />
+            <column name="client_id" type="varchar(256)" remarks="OAuth 2.0 Client ID." />
+            <column name="authentication" type="${blob_type}" remarks="Encoded authentication details." />
+            <column name="refresh_token" type="varchar(256)" remarks="Refresh token ID." />
+        </createTable>
+    </changeSet>
+
+    <!--  See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java  -->
+    <changeSet id="12" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="oauth_refresh_token"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table oauth_refresh_token</comment>
+        <createTable tableName="oauth_refresh_token" remarks="Table oauth_access_token stores OAuth2 refresh tokens.">
+            <column name="token_id" type="varchar(256)" remarks="Refresh token ID." />
+            <column name="token" type="${blob_type}" remarks="Token value." />
+            <column name="authentication" type="${blob_type}" remarks="Encoded authentication details." />
+        </createTable>
+    </changeSet>
+
+    <!--  See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/code/JdbcAuthorizationCodeServices.java  -->
+    <changeSet id="13" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="oauth_code"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table oauth_code</comment>
+        <createTable tableName="oauth_code" remarks="Table oauth_code stores data for the OAuth2 authorization code grant.">
+            <column name="code" type="varchar(256)" remarks="OAuth 2.0 protocol 'codes'." />
+            <column name="authentication" type="${blob_type}" remarks="Encoded authentication details." />
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
