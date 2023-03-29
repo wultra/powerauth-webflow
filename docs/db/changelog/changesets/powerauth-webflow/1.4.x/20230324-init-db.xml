@@ -85,7 +85,7 @@
         </preConditions>
         <comment>Create a new index wf_operation_session(operation_hash)</comment>
         <createIndex tableName="wf_operation_session" indexName="wf_operation_hash">
-            <column name="operation_hash"></column>
+            <column name="operation_hash" />
         </createIndex>
     </changeSet>
 
@@ -97,7 +97,7 @@
         </preConditions>
         <comment>Create a new index wf_operation_session(websocket_session_id)</comment>
         <createIndex tableName="wf_operation_session" indexName="wf_websocket_session">
-            <column name="websocket_session_id"></column>
+            <column name="websocket_session_id" />
         </createIndex>
     </changeSet>
 
@@ -109,7 +109,7 @@
         </preConditions>
         <comment>Create a new index wf_certificate_verification(operation_id)</comment>
         <createIndex tableName="wf_operation_session" indexName="wf_certificate_operation">
-            <column name="operation_id"></column>
+            <column name="operation_id" />
         </createIndex>
     </changeSet>
 

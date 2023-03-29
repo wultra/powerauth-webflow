@@ -931,4 +931,398 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="39" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_operation" indexName="ns_operation_pending"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_operation(user_id, result)</comment>
+        <createIndex tableName="ns_operation" indexName="ns_operation_pending">
+            <column name="user_id" />
+            <column name="result" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="40" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_operation_afs" indexName="ns_operation_afs_unique"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_operation_afs(operation_id, request_afs_action, request_step_index)</comment>
+        <createIndex tableName="ns_operation_afs" indexName="ns_operation_afs_unique" unique="true">
+            <column name="operation_id" />
+            <column name="request_afs_action" />
+            <column name="request_step_index" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="41" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_application" indexName="ns_application_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_application(name)</comment>
+        <createIndex tableName="ns_application" indexName="ns_application_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="42" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_policy" indexName="ns_credential_policy_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_credential_policy(name)</comment>
+        <createIndex tableName="ns_credential_policy" indexName="ns_credential_policy_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="43" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_otp_policy" indexName="ns_otp_policy_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_otp_policy(name)</comment>
+        <createIndex tableName="ns_otp_policy" indexName="ns_otp_policy_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="44" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_contact" indexName="ns_user_contact_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_contact(user_id)</comment>
+        <createIndex tableName="ns_user_contact" indexName="ns_user_contact_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="45" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_contact" indexName="ns_user_contact_unique"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_user_contact(user_id, name, type)</comment>
+        <createIndex tableName="ns_user_contact" indexName="ns_user_contact_unique" unique="true">
+            <column name="user_id" />
+            <column name="name" />
+            <column name="type" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="46" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_identity" indexName="ns_user_identity_status"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_identity(status)</comment>
+        <createIndex tableName="ns_user_identity" indexName="ns_user_identity_status">
+            <column name="status" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="47" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_identity" indexName="ns_user_identity_created"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_identity(timestamp_created)</comment>
+        <createIndex tableName="ns_user_identity" indexName="ns_user_identity_created">
+            <column name="timestamp_created" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="48" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_identity_history" indexName="ns_user_identity_history_user"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_identity_history(user_id)</comment>
+        <createIndex tableName="ns_user_identity_history" indexName="ns_user_identity_history_user">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="49" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_identity_history" indexName="ns_user_identity_history_created"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_identity_history(timestamp_created)</comment>
+        <createIndex tableName="ns_user_identity_history" indexName="ns_user_identity_history_created">
+            <column name="timestamp_created" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="50" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_role" indexName="ns_role_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_role(name)</comment>
+        <createIndex tableName="ns_role" indexName="ns_role_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="51" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_role" indexName="ns_user_role_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_role(user_id)</comment>
+        <createIndex tableName="ns_user_role" indexName="ns_user_role_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="52" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_role" indexName="ns_user_role_role_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_role(role_id)</comment>
+        <createIndex tableName="ns_user_role" indexName="ns_user_role_role_id">
+            <column name="role_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="53" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_alias" indexName="ns_user_alias_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_alias(user_id)</comment>
+        <createIndex tableName="ns_user_alias" indexName="ns_user_alias_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="54" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_definition" indexName="ns_credential_definition_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_credential_definition(name)</comment>
+        <createIndex tableName="ns_credential_definition" indexName="ns_credential_definition_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="55" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_otp_definition" indexName="ns_otp_definition_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_otp_definition(name)</comment>
+        <createIndex tableName="ns_otp_definition" indexName="ns_otp_definition_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="56" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_storage" indexName="ns_credential_storage_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_credential_storage(user_id)</comment>
+        <createIndex tableName="ns_credential_storage" indexName="ns_credential_storage_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="57" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_storage" indexName="ns_credential_storage_status"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_credential_storage(status)</comment>
+        <createIndex tableName="ns_credential_storage" indexName="ns_credential_storage_status">
+            <column name="status" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="58" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_storage" indexName="ns_credential_storage_query1"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_credential_storage(credential_definition_id, user_name)</comment>
+        <createIndex tableName="ns_credential_storage" indexName="ns_credential_storage_query1" unique="true">
+            <column name="credential_definition_id" />
+            <column name="user_name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="59" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_storage" indexName="ns_credential_storage_query2"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_credential_storage(user_id, credential_definition_id)</comment>
+        <createIndex tableName="ns_credential_storage" indexName="ns_credential_storage_query2" unique="true">
+            <column name="user_id" />
+            <column name="credential_definition_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="60" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_storage" indexName="ns_credential_storage_query3"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_credential_storage(credential_definition_id, status)</comment>
+        <createIndex tableName="ns_credential_storage" indexName="ns_credential_storage_query3">
+            <column name="credential_definition_id" />
+            <column name="status" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="61" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_history" indexName="ns_credential_history_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_credential_history(user_id)</comment>
+        <createIndex tableName="ns_credential_history" indexName="ns_credential_history_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="62" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_otp_storage" indexName="ns_otp_storage_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_otp_storage(user_id)</comment>
+        <createIndex tableName="ns_otp_storage" indexName="ns_otp_storage_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="63" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_otp_storage" indexName="ns_otp_storage_user_id_status"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_otp_storage(user_id, status)</comment>
+        <createIndex tableName="ns_otp_storage" indexName="ns_otp_storage_user_id_status">
+            <column name="user_id" />
+            <column name="status" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="64" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_otp_storage" indexName="ns_otp_storage_operation_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_otp_storage(operation_id)</comment>
+        <createIndex tableName="ns_otp_storage" indexName="ns_otp_storage_operation_id">
+            <column name="operation_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="65" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_authentication" indexName="ns_authentication_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_authentication(user_id)</comment>
+        <createIndex tableName="ns_authentication" indexName="ns_authentication_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="66" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_authentication" indexName="ns_authentication_operation_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_authentication(operation_id)</comment>
+        <createIndex tableName="ns_authentication" indexName="ns_authentication_operation_id">
+            <column name="operation_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="67" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_authentication" indexName="ns_authentication_timestamp_created"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_authentication(timestamp_created)</comment>
+        <createIndex tableName="ns_authentication" indexName="ns_authentication_timestamp_created">
+            <column name="timestamp_created" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="68" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_hashing_config" indexName="ns_hashing_config_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_hashing_config(name)</comment>
+        <createIndex tableName="ns_hashing_config" indexName="ns_hashing_config_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="69" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_alias" indexName="ns_user_alias_unique"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_user_alias(user_id, name)</comment>
+        <createIndex tableName="ns_user_alias" indexName="ns_user_alias_unique" unique="true">
+            <column name="user_id" />
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="70" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_role" indexName="ns_user_role_unique"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_user_role(user_id, role_id)</comment>
+        <createIndex tableName="ns_user_role" indexName="ns_user_role_unique" unique="true">
+            <column name="user_id" />
+            <column name="role_id" />
+        </createIndex>
+    </changeSet>
 </databaseChangeLog>
