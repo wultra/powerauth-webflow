@@ -69,6 +69,7 @@ Others (like URL, username, password) depend on your environment.
 liquibase --changelog-file=./docs/db/changelog/changesets/powerauth-nextstep/db.changelog-module.xml --url=jdbc:postgresql://localhost:5432/powerauth --username=powerauth --hub-mode=off status
 ```
 
+There is a liqubase context `ns-user-identity` to add foreign keys for user identity, to be used only when all user identities are stored in Next Step.
 
 ## Webflow Client
 
