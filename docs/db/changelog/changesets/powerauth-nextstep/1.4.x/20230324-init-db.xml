@@ -188,9 +188,7 @@
             <column name="afs_enabled" type="boolean" defaultValueBoolean="false" remarks="Flag indicating if AFS system is enabled.">
                 <constraints nullable="false" />
             </column>
-            <column name="afs_config_id" type="varchar(256)" remarks="Configuration of AFS system.">
-                <constraints foreignKeyName="ns_operation_config_afs_fk" referencedTableName="wf_afs_config" referencedColumnNames="config_id" />
-            </column>
+            <column name="afs_config_id" type="varchar(256)" remarks="Configuration of AFS system." />
             <column name="expiration_time" type="integer" remarks="Expiration time in seconds, which overrides global Next Step configuration." />
         </createTable>
     </changeSet>
