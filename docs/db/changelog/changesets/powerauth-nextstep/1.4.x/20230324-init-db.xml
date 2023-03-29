@@ -1327,7 +1327,7 @@
     </changeSet>
 
     <!--  Foreign keys for user identity, to be used only when all user identities are stored in Next Step  -->
-    <changeSet id="71" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="ns-user-identity">
+    <changeSet id="71" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="!exclude-user-identity">
         <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="ns_operation_user_fk" foreignKeyTableName="ns_operation" />
@@ -1338,7 +1338,7 @@
     </changeSet>
 
     <!--  Foreign keys for user identity, to be used only when all user identities are stored in Next Step  -->
-    <changeSet id="72" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="ns-user-identity">
+    <changeSet id="72" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="!exclude-user-identity">
         <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="ns_user_prefs_fk" foreignKeyTableName="ns_user_prefs" />
@@ -1349,7 +1349,7 @@
     </changeSet>
 
     <!--  Foreign keys for user identity, to be used only when all user identities are stored in Next Step  -->
-    <changeSet id="73" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="ns-user-identity">
+    <changeSet id="73" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="!exclude-user-identity">
         <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="ns_otp_user_fk" foreignKeyTableName="ns_otp_storage" />
@@ -1360,7 +1360,7 @@
     </changeSet>
 
     <!--  Foreign keys for user identity, to be used only when all user identities are stored in Next Step  -->
-    <changeSet id="74" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="ns-user-identity">
+    <changeSet id="74" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="!exclude-user-identity">
         <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="ns_auth_user_fk" foreignKeyTableName="ns_authentication" />
