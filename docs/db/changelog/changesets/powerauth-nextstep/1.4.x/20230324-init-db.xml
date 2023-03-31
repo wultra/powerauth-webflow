@@ -1324,48 +1324,4 @@
         </createIndex>
     </changeSet>
 
-    <!--  Foreign keys for user identity, to be used only when all user identities are stored in Next Step  -->
-    <changeSet id="71" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="!exclude-user-identity">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <foreignKeyConstraintExists foreignKeyName="ns_operation_user_fk" foreignKeyTableName="ns_operation" />
-            </not>
-        </preConditions>
-        <comment>Add a new foreign key ns_operation_user_fk</comment>
-        <addForeignKeyConstraint baseTableName="ns_operation" baseColumnNames="user_id" constraintName="ns_operation_user_fk" referencedTableName="ns_user_identity" referencedColumnNames="user_id" />
-    </changeSet>
-
-    <!--  Foreign keys for user identity, to be used only when all user identities are stored in Next Step  -->
-    <changeSet id="72" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="!exclude-user-identity">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <foreignKeyConstraintExists foreignKeyName="ns_user_prefs_fk" foreignKeyTableName="ns_user_prefs" />
-            </not>
-        </preConditions>
-        <comment>Add a new foreign key ns_operation_user_fk</comment>
-        <addForeignKeyConstraint baseTableName="ns_user_prefs" baseColumnNames="user_id" constraintName="ns_user_prefs_fk" referencedTableName="ns_user_identity" referencedColumnNames="user_id" />
-    </changeSet>
-
-    <!--  Foreign keys for user identity, to be used only when all user identities are stored in Next Step  -->
-    <changeSet id="73" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="!exclude-user-identity">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <foreignKeyConstraintExists foreignKeyName="ns_otp_user_fk" foreignKeyTableName="ns_otp_storage" />
-            </not>
-        </preConditions>
-        <comment>Add a new foreign key ns_operation_user_fk</comment>
-        <addForeignKeyConstraint baseTableName="ns_otp_storage" baseColumnNames="user_id" constraintName="ns_otp_user_fk" referencedTableName="ns_user_identity" referencedColumnNames="user_id" />
-    </changeSet>
-
-    <!--  Foreign keys for user identity, to be used only when all user identities are stored in Next Step  -->
-    <changeSet id="74" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky" context="!exclude-user-identity">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <foreignKeyConstraintExists foreignKeyName="ns_auth_user_fk" foreignKeyTableName="ns_authentication" />
-            </not>
-        </preConditions>
-        <comment>Add a new foreign key ns_operation_user_fk</comment>
-        <addForeignKeyConstraint baseTableName="ns_authentication" baseColumnNames="user_id" constraintName="ns_auth_user_fk" referencedTableName="ns_user_identity" referencedColumnNames="user_id" />
-    </changeSet>
-
 </databaseChangeLog>

@@ -69,7 +69,16 @@ Others (like URL, username, password) depend on your environment.
 liquibase --changelog-file=./docs/db/changelog/changesets/powerauth-nextstep/db.changelog-module.xml --url=jdbc:postgresql://localhost:5432/powerauth --username=powerauth --hub-mode=off status
 ```
 
-When all user identities are not stored in Next Step, avoid adding foreign keys for user identity by using CLI option `--contexts=exclude-user-identity`.
+When all user identities are stored in Next Step, add foreign keys for user identity manually (they are not part of liquibase changesets).
+
+```sql
+-- Foreign keys for user identity, to be used only when all user identities are stored in Next Step
+ALTER TABLE ns_operation ADD CONSTRAINT ns_operation_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);
+ALTER TABLE ns_user_prefs ADD CONSTRAINT ns_user_prefs_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);
+ALTER TABLE ns_otp_storage ADD CONSTRAINT ns_otp_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);
+ALTER TABLE ns_authentication ADD CONSTRAINT ns_auth_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);
+```
+
 
 ## Webflow Client
 
