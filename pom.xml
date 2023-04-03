@@ -99,7 +99,7 @@
         <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
         <bc.version>1.72</bc.version>
         <zxing.version>3.5.0</zxing.version>
-        <passay.version>1.6.1</passay.version>
+        <passay.version>1.6.3</passay.version>
         <springdoc-openapi.version>1.6.14</springdoc-openapi.version>
         <guava.version>31.1-jre</guava.version>
         <moneta.version>1.4.2</moneta.version>
