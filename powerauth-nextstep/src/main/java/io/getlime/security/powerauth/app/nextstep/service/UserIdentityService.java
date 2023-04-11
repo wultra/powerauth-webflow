@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -96,7 +96,7 @@ public class UserIdentityService {
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
      * @throws EncryptionException Thrown when encryption or decryption fails.
      */
-    @Transactional(rollbackOn = Throwable.class)
+    @Transactional(rollbackFor = Throwable.class)
     public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
         final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
         final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
@@ -227,7 +227,7 @@ public class UserIdentityService {
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
      * @throws EncryptionException Thrown when encryption or decryption fails.
      */
-    @Transactional(rollbackOn = Throwable.class)
+    @Transactional(rollbackFor = Throwable.class)
     public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
         final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
         final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
