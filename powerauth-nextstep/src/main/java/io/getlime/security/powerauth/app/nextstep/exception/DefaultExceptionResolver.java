@@ -26,6 +26,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialV
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.ExtendedError;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.Violation;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +40,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 
 /**
  * Controller advice responsible for default exception resolving.

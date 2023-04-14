@@ -17,9 +17,9 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

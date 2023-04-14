@@ -17,10 +17,10 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 

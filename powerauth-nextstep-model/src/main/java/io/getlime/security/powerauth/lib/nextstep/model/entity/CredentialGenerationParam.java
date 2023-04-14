@@ -17,10 +17,9 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 
 /**
  * Credential generation parameters.

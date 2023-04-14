@@ -18,10 +18,12 @@
 
 package io.getlime.security.powerauth.app.webflow.demo.oauth;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -53,7 +55,7 @@ public class DefaultAuthApiTemplate extends OAuth2Template {
 
     @Override
     protected RestTemplate createRestTemplate() {
-        RestTemplate restTemplate = super.createRestTemplate();
+        final RestTemplate restTemplate = super.createRestTemplate();
         try {
             final HttpComponentsClientHttpRequestFactory requestFactory = configureSsl();
             if (requestFactory != null) {
@@ -67,10 +69,10 @@ public class DefaultAuthApiTemplate extends OAuth2Template {
 
     private HttpComponentsClientHttpRequestFactory configureSsl() throws IOException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         // Prepare keystore and truststore configurations
-        SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
+        final SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
 
         // Configure keystore
-        File keyStoreResource = ResourceUtils.getFile("keystore.jks");
+        final File keyStoreResource = ResourceUtils.getFile("keystore.jks");
         if (keyStoreResource.exists()) {
             final String keyAlias = "key";
             final char[] keyStorePassword = "changeme".toCharArray();
@@ -79,10 +81,11 @@ public class DefaultAuthApiTemplate extends OAuth2Template {
         }
 
         // Prepare request factory
-        SSLContext sslContext = sslContextBuilder.build();
+        final SSLContext sslContext = sslContextBuilder.build();
         if (sslContext != null) {
-            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
-            HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
+            final SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
+            final PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create().setSSLSocketFactory(socketFactory).build();
+            final HttpClient httpClient = HttpClients.custom().setConnectionManager(connectionManager).build();
             return new HttpComponentsClientHttpRequestFactory(httpClient);
         }
 

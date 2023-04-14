@@ -19,10 +19,10 @@ package io.getlime.security.powerauth.app.webflow.i18n;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Resource;
 import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Locale;
 
 /**

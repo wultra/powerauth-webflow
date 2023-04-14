@@ -19,10 +19,10 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OtpGenerationAlgorithm;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.*;
 import java.util.Date;
 
 /**

@@ -24,9 +24,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -40,7 +40,7 @@ import java.util.Collections;
  * @author Petr Dvorak, petr@wultra.com
  */
 @Configuration
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration {
 
     @Value("${powerauth.webflow.security.cors.enabled:false}")
     private boolean corsConfigurationEnabled;
@@ -66,20 +66,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
      * @param http HTTP security.
      * @throws Exception Thrown when configuration fails.
      */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         http
-                .csrf().ignoringAntMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**", OAUTH2_TOKEN_REVOKE_ENDPOINT)
-                .and()
-                    .antMatcher(OAUTH2_TOKEN_REVOKE_ENDPOINT).httpBasic().realmName(OAUTH2_CLIENT_REALM_NAME)
-                .and()
-                    .antMatcher("/**").authorizeRequests()
-                    .antMatchers("/", "/authenticate", "/authenticate/**", "/oauth/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/actuator/**", "/tls/client/**", "/signer/**").permitAll()
-                    .anyRequest().fullyAuthenticated()
-                .and()
-                    .exceptionHandling()
-                    .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/authenticate"));
-        http.cors();
+                .csrf().ignoringRequestMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**", OAUTH2_TOKEN_REVOKE_ENDPOINT)
+                .and().authorizeHttpRequests((requests) -> requests
+                        .requestMatchers(OAUTH2_TOKEN_REVOKE_ENDPOINT).authenticated()).httpBasic().realmName(OAUTH2_CLIENT_REALM_NAME)
+                .and().authorizeHttpRequests((requests2) ->
+                    requests2
+                            .requestMatchers("/**").authenticated()
+                            .requestMatchers("/", "/authenticate", "/authenticate/**", "/oauth/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/actuator/**", "/tls/client/**", "/signer/**").permitAll()
+                            .anyRequest().fullyAuthenticated())
+                .exceptionHandling()
+                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/authenticate"));
+        return http.cors().and().build();
     }
 
     /**

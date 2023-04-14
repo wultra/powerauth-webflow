@@ -18,7 +18,8 @@
 
 package io.getlime.security.powerauth.app.tppengine.repository.model.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.List;
 

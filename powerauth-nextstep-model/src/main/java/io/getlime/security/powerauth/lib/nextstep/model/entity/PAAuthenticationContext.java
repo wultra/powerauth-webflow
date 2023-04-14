@@ -17,9 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
-
-import javax.validation.constraints.PositiveOrZero;
 
 /**
  * PowerAuth authentication context.

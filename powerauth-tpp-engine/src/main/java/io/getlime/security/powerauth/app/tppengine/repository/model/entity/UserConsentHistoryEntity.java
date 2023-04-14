@@ -19,8 +19,8 @@
 package io.getlime.security.powerauth.app.tppengine.repository.model.entity;
 
 import io.getlime.security.powerauth.app.tppengine.model.enumeration.ConsentChange;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
