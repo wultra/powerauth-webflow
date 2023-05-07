@@ -28,7 +28,7 @@ The updated Data Adapter interface and REST API is documented in following chapt
 
 ### DB Migration to BCrypt
 
-With the new version of PowerAuth Web Flow, plain-text credentials are no longer allowed. As a result, OAuth 2.0 client credentials need to be migrated to use `bcrypt` algorithm.
+With the new version of PowerAuth Web Flow, plain-text credentials are no longer allowed. As a result, OAuth 2.1 client credentials need to be migrated to use `bcrypt` algorithm.
 
 To migrate existing database, first generate `bcrypt` values of existing passwords, for example like so:
 
@@ -39,7 +39,7 @@ $2a$12$XNPTj1HKxC4ORnKYo1gUkOybWYydJkCh9jbjQ1lBKgXIH0U6mTZe2
 
 Of course, you can use any means for generating `bcrypt` values (maybe except for untrusted online generators, for obvious reasons) and any sufficient value of `bcrypt` cost (we use `12` in the example above).
 
-After that, you need to update database record for given OAuth 2.0 client instance, in our case identified by `client_id` value:
+After that, you need to update database record for given OAuth 2.1 client instance, in our case identified by `client_id` value:
 
 ```sql
 UPDATE oauth_client_details SET client_secret='$2a$12$kJQvZfvet52pFIwyxUjbOev4kok7P07nc..cs2FzYBEgcIi.w2mjC' WHERE client_id='democlient'

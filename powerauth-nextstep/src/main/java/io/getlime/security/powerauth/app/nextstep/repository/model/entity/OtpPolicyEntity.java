@@ -40,7 +40,7 @@ public class OtpPolicyEntity implements Serializable {
     private static final long serialVersionUID = -1157742528088577985L;
 
     @Id
-    @SequenceGenerator(name = "ns_otp_policy", sequenceName = "ns_otp_policy_seq")
+    @SequenceGenerator(name = "ns_otp_policy", sequenceName = "ns_otp_policy_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_otp_policy")
     @Column(name = "otp_policy_id", nullable = false)
     private Long otpPolicyId;

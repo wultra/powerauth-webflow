@@ -4,7 +4,7 @@
 - [Basic Definitions](./Basic-Definitions.md)
 - [Components](./Components.md)
 - [Web Flow Architecture](./Web-Flow-Architecture.md)
-- [OAuth 2.0 Integration](./OAuth-2.0-Integration.md)
+- [OAuth 2.1 Integration](./OAuth-2.1-Integration.md)
 - [User's Guide](./Users-Guide.md)
 
 **Applications**

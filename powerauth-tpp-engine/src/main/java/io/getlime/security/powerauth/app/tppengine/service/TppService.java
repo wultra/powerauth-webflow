@@ -68,7 +68,7 @@ public class TppService {
     }
 
     /**
-     * Fetch application details by provided client ID (OAuth 2.0 identification).
+     * Fetch application details by provided client ID (OAuth 2.1 identification).
      *
      * @param clientId Client ID.
      * @return Application details for app with given client ID, or null
@@ -91,7 +91,7 @@ public class TppService {
     }
 
     /**
-     * Fetch application details by provided client ID (OAuth 2.0 identification) and TPP license information.
+     * Fetch application details by provided client ID (OAuth 2.1 identification) and TPP license information.
      *
      * @param clientId Client ID.
      * @param tppLicense TPP license info.
@@ -137,7 +137,7 @@ public class TppService {
             final Iterable<TppAppDetailEntity> appDetailEntityIterable = appDetailRepository.findByTppId(tppEntity.getTppId());
             List<TppAppDetailResponse> response = new ArrayList<>();
             for (TppAppDetailEntity app: appDetailEntityIterable) {
-                response.add(TppAppConverter.fromTppAppEntity(app)); // no need to list all OAuth 2.0 details here
+                response.add(TppAppConverter.fromTppAppEntity(app)); // no need to list all OAuth 2.1 details here
             }
             return response;
         } else {
@@ -148,7 +148,7 @@ public class TppService {
     /**
      * Create a new application with provided information.
      * @param request Request with information about a newly created app.
-     * @return Information about a newly created app, including the OAuth 2.0 credentials (including "client secret").
+     * @return Information about a newly created app, including the OAuth 2.1 credentials (including "client secret").
      * @throws UnableToCreateAppException When attempting to create application with a name that already exists.
      */
     @Transactional
@@ -175,7 +175,7 @@ public class TppService {
             throw new UnableToCreateAppException(errors);
         }
 
-        // Generate app OAuth 2.0 credentials
+        // Generate app OAuth 2.1 credentials
         final String clientId = UUID.randomUUID().toString();
         final String clientSecret = UUID.randomUUID().toString();
         BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
@@ -199,7 +199,7 @@ public class TppService {
         // Sort scopes and make sure a scope is unique in the collection
         final String scopes = sanitizeScopes(request.getScopes());
 
-        // Store the new OAuth 2.0 credentials in database
+        // Store the new OAuth 2.1 credentials in database
         OAuthClientDetailsEntity oAuthClientDetailsEntity = new OAuthClientDetailsEntity();
         oAuthClientDetailsEntity.setClientId(clientId);
         oAuthClientDetailsEntity.setClientSecret(encodedClientSecret);
@@ -261,7 +261,7 @@ public class TppService {
             // Sort scopes and make sure a scope is unique in the collection
             final String scopes = sanitizeScopes(request.getScopes());
 
-            // Store the new OAuth 2.0 credentials in database
+            // Store the new OAuth 2.1 credentials in database
             Optional<OAuthClientDetailsEntity> oAuthClientDetailsEntityOptional = clientDetailsRepository.findById(clientId);
             if (oAuthClientDetailsEntityOptional.isPresent()) {
                 final OAuthClientDetailsEntity oAuthClientDetailsEntity = oAuthClientDetailsEntityOptional.get();
@@ -284,7 +284,7 @@ public class TppService {
     }
 
     /**
-     * Renew OAuth 2.0 secret for an app with given client ID and belonging to TPP with specific license.
+     * Renew OAuth 2.1 secret for an app with given client ID and belonging to TPP with specific license.
      * @param clientId Client ID for which to refresh Client Secret.
      * @param tppLicense License information of the party that owns the app with given Client ID.
      * @return Information about application, including new client secret.
@@ -303,12 +303,12 @@ public class TppService {
                 throw new TppAppNotFoundException(clientId);
             }
 
-            // Generate app OAuth 2.0 credentials
+            // Generate app OAuth 2.1 credentials
             final String clientSecret = UUID.randomUUID().toString();
             BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
             final String encodedClientSecret = bcrypt.encode(clientSecret);
 
-            // Store the new OAuth 2.0 credentials in database
+            // Store the new OAuth 2.1 credentials in database
             Optional<OAuthClientDetailsEntity> oAuthClientDetailsEntityOptional = clientDetailsRepository.findById(clientId);
             if (oAuthClientDetailsEntityOptional.isPresent()) {
                 final OAuthClientDetailsEntity oAuthClientDetailsEntity = oAuthClientDetailsEntityOptional.get();
@@ -345,7 +345,7 @@ public class TppService {
                 throw new TppAppNotFoundException(clientId);
             }
 
-            // Store the new OAuth 2.0 credentials in database
+            // Store the new OAuth 2.1 credentials in database
             Optional<OAuthClientDetailsEntity> oAuthClientDetailsEntityOptional = clientDetailsRepository.findById(clientId);
             if (oAuthClientDetailsEntityOptional.isPresent()) {
                 final OAuthClientDetailsEntity oAuthClientDetailsEntity = oAuthClientDetailsEntityOptional.get();

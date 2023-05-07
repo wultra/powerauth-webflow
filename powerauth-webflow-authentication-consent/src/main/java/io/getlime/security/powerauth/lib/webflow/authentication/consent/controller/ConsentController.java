@@ -63,7 +63,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * Controller which provides endpoints for OAuth 2.0 consent screen.
+ * Controller which provides endpoints for OAuth 2.1 consent screen.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -180,7 +180,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     }
 
     /**
-     * Initializes the OAuth 2.0 consent form.
+     * Initializes the OAuth 2.1 consent form.
      *
      * @return Authorization response.
      * @throws AuthStepException Thrown when operation is invalid or not available.
@@ -331,7 +331,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     }
 
     /**
-     * Cancels the OAuth 2.0 consent.
+     * Cancels the OAuth 2.1 consent.
      *
      * @return Authorization response.
      * @throws AuthStepException Thrown when operation is invalid or not available.

@@ -57,7 +57,7 @@ public class TppAppConverter {
      * Convert TppAppDetailResponse response entity from TppAppDetail entity in database.
      * @param tppAppDetailEntity DB entity of TPP app to be converted.
      * @param oAuthClientDetailsEntity DB entity of OAuth client details to be converted.
-     * @param clientSecret OAuth 2.0 client secret, available when new app is created or on renewal only (otherwise, we store a bcrypted version).
+     * @param clientSecret OAuth 2.1 client secret, available when new app is created or on renewal only (otherwise, we store a bcrypted version).
      * @return Response entity with TPP app details.
      */
     public static TppAppDetailResponse fromTppAppEntity(TppAppDetailEntity tppAppDetailEntity, OAuthClientDetailsEntity oAuthClientDetailsEntity, String clientSecret) {
@@ -74,7 +74,7 @@ public class TppAppConverter {
         // Convert TPP info
         result.setTpp(fromTppEntity(tppAppDetailEntity.getTpp()));
 
-        // Convert OAuth 2.0 info
+        // Convert OAuth 2.1 info
         if (oAuthClientDetailsEntity != null) {
             // Decode sanitized redirect URIs
             final String[] redirectUris = oAuthClientDetailsEntity.getWebServerRedirectUri().split(",");

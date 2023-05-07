@@ -40,21 +40,57 @@ public class WebFlowServiceConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(WebFlowServiceConfiguration.class);
 
-    @Value("${powerauth.webflow.service.url}")
-    private String webFlowServiceUrl;
+    /**
+     * OAuth 2.1 client registration ID.
+     */
+    @Value("${powerauth.webflow.service.oauth2.registrationId}")
+    private String registrationId;
 
-    @Value("${powerauth.webflow.service.oauth.authorizeUrl}")
-    private String webFlowOAuthAuthorizeUrl;
-
-    @Value("${powerauth.webflow.service.oauth.tokenUrl}")
-    private String webFlowOAuthTokenUrl;
-
-    @Value("${powerauth.webflow.service.oauth.clientId}")
+    /**
+     * OAuth 2.1 client ID.
+     */
+    @Value("${powerauth.webflow.service.oauth2.clientId}")
     private String clientId;
 
-    @Value("${powerauth.webflow.service.oauth.clientSecret}")
+    /**
+     * OAuth 2.1 client secret.
+     */
+    @Value("${powerauth.webflow.service.oauth2.clientSecret}")
     private String clientSecret;
 
+    /**
+     * OAuth 2.1 authorization URI.
+     */
+    @Value("${powerauth.webflow.service.oauth2.authorizationUri}")
+    private String authorizationUri;
+
+    /**
+     * OAuth 2.1 token URI.
+     */
+    @Value("${powerauth.webflow.service.oauth2.tokenUri}")
+    private String tokenUri;
+
+    /**
+     * OAuth 2.1 user info URI.
+     */
+    @Value("${powerauth.webflow.service.oauth2.userInfoUri}")
+    private String userInfoUri;
+
+    /**
+     * OAuth 2.1 redirect URI.
+     */
+    @Value("${powerauth.webflow.service.oauth2.redirectUri}")
+    private String redirectUri;
+
+    /**
+     * OAuth 2.1 username attribute name for user info response.
+     */
+    @Value("${powerauth.webflow.service.oauth2.userNameAttributeName}")
+    private String userNameAttributeName;
+
+    /**
+     * Next Step service URL.
+     */
     @Value("${powerauth.nextstep.service.url}")
     private String nextstepServiceUrl;
 
@@ -82,26 +118,6 @@ public class WebFlowServiceConfiguration {
     @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
     private boolean acceptInvalidSslCertificate;
 
-    public String getWebFlowServiceUrl() {
-        return webFlowServiceUrl;
-    }
-
-    public String getWebFlowOAuthAuthorizeUrl() {
-        return webFlowOAuthAuthorizeUrl;
-    }
-
-    public String getWebFlowOAuthTokenUrl() {
-        return webFlowOAuthTokenUrl;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public String getClientSecret() {
-        return clientSecret;
-    }
-
     /**
      * Get application name.
      * @return Application name.
@@ -124,6 +140,70 @@ public class WebFlowServiceConfiguration {
      */
     public String getApplicationEnvironment() {
         return applicationEnvironment;
+    }
+
+    /**
+     * Get OAuth 2.1 client registration ID.
+     * @return OAuth 2.1 client registration ID.
+     */
+    public String getRegistrationId() {
+        return registrationId;
+    }
+
+    /**
+     * Get OAuth 2.1 client ID.
+     * @return OAuth 2.1 client ID.
+     */
+    public String getClientId() {
+        return clientId;
+    }
+
+    /**
+     * Get OAuth 2.1 client secret.
+     * @return OAuth 2.1 client secret.
+     */
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    /**
+     * Get OAuth 2.1 authorization URI.
+     * @return OAuth 2.1 authorization URI.
+     */
+    public String getAuthorizationUri() {
+        return authorizationUri;
+    }
+
+    /**
+     * Get OAuth 2.1 token URI.
+     * @return OAuth 2.1 token URI.
+     */
+    public String getTokenUri() {
+        return tokenUri;
+    }
+
+    /**
+     * Get OAuth 2.1 user info URI.
+     * @return OAuth 2.1 user info URI.
+     */
+    public String getUserInfoUri() {
+        return userInfoUri;
+    }
+
+    /**
+     * Get OAuth 2.1 redirect URI.
+     * @return OAuth 2.1 redirect URI.
+     */
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    /**
+     * Get OAuth 2.1 username attribute name for user info response.
+     * @return OAuth 2.1 username attribute name.
+     */
+    public String getUserNameAttributeName() {
+        return userNameAttributeName;
     }
 
     /**

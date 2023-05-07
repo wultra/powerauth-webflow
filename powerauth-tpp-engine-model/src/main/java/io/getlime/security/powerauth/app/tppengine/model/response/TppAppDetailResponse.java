@@ -28,7 +28,7 @@ import io.getlime.security.powerauth.app.tppengine.model.entity.TppInfo;
 public class TppAppDetailResponse {
 
     /**
-     * App Identifier, OAuth 2.0 Client ID.
+     * App Identifier, OAuth 2.1 Client ID.
      */
     private String clientId;
 
@@ -48,17 +48,17 @@ public class TppAppDetailResponse {
     private String appType;
 
     /**
-     * OAuth 2.0 scopes of this application.
+     * OAuth 2.1 scopes of this application.
      */
     private String[] scopes;
 
     /**
-     * OAuth 2.0 redirect URLs.
+     * OAuth 2.1 redirect URLs.
      */
     private String[] redirectUris;
 
     /**
-     * OAuth 2.0 client secret.
+     * OAuth 2.1 client secret.
      */
     private String clientSecret;
 

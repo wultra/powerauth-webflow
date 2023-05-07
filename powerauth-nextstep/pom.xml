@@ -22,7 +22,7 @@
 
     <name>powerauth-nextstep</name>
     <artifactId>powerauth-nextstep</artifactId>
-    <description>PowerAuth 2.0 Next Step Server</description>
+    <description>PowerAuth Next Step Server</description>
     <packaging>war</packaging>
 
     <parent>

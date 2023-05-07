@@ -18,21 +18,106 @@
 
 package io.getlime.security.powerauth.app.webflow.demo.configuration;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Default Spring Security configuration.
  *
  * @author Petr Dvorak, petr@wultra.com
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Configuration
+@EnableWebSecurity
 public class SecurityConfiguration {
+
+    private final OAuth2AuthorizedClientRepository authorizedClientRepository;
+    private final OAuth2AuthorizedClientService authorizedClientService;
+    private final ClientRegistrationRepository clientRegistrationRepository;
+
+    @Autowired
+    public SecurityConfiguration(OAuth2AuthorizedClientRepository authorizedClientRepository, OAuth2AuthorizedClientService authorizedClientService, ClientRegistrationRepository clientRegistrationRepository) {
+        this.authorizedClientRepository = authorizedClientRepository;
+        this.authorizedClientService = authorizedClientService;
+        this.clientRegistrationRepository = clientRegistrationRepository;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
-        return http.httpBasic().disable().build();
+        return http
+                .httpBasic().disable()
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/", "/home", "/css/**", "/js/**", "/images/**").permitAll()
+                        .anyRequest().fullyAuthenticated()
+                )
+                .oauth2Login()
+                    .authorizedClientRepository(authorizedClientRepository)
+                    .authorizedClientService(authorizedClientService)
+                    .clientRegistrationRepository(clientRegistrationRepository)
+                    .authorizationEndpoint()
+                    .authorizationRequestResolver(new CustomAuthorizationRequestResolver(this.clientRegistrationRepository))
+                .and()
+                    .loginProcessingUrl("/connect/demo")
+                .and()
+                    .logout()
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/")
+                    .permitAll()
+                .and()
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        // Error message is already shown in Web Flow
+                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/"))
+                )
+                .build();
+    }
+
+    /**
+     * Customization of authorization attributes - scope and operation_id.
+     */
+    public static class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
+        private final OAuth2AuthorizationRequestResolver defaultAuthorizationRequestResolver;
+
+        public CustomAuthorizationRequestResolver(ClientRegistrationRepository clientRegistrationRepository) {
+            this.defaultAuthorizationRequestResolver = new DefaultOAuth2AuthorizationRequestResolver(
+                    clientRegistrationRepository, "/oauth2/authorization");
+        }
+
+        @Override
+        public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
+            OAuth2AuthorizationRequest authorizationRequest = this.defaultAuthorizationRequestResolver.resolve(request);
+            return authorizationRequest != null ? customAuthorizationRequest(request, authorizationRequest) : null;
+        }
+
+        @Override
+        public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
+            OAuth2AuthorizationRequest authorizationRequest = this.defaultAuthorizationRequestResolver.resolve(request, clientRegistrationId);
+            return authorizationRequest != null ? customAuthorizationRequest(request, authorizationRequest) : null;
+        }
+
+        private OAuth2AuthorizationRequest customAuthorizationRequest(HttpServletRequest request, OAuth2AuthorizationRequest authorizationRequest) {
+            final Map<String, Object> additionalParameters = new LinkedHashMap<>(authorizationRequest.getAdditionalParameters());
+            if (request.getParameter("scope") != null) {
+                additionalParameters.put("scope", request.getParameter("scope"));
+            }
+            if (request.getParameter("operation_id") != null) {
+                additionalParameters.put("operation_id", request.getParameter("operation_id"));
+            }
+            return OAuth2AuthorizationRequest.from(authorizationRequest).additionalParameters(additionalParameters).build();
+        }
     }
 }

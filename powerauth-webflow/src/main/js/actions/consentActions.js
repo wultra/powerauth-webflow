@@ -20,7 +20,7 @@ import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 import {handleAuthFailedError} from "./errorHandling";
 
 /**
- * Initialize OAuth 2.0 consent form.
+ * Initialize OAuth 2.1 consent form.
  * @returns {Function} No return value.
  */
 export function init() {

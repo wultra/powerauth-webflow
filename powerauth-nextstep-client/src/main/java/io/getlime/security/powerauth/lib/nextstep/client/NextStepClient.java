@@ -112,7 +112,7 @@ public class NextStepClient {
      * @param operationId Operation ID (optional - if null, unique ID is automatically generated).
      * @param operationData Operation data.
      * @param params List of generic parameters.
-     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
+     * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with CreateOperationResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
     */
@@ -127,7 +127,7 @@ public class NextStepClient {
      * @param operationData Operation data.
      * @param formData Operation form data, such as title, message and displayable attributes.
      * @param params List of generic parameters.
-     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
+     * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with CreateOperationResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
@@ -145,7 +145,7 @@ public class NextStepClient {
      * @param externalTransactionId External transaction ID.
      * @param formData Operation form data, such as title, message and displayable attributes.
      * @param params List of generic parameters.
-     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
+     * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with CreateOperationResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
@@ -172,7 +172,7 @@ public class NextStepClient {
      * @param organizationId Organization ID.
      * @param formData Operation form data, such as title, message and displayable attributes.
      * @param params List of generic parameters.
-     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
+     * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with CreateOperationResponse object.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
@@ -191,7 +191,7 @@ public class NextStepClient {
      * @param authStepResult Result of the last step.
      * @param authStepResultDescription Description of the result of the last step.
      * @param params List of generic parameters.
-     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
+     * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with UpdateOperationResponse object.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
@@ -223,7 +223,7 @@ public class NextStepClient {
      * @param authStepResult Result of the last step.
      * @param authStepResultDescription Description of the result of the last step.
      * @param params List of generic parameters.
-     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
+     * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with UpdateOperationResponse object.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */

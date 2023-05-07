@@ -41,7 +41,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- PowerAuth 2.0 Web Flow Dependencies -->
+        <!-- PowerAuth Web Flow Dependencies -->
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-data-adapter-model</artifactId>

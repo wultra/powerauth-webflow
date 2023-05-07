@@ -33,7 +33,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for the PowerAuth 2.0 Server connector.
+ * Configuration for the PowerAuth Server connector.
  *
  * @author Petr Dvorak, petr@wultra.com
  */
@@ -91,7 +91,7 @@ public class PowerAuthWebServiceConfiguration {
     }
 
     /**
-     * Initialize PowerAuth 2.0 Push server client.
+     * Initialize PowerAuth Push server client.
      * @return Push server client.
      */
     @Bean

@@ -180,7 +180,7 @@ For Next Step you can use the same configuration, just change the variable `LOG_
 
 The `application-ext.properties` file is used to override default configuration properties, for example:
 ```
-# PowerAuth 2.0 Client configuration
+# PowerAuth Client configuration
 powerauth.service.url=http://[host]:[port]/powerauth-java-server/rest
 ```
 

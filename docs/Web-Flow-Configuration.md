@@ -45,7 +45,6 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=powerauth
 spring.datasource.driver-class-name=org.postgresql.Driver
-spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
 
@@ -54,8 +53,6 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following property speeds up Spring Boot startup
-#spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # Application Service Configuration
 powerauth.webflow.service.applicationName=powerauth-webflow
@@ -165,7 +162,6 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.driver-class-name=org.postgresql.Driver
-spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
 
@@ -174,8 +170,6 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following property speeds up Spring Boot startup
-#spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # Data Adapter Server Service URL
 powerauth.dataAdapter.service.url=http://localhost:8080/powerauth-data-adapter
@@ -270,7 +264,6 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.driver-class-name=org.postgresql.Driver
-spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
 
@@ -279,8 +272,6 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following property speeds up Spring Boot startup
-#spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # SMS OTP expiration time in seconds
 powerauth.authorization.sms-otp.expiration-time-in-seconds=300
@@ -305,10 +296,10 @@ springdoc.swagger-ui.disable-swagger-default-url=true
 ## Web Flow Client
 At minimum the following configuration properties should be updated based on deployment:
 - `powerauth.webflow.service.url` - Web Flow service URL
-- `powerauth.webflow.service.oauth.authorizeUrl` - OAuth 2.0 authorize endpoint
-- `powerauth.webflow.service.oauth.tokenUrl` - OAuth 2.0 token endpoint
-- `powerauth.webflow.service.oauth.clientId` - OAuth 2.0 client ID
-- `powerauth.webflow.service.oauth.clientSecret` OAuth 2.0 client secret
+- `powerauth.webflow.service.oauth.authorizeUrl` - OAuth 2.1 authorize endpoint
+- `powerauth.webflow.service.oauth.tokenUrl` - OAuth 2.1 token endpoint
+- `powerauth.webflow.service.oauth.clientId` - OAuth 2.1 client ID
+- `powerauth.webflow.service.oauth.clientSecret` OAuth 2.1 client secret
 - `powerauth.nextstep.service.url` - Next Step service URL
 
 Complete configuration file:
@@ -350,16 +341,16 @@ logging.level.com.zaxxer.hikari.util.DriverDataSource=ERROR
 spring.web.resources.cache.cachecontrol.max-age=86400
 ```
 
-## OAuth 2.0 Client Configuration
+## OAuth 2.1 Client Configuration
 
-The OAuth 2.0 client requires following configuration:
-- `client_id` - an identifier of the OAuth 2.0 client, choose the name so that it describes the client purpose
-- `client_secret` - secret used for authentication of the OAuth 2.0 client, use BCrypt to encrypt the secret
-- `scope` - OAuth 2.0 scopes supported by this client
-- `authorized_grant_types` - OAuth 2.0 grant types, use `authorization_code` for typical deployment
-- `web_server_redirect_url` - comma separated list of all redirect URLs after completion of OAuth 2.0 protocol
+The OAuth 2.1 client requires following configuration:
+- `client_id` - an identifier of the OAuth 2.1 client, choose the name so that it describes the client purpose
+- `client_secret` - secret used for authentication of the OAuth 2.1 client, use BCrypt to encrypt the secret
+- `scope` - OAuth 2.1 scopes supported by this client
+- `authorized_grant_types` - OAuth 2.1 grant types, use `authorization_code` for typical deployment
+- `web_server_redirect_url` - comma separated list of all redirect URLs after completion of OAuth 2.1 protocol
 - `additional_information` - additional information for this client, use `{}` for no additional information
-- `autoapprove` - use `true` value because consent page is displayed by Web Flow separately and is not handled by Spring OAuth 2.0 support
+- `autoapprove` - use `true` value because consent page is displayed by Web Flow separately and is not handled by Spring OAuth 2.1 support
 
 ```sql
 INSERT INTO oauth_client_details (client_id, client_secret, scope, authorized_grant_types, web_server_redirect_uri, additional_information, autoapprove)

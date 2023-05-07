@@ -41,7 +41,7 @@ public class CredentialPolicyEntity implements Serializable {
     private static final long serialVersionUID = -4580881377865304625L;
 
     @Id
-    @SequenceGenerator(name = "ns_credential_policy", sequenceName = "ns_credential_policy_seq")
+    @SequenceGenerator(name = "ns_credential_policy", sequenceName = "ns_credential_policy_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_credential_policy")
     @Column(name = "credential_policy_id", nullable = false)
     private Long credentialPolicyId;

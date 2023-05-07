@@ -54,7 +54,7 @@ public class AuthMethodQueryService {
     /**
      * Service constructor.
      * @param nextStepClient Next step client.
-     * @param powerAuthClient PowerAuth 2.0 client.
+     * @param powerAuthClient PowerAuth client.
      */
     @Autowired
     public AuthMethodQueryService(NextStepClient nextStepClient, PowerAuthClient powerAuthClient) {

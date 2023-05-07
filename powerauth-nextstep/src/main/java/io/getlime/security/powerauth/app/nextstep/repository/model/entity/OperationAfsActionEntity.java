@@ -40,7 +40,7 @@ public class OperationAfsActionEntity implements Serializable {
     private static final long serialVersionUID = 744614077188309148L;
 
     @Id
-    @SequenceGenerator(name = "ns_operation_afs", sequenceName = "ns_operation_afs_seq")
+    @SequenceGenerator(name = "ns_operation_afs", sequenceName = "ns_operation_afs_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_operation_afs")
     @Column(name = "afs_action_id", nullable = false)
     private Long afsActionId;

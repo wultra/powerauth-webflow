@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Application context for OAuth 2.0 consent screen.
+ * Application context for OAuth 2.1 consent screen.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

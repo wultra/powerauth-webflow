@@ -42,7 +42,7 @@ public class CredentialDefinitionEntity implements Serializable {
     private static final long serialVersionUID = 1113222092995641439L;
 
     @Id
-    @SequenceGenerator(name = "ns_credential_definition", sequenceName = "ns_credential_definition_seq")
+    @SequenceGenerator(name = "ns_credential_definition", sequenceName = "ns_credential_definition_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_credential_definition")
     @Column(name = "credential_definition_id", nullable = false)
     private Long credentialDefinitionId;

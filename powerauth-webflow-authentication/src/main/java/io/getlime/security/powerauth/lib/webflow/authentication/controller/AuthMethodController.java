@@ -135,9 +135,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
-     * Create a new implicit login operation based on the OAuth 2.0 scopes.
-     * @param clientId OAuth 2.0 Client ID.
-     * @param scopes OAuth 2.0 Scopes
+     * Create a new implicit login operation based on the OAuth 2.1 scopes.
+     * @param clientId OAuth 2.1 Client ID.
+     * @param scopes OAuth 2.1 Scopes
      * @return Information about a new operation.
      * @throws CommunicationFailedException In case the communication with data adapter fails.
      */

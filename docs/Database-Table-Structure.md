@@ -20,7 +20,7 @@ Web Flow can coexist with PowerAuth in the same database schema, or it can use a
 
 ## Database Tables
 
-### Database Tables for the OAuth 2.0 protocol
+### Database Tables for the OAuth 2.1 protocol
 
 - **oauth_client_details** - the table stores details about OAuth2 client applications. Every Web Flow client application should have a record in this table. See [JdbcClientDetailsService.java](https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/JdbcClientDetailsService.java).
 

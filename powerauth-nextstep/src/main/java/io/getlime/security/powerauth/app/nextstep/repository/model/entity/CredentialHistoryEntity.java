@@ -39,7 +39,7 @@ public class CredentialHistoryEntity implements Serializable {
     private static final long serialVersionUID = -3222892995455956072L;
 
     @Id
-    @SequenceGenerator(name = "ns_credential_history", sequenceName = "ns_credential_history_seq")
+    @SequenceGenerator(name = "ns_credential_history", sequenceName = "ns_credential_history_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_credential_history")
     @Column(name = "credential_history_id", nullable = false)
     private Long credentialHistoryId;

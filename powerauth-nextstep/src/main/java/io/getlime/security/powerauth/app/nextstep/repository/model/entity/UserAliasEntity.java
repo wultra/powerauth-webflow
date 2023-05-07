@@ -39,7 +39,7 @@ public class UserAliasEntity implements Serializable {
     private static final long serialVersionUID = -6855066974507308862L;
 
     @Id
-    @SequenceGenerator(name = "ns_user_alias", sequenceName = "ns_user_alias_seq")
+    @SequenceGenerator(name = "ns_user_alias", sequenceName = "ns_user_alias_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_user_alias")
     @Column(name = "user_alias_id", nullable = false)
     private Long userAliasId;

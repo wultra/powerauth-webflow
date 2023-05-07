@@ -25,8 +25,8 @@ import java.util.Objects;
 
 /**
  * Entity representing a TPP application details. This entity is connected to TPP via tpp_id on one end,
- * and to OAuth 2.0 client details via client_id on the other hand. As a result, this table does not contain
- * association with the OAuth 2.0 credentials. It only stores connection between TPP and the credentials and
+ * and to OAuth 2.1 client details via client_id on the other hand. As a result, this table does not contain
+ * association with the OAuth 2.1 credentials. It only stores connection between TPP and the credentials and
  * also some basic metadata info related to the app.
  *
  * @author Petr Dvorak, petr@wultra.com

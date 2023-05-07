@@ -56,7 +56,7 @@ public class PushRegistrationController {
 
     /**
      * Controller constructor.
-     * @param pushServerClient PowerAuth 2.0 Push server client.
+     * @param pushServerClient PowerAuth Push server client.
      */
     @Autowired
     public PushRegistrationController(PushServerClient pushServerClient) {

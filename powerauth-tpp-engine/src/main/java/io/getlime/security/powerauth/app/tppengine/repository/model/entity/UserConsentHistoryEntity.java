@@ -37,7 +37,7 @@ public class UserConsentHistoryEntity implements Serializable {
     private static final long serialVersionUID = 6697728608700209704L;
 
     @Id
-    @SequenceGenerator(name = "tpp_user_consent_history", sequenceName = "tpp_user_consent_history_seq")
+    @SequenceGenerator(name = "tpp_user_consent_history", sequenceName = "tpp_user_consent_history_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "tpp_user_consent_history")
     @Column(name = "id", nullable = false)
     private Long id;

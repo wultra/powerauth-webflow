@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extras for application context for OAuth 2.0 consent screen.
+ * Extras for application context for OAuth 2.1 consent screen.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

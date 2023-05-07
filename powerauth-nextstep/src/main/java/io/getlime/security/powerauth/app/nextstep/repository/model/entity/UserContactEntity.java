@@ -39,7 +39,7 @@ public class UserContactEntity implements Serializable {
     private static final long serialVersionUID = 7530081244465987786L;
 
     @Id
-    @SequenceGenerator(name = "ns_user_contact", sequenceName = "ns_user_contact_seq")
+    @SequenceGenerator(name = "ns_user_contact", sequenceName = "ns_user_contact_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_user_contact")
     @Column(name = "user_contact_id", nullable = false)
     private Long userContactId;

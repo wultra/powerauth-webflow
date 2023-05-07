@@ -35,7 +35,7 @@ public class UserConsentEntity implements Serializable {
     private static final long serialVersionUID = 4873304514084189625L;
 
     @Id
-    @SequenceGenerator(name = "tpp_user_consent", sequenceName = "tpp_user_consent_seq")
+    @SequenceGenerator(name = "tpp_user_consent", sequenceName = "tpp_user_consent_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "tpp_user_consent")
     @Column(name = "id", nullable = false)
     private Long id;

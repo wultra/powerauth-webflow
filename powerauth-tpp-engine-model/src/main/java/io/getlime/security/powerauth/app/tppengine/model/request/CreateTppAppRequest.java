@@ -39,12 +39,12 @@ public class CreateTppAppRequest {
     private String appType;
 
     /**
-     * TPP app OAuth 2.0 redirect URIs.
+     * TPP app OAuth 2.1 redirect URIs.
      */
     private String[] redirectUris;
 
     /**
-     * TPP app OAuth 2.0 scopes.
+     * TPP app OAuth 2.1 scopes.
      */
     private String[] scopes;
 

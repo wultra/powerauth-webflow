@@ -41,9 +41,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.oauth2.provider.ClientDetails;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
-import org.springframework.security.oauth2.provider.ClientRegistrationException;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
@@ -73,8 +72,8 @@ public class HomeController {
     private final NextStepClient nextStepClient;
     private final AfsConfigRepository afsConfigRepository;
     private final HttpSession httpSession;
-    private final ClientDetailsService clientDetailsService;
     private final OperationCancellationService operationCancellationService;
+    private final RegisteredClientRepository registeredClientRepository;
 
     /**
      * Initialization of the HomeController with application configuration.
@@ -85,11 +84,11 @@ public class HomeController {
      * @param nextStepClient Next step client.
      * @param afsConfigRepository Anti-fraud system configuration repository.
      * @param httpSession HTTP session.
-     * @param clientDetailsService Client details service for accessing OAuth 2.0 client data.
      * @param operationCancellationService Service used for canceling operations.
+     * @param registeredClientRepository OAuth 2.1 registered client repository.
      */
     @Autowired
-    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService, NextStepClient nextStepClient, AfsConfigRepository afsConfigRepository, HttpSession httpSession, ClientDetailsService clientDetailsService, OperationCancellationService operationCancellationService) {
+    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService, NextStepClient nextStepClient, AfsConfigRepository afsConfigRepository, HttpSession httpSession, OperationCancellationService operationCancellationService, RegisteredClientRepository registeredClientRepository) {
         this.webFlowConfig = webFlowConfig;
         this.authenticationManagementService = authenticationManagementService;
         this.i18nService = i18nService;
@@ -97,8 +96,8 @@ public class HomeController {
         this.nextStepClient = nextStepClient;
         this.afsConfigRepository = afsConfigRepository;
         this.httpSession = httpSession;
-        this.clientDetailsService = clientDetailsService;
         this.operationCancellationService = operationCancellationService;
+        this.registeredClientRepository = registeredClientRepository;
     }
 
     /**
@@ -126,7 +125,7 @@ public class HomeController {
         SavedRequest savedRequest = cache.getRequest(request, response);
         if (savedRequest == null) {
             logger.error("HTTP request not found in HttpSessionRequestCache");
-            return "redirect:/oauth/error";
+            return "redirect:/oauth2/error";
         }
 
         authenticationManagementService.clearContext();
@@ -173,7 +172,7 @@ public class HomeController {
 
             } catch (NextStepClientException ex) {
                 logger.error("Error occurred while retrieving operation with ID: " + operationId, ex);
-                return "redirect:/oauth/error";
+                return "redirect:/oauth2/error";
             }
 
             authenticationManagementService.createAuthenticationWithOperationId(operationId, organizationId);
@@ -218,8 +217,8 @@ public class HomeController {
     @RequestMapping(value = "/authenticate/continue", method = RequestMethod.GET)
     public String continueToRedirect(HttpServletRequest request, HttpServletResponse response) {
         logger.info("Received /authenticate/continue request");
-        HttpSessionRequestCache cache = new HttpSessionRequestCache();
-        SavedRequest savedRequest = cache.getRequest(request, response);
+        final HttpSessionRequestCache cache = new HttpSessionRequestCache();
+        final SavedRequest savedRequest = cache.getRequest(request, response);
         String redirectUrl;
         if (savedRequest == null) {
             // Redirect to original page? Currently, use redirect to error...
@@ -228,7 +227,7 @@ public class HomeController {
             // String ctx = request.getContextPath();
             // String base = url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
             logger.error("HTTP request not found in HttpSessionRequestCache");
-            return "redirect:/oauth/error";
+            return "redirect:/oauth2/error";
         } else {
             authenticationManagementService.setLanguage(LocaleContextHolder.getLocale().getLanguage());
             authenticationManagementService.pendingAuthenticationToAuthentication();
@@ -238,7 +237,7 @@ public class HomeController {
         cleanHttpSession();
         response.setHeader("Location", redirectUrl);
         response.setStatus(HttpServletResponse.SC_FOUND);
-        logger.info("The /authenticate/continue request succeeded");
+        logger.info("The /authenticate/continue request succeeded, redirect URL: {}", redirectUrl);
         return null;
     }
 
@@ -256,16 +255,16 @@ public class HomeController {
         SavedRequest savedRequest = cache.getRequest(request, response);
         if (savedRequest == null) {
             logger.error("HTTP request not found in HttpSessionRequestCache");
-            return "redirect:/oauth/error";
+            return "redirect:/oauth2/error";
         }
         String[] redirectUriParameter = savedRequest.getParameterMap().get("redirect_uri");
         if (redirectUriParameter == null) {
             logger.error("Parameter redirect_uri is missing");
-            return "redirect:/oauth/error";
+            return "redirect:/oauth2/error";
         }
         if (redirectUriParameter.length != 1) {
             logger.error("Multiple redirect_uri request parameters found");
-            return "redirect:/oauth/error";
+            return "redirect:/oauth2/error";
         }
         String redirectUri = redirectUriParameter[0];
 
@@ -273,44 +272,42 @@ public class HomeController {
         String[] clientIdParameter = savedRequest.getParameterMap().get("client_id");
         if (clientIdParameter == null) {
             logger.error("Parameter client_id is missing");
-            return "redirect:/oauth/error";
+            return "redirect:/oauth2/error";
         }
         if (clientIdParameter.length != 1) {
             logger.error("Multiple client_id request parameters found");
-            return "redirect:/oauth/error";
+            return "redirect:/oauth2/error";
         }
 
         String clientId = clientIdParameter[0];
 
-        try {
-            ClientDetails clientDetails = clientDetailsService.loadClientByClientId(clientId);
-            Set<String> registeredRedirectUris = clientDetails.getRegisteredRedirectUri();
-
-            // Verify that redirect URI is registered for provided client ID
-            if (!registeredRedirectUris.contains(redirectUri)) {
-                logger.error("Redirect URI '{}' is not registered for client_id: {}", redirectUri, clientId);
-                return "redirect:/oauth/error";
-            }
-        } catch (ClientRegistrationException ex) {
-            logger.error("Client details not found for client_id: {}, error: {}", clientId, ex.getMessage());
-            return "redirect:/oauth/error";
+        final RegisteredClient registeredClient = registeredClientRepository.findByClientId(clientId);
+        if (registeredClient == null) {
+            logger.error("Registered client not found for client_id: {}", clientId);
+            return "redirect:/oauth2/error";
+        }
+        Set<String> registeredRedirectUris = registeredClient.getRedirectUris();
+        // Verify that redirect URI is registered for provided client ID
+        if (!registeredRedirectUris.contains(redirectUri)) {
+            logger.error("Redirect URI '{}' is not registered for client_id: {}", redirectUri, clientId);
+            return "redirect:/oauth2/error";
         }
 
         // Verify response type, only 'code' is supported
         String[] responseTypeParameter = savedRequest.getParameterMap().get("response_type");
         if (responseTypeParameter == null) {
             logger.error("Parameter response_type is missing");
-            return "redirect:/oauth/error";
+            return "redirect:/oauth2/error";
         }
         if (responseTypeParameter.length != 1) {
             logger.error("Multiple response_type request parameters found");
-            return "redirect:/oauth/error";
+            return "redirect:/oauth2/error";
         }
 
         String responseType = responseTypeParameter[0];
         if (!"code".equals(responseType)) {
             logger.error("Invalid response type: {}", responseType);
-            return "redirect:/oauth/error";
+            return "redirect:/oauth2/error";
         }
 
         // Extract optional state parameter from original request
@@ -318,7 +315,7 @@ public class HomeController {
         String state = null;
         if (stateParameter == null || stateParameter.length > 1) {
             logger.error("Multiple state request parameters found");
-            return "redirect:/oauth/error";
+            return "redirect:/oauth2/error";
         } else if (stateParameter.length == 1) {
             state = stateParameter[0];
         }
@@ -331,7 +328,7 @@ public class HomeController {
                 operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.UNEXPECTED_ERROR, true);
             } catch (CommunicationFailedException ex) {
                 // Exception is already logged
-                return "redirect:/oauth/error";
+                return "redirect:/oauth2/error";
             }
         }
 
@@ -360,12 +357,12 @@ public class HomeController {
     }
 
     /**
-     * Render the OAuth 2.0 protocol error page.
+     * Render the OAuth 2.1 protocol error page.
      *
      * @param model Model.
      * @return Return oauth/error template.
      */
-    @RequestMapping(value = "/oauth/error", method = RequestMethod.GET)
+    @RequestMapping(value = "/oauth2/error", method = RequestMethod.GET)
     public String oauthError(Map<String, Object> model) {
         // Make sure HTTP session is cleaned when error is displayed
         cleanHttpSession();

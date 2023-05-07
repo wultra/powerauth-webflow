@@ -19,49 +19,49 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.entity;
 
 /**
- * Object for containing the basic OAuth 2.0 dance context.
+ * Object for containing the basic OAuth 2.1 dance context.
  *
  * @author Petr Dvorak, petr@wultra.com
  */
 public class OAuthBasicContext {
 
     /**
-     * OAuth 2.0 client ID.
+     * OAuth 2.1 client ID.
      */
     private String clientId;
 
     /**
-     * OAuth 2.0 scopes.
+     * OAuth 2.1 scopes.
      */
     private String[] scopes;
 
     /**
-     * Get OAuth 2.0 client ID.
-     * @return OAuth 2.0 client ID.
+     * Get OAuth 2.1 client ID.
+     * @return OAuth 2.1 client ID.
      */
     public String getClientId() {
         return clientId;
     }
 
     /**
-     * Set OAuth 2.0 client ID.
-     * @param clientId OAuth 2.0 client ID.
+     * Set OAuth 2.1 client ID.
+     * @param clientId OAuth 2.1 client ID.
      */
     public void setClientId(String clientId) {
         this.clientId = clientId;
     }
 
     /**
-     * Get OAuth 2.0 scopes.
-     * @return OAuth 2.0 scopes.
+     * Get OAuth 2.1 scopes.
+     * @return OAuth 2.1 scopes.
      */
     public String[] getScopes() {
         return scopes;
     }
 
     /**
-     * Set OAuth 2.0 scopes.
-     * @param scopes OAuth 2.0 scopes.
+     * Set OAuth 2.1 scopes.
+     * @param scopes OAuth 2.1 scopes.
      */
     public void setScopes(String[] scopes) {
         this.scopes = scopes;

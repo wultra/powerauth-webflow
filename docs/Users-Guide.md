@@ -14,7 +14,7 @@ These two operations are described in details in the following sections.
 Web Flow can also be used for additional purposes, such as:
 - user authentication and consent approval for providing user identity (the `bank ID` use case)
 - user authentication and payment authorization during 3D secure operations when paying online with a credit card
-- any other case of OAuth 2.0 or Open ID Connect (OIDC) standard based authentication
+- any other case of OAuth 2.1 or Open ID Connect (OIDC) standard based authentication
 
 Documentation of these additional scenarios are out of scope of this user's guide.
 

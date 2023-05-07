@@ -39,7 +39,7 @@ public class UserRoleEntity implements Serializable {
     private static final long serialVersionUID = -248437038124901685L;
 
     @Id
-    @SequenceGenerator(name = "ns_user_role", sequenceName = "ns_user_role_seq")
+    @SequenceGenerator(name = "ns_user_role", sequenceName = "ns_user_role_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_user_role")
     @Column(name = "user_role_id", nullable = false)
     private Long userRoleId;

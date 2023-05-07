@@ -21,11 +21,14 @@ package io.getlime.security.powerauth.lib.webflow.authentication.service;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -43,6 +46,13 @@ public class AuthenticationManagementService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationManagementService.class);
 
+    private final SecurityContextRepository securityContextRepository;
+
+    @Autowired
+    public AuthenticationManagementService(SecurityContextRepository securityContextRepository) {
+        this.securityContextRepository = securityContextRepository;
+    }
+
     /**
      * Get current HTTP request.
      * @return Current HTTP request.
@@ -51,6 +61,16 @@ public class AuthenticationManagementService {
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         ServletRequestAttributes attributes = (ServletRequestAttributes) requestAttributes;
         return attributes.getRequest();
+    }
+
+    /**
+     * Get current HTTP response.
+     * @return Current HTTP request.
+     */
+    private HttpServletResponse currentResponse() {
+        RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+        ServletRequestAttributes attributes = (ServletRequestAttributes) requestAttributes;
+        return attributes.getResponse();
     }
 
     /**
@@ -80,15 +100,18 @@ public class AuthenticationManagementService {
      * Clear the security context.
      */
     public void clearContext() {
-        SecurityContextHolder.clearContext();
-        logger.info("Security context was cleared");
         HttpServletRequest request = currentRequest();
+        HttpServletResponse response = currentResponse();
         HttpSession session = request.getSession();
+
+        final SecurityContext context = SecurityContextHolder.createEmptyContext();
+        securityContextRepository.saveContext(context, request, response);
+
+        logger.info("Security context was cleared");
         synchronized (session.getServletContext()) {
             session.removeAttribute(HttpSessionAttributeNames.PENDING_AUTH_OBJECT);
         }
         logger.info("PENDING_AUTH_OBJECT was removed from HTTP session");
-
     }
 
     /**
@@ -165,7 +188,7 @@ public class AuthenticationManagementService {
     }
 
     /**
-     * Mark the current pending authentication autenticated.
+     * Mark the current pending authentication authenticated.
      */
     public void authenticateCurrentSession() {
         UserOperationAuthentication auth = getPendingUserAuthentication();
@@ -184,6 +207,7 @@ public class AuthenticationManagementService {
             final SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
             securityContext.setAuthentication(auth);
             SecurityContextHolder.setContext(securityContext);
+            securityContextRepository.saveContext(securityContext, currentRequest(), currentResponse());
             logger.info("UserOperationAuthentication(userId={}) set to the security context.", auth.getUserId());
         }
     }

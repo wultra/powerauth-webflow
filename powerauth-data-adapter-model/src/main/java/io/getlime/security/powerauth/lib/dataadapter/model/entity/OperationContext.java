@@ -138,16 +138,16 @@ public class OperationContext {
     }
 
     /**
-     * Get application context for OAuth 2.0 consent screen.
-     * @return Application context for OAuth 2.0 consent screen.
+     * Get application context for OAuth 2.1 consent screen.
+     * @return Application context for OAuth 2.1 consent screen.
      */
     public ApplicationContext getApplicationContext() {
         return applicationContext;
     }
 
     /**
-     * Set application context for OAuth 2.0 consent screen.
-     * @param applicationContext Application context for OAuth 2.0 consent screen.
+     * Set application context for OAuth 2.1 consent screen.
+     * @param applicationContext Application context for OAuth 2.1 consent screen.
      */
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;

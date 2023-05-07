@@ -64,10 +64,10 @@ Data Adapter handles following use cases:
 - verify OTP authorization code from SMS
 - authenticate user using user ID, password and OTP authorization code
 - verify a client TLS certificate
-- initialize OAuth 2.0 consent form
-- create OAuth 2.0 consent form
-- validate OAuth 2.0 consent form options
-- save OAuth 2.0 consent form options
+- initialize OAuth 2.1 consent form
+- create OAuth 2.1 consent form
+- validate OAuth 2.1 consent form options
+- save OAuth 2.1 consent form options
 - execute an anti-fraud system (AFS) action and react on response from AFS
 
 For more information see the [Web Flow customization project](https://github.com/wultra/powerauth-webflow-customization)
@@ -76,7 +76,7 @@ For more information see the [Web Flow customization project](https://github.com
 
 Third Party Provider (TPP) Engine implements following functionality:
 - third party provider registry
-- storage of OAuth 2.0 consents
+- storage of OAuth 2.1 consents
 
 TPP Engine is available as a separate application and its deployment is optional.
 

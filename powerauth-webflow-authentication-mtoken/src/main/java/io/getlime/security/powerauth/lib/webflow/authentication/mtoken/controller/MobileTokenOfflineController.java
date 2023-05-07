@@ -99,7 +99,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
 
     /**
      * Controller constructor.
-     * @param powerAuthClient PowerAuth 2.0 service client.
+     * @param powerAuthClient PowerAuth service client.
      * @param authMethodQueryService Authentication method query service.
      * @param webFlowServicesConfiguration Web Flow configuration.
      * @param pushMessageService Push message service.

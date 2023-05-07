@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Request for OAuth 2.0 consent.
+ * Request for OAuth 2.1 consent.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
