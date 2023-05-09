@@ -65,20 +65,18 @@ public class SecurityConfiguration {
                         .requestMatchers("/", "/home", "/css/**", "/js/**", "/images/**").permitAll()
                         .anyRequest().fullyAuthenticated()
                 )
-                .oauth2Login()
+                .oauth2Login(login -> login
+                    .loginProcessingUrl("/connect/demo")
                     .authorizedClientRepository(authorizedClientRepository)
                     .authorizedClientService(authorizedClientService)
                     .clientRegistrationRepository(clientRegistrationRepository)
                     .authorizationEndpoint()
-                    .authorizationRequestResolver(new CustomAuthorizationRequestResolver(this.clientRegistrationRepository))
-                .and()
-                    .loginProcessingUrl("/connect/demo")
-                .and()
-                    .logout()
+                    .authorizationRequestResolver(new CustomAuthorizationRequestResolver(this.clientRegistrationRepository)))
+               .logout(logout -> logout
                     .logoutUrl("/logout")
                     .logoutSuccessUrl("/")
                     .permitAll()
-                .and()
+                )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         // Error message is already shown in Web Flow
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/"))
