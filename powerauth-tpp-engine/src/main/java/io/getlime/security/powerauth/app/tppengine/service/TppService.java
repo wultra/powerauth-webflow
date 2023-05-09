@@ -26,20 +26,24 @@ import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.Unabl
 import io.getlime.security.powerauth.app.tppengine.model.entity.TppInfo;
 import io.getlime.security.powerauth.app.tppengine.model.request.CreateTppAppRequest;
 import io.getlime.security.powerauth.app.tppengine.model.response.TppAppDetailResponse;
-import io.getlime.security.powerauth.app.tppengine.repository.OAuthAccessTokenRepository;
-import io.getlime.security.powerauth.app.tppengine.repository.OAuthClientDetailsRepository;
 import io.getlime.security.powerauth.app.tppengine.repository.TppAppDetailRepository;
 import io.getlime.security.powerauth.app.tppengine.repository.TppRepository;
-import io.getlime.security.powerauth.app.tppengine.repository.model.entity.OAuthClientDetailsEntity;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppAppDetailEntity;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -55,16 +59,16 @@ public class TppService {
     private final TppRepository tppRepository;
     private final TppAppDetailRepository appDetailRepository;
     private final TppEngineConfiguration tppEngineConfiguration;
-    private final OAuthClientDetailsRepository clientDetailsRepository;
-    private final OAuthAccessTokenRepository accessTokenRepository;
+    private final RegisteredClientRepository registeredClientRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public TppService(TppRepository tppRepository, TppAppDetailRepository appDetailRepository, TppEngineConfiguration tppEngineConfiguration, OAuthClientDetailsRepository clientDetailsRepository, OAuthAccessTokenRepository accessTokenRepository) {
+    public TppService(TppRepository tppRepository, TppAppDetailRepository appDetailRepository, TppEngineConfiguration tppEngineConfiguration, RegisteredClientRepository registeredClientRepository, JdbcTemplate jdbcTemplate) {
         this.tppRepository = tppRepository;
         this.appDetailRepository = appDetailRepository;
         this.tppEngineConfiguration = tppEngineConfiguration;
-        this.clientDetailsRepository = clientDetailsRepository;
-        this.accessTokenRepository = accessTokenRepository;
+        this.registeredClientRepository = registeredClientRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     /**
@@ -79,9 +83,9 @@ public class TppService {
         final Optional<TppAppDetailEntity> tppAppEntityOptional = appDetailRepository.findByClientId(clientId);
         if (tppAppEntityOptional.isPresent()) {
             final TppAppDetailEntity tppAppDetailEntity = tppAppEntityOptional.get();
-            final Optional<OAuthClientDetailsEntity> clientDetailsRepositoryById = clientDetailsRepository.findById(clientId);
-            if (clientDetailsRepositoryById.isPresent()) {
-                return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, clientDetailsRepositoryById.get());
+            final RegisteredClient registeredClient = registeredClientRepository.findById(clientId);
+            if (registeredClient != null) {
+                return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, registeredClient);
             } else {
                 return TppAppConverter.fromTppAppEntity(tppAppDetailEntity);
             }
@@ -109,9 +113,9 @@ public class TppService {
             final TppAppDetailEntity tppAppDetailEntity = tppAppEntityOptional.get();
 
             if (Objects.equals(tppAppDetailEntity.getPrimaryKey().getTppId(), tppEntity.getTppId())) {
-                final Optional<OAuthClientDetailsEntity> clientDetailsRepositoryById = clientDetailsRepository.findById(clientId);
-                if (clientDetailsRepositoryById.isPresent()) {
-                    return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, clientDetailsRepositoryById.get());
+                final RegisteredClient registeredClient = registeredClientRepository.findById(clientId);
+                if (registeredClient != null) {
+                    return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, registeredClient);
                 } else {
                     return TppAppConverter.fromTppAppEntity(tppAppDetailEntity);
                 }
@@ -194,26 +198,30 @@ public class TppService {
         tppAppDetailEntity.setPrimaryKey(tppAppDetailKey);
 
         // Sanitize redirect URIs by Base64 decoding them
-        final String redirectUris = sanitizeRedirectUris(request.getRedirectUris());
+        final Set<String> redirectUris = sanitizeRedirectUris(request.getRedirectUris());
 
         // Sort scopes and make sure a scope is unique in the collection
-        final String scopes = sanitizeScopes(request.getScopes());
+        final Set<String> scopes = sanitizeScopes(request.getScopes());
 
         // Store the new OAuth 2.1 credentials in database
-        OAuthClientDetailsEntity oAuthClientDetailsEntity = new OAuthClientDetailsEntity();
-        oAuthClientDetailsEntity.setClientId(clientId);
-        oAuthClientDetailsEntity.setClientSecret(encodedClientSecret);
-        oAuthClientDetailsEntity.setAuthorizedGrantTypes("authorization_code,refresh_token");
-        oAuthClientDetailsEntity.setWebServerRedirectUri(redirectUris);
-        oAuthClientDetailsEntity.setScope(scopes);
-        oAuthClientDetailsEntity.setRefreshTokenValidity(tppEngineConfiguration.getDefaultRefreshTokenValidity().getSeconds());
-        oAuthClientDetailsEntity.setAccessTokenValidity(tppEngineConfiguration.getDefaultAccessTokenValidityInSeconds());
-        oAuthClientDetailsEntity.setAdditionalInformation("{}");
-        oAuthClientDetailsEntity.setAutoapprove("true");
-        clientDetailsRepository.save(oAuthClientDetailsEntity);
+        final RegisteredClient.Builder registeredClientBuilder = RegisteredClient.withId(UUID.randomUUID().toString());
+        registeredClientBuilder.clientId(clientId);
+        registeredClientBuilder.clientSecret(encodedClientSecret);
+        registeredClientBuilder.authorizationGrantTypes(authorizationGrantTypes -> {
+            authorizationGrantTypes.add(AuthorizationGrantType.AUTHORIZATION_CODE);
+            authorizationGrantTypes.add(AuthorizationGrantType.REFRESH_TOKEN);
+        });
+        registeredClientBuilder.redirectUris(r -> r.addAll(redirectUris));
+        registeredClientBuilder.scopes(s -> s.addAll(scopes));
+        registeredClientBuilder.tokenSettings(TokenSettings.builder()
+                        .refreshTokenTimeToLive(Duration.ofSeconds(tppEngineConfiguration.getDefaultRefreshTokenValidity().getSeconds()))
+                        .accessTokenTimeToLive(Duration.ofSeconds(tppEngineConfiguration.getDefaultAccessTokenValidityInSeconds()))
+                .build());
+        final RegisteredClient registeredClient = registeredClientBuilder.build();
+        registeredClientRepository.save(registeredClient);
         tppAppDetailEntity = appDetailRepository.save(tppAppDetailEntity);
 
-        return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, oAuthClientDetailsEntity, clientSecret);
+        return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, registeredClient, clientSecret);
 
     }
 
@@ -256,23 +264,24 @@ public class TppService {
             tppAppDetailEntity.setAppType(request.getAppType());
 
             // Sanitize redirect URIs by Base64 decoding them
-            final String redirectUris = sanitizeRedirectUris(request.getRedirectUris());
+            final Set<String> redirectUris = sanitizeRedirectUris(request.getRedirectUris());
 
             // Sort scopes and make sure a scope is unique in the collection
-            final String scopes = sanitizeScopes(request.getScopes());
+            final Set<String> scopes = sanitizeScopes(request.getScopes());
 
             // Store the new OAuth 2.1 credentials in database
-            Optional<OAuthClientDetailsEntity> oAuthClientDetailsEntityOptional = clientDetailsRepository.findById(clientId);
-            if (oAuthClientDetailsEntityOptional.isPresent()) {
-                final OAuthClientDetailsEntity oAuthClientDetailsEntity = oAuthClientDetailsEntityOptional.get();
-                oAuthClientDetailsEntity.setWebServerRedirectUri(redirectUris);
-                if (!scopes.equals(oAuthClientDetailsEntity.getScope())) {
-                    oAuthClientDetailsEntity.setScope(scopes);
-                    accessTokenRepository.deleteAllByClientId(clientId); // changing application scopes will immediately revoke access tokens
+            final RegisteredClient registeredClient = registeredClientRepository.findById(clientId);
+            if (registeredClient != null) {
+                final RegisteredClient registeredClientUpdated = RegisteredClient.from(registeredClient)
+                        .redirectUris(uris -> uris.addAll(redirectUris))
+                        .scopes(s -> s.addAll(scopes))
+                        .build();
+                if (!registeredClient.getScopes().equals(scopes)) {
+                    deleteAuthorizationsForClientId(clientId);
                 }
-                clientDetailsRepository.save(oAuthClientDetailsEntity);
+                registeredClientRepository.save(registeredClientUpdated);
                 tppAppDetailEntity = appDetailRepository.save(tppAppDetailEntity);
-                return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, oAuthClientDetailsEntity);
+                return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, registeredClientUpdated);
             } else {
                 throw new TppAppNotFoundException(clientId);
             }
@@ -305,16 +314,15 @@ public class TppService {
 
             // Generate app OAuth 2.1 credentials
             final String clientSecret = UUID.randomUUID().toString();
-            BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+            final BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
             final String encodedClientSecret = bcrypt.encode(clientSecret);
 
             // Store the new OAuth 2.1 credentials in database
-            Optional<OAuthClientDetailsEntity> oAuthClientDetailsEntityOptional = clientDetailsRepository.findById(clientId);
-            if (oAuthClientDetailsEntityOptional.isPresent()) {
-                final OAuthClientDetailsEntity oAuthClientDetailsEntity = oAuthClientDetailsEntityOptional.get();
-                oAuthClientDetailsEntity.setClientSecret(encodedClientSecret);
-                clientDetailsRepository.save(oAuthClientDetailsEntity);
-                return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, oAuthClientDetailsEntity, clientSecret);
+            final RegisteredClient registeredClient = registeredClientRepository.findById(clientId);
+            if (registeredClient != null) {
+                final RegisteredClient registeredClientUpdated = RegisteredClient.from(registeredClient).clientSecret(encodedClientSecret).build();
+                registeredClientRepository.save(registeredClientUpdated);
+                return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, registeredClientUpdated, clientSecret);
             } else {
                 throw new TppAppNotFoundException(clientId);
             }
@@ -346,12 +354,14 @@ public class TppService {
             }
 
             // Store the new OAuth 2.1 credentials in database
-            Optional<OAuthClientDetailsEntity> oAuthClientDetailsEntityOptional = clientDetailsRepository.findById(clientId);
-            if (oAuthClientDetailsEntityOptional.isPresent()) {
-                final OAuthClientDetailsEntity oAuthClientDetailsEntity = oAuthClientDetailsEntityOptional.get();
+            final RegisteredClient registeredClient = registeredClientRepository.findById(clientId);
+            if (registeredClient != null) {
                 appDetailRepository.delete(tppAppDetailEntity);
-                clientDetailsRepository.delete(oAuthClientDetailsEntity);
-                accessTokenRepository.deleteAllByClientId(clientId);
+                // Spring Authorization Server has no delete functionality, expire the client credentials instead
+                final RegisteredClient registeredClientUpdated = RegisteredClient.from(registeredClient).clientSecretExpiresAt(Instant.now()).build();
+                registeredClientRepository.save(registeredClientUpdated);
+                // Delete all existing tokens
+                deleteAuthorizationsForClientId(clientId);
             } else {
                 throw new TppAppNotFoundException(clientId);
             }
@@ -417,41 +427,49 @@ public class TppService {
     }
 
     /**
-     * Create a comma-separated string with unique values from an array, sorted.
+     * Create a set with unique values from an array, sorted.
      * @param source Original array.
-     * @return A comma-separated string with unique values from an array, sorted.
+     * @return A set with unique values from an array, sorted.
      */
-    private String sortAndUniqueCommaSeparated(String[] source) {
+    private TreeSet<String> uniqueCommaSeparated(String[] source) {
         TreeSet<String> set = new TreeSet<>();
         Collections.addAll(set, source);
-        return String.join(",", set);
+        return set;
     }
 
     /**
-     * Create a comma-separated string with unique sorted redirect URIs.
+     * Create a set with unique redirect URIs.
      * @param redirectUris Original redirect URIs.
-     * @return A comma separated string with unique sorted redirect URIs, or null if original array is null.
+     * @return A set with unique redirect URIs, or emtpy if original array is null.
      */
-    private String sanitizeRedirectUris(String[] redirectUris) {
+    private Set<String> sanitizeRedirectUris(String[] redirectUris) {
+        final Set<String> redirectUriSet = new HashSet<>();
         if (redirectUris != null) {
-            String[] sanitizedUris = new String[redirectUris.length];
-            for (int i = 0; i < redirectUris.length; i++) {
+            for (String uris : redirectUris) {
                 // comma is not allowed, we cannot encode the data in DB due to Spring OAuth support
-                sanitizedUris[i] = redirectUris[i].replace(",", "%2C");
+                redirectUriSet.add(uris.replace(",", "%2C"));
             }
-            // Make sure that redirect URIs are unique
-            return sortAndUniqueCommaSeparated(sanitizedUris);
         }
-        return null;
+        return redirectUriSet;
     }
 
     /**
-     * Create a comma-separated string with unique sorted scopes.
+     * Create a set with unique sorted scopes.
      * @param scopes Original scopes.
-     * @return A comma-separated string with unique sorted scopes, or null if original array is null.
+     * @return A set with unique sorted scopes, or null if original array is null.
      */
-    private String sanitizeScopes(String[] scopes) {
-        return sortAndUniqueCommaSeparated(scopes);
+    private Set<String> sanitizeScopes(String[] scopes) {
+        return uniqueCommaSeparated(scopes);
+    }
+
+    /**
+     * Delete authorization records for a client.
+     * @param clientId Client identifier.
+     */
+    private void deleteAuthorizationsForClientId(String clientId) {
+        jdbcTemplate.query("DELETE FROM oauth2_authorization WHERE registered_client_id=?",
+                preparedStatement -> preparedStatement.setString(1, clientId),
+                rs -> null);
     }
 
 }
