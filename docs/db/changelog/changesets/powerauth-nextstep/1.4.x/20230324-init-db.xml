@@ -781,10 +781,10 @@
                 <constraints nullable="false" />
             </column>
             <column name="operation_form_data" type="text" remarks="Structured data of the operation that are displayed to the end user." />
-            <column name="application_id" type="varchar(256)" remarks="ID of the application that initiated the operation, usually OAuth 2.1 client ID." />
+            <column name="application_id" type="varchar(256)" remarks="ID of the application that initiated the operation, usually OAuth 2.0 client ID." />
             <column name="application_name" type="varchar(256)" remarks="Displayable name of the application that initiated the operation." />
             <column name="application_description" type="varchar(256)" remarks="Displayable description of the application that initiated the operation." />
-            <column name="application_original_scopes" type="varchar(256)" remarks="Original OAuth 2.1 scopes used by the application that initiated the operation." />
+            <column name="application_original_scopes" type="varchar(256)" remarks="Original OAuth 2.0 scopes used by the application that initiated the operation." />
             <column name="application_extras" type="text" remarks="Any additional information related to the application that initiated the operation." />
             <column name="user_id" type="varchar(256)" remarks="Associated user ID." />
             <column name="organization_id" type="varchar(256)" remarks="Associated organization ID.">

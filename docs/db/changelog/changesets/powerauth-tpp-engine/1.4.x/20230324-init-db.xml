@@ -70,7 +70,7 @@
             <column name="user_id" type="varchar(256)" remarks="User ID.">
                 <constraints nullable="false" />
             </column>
-            <column name="client_id" type="varchar(256)" remarks="OAuth 2.1 client ID.">
+            <column name="client_id" type="varchar(256)" remarks="OAuth 2.0 client ID.">
                 <constraints nullable="false" />
             </column>
             <column name="consent_id" type="varchar(64)" remarks="Consent ID.">
@@ -154,17 +154,17 @@
         </preConditions>
         <comment>Create a new table oauth_client_details</comment>
         <createTable tableName="oauth_client_details" remarks="Table oauth_client_details stores details about OAuth2 client applications. Every Web Flow client application should have a record in this table.">
-            <column name="client_id" type="varchar(256)" remarks="OAuth 2.1 protocol client ID.">
+            <column name="client_id" type="varchar(256)" remarks="OAuth 2.0 protocol client ID.">
                 <constraints primaryKey="true" />
             </column>
-            <column name="resource_ids" type="varchar(256)" remarks="Identifiers of the OAuth 2.1 resource servers." />
-            <column name="client_secret" type="varchar(256)" remarks="OAuth 2.1 protocol client secret." />
-            <column name="scope" type="varchar(256)" remarks="OAuth 2.1 scopes, comma-separated values." />
-            <column name="authorized_grant_types" type="varchar(256)" remarks="OAuth 2.1 authorization grant types, comma-separated values." />
-            <column name="web_server_redirect_uri" type="varchar(256)" remarks="OAuth 2.1 redirect URIs, comma-separated values." />
-            <column name="authorities" type="varchar(256)" remarks="OAuth 2.1 resource grant authorities." />
-            <column name="access_token_validity" type="integer" remarks="Validity of the OAuth 2.1 access tokens, in seconds." />
-            <column name="refresh_token_validity" type="integer" remarks="Validity of the OAuth 2.1 refresh tokens, in seconds." />
+            <column name="resource_ids" type="varchar(256)" remarks="Identifiers of the OAuth 2.0 resource servers." />
+            <column name="client_secret" type="varchar(256)" remarks="OAuth 2.0 protocol client secret." />
+            <column name="scope" type="varchar(256)" remarks="OAuth 2.0 scopes, comma-separated values." />
+            <column name="authorized_grant_types" type="varchar(256)" remarks="OAuth 2.0 authorization grant types, comma-separated values." />
+            <column name="web_server_redirect_uri" type="varchar(256)" remarks="OAuth 2.0 redirect URIs, comma-separated values." />
+            <column name="authorities" type="varchar(256)" remarks="OAuth 2.0 resource grant authorities." />
+            <column name="access_token_validity" type="integer" remarks="Validity of the OAuth 2.0 access tokens, in seconds." />
+            <column name="refresh_token_validity" type="integer" remarks="Validity of the OAuth 2.0 refresh tokens, in seconds." />
             <column name="additional_information" type="varchar(4000)" remarks="Field reserved for additional information about the client." />
             <column name="autoapprove" type="varchar(256)" remarks="Flag indicating if scopes should be automatically approved." />
         </createTable>
@@ -181,7 +181,7 @@
             <column name="tpp_id" type="integer" remarks="TPP ID.">
                 <constraints primaryKey="true" foreignKeyName="tpp_detail_fk" referencedTableName="tpp_detail" referencedColumnNames="tpp_id" />
             </column>
-            <column name="app_client_id" type="varchar(256)" remarks="TPP app ID, represented as OAuth 2.1 client ID and connecting the application to OAuth 2.1 credentials.">
+            <column name="app_client_id" type="varchar(256)" remarks="TPP app ID, represented as OAuth 2.0 client ID and connecting the application to OAuth 2.0 credentials.">
                 <constraints primaryKey="true" foreignKeyName="tpp_client_secret_fk" referencedTableName="oauth_client_details" referencedColumnNames="client_id" />
             </column>
             <column name="app_name" type="varchar(256)" remarks="TPP app name.">
@@ -207,7 +207,7 @@
             <column name="token_id" type="varchar(256)" remarks="Token ID." />
             <column name="token" type="${blob_type}" remarks="Token value." />
             <column name="user_name" type="varchar(256)" remarks="Username, identification of the user." />
-            <column name="client_id" type="varchar(256)" remarks="OAuth 2.1 Client ID." />
+            <column name="client_id" type="varchar(256)" remarks="OAuth 2.0 Client ID." />
         </createTable>
     </changeSet>
 
@@ -226,7 +226,7 @@
             <column name="token_id" type="varchar(256)" remarks="Token ID." />
             <column name="token" type="${blob_type}" remarks="Token value." />
             <column name="user_name" type="varchar(256)" remarks="Username, identification of the user." />
-            <column name="client_id" type="varchar(256)" remarks="OAuth 2.1 Client ID." />
+            <column name="client_id" type="varchar(256)" remarks="OAuth 2.0 Client ID." />
             <column name="authentication" type="${blob_type}" remarks="Encoded authentication details." />
             <column name="refresh_token" type="varchar(256)" remarks="Refresh token ID." />
         </createTable>
@@ -256,7 +256,7 @@
         </preConditions>
         <comment>Create a new table oauth_code</comment>
         <createTable tableName="oauth_code" remarks="Table oauth_code stores data for the OAuth2 authorization code grant.">
-            <column name="code" type="varchar(256)" remarks="OAuth 2.1 protocol 'codes'." />
+            <column name="code" type="varchar(256)" remarks="OAuth 2.0 protocol 'codes'." />
             <column name="authentication" type="${blob_type}" remarks="Encoded authentication details." />
         </createTable>
     </changeSet>
