@@ -4,7 +4,23 @@ This guide contains instructions for migration from PowerAuth WebFlow version `1
 
 ## Migration to Spring Boot 3
 
-Web Flow has been migrated to Spring Authorization Server. The OAuth version has been updated from 2.0 to version 2.1.
+### Required Java Version
+
+Web Flow requires Java 17 or higher due to migration to Spring Boot 3. Support for older Java versions is not available.
+
+### Spring OAuth2 Migration
+
+Due to migration to Spring Boot 3, following dependency changes have been introduced:
+
+- Web Flow has been migrated to [Spring Authorization Server](https://github.com/spring-projects/spring-authorization-server).
+- Web Flow user profile endpoint now uses [Spring Security OAuth2 Resource Server](https://github.com/spring-projects/spring-security/tree/main/oauth2/oauth2-resource-server).  
+- The sample Web Flow client now uses [Spring Security OAuth2 Client](https://github.com/spring-projects/spring-security/tree/main/oauth2/oauth2-client).
+
+Due to these changes, the OAuth version has been updated from 2.0 to version 2.1, with several limitations due to compatibility with OAuth 2.0:
+
+- PXCE is not enforced to allow existing OAuth 2.0 clients to use new version of Web Flow.
+- Default refresh token time to live remains 1 year. It is expected that Web Flow is used in backend-to-backend scenarios, and OAuth dance is not triggered directly from frontend applications, thus refresh token rotation is not enforced.
+- The format of generated tokens remains opaque due to lower probability of information leakage which can be a problem with JWT tokens which may contain private data.
 
 ### Change of OAuth 2.x Endpoints
 
@@ -174,7 +190,7 @@ Due to migration to Spring Authorization Server, the OAuth clients need to be re
 Sample configuration:
 
 ```sql
-INSERT INTO oauth2_registered_client (id, client_id, client_id_issued_at, client_secret, client_secret_expires_at, client_name, client_authentication_methods, authorization_grant_types, redirect_uris, post_logout_redirect_uris, scopes, client_settings, token_settings) VALUES ('8cb2cedf-0152-47c4-b25e-0ee81b1acd44', 'democlient', '2023-04-28 11:44:29.000000', '$2a$12$MkYsT5igDXSDgRwyDVz1B.93h8F81E4GZJd/spy/1vhjM4CJgeed.', null, 'democlient', 'client_secret_basic', 'authorization_code,refresh_token', 'http://localhost:8080/powerauth-webflow-client/connect/demo', null, 'profile,aisp,pisp', '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false}', '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":true,"settings.token.id-token-signature-algorithm":["org.springframework.security.oauth2.jose.jws.SignatureAlgorithm","RS256"],"settings.token.access-token-time-to-live":["java.time.Duration",300.000000000],"settings.token.access-token-format":{"@class":"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat","value":"reference"},"settings.token.refresh-token-time-to-live":["java.time.Duration",1296000.000000000],"settings.token.authorization-code-time-to-live":["java.time.Duration",300.000000000]}}');
+INSERT INTO oauth2_registered_client (id, client_id, client_id_issued_at, client_secret, client_secret_expires_at, client_name, client_authentication_methods, authorization_grant_types, redirect_uris, post_logout_redirect_uris, scopes, client_settings, token_settings) VALUES ('8cb2cedf-0152-47c4-b25e-0ee81b1acd44', 'democlient', '2023-04-28 11:44:29.000000', '$2a$12$MkYsT5igDXSDgRwyDVz1B.93h8F81E4GZJd/spy/1vhjM4CJgeed.', null, 'democlient', 'client_secret_basic', 'authorization_code,refresh_token', 'http://localhost:8080/powerauth-webflow-client/connect/demo', null, 'profile,aisp,pisp', '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false}', '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":true,"settings.token.id-token-signature-algorithm":["org.springframework.security.oauth2.jose.jws.SignatureAlgorithm","RS256"],"settings.token.access-token-time-to-live":["java.time.Duration",300],"settings.token.access-token-format":{"@class":"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat","value":"reference"},"settings.token.refresh-token-time-to-live":["java.time.Duration",1296000],"settings.token.authorization-code-time-to-live":["java.time.Duration",300]}}');
 ```
 
 See Spring OAuth 2.1 client registration documentation for more details: https://docs.spring.io/spring-security/reference/servlet/oauth2/client/core.html#oauth2Client-client-registration
