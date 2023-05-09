@@ -181,13 +181,11 @@ CREATE TABLE oauth2_authorization_consent (
 );
 ```
 
-### Drop MySQL Support
-
-Since version `1.5.0`, MySQL database is not supported anymore.
-
 ### Migration of OAuth 2.x Clients
 
 Due to migration to Spring Authorization Server, the OAuth clients need to be reconfigured.
+
+The OAuth 2.1 client registration corresponds to existing records in table `oauth_client_details`. You can update the configuration below with any neccessary customization.
 
 Sample configuration:
 
@@ -202,6 +200,7 @@ The following parameters should be configured:
 - `client_id` - identifier of the client
 - `client_id_issued_at` - timestamp of client issuance 
 - `client_secret` - client password hashed using bcrypt
+- `client_name` - name of the client
 - `redirect_uris` - registered redirect URIs for redirect to original application
 - `scope` - supported OAuth 2.1 scopes
 - `settings.token.access-token-time-to-live` - access token time to live
@@ -221,4 +220,8 @@ DROP TABLE oauth_access_token;
 DROP TABLE oauth_client_token;
 DROP TABLE oauth_client_details;
 ```
+
+### Dropped MySQL Support
+
+Since version `1.5.0`, MySQL database is not supported anymore.
 
