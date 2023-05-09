@@ -369,7 +369,7 @@ public class HomeController {
 
         model.put("title", webFlowConfig.getPageTitle());
         model.put("stylesheet", webFlowConfig.getCustomStyleSheetUrl());
-        return "oauth/error";
+        return "oauth2/error";
     }
 
     /**
