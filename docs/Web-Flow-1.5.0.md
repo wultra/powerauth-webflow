@@ -33,6 +33,8 @@ Due to migration to Spring Authorization Server, the OAuth endpoints URIs have b
 
 The user info endpoints URIs did not change.
 
+There is a change in behaviour of revocation endpoint. Previously, the revocation endpoint revoked all access tokens as well as refresh token for a revoked access token. Currently, only the requested access token is revoked. In case you want to revoke all access tokens and refresh tokens, use the refresh token as the parameter during the revocation. 
+
 ## Database Changes
 
 ### Migration to Spring Authorization Server
