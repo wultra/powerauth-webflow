@@ -36,8 +36,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -207,12 +209,15 @@ public class TppService {
         final RegisteredClient.Builder registeredClientBuilder = RegisteredClient.withId(UUID.randomUUID().toString());
         registeredClientBuilder.clientId(clientId);
         registeredClientBuilder.clientSecret(encodedClientSecret);
+        registeredClientBuilder.clientName(clientId);
+        registeredClientBuilder.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
         registeredClientBuilder.authorizationGrantTypes(authorizationGrantTypes -> {
             authorizationGrantTypes.add(AuthorizationGrantType.AUTHORIZATION_CODE);
             authorizationGrantTypes.add(AuthorizationGrantType.REFRESH_TOKEN);
         });
         registeredClientBuilder.redirectUris(r -> r.addAll(redirectUris));
         registeredClientBuilder.scopes(s -> s.addAll(scopes));
+        registeredClientBuilder.clientSettings(ClientSettings.builder().build());
         registeredClientBuilder.tokenSettings(TokenSettings.builder()
                         .refreshTokenTimeToLive(Duration.ofSeconds(tppEngineConfiguration.getDefaultRefreshTokenValidity().getSeconds()))
                         .accessTokenTimeToLive(Duration.ofSeconds(tppEngineConfiguration.getDefaultAccessTokenValidityInSeconds()))
