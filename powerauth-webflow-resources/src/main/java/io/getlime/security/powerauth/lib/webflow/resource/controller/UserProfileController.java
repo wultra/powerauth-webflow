@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -111,6 +110,7 @@ public class UserProfileController {
             }
             userResponse.getConnection().setOrganizationId(organizationId);
         } catch (DataAdapterClientErrorException e) {
+            logger.warn(e.getMessage(), e);
             return anonymousUser();
         }
         // Save service information
@@ -151,7 +151,8 @@ public class UserProfileController {
             logger.info("Found user with ID: {}, given name: {}, family name: {}", usedId, givenName, familyName);
             return new UserInfoResponse(id, id, givenName, familyName, extras);
         } catch (DataAdapterClientErrorException e) {
-            throw new OAuth2AuthenticationException("Unable to fetch user details from data adapter");
+            logger.warn(e.getMessage(), e);
+            return anonymousUserDetail();
         }
     }
 
@@ -167,6 +168,19 @@ public class UserProfileController {
         userResponse.getConnection().setLanguage("en");
         userResponse.getConnection().setSca(false);
         userResponse.getConnection().setOrganizationId(null);
+        return userResponse;
+    }
+
+    /**
+     * Create dummy user detail for case when user does not exist or user account is not active.
+     * @return Dummy user detail response.
+     */
+    private UserInfoResponse anonymousUserDetail() {
+        UserInfoResponse userResponse = new UserInfoResponse();
+        userResponse.setId(ANONYMOUS_USER);
+        userResponse.setSub(ANONYMOUS_USER);
+        userResponse.setGivenName(null);
+        userResponse.setFamilyName(null);
         return userResponse;
     }
 
