@@ -18,7 +18,6 @@
 package io.getlime.security.powerauth.app.nextstep.configuration;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.wultra.core.rest.client.base.RestClientConfiguration;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
@@ -33,18 +32,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class NextStepClientFactory {
 
-    private final ObjectMapper objectMapper;
-
-    /**
-     * Next Step client factory constructor.
-     * @param objectMapper Object mapper.
-     */
-    public NextStepClientFactory(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
-
     /**
      * Create Next Step client.
      * @param baseUrl Base URL.
@@ -52,9 +39,13 @@ public class NextStepClientFactory {
      * @throws NextStepClientException Thrown in case Next Step client could not be initialized.
      */
     public NextStepClient createNextStepClient(String baseUrl) throws NextStepClientException {
+        final RestClientConfiguration.JacksonConfiguration jacksonConfiguration = new RestClientConfiguration.JacksonConfiguration();
+        jacksonConfiguration.getSerialization().put(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        jacksonConfiguration.getDeserialization().put(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         RestClientConfiguration restClientConfiguration = new RestClientConfiguration();
         restClientConfiguration.setBaseUrl(baseUrl);
-        restClientConfiguration.setObjectMapper(objectMapper);
+        restClientConfiguration.setJacksonConfiguration(jacksonConfiguration);
         return new NextStepClient(restClientConfiguration);
     }
 }
