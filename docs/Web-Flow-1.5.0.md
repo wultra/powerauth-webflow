@@ -185,7 +185,7 @@ CREATE TABLE oauth2_authorization_consent (
 
 Due to migration to Spring Authorization Server, the OAuth clients need to be reconfigured.
 
-The OAuth 2.1 client registration corresponds to existing records in table `oauth_client_details`. You can update the configuration below with any neccessary customization.
+The OAuth 2.1 client registration corresponds to existing records in table `oauth_client_details`. You can update the configuration below with any necessary customization.
 
 Sample configuration:
 
@@ -208,6 +208,14 @@ The following parameters should be configured:
 - `settings.token.authorization-code-time-to-live` - authorization code time to live
 
 The remaining parameters should not be changed, because they correspond to the Spring Authorization Server integration.
+
+You can use the following SQL query for automating client migration:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+INSERT INTO oauth2_registered_client (id, client_id, client_id_issued_at, client_secret, client_secret_expires_at, client_name, client_authentication_methods, authorization_grant_types, redirect_uris, post_logout_redirect_uris, scopes, client_settings, token_settings) 
+SELECT uuid_generate_v4(), client_id, now(), client_secret, null, client_id, 'client_secret_basic', authorized_grant_types, web_server_redirect_uri, null, scope, '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false}', '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":true,"settings.token.id-token-signature-algorithm":["org.springframework.security.oauth2.jose.jws.SignatureAlgorithm","RS256"],"settings.token.access-token-time-to-live":["java.time.Duration",300],"settings.token.access-token-format":{"@class":"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat","value":"reference"},"settings.token.refresh-token-time-to-live":["java.time.Duration",1296000],"settings.token.authorization-code-time-to-live":["java.time.Duration",300]}}' FROM oauth_client_details;
+```
 
 ### Dropped Tables
 
