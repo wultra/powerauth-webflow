@@ -22,15 +22,11 @@ Web Flow can coexist with PowerAuth in the same database schema, or it can use a
 
 ### Database Tables for the OAuth 2.1 protocol
 
-- **oauth_client_details** - the table stores details about OAuth2 client applications. Every Web Flow client application should have a record in this table. See [JdbcClientDetailsService.java](https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/JdbcClientDetailsService.java).
+- **oauth2_authorization** - the table stores OAuth 2.1 authorization codes, access tokens and refresh tokens
 
-- **oauth_client_token** - the table stores OAuth2 tokens for retrieval by client applications. See [JdbcClientTokenServices.java](https://docs.spring.io/spring-security/oauth/apidocs/org/springframework/security/oauth2/client/token/JdbcClientTokenServices.html).
+- **oauth2_registered_client** - the table stores OAuth 2.1 client registrations
 
-- **oauth_access_token** - the table stores OAuth2 access tokens. See [JdbcTokenStore.java](https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java).
-
-- **oauth_refresh_token** - the table stores OAuth2 refresh tokens. See [JdbcTokenStore.java](https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java).
-
-- **oauth_code** - the table stores data for the OAuth2 authorization code grant. See [JdbcAuthorizationCodeServices.java](https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/code/JdbcAuthorizationCodeServices.java).
+- **oauth2_authorization_consent** - the table stores OAuth 2.1 consents (only added for compatibility with Spring Authorization Server)
 
 ### Database Tables for the Next Step Server
 
