@@ -1,8 +1,8 @@
 # PowerAuth Web Flow
 
-PowerAuth Web Flow is a federated authentication and authorization server for web application. It allows user authentication and operation authorization using OAuth 2.1 protocol, and it supports multiple authentication methods, such as username / password combination, PowerAuth data signature or SMS OTP.
+PowerAuth Web Flow is an authentication and authorization server for web applications. It allows user authentication and operation authorization using OAuth 2.1 protocol, and it supports multiple authentication methods, such as username / password verification, PowerAuth data signature verification (both online and offline), and OTP code verification. Web Flow supports multi-factor authentication and enforces Strong Customer Authentication (SCA) when required by the use case, e.g. in case of protection of PSD2 APIs.
 
-Typical use-case for the software stack is securing the RESTful API interfaces, or authentication / authorization for internet banking via central authentication / authorization component.
+The typical use-case for the software stack is securing RESTful API interfaces, or authentication / authorization for internet banking via a central authentication / authorization component.
 
 ## Documentation
 
