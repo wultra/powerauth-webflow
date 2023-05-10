@@ -43,49 +43,55 @@ public class WebFlowServiceConfiguration {
     /**
      * OAuth 2.1 client registration ID.
      */
-    @Value("${powerauth.webflow.service.oauth2.registrationId}")
+    @Value("${powerauth.webflow.service.oauth2.client.registrationId}")
     private String registrationId;
 
     /**
      * OAuth 2.1 client ID.
      */
-    @Value("${powerauth.webflow.service.oauth2.clientId}")
+    @Value("${powerauth.webflow.service.oauth2.client.id}")
     private String clientId;
 
     /**
      * OAuth 2.1 client secret.
      */
-    @Value("${powerauth.webflow.service.oauth2.clientSecret}")
+    @Value("${powerauth.webflow.service.oauth2.client.secret}")
     private String clientSecret;
+
+    /**
+     * OAuth 2.1 client name.
+     */
+    @Value("${powerauth.webflow.service.oauth2.client.name}")
+    private String clientName;
 
     /**
      * OAuth 2.1 authorization URI.
      */
-    @Value("${powerauth.webflow.service.oauth2.authorizationUri}")
+    @Value("${powerauth.webflow.service.oauth2.client.authorizationUri}")
     private String authorizationUri;
 
     /**
      * OAuth 2.1 token URI.
      */
-    @Value("${powerauth.webflow.service.oauth2.tokenUri}")
+    @Value("${powerauth.webflow.service.oauth2.client.tokenUri}")
     private String tokenUri;
 
     /**
      * OAuth 2.1 user info URI.
      */
-    @Value("${powerauth.webflow.service.oauth2.userInfoUri}")
+    @Value("${powerauth.webflow.service.oauth2.client.userInfoUri}")
     private String userInfoUri;
 
     /**
      * OAuth 2.1 redirect URI.
      */
-    @Value("${powerauth.webflow.service.oauth2.redirectUri}")
+    @Value("${powerauth.webflow.service.oauth2.client.redirectUri}")
     private String redirectUri;
 
     /**
      * OAuth 2.1 username attribute name for user info response.
      */
-    @Value("${powerauth.webflow.service.oauth2.userNameAttributeName}")
+    @Value("${powerauth.webflow.service.oauth2.client.userNameAttributeName}")
     private String userNameAttributeName;
 
     /**
@@ -164,6 +170,14 @@ public class WebFlowServiceConfiguration {
      */
     public String getClientSecret() {
         return clientSecret;
+    }
+
+    /**
+     * Get OAuth 2.1 client name.
+     * @return OAuth 2.1 client name.
+     */
+    public String getClientName() {
+        return clientName;
     }
 
     /**

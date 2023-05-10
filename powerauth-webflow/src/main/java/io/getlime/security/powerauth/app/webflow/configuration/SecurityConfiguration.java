@@ -62,13 +62,13 @@ public class SecurityConfiguration {
     @Value("${powerauth.webflow.security.cors.allowOrigin:*}")
     private String corsAllowOrigin;
 
-    @Value("${powerauth.webflow.oauth2.resource-server.introspection-uri}")
+    @Value("${powerauth.webflow.service.oauth2.introspection.uri}")
     private String introspectionUri;
 
-    @Value("${powerauth.webflow.oauth2.resource-server.introspection-client-id}")
+    @Value("${powerauth.webflow.service.oauth2.introspection.clientId}")
     private String clientId;
 
-    @Value("${powerauth.webflow.oauth2.resource-server.introspection-client-secret}")
+    @Value("${powerauth.webflow.service.oauth2.introspection.clientSecret}")
     private String clientSecret;
 
     private final SecurityContextRepository securityContextRepository;

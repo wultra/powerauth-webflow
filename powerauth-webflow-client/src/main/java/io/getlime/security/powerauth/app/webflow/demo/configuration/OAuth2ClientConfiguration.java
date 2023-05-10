@@ -59,6 +59,7 @@ public class OAuth2ClientConfiguration {
                 .withRegistrationId(webFlowConfig.getRegistrationId())
                 .clientId(webFlowConfig.getClientId())
                 .clientSecret(webFlowConfig.getClientSecret())
+                .clientName(webFlowConfig.getClientName())
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationUri(webFlowConfig.getAuthorizationUri())
