@@ -185,7 +185,7 @@ CREATE TABLE oauth2_authorization_consent (
 
 Due to migration to Spring Authorization Server, the OAuth clients need to be reconfigured.
 
-The OAuth 2.1 client registration corresponds to existing records in table `oauth_client_details`. You can update the configuration below with any necessary customization.
+The OAuth 2.1 client registration corresponds to existing records in table `oauth_client_details`. You can update the configuration based on the sample configuration below with any required customization.
 
 Sample configuration:
 
