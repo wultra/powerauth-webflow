@@ -251,13 +251,13 @@ public class HomeController {
     @RequestMapping(value = "/authenticate/cancel", method = RequestMethod.GET)
     public String cancelAuthentication(HttpServletRequest request, HttpServletResponse response) {
         logger.info("Received /authenticate/cancel request");
-        HttpSessionRequestCache cache = new HttpSessionRequestCache();
-        SavedRequest savedRequest = cache.getRequest(request, response);
+        final HttpSessionRequestCache cache = new HttpSessionRequestCache();
+        final SavedRequest savedRequest = cache.getRequest(request, response);
         if (savedRequest == null) {
             logger.error("HTTP request not found in HttpSessionRequestCache");
             return "redirect:/oauth2/error";
         }
-        String[] redirectUriParameter = savedRequest.getParameterMap().get("redirect_uri");
+        final String[] redirectUriParameter = savedRequest.getParameterMap().get("redirect_uri");
         if (redirectUriParameter == null) {
             logger.error("Parameter redirect_uri is missing");
             return "redirect:/oauth2/error";
@@ -266,10 +266,10 @@ public class HomeController {
             logger.error("Multiple redirect_uri request parameters found");
             return "redirect:/oauth2/error";
         }
-        String redirectUri = redirectUriParameter[0];
+        final String redirectUri = redirectUriParameter[0];
 
         // Verify client_id against oauth_client_details database table
-        String[] clientIdParameter = savedRequest.getParameterMap().get("client_id");
+        final String[] clientIdParameter = savedRequest.getParameterMap().get("client_id");
         if (clientIdParameter == null) {
             logger.error("Parameter client_id is missing");
             return "redirect:/oauth2/error";
@@ -279,14 +279,14 @@ public class HomeController {
             return "redirect:/oauth2/error";
         }
 
-        String clientId = clientIdParameter[0];
+        final String clientId = clientIdParameter[0];
 
         final RegisteredClient registeredClient = registeredClientRepository.findByClientId(clientId);
         if (registeredClient == null) {
             logger.error("Registered client not found for client_id: {}", clientId);
             return "redirect:/oauth2/error";
         }
-        Set<String> registeredRedirectUris = registeredClient.getRedirectUris();
+        final Set<String> registeredRedirectUris = registeredClient.getRedirectUris();
         // Verify that redirect URI is registered for provided client ID
         if (!registeredRedirectUris.contains(redirectUri)) {
             logger.error("Redirect URI '{}' is not registered for client_id: {}", redirectUri, clientId);
@@ -294,7 +294,7 @@ public class HomeController {
         }
 
         // Verify response type, only 'code' is supported
-        String[] responseTypeParameter = savedRequest.getParameterMap().get("response_type");
+        final String[] responseTypeParameter = savedRequest.getParameterMap().get("response_type");
         if (responseTypeParameter == null) {
             logger.error("Parameter response_type is missing");
             return "redirect:/oauth2/error";
@@ -304,14 +304,14 @@ public class HomeController {
             return "redirect:/oauth2/error";
         }
 
-        String responseType = responseTypeParameter[0];
+        final String responseType = responseTypeParameter[0];
         if (!"code".equals(responseType)) {
             logger.error("Invalid response type: {}", responseType);
             return "redirect:/oauth2/error";
         }
 
         // Extract optional state parameter from original request
-        String[] stateParameter = savedRequest.getParameterMap().get("state");
+        final String[] stateParameter = savedRequest.getParameterMap().get("state");
         String state = null;
         if (stateParameter == null || stateParameter.length > 1) {
             logger.error("Multiple state request parameters found");
@@ -332,7 +332,7 @@ public class HomeController {
             }
         }
 
-        String clearContext = request.getParameter("clearContext");
+        final String clearContext = request.getParameter("clearContext");
         if (!"false".equals(clearContext)) {
             // Clear security context and invalidate session unless it is suppressed due to a new operation
             authenticationManagementService.clearContext();
@@ -341,7 +341,7 @@ public class HomeController {
         // Make sure HTTP session is cleaned when authentication is canceled
         cleanHttpSession();
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(redirectUri)
+        final UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("error", "access_denied")
                 .queryParam("error_description", "User%20canceled%20authentication%20request");
         if (state != null) {
