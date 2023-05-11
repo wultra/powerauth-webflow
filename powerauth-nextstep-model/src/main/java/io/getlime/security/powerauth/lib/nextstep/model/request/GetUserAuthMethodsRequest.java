@@ -17,9 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-
-import javax.validation.constraints.Size;
 
 /**
  * Request object used for querying authentication methods per user.

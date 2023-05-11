@@ -66,7 +66,7 @@ but this has not generally been true for Internet transactions across the EU pri
 
 ### Operation
 
-A new operation is created in the Next Step application with every authentication process in Web Flow. The operation is mapped 1:1 to the OAuth 2.0 dance.
+A new operation is created in the Next Step application with every authentication process in Web Flow. The operation is mapped 1:1 to the OAuth 2.1 dance.
 
 There are two possible outcomes of an operation:
 - **Operation succeeds** - the HTTP session becomes authenticated and the user is redirected to the original application with a successful result
@@ -270,9 +270,9 @@ The effective number of remaining attempts is the lower of the two above mention
 ### HTTP session
 
 The HTTP session is used in Web Flow in following ways:
-- A client may create an operation with operation data before the OAuth 2.0 authentication is started and store assigned operationId in HTTP session in the `operationId` attribute. This attribute is picked when authentication is started and Web Flow continues an already existing operation. In case the `operationId` attribute is not found, Web Flow creates a new login operation with default operation data.
-- During the authentication process, the `PENDING_AUTH_OBJECT` attribute stored in HTTP session is updated with OAuth 2.0 `UserOperationAuthentication` token which contains the most current state of authentication.
-- When the authentication process is successfully completed, the HTTP session becomes authenticated with the OAuth 2.0 `UserOperationAuthentication` token.
+- A client may create an operation with operation data before the OAuth 2.1 authentication is started and store assigned operationId in HTTP session in the `operationId` attribute. This attribute is picked when authentication is started and Web Flow continues an already existing operation. In case the `operationId` attribute is not found, Web Flow creates a new login operation with default operation data.
+- During the authentication process, the `PENDING_AUTH_OBJECT` attribute stored in HTTP session is updated with OAuth 2.1 `UserOperationAuthentication` token which contains the most current state of authentication.
+- When the authentication process is successfully completed, the HTTP session becomes authenticated with the OAuth 2.1 `UserOperationAuthentication` token.
 - When the authentication process fails, the `PENDING_AUTH_OBJECT` attribute is removed from HTTP session. The HTTP session does not become authenticated.
 
 The HTTP session is also used for storing temporary data during operation.

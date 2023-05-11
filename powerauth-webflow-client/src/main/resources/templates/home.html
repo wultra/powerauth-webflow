@@ -38,7 +38,7 @@
             <p>
                 <img class="logo" src="./images/logo.png" alt="logo"/>
             </p>
-            <div th:each="providerId : ${providerIds}" class="operations">
+            <div class="operations">
                 <table class="operations-table">
                     <tr>
                         <td>
@@ -53,11 +53,11 @@
                                 <div th:each="opConfig : ${availableOperations}" th:classappend="${opConfig.isDefault()} ? 'active' : ''" role="tabpanel" class="tab-pane" th:id="${opConfig.getType().name()}">
                                     <div th:if="${opConfig.getType().name() == 'LOGIN'}" class="padding text-left">
 
-                                        <div th:if="${#lists.isEmpty(connectionMap[__${providerId}__])}">
+                                        <div th:if="${!authenticated}">
                                             <p>
                                                 Select the third party connection type:
                                             </p>
-                                            <form th:action="@{/connect/demo}" method="POST">
+                                            <form th:action="@{/oauth2/authorization/democlient}" method="POST">
                                                 <p>
                                                     <label class="radio"><input id="scope_aisp" type="radio" name="scope" value="aisp" checked="checked"/> AIS - Account Information Service Provider</label>
                                                 </p>
@@ -68,13 +68,12 @@
                                             </form>
                                         </div>
 
-                                        <div class="authorized" th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
+                                        <div class="authorized" th:if="${authenticated}">
                                             <p>
                                                 User ID of a connected user: <span class="tint"><span
-                                                    th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
+                                                    th:text="${userName}">user display name</span></span>!
                                             </p>
-                                            <form id="disconnect" th:action="@{/connect/demo}" method="post">
-                                                <input type="hidden" name="_method" value="delete"/>
+                                            <form id="disconnect" th:action="@{/logout}" method="POST">
                                                 <button type="submit" class="btn btn-lg btn-danger">Disconnect</button>
                                             </form>
                                         </div>
@@ -84,7 +83,7 @@
                                         <p>
                                             Authorize operation with ID:
                                         </p>
-                                        <form th:action="@{/connect/demo}" method="POST" id="operationAuthorizeForm">
+                                        <form th:action="@{/oauth2/authorization/democlient}" method="POST" id="operationAuthorizeForm">
                                             <div class="input-group input-group-lg">
                                                 <input type="text" class="form-control" name="operation_id"
                                                        th:value="${operationId}" placeholder="Operation ID"/>

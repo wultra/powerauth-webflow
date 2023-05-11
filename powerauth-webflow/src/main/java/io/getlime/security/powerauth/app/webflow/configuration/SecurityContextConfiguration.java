@@ -1,6 +1,6 @@
 /*
  * PowerAuth Web Flow and related software components
- * Copyright (C) 2017 Wultra s.r.o.
+ * Copyright (C) 2023 Wultra s.r.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -15,28 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package io.getlime.security.powerauth.app.webflow.configuration;
 
-package io.getlime.security.powerauth.lib.webflow.resource.configuration;
-
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 /**
- * OAuth 2.0 Resource service configuration class.
+ * Configuration of Spring Security Context.
  *
- * @author Petr Dvorak, petr@wultra.com
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Configuration
-@EnableResourceServer
-public class OAuth2ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
+public class SecurityContextConfiguration {
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        http
-                .antMatcher("/api/secure/**")
-                .authorizeRequests().anyRequest().authenticated();
+    /**
+     * Configure HTTP session context repository.
+     *
+     * @return Security context repository.
+     */
+    @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
     }
 
 }

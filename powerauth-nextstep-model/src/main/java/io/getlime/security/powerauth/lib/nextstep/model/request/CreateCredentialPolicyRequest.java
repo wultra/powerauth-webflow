@@ -22,9 +22,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.CredentialGenerationAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.UsernameGenerationAlgorithm;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-
-import javax.validation.constraints.*;
 
 /**
  * Request object used for creating a credential policy.

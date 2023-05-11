@@ -21,10 +21,10 @@ Following topics are covered in this chapter:
 - [Verify authorization SMS code](#verify-authorization-sms-code)
 - [Verify authorization SMS code and password](#verify-authorization-sms-code-and-password)
 - [Verify a client TLS certificate](#verify-a-client-tls-certificate)
-- [Initialize OAuth 2.0 consent form](#initialize-oauth-20-consent-form)
-- [Create OAuth 2.0 consent form](#create-oauth-20-consent-form)
-- [Validate OAuth 2.0 consent form](#validate-oauth-20-consent-form)
-- [Save OAuth 2.0 consent form](#save-oauth-20-consent-form)
+- [Initialize OAuth 2.1 consent form](#initialize-oauth-20-consent-form)
+- [Create OAuth 2.1 consent form](#create-oauth-20-consent-form)
+- [Validate OAuth 2.1 consent form](#validate-oauth-20-consent-form)
+- [Save OAuth 2.1 consent form](#save-oauth-20-consent-form)
 - [Execute an AFS action](#execute-an-afs-action)
 
 You can access the generated REST API documentation in deployed Data Adapter:
@@ -2260,9 +2260,9 @@ In case the client TLS certificate verification fails, the parameter `certificat
 ## Consent API
 
 <!-- begin api POST /api/auth/consent/init -->
-### Initialize OAuth 2.0 Consent Form
+### Initialize OAuth 2.1 Consent Form
 
-Initialize the OAuth 2.0 consent form and get information whether consent form should be displayed.
+Initialize the OAuth 2.1 consent form and get information whether consent form should be displayed.
 
 <!-- begin remove -->
 <table>
@@ -2396,9 +2396,9 @@ The list of expected status codes:
 <!-- end -->
 
 <!-- begin api POST /api/auth/consent/create -->
-### Create OAuth 2.0 Consent Form
+### Create OAuth 2.1 Consent Form
 
-Create the OAuth 2.0 consent form and obtain form options.
+Create the OAuth 2.1 consent form and obtain form options.
 
 <!-- begin remove -->
 <table>
@@ -2549,9 +2549,9 @@ The list of expected status codes:
 <!-- end -->
 
 <!-- begin api POST /api/auth/consent/validate -->
-### Validate OAuth 2.0 Consent Form
+### Validate OAuth 2.1 Consent Form
 
-Validate submitted options in the OAuth 2.0 consent form.
+Validate submitted options in the OAuth 2.1 consent form.
 
 <!-- begin remove -->
 <table>
@@ -2734,9 +2734,9 @@ The list of expected status codes:
 <!-- end -->
 
 <!-- begin api POST /api/auth/consent/save -->
-### Save OAuth 2.0 Consent Form
+### Save OAuth 2.1 Consent Form
 
-Save the OAuth 2.0 consent form options.
+Save the OAuth 2.1 consent form options.
 
 <!-- begin remove -->
 <table>
@@ -2873,7 +2873,7 @@ The list of expected status codes:
 
 #### Response 200
 
-##### Save OAuth 2.0 consent form response - consent form has been successfully saved
+##### Save OAuth 2.1 consent form response - consent form has been successfully saved
 
 - Headers:
   - `Content-Type: application/json`
@@ -2887,7 +2887,7 @@ The list of expected status codes:
 }
 ```
 
-##### Save OAuth 2.0 consent form response - the processing was correct however consent form could not be saved at this time
+##### Save OAuth 2.1 consent form response - the processing was correct however consent form could not be saved at this time
 
 - Headers:
   - `Content-Type: application/json`

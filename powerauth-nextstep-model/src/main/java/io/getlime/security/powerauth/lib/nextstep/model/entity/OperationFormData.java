@@ -23,8 +23,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Banne
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.validator.AmountValidator;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidOperationDataException;
+import jakarta.validation.constraints.NotNull;
 
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

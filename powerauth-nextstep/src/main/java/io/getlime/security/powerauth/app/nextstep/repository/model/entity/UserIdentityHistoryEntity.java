@@ -18,10 +18,10 @@
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -39,7 +39,7 @@ public class UserIdentityHistoryEntity implements Serializable {
     private static final long serialVersionUID = 2982236221553997424L;
 
     @Id
-    @SequenceGenerator(name = "ns_user_identity_history", sequenceName = "ns_user_identity_history_seq")
+    @SequenceGenerator(name = "ns_user_identity_history", sequenceName = "ns_user_identity_history_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_user_identity_history")
     @Column(name = "user_identity_history_id", nullable = false)
     private Long userIdentityId;

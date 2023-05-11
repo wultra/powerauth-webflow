@@ -79,7 +79,7 @@ public class CreateTppAppRequestValidator {
 
         final String[] scopes = source.getScopes();
         if (scopes == null || scopes.length == 0) {
-            errors.add("You must provide at least one OAuth 2.0 scope.");
+            errors.add("You must provide at least one OAuth 2.1 scope.");
         } else {
             for (final String scope : scopes) {
                 // validate scope against the basic regexp pattern

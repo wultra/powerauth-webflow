@@ -18,10 +18,10 @@
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ContactType;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -39,7 +39,7 @@ public class UserContactEntity implements Serializable {
     private static final long serialVersionUID = 7530081244465987786L;
 
     @Id
-    @SequenceGenerator(name = "ns_user_contact", sequenceName = "ns_user_contact_seq")
+    @SequenceGenerator(name = "ns_user_contact", sequenceName = "ns_user_contact_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_user_contact")
     @Column(name = "user_contact_id", nullable = false)
     private Long userContactId;

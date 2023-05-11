@@ -18,6 +18,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.interceptor;
 
 import com.google.common.net.InetAddresses;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
@@ -27,7 +28,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.Inet4Address;
 import java.util.Map;
 

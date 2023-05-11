@@ -18,10 +18,10 @@
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ApplicationStatus;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -39,7 +39,7 @@ public class ApplicationEntity implements Serializable {
     private static final long serialVersionUID = 583672417376181537L;
 
     @Id
-    @SequenceGenerator(name = "ns_application", sequenceName = "ns_application_seq")
+    @SequenceGenerator(name = "ns_application", sequenceName = "ns_application_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_application")
     @Column(name = "application_id", nullable = false)
     private Long applicationId;

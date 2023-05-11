@@ -2,7 +2,7 @@
 
 TPP Engine implements following functionality:
 - third party provider registry
-- storage of OAuth 2.0 consents
+- storage of OAuth 2.1 consents
 
 TPP Engine is available as a separate application and its deployment is optional.
 

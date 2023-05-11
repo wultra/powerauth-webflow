@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Request for creating the OAuth 2.0 consent form.
+ * Request for creating the OAuth 2.1 consent form.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

@@ -44,12 +44,12 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResult
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.OperationSessionEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -135,9 +135,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
-     * Create a new implicit login operation based on the OAuth 2.0 scopes.
-     * @param clientId OAuth 2.0 Client ID.
-     * @param scopes OAuth 2.0 Scopes
+     * Create a new implicit login operation based on the OAuth 2.1 scopes.
+     * @param clientId OAuth 2.1 Client ID.
+     * @param scopes OAuth 2.1 Scopes
      * @return Information about a new operation.
      * @throws CommunicationFailedException In case the communication with data adapter fails.
      */

@@ -18,7 +18,8 @@
 
 package io.getlime.security.powerauth.app.tppengine.repository.model.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class TppEntity implements Serializable {
     private static final long serialVersionUID = -7089801604663605351L;
 
     @Id
-    @SequenceGenerator(name = "tpp_detail", sequenceName = "tpp_detail_seq")
+    @SequenceGenerator(name = "tpp_detail", sequenceName = "tpp_detail_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "tpp_detail")
     @Column(name = "tpp_id", nullable = false)
     private Long tppId;

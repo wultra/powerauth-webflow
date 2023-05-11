@@ -17,10 +17,9 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * Response object used for creating a user role.

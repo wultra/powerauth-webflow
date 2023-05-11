@@ -19,12 +19,12 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
 import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
 import com.wultra.security.powerauth.client.model.enumeration.SignatureType;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
-import com.wultra.security.powerauth.client.v3.ActivationStatus;
-import com.wultra.security.powerauth.client.v3.CreatePersonalizedOfflineSignaturePayloadResponse;
-import com.wultra.security.powerauth.client.v3.GetActivationStatusResponse;
-import com.wultra.security.powerauth.client.v3.VerifyOfflineSignatureResponse;
+import com.wultra.security.powerauth.client.model.response.CreatePersonalizedOfflineSignaturePayloadResponse;
+import com.wultra.security.powerauth.client.model.response.GetActivationStatusResponse;
+import com.wultra.security.powerauth.client.model.response.VerifyOfflineSignatureResponse;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.http.PowerAuthHttpBody;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
@@ -58,6 +58,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.res
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.PushMessageService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.PowerAuthOperationService;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -99,7 +99,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
 
     /**
      * Controller constructor.
-     * @param powerAuthClient PowerAuth 2.0 service client.
+     * @param powerAuthClient PowerAuth service client.
      * @param authMethodQueryService Authentication method query service.
      * @param webFlowServicesConfiguration Web Flow configuration.
      * @param pushMessageService Push message service.
@@ -270,7 +270,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         activationEntity.setActivationId(activationStatusResponse.getActivationId());
         activationEntity.setActivationName(activationStatusResponse.getActivationName());
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        Date timestampLastUsed = activationStatusResponse.getTimestampLastUsed().toGregorianCalendar().getTime();
+        Date timestampLastUsed = activationStatusResponse.getTimestampLastUsed();
         activationEntity.setTimestampLastUsed(formatter.format(timestampLastUsed));
         activationEntities.add(activationEntity);
 

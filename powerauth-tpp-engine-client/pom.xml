@@ -58,7 +58,7 @@
             <artifactId>rest-client-base</artifactId>
         </dependency>
 
-        <!-- PowerAuth 2.0 Web Flow Dependencies -->
+        <!-- PowerAuth Web Flow Dependencies -->
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-tpp-engine-model</artifactId>
