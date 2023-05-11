@@ -233,3 +233,8 @@ DROP TABLE oauth_client_details;
 
 Since version `1.5.0`, MySQL database is not supported anymore.
 
+
+## Dependencies
+
+PostgreSQL JDBC driver is already included in the WAR file.
+Oracle JDBC driver remains optional and must be added to your deployment if desired.
