@@ -27,7 +27,7 @@ export function getOperationData(callback) {
     return function (dispatch) {
         axios.post("./api/auth/operation/detail", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             dispatch({
@@ -52,7 +52,7 @@ export function initOnline(callback) {
     return function (dispatch) {
         axios.post("./api/auth/token/web/init", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             // silently ignore push message failures, see #125
@@ -91,7 +91,7 @@ export function authenticateOnline(callback) {
     return function (dispatch) {
         axios.post("./api/auth/token/web/authenticate", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             switch (response.data.result) {
@@ -140,7 +140,7 @@ export function cancel() {
     return function (dispatch) {
         axios.post("./api/auth/token/web/cancel", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             dispatch({
@@ -168,7 +168,7 @@ export function updateFormData(formData, callback) {
             formData: formData
         }, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             callback();

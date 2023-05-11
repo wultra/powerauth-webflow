@@ -35,7 +35,7 @@ export function init() {
         });
         axios.post("./api/auth/consent/init", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
@@ -73,7 +73,7 @@ export function authenticate(options, callback) {
             options
         }, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             switch (response.data.result) {
@@ -126,7 +126,7 @@ export function cancel(callback) {
     return function (dispatch) {
         axios.post("./api/auth/consent/cancel", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             callback();

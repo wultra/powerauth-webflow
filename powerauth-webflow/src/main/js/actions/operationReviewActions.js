@@ -26,7 +26,7 @@ export function getOperationData() {
     return function (dispatch) {
         axios.post("./api/auth/operation/detail", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             if (response.data.chosenAuthMethod) {
@@ -66,7 +66,7 @@ export function cancel() {
     return function (dispatch) {
         axios.post("./api/auth/operation/cancel", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             dispatch({
@@ -95,14 +95,14 @@ export function updateOperation(formData, chosenAuthMethod, callback) {
             formData: formData
         }, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             axios.put("./api/auth/operation/chosenAuthMethod", {
                 chosenAuthMethod: chosenAuthMethod
             }, {
                 headers: {
-                    'X-OPERATION-HASH': operationHash,
+                    'X-OPERATION-HASH': operationHash
                 }
             });
             callback();

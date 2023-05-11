@@ -39,7 +39,7 @@ export function initOffline(activationId) {
             activationId: activationId
         }, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
@@ -91,7 +91,7 @@ export function authenticateOffline(activationId, authCode, nonce) {
             nonce: nonce,
         }, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             dispatch({
@@ -153,7 +153,7 @@ export function updateFormData(formData, callback) {
             formData: formData
         }, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             callback();

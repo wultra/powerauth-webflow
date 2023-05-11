@@ -27,7 +27,7 @@ export function authenticate(callback) {
     return function (dispatch) {
         axios.post("./api/auth/init/authenticate", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             // Save operation hash in case the operation has been just initialized (default operation)
