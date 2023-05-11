@@ -55,6 +55,7 @@ import java.util.Objects;
  * @author Petr Dvorak, petr@wultra.com
  */
 @Configuration
+@EnableWebSecurity
 public class SecurityConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
