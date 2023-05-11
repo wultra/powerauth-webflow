@@ -33,7 +33,7 @@ import java.util.Locale;
 @Service
 public class I18NService {
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     @Resource
     private ReloadableResourceBundleMessageSourceWithListing messageSource;

@@ -135,58 +135,52 @@ class OperationDataBuilderTest {
 
     @Test
     void testDataInvalid1() {
-        Assertions.assertThrows(InvalidOperationDataException.class, () -> {
-            builder.build();
-        });
+        Assertions.assertThrows(InvalidOperationDataException.class, () ->
+                builder.build());
     }
 
     @Test
     void testDataInvalid2() {
-        Assertions.assertThrows(InvalidOperationDataException.class, () -> {
-            builder.templateId(1).build();
-        });
+        Assertions.assertThrows(InvalidOperationDataException.class, () ->
+                builder.templateId(1).build());
     }
 
     @Test
     void testDataInvalid3() {
-        Assertions.assertThrows(InvalidOperationDataException.class, () -> {
-            builder.templateVersion("A").build();
-        });
+        Assertions.assertThrows(InvalidOperationDataException.class, () ->
+                builder.templateVersion("A").build());
     }
 
     @Test
     void testInvalidAmount() {
-        Assertions.assertThrows(InvalidOperationDataException.class, () -> {
-            builder
+        Assertions.assertThrows(InvalidOperationDataException.class, () ->
+                builder
                     .templateId(1)
                     .templateVersion("A")
                     .attr1().accountGeneric("12345678/0100")
                     .attr2().amount(new BigDecimal("0.0099"), "EUR")
-                    .build();
-        });
+                    .build());
     }
 
     @Test
     void testZeroAmount() {
-        Assertions.assertThrows(InvalidOperationDataException.class, () -> {
-            builder
+        Assertions.assertThrows(InvalidOperationDataException.class, () ->
+                builder
                     .templateId(1)
                     .templateVersion("A")
                     .attr1().accountGeneric("12345678/0100")
                     .attr2().amount(BigDecimal.ZERO, "EUR")
-                    .build();
-        });
+                    .build());
     }
 
     @Test
     void testNegativeAmount() {
-        Assertions.assertThrows(InvalidOperationDataException.class, () -> {
-            builder
+        Assertions.assertThrows(InvalidOperationDataException.class, () ->
+                builder
                     .templateId(1)
                     .templateVersion("A")
                     .attr1().accountGeneric("12345678/0100")
                     .attr2().amount(new BigDecimal("-100"), "EUR")
-                    .build();
-        });
+                    .build());
     }
 }

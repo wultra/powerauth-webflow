@@ -23,6 +23,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -37,6 +38,7 @@ import java.util.Date;
 @EqualsAndHashCode(of = {"otpDefinition", "userId", "credentialDefinition", "timestampCreated"})
 public class OtpEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 8483820995210446509L;
 
     @Id

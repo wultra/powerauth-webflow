@@ -102,9 +102,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public LocaleResolver localeResolver() {
-        CookieLocaleResolver resolver = new CookieLocaleResolver();
-        resolver.setCookieName("lang");
-        return resolver;
+        return new CookieLocaleResolver("lang");
     }
 
     /**

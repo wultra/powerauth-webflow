@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class UnableToCreateAppException extends Exception {
 
-    private List<String> errors;
+    private final List<String> errors;
 
     public UnableToCreateAppException(List<String> errors) {
         this.errors = new ArrayList<>(errors);

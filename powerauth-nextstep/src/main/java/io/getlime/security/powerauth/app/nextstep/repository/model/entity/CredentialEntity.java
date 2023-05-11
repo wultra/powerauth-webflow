@@ -24,6 +24,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -38,6 +39,7 @@ import java.util.Date;
 @EqualsAndHashCode(of = {"credentialDefinition", "user", "type", "username"})
 public class CredentialEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -1331139715085676624L;
 
     @Id

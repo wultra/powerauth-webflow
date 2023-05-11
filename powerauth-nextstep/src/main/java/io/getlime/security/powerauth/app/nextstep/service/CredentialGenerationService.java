@@ -76,7 +76,7 @@ public class CredentialGenerationService {
     public String generateUsername(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
         final CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         switch (credentialPolicy.getUsernameGenAlgorithm()) {
-            case RANDOM_DIGITS:
+            case RANDOM_DIGITS -> {
                 try {
                     return generateRandomUsernameWithDigits(credentialDefinition);
                 } catch (InvalidConfigurationException ex) {
@@ -84,8 +84,8 @@ public class CredentialGenerationService {
                 } catch (Exception ex) {
                     throw new InvalidConfigurationException(ex);
                 }
-
-            case RANDOM_LETTERS:
+            }
+            case RANDOM_LETTERS -> {
                 try {
                     return generateRandomUsernameWithLetters(credentialDefinition);
                 } catch (InvalidConfigurationException ex) {
@@ -93,12 +93,12 @@ public class CredentialGenerationService {
                 } catch (Exception ex) {
                     throw new InvalidConfigurationException(ex);
                 }
-
-            case NO_USERNAME:
+            }
+            case NO_USERNAME -> {
                 return null;
-
-            default:
-                throw new InvalidConfigurationException("Unsupported username generation algorithm: " + credentialPolicy.getUsernameGenAlgorithm());
+            }
+            default ->
+                    throw new InvalidConfigurationException("Unsupported username generation algorithm: " + credentialPolicy.getUsernameGenAlgorithm());
         }
     }
 
@@ -111,7 +111,7 @@ public class CredentialGenerationService {
     public String generateCredentialValue(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
         final CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         switch (credentialPolicy.getCredentialGenAlgorithm()) {
-            case RANDOM_PASSWORD:
+            case RANDOM_PASSWORD -> {
                 try {
                     return generateRandomPassword(credentialPolicy);
                 } catch (InvalidConfigurationException ex) {
@@ -119,8 +119,8 @@ public class CredentialGenerationService {
                 } catch (Exception ex) {
                     throw new InvalidConfigurationException(ex);
                 }
-
-            case RANDOM_PIN:
+            }
+            case RANDOM_PIN -> {
                 try {
                     return generateRandomPin(credentialPolicy);
                 } catch (InvalidConfigurationException ex) {
@@ -128,9 +128,9 @@ public class CredentialGenerationService {
                 } catch (Exception ex) {
                     throw new InvalidConfigurationException(ex);
                 }
-
-            default:
-                throw new InvalidConfigurationException("Unsupported credential value generation algorithm: " + credentialPolicy.getCredentialGenAlgorithm());
+            }
+            default ->
+                    throw new InvalidConfigurationException("Unsupported credential value generation algorithm: " + credentialPolicy.getCredentialGenAlgorithm());
         }
     }
 

@@ -37,7 +37,7 @@ public class OperationFormFieldAttributeFormatted extends OperationFormFieldAttr
     /**
      * Formatted values.
      */
-    protected Map<String, String> formattedValues = new HashMap<>();
+    protected final Map<String, String> formattedValues = new HashMap<>();
 
     /**
      * Get value format type of this attribute.

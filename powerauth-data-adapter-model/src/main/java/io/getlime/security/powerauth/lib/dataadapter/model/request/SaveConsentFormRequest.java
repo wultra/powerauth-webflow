@@ -48,7 +48,7 @@ public class SaveConsentFormRequest {
     /**
      * Consent options with values set by the user.
      */
-    private List<ConsentOption> options;
+    private final List<ConsentOption> options;
 
     /**
      * Default constructor.

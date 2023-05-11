@@ -311,8 +311,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             final ConsentAuthResponse response = new ConsentAuthResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
-            if (e instanceof ConsentValidationFailedException) {
-                ConsentValidationFailedException validationEx = (ConsentValidationFailedException) e;
+            if (e instanceof final ConsentValidationFailedException validationEx) {
                 response.setConsentValidationPassed(false);
                 response.setValidationErrorMessage(validationEx.getErrorMessage());
                 response.setOptionValidationResults(validationEx.getOptionValidationResults());

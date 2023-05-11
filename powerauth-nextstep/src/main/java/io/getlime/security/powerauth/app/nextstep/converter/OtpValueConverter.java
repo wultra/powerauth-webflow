@@ -77,11 +77,10 @@ public class OtpValueConverter {
      */
     public String fromDBValue(OtpValue otpValue, String otpId, OtpDefinitionEntity otpDefinition) throws InvalidConfigurationException, EncryptionException {
         switch (otpValue.getEncryptionAlgorithm()) {
-
-            case NO_ENCRYPTION:
+            case NO_ENCRYPTION -> {
                 return otpValue.getValue();
-
-            case AES_HMAC:
+            }
+            case AES_HMAC -> {
                 final String masterDbEncryptionKeyBase64 = configuration.getMasterDbEncryptionKey();
 
                 // In case master DB encryption key does not exist, do not encrypt the server private key
@@ -111,9 +110,8 @@ public class OtpValueConverter {
                 } catch (Exception ex) {
                     throw new EncryptionException(ex);
                 }
-
-            default:
-                throw new InvalidConfigurationException("Unsupported encryption algorithm: " + otpValue.getEncryptionAlgorithm());
+            }
+            default -> throw new InvalidConfigurationException("Unsupported encryption algorithm: " + otpValue.getEncryptionAlgorithm());
         }
 
     }
@@ -134,11 +132,10 @@ public class OtpValueConverter {
         }
 
         switch (otpDefinition.getEncryptionAlgorithm()) {
-
-            case NO_ENCRYPTION:
+            case NO_ENCRYPTION -> {
                 return new OtpValue(EncryptionAlgorithm.NO_ENCRYPTION, otpValue);
-
-            case AES_HMAC:
+            }
+            case AES_HMAC -> {
                 final String masterDbEncryptionKeyBase64 = configuration.getMasterDbEncryptionKey();
 
                 // In case master DB encryption key does not exist, do not encrypt the server private key
@@ -151,7 +148,6 @@ public class OtpValueConverter {
 
                 // Derive secret key from master DB encryption key, userId and activationId
                 final SecretKey secretKey = deriveSecretKey(masterDbEncryptionKey, otpId, otpDefinition.getName());
-
                 try {
                     // Generate random IV
                     final byte[] iv = keyGenerator.generateRandomBytes(16);
@@ -173,9 +169,8 @@ public class OtpValueConverter {
                 } catch (Exception ex) {
                     throw new EncryptionException(ex);
                 }
-
-            default:
-                throw new InvalidConfigurationException("Unsupported encryption algorithm: " + otpDefinition.getEncryptionAlgorithm());
+            }
+            default -> throw new InvalidConfigurationException("Unsupported encryption algorithm: " + otpDefinition.getEncryptionAlgorithm());
         }
 
     }

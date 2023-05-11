@@ -33,7 +33,6 @@ import org.bouncycastle.openssl.PEMParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
@@ -70,11 +69,7 @@ public class ICACertificateParser implements ICertificateParser {
 
         // Handle the URL encoded certificates
         if (certificatePem.startsWith("-----BEGIN%20CERTIFICATE-----")) { // certificate is URL encoded by nginx.
-            try {
-                certificatePem = URLDecoder.decode(certificatePem, StandardCharsets.UTF_8.toString());
-            } catch (UnsupportedEncodingException e) {
-                throw new CertificateException("Unable to extract certificate in PEM format (nginx).");
-            }
+            certificatePem = URLDecoder.decode(certificatePem, StandardCharsets.UTF_8);
         }
 
         // Replace spaces in Apache forwarded certificate by newlines correctly
@@ -108,8 +103,7 @@ public class ICACertificateParser implements ICertificateParser {
             Set<CertInfo.PSD2> psd2Mandates = new HashSet<>();
 
             for (ASN1Encodable asn1Primitive : it) {
-                if (asn1Primitive instanceof DLSequence) {
-                    DLSequence sequence = (DLSequence) asn1Primitive;
+                if (asn1Primitive instanceof final DLSequence sequence) {
                     if (sequence.size() == 2) {
                         ASN1ObjectIdentifier id = (ASN1ObjectIdentifier) sequence.getObjectAt(0);
                         DLSequence mandates = (DLSequence) sequence.getObjectAt(1);
@@ -138,7 +132,7 @@ public class ICACertificateParser implements ICertificateParser {
                     }
                 }
             }
-            final X500Name x500Name = new X500Name(cert.getSubjectDN().toString());
+            final X500Name x500Name = new X500Name(cert.getSubjectX500Principal().toString());
             String country = null;
             String serialNumber = null;
             String commonName = null;
@@ -155,42 +149,33 @@ public class ICACertificateParser implements ICertificateParser {
                 final String val = attr.getValue().toString();
 
                 switch (oid) {
-                    case "2.5.4.6": {   //    C=CZ => 2.5.4.6
+                    case "2.5.4.6" -> {   //    C=CZ => 2.5.4.6
                         country = val;
-                        break;
                     }
-                    case "2.5.4.3": {   //    CN=cnb.cz => 2.5.4.3
+                    case "2.5.4.3" -> {   //    CN=cnb.cz => 2.5.4.3
                         commonName = val;
                         website = "https://" + val;
-                        break;
                     }
-                    case "2.5.4.10": {  //    O=ČESKÁ NÁRODNÍ BANKA => 2.5.4.10
+                    case "2.5.4.10" -> {  //    O=ČESKÁ NÁRODNÍ BANKA => 2.5.4.10
                         organization = val;
-                        break;
                     }
-                    case "2.5.4.9": {   //    STREET=Na příkopě 864/28 => 2.5.4.9
+                    case "2.5.4.9" -> {   //    STREET=Na příkopě 864/28 => 2.5.4.9
                         street = val;
-                        break;
                     }
-                    case "2.5.4.7": {   //    L=Praha 1 => 2.5.4.7
+                    case "2.5.4.7" -> {   //    L=Praha 1 => 2.5.4.7
                         city = val;
-                        break;
                     }
-                    case "2.5.4.17": {  //    OID.2.5.4.17=11000 => 2.5.4.17
+                    case "2.5.4.17" -> {  //    OID.2.5.4.17=11000 => 2.5.4.17
                         zipCode = val;
-                        break;
                     }
-                    case "2.5.4.5": {   //    SERIALNUMBER=48136450 => 2.5.4.5
+                    case "2.5.4.5" -> {   //    SERIALNUMBER=48136450 => 2.5.4.5
                         serialNumber = val;
-                        break;
                     }
-                    case "2.5.4.8": {   //    ST=Hlavní město Praha => 2.5.4.8
+                    case "2.5.4.8" -> {   //    ST=Hlavní město Praha => 2.5.4.8
                         region = val;
-                        break;
                     }
-                    case "2.5.4.97": {  //   OID.2.5.4.97=PSDCZ-CNB-48136450 => 2.5.4.97
+                    case "2.5.4.97" -> {  //   OID.2.5.4.97=PSDCZ-CNB-48136450 => 2.5.4.97
                         psd2License = val;
-                        break;
                     }
                 }
             }

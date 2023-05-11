@@ -32,22 +32,14 @@ public class ValueFormatTypeConverter {
      * @return Data adapter value format type.
      */
     public io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType fromOperationValueFormatType(ValueFormatType input) {
-        switch (input) {
-            case AMOUNT:
-                return io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.AMOUNT;
-            case TEXT:
-                return io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.TEXT;
-            case LOCALIZED_TEXT:
-                return io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.LOCALIZED_TEXT;
-            case DATE:
-                return io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.DATE;
-            case NUMBER:
-                return io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.NUMBER;
-            case ACCOUNT:
-                return io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.ACCOUNT;
-            default:
-                throw new IllegalStateException("Unsupported value format type: "+input);
-        }
+        return switch (input) {
+            case AMOUNT -> io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.AMOUNT;
+            case TEXT -> io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.TEXT;
+            case LOCALIZED_TEXT -> io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.LOCALIZED_TEXT;
+            case DATE -> io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.DATE;
+            case NUMBER -> io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.NUMBER;
+            case ACCOUNT -> io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType.ACCOUNT;
+        };
     }
 
     /**
@@ -56,22 +48,14 @@ public class ValueFormatTypeConverter {
      * @return Next step value format type.
      */
     public ValueFormatType fromValueFormatType(io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType input) {
-        switch (input) {
-            case AMOUNT:
-                return ValueFormatType.AMOUNT;
-            case TEXT:
-                return ValueFormatType.TEXT;
-            case LOCALIZED_TEXT:
-                return ValueFormatType.LOCALIZED_TEXT;
-            case DATE:
-                return ValueFormatType.DATE;
-            case NUMBER:
-                return ValueFormatType.NUMBER;
-            case ACCOUNT:
-                return ValueFormatType.ACCOUNT;
-            default:
-                throw new IllegalStateException("Unsupported value format type: "+input);
-        }
+        return switch (input) {
+            case AMOUNT -> ValueFormatType.AMOUNT;
+            case TEXT -> ValueFormatType.TEXT;
+            case LOCALIZED_TEXT -> ValueFormatType.LOCALIZED_TEXT;
+            case DATE -> ValueFormatType.DATE;
+            case NUMBER -> ValueFormatType.NUMBER;
+            case ACCOUNT -> ValueFormatType.ACCOUNT;
+        };
     }
 
 }

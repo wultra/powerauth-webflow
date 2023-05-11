@@ -19,7 +19,6 @@
 package io.getlime.security.powerauth.app.tppengine.model.certificate;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +27,8 @@ import java.util.Set;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
-public class CertInfo {
+public record CertInfo(String serialNumber, String commonName, String psd2License, String organization, String street, String city,
+                       String zipCode, String region, String country, String website, Set<PSD2> psd2Mandates) {
 
     public enum PSD2 {
         /**
@@ -47,7 +47,7 @@ public class CertInfo {
         PSP_IC,
 
         /**
-         *  Payment Initiation Service Provider
+         * Payment Initiation Service Provider
          */
         PSP_PI
     }
@@ -56,76 +56,6 @@ public class CertInfo {
      * Location of the forwarded certificate in HTTP header.
      */
     public static final String HTTP_HEADER = "X-Client-Certificate";
-
-    private String serialNumber;
-    private String commonName;
-    private String psd2License;
-    private String organization;
-    private String street;
-    private String city;
-    private String zipCode;
-    private String region;
-    private String country;
-    private String website;
-    private Set<PSD2> psd2Mandates;
-
-    public CertInfo(String serialNumber, String commonName, String psd2License, String organization, String street, String city, String zipCode, String region, String country, String website, Set<PSD2> psd2Mandates) {
-        this.serialNumber = serialNumber;
-        this.commonName = commonName;
-        this.psd2License = psd2License;
-        this.organization = organization;
-        this.street = street;
-        this.city = city;
-        this.zipCode = zipCode;
-        this.region = region;
-        this.country = country;
-        this.website = website;
-        this.psd2Mandates = new HashSet<>(psd2Mandates);
-    }
-
-    public String getSerialNumber() {
-        return serialNumber;
-    }
-
-    public String getCommonName() {
-        return commonName;
-    }
-
-    public String getPsd2License() {
-        return psd2License;
-    }
-
-    public String getOrganization() {
-        return organization;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getZipCode() {
-        return zipCode;
-    }
-
-    public String getRegion() {
-        return region;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public Set<PSD2> getPsd2Mandates() {
-        return psd2Mandates;
-    }
 
     /**
      * Checks if the certificate info contains a correct PSD2 license information.

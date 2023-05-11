@@ -222,19 +222,15 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
 
                 if (h.getAuthStepResultDescription() != null) {
                     switch (h.getAuthStepResultDescription()) {
-                        case "canceled.incorrect_data":
-                        case "canceled.unexpected_operation":
-                        case "canceled.unknown":
+                        case "canceled.incorrect_data", "canceled.unexpected_operation", "canceled.unknown" ->
                             // User rejected the operation
-                            response.setMessage("operation.canceled");
-                            break;
-                        case "canceled.timed_out_operation":
+                                response.setMessage("operation.canceled");
+                        case "canceled.timed_out_operation" ->
                             // The operation timed out
-                            response.setMessage("operation.timeout");
-                            break;
-                        default:
+                                response.setMessage("operation.timeout");
+                        default ->
                             // The operation failed for other reason
-                            response.setMessage("operation.alreadyFailed");
+                                response.setMessage("operation.alreadyFailed");
                     }
                 } else {
                     response.setMessage("error.unknown");

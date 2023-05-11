@@ -34,18 +34,10 @@ public class AuthInstrumentConverter {
         List<AfsAuthInstrument> authInstrumentsAfs = new ArrayList<>();
         for (AuthInstrument instrument: authInstruments) {
             switch (instrument) {
-                case CREDENTIAL:
-                    authInstrumentsAfs.add(AfsAuthInstrument.CREDENTIAL);
-                    break;
-                case OTP_KEY:
-                    authInstrumentsAfs.add(AfsAuthInstrument.OTP_KEY);
-                    break;
-                case POWERAUTH_TOKEN:
-                    authInstrumentsAfs.add(AfsAuthInstrument.POWERAUTH_TOKEN);
-                    break;
-                case HW_TOKEN:
-                    authInstrumentsAfs.add(AfsAuthInstrument.HW_TOKEN);
-                    break;
+                case CREDENTIAL -> authInstrumentsAfs.add(AfsAuthInstrument.CREDENTIAL);
+                case OTP_KEY -> authInstrumentsAfs.add(AfsAuthInstrument.OTP_KEY);
+                case POWERAUTH_TOKEN -> authInstrumentsAfs.add(AfsAuthInstrument.POWERAUTH_TOKEN);
+                case HW_TOKEN -> authInstrumentsAfs.add(AfsAuthInstrument.HW_TOKEN);
             }
         }
         return authInstrumentsAfs;

@@ -125,11 +125,8 @@ public class HashConfigService {
      */
     @Transactional
     public UpdateHashConfigResponse updateHashConfig(UpdateHashConfigRequest request) throws HashConfigNotFoundException, InvalidRequestException {
-        final Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
-        if (!hashConfigOptional.isPresent()) {
-            throw new HashConfigNotFoundException("Hashing configuration not found: " + request.getHashConfigName());
-        }
-        HashConfigEntity hashConfig = hashConfigOptional.get();
+        HashConfigEntity hashConfig = hashConfigRepository.findByName(request.getHashConfigName()).orElseThrow(() ->
+                new HashConfigNotFoundException("Hashing configuration not found: " + request.getHashConfigName()));
         if (hashConfig.getStatus() != HashConfigStatus.ACTIVE && request.getHashConfigStatus() != HashConfigStatus.ACTIVE) {
             throw new HashConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
         }
@@ -188,11 +185,8 @@ public class HashConfigService {
      */
     @Transactional
     public DeleteHashConfigResponse deleteHashConfig(DeleteHashConfigRequest request) throws HashConfigNotFoundException {
-        final Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
-        if (!hashConfigOptional.isPresent()) {
-            throw new HashConfigNotFoundException("Hashing configuration not found: " + request.getHashConfigName());
-        }
-        HashConfigEntity hashConfig = hashConfigOptional.get();
+        HashConfigEntity hashConfig = hashConfigRepository.findByName(request.getHashConfigName()).orElseThrow(() ->
+            new HashConfigNotFoundException("Hashing configuration not found: " + request.getHashConfigName()));
         if (hashConfig.getStatus() == HashConfigStatus.REMOVED) {
             throw new HashConfigNotFoundException("Hashing configuration is already REMOVED: " + request.getHashConfigName());
         }

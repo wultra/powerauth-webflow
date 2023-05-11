@@ -119,11 +119,8 @@ public class OperationConfigurationService {
      */
     @Transactional
     public GetOperationConfigDetailResponse getOperationConfig(String operationName) throws OperationConfigNotFoundException {
-        final Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(operationName);
-        if (!operationConfigOptional.isPresent()) {
-            throw new OperationConfigNotFoundException("Operation not configured, operation name: " + operationName);
-        }
-        final OperationConfigEntity operationConfig = operationConfigOptional.get();
+        final OperationConfigEntity operationConfig = operationConfigRepository.findById(operationName).orElseThrow(() ->
+                new OperationConfigNotFoundException("Operation not configured, operation name: " + operationName));
         return configConverter.fromOperationConfigEntity(operationConfig);
     }
 
@@ -151,15 +148,12 @@ public class OperationConfigurationService {
      */
     @Transactional
     public DeleteOperationConfigResponse deleteOperationConfig(DeleteOperationConfigRequest request) throws OperationConfigNotFoundException, DeleteNotAllowedException {
-        final Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(request.getOperationName());
-        if (!operationConfigOptional.isPresent()) {
-            throw new OperationConfigNotFoundException("Operation configuration not found, operation name: " + request.getOperationName());
-        }
+        final OperationConfigEntity operationConfig = operationConfigRepository.findById(request.getOperationName()).orElseThrow(() ->
+            new OperationConfigNotFoundException("Operation configuration not found, operation name: " + request.getOperationName()));
         final long existingOperationCount = operationRepository.countByOperationName(request.getOperationName());
         if (existingOperationCount > 0) {
             throw new DeleteNotAllowedException("Operation configuration cannot be deleted because it is used: " + request.getOperationName());
         }
-        final OperationConfigEntity operationConfig = operationConfigOptional.get();
         operationConfigRepository.delete(operationConfig);
         logger.debug("Operation configuration was deleted, operation name: {}", operationConfig.getOperationName());
         audit.info("Operation configuration was deleted", AuditDetail.builder()
@@ -182,11 +176,11 @@ public class OperationConfigurationService {
     @Transactional
     public CreateOperationMethodConfigResponse createOperationMethodConfig(CreateOperationMethodConfigRequest request) throws OperationMethodConfigAlreadyExists, OperationConfigNotFoundException, AuthMethodNotFoundException {
         final Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(request.getOperationName());
-        if (!operationConfigOptional.isPresent()) {
+        if (operationConfigOptional.isEmpty()) {
             throw new OperationConfigNotFoundException("Operation configuration not found, operation: " + request.getOperationName());
         }
         final Optional<AuthMethodEntity> authMethodOptional = authMethodRepository.findById(request.getAuthMethod());
-        if (!authMethodOptional.isPresent()) {
+        if (authMethodOptional.isEmpty()) {
             throw new AuthMethodNotFoundException("Authentication method not found: " + request.getAuthMethod());
         }
         final OperationMethodConfigEntity.OperationAuthMethodKey primaryKey = new OperationMethodConfigEntity.OperationAuthMethodKey(request.getOperationName(), request.getAuthMethod());
@@ -213,11 +207,8 @@ public class OperationConfigurationService {
     @Transactional
     public GetOperationMethodConfigDetailResponse getOperationMethodConfigDetail(GetOperationMethodConfigDetailRequest request) throws OperationMethodConfigNotFoundException {
         final OperationMethodConfigEntity.OperationAuthMethodKey primaryKey = new OperationMethodConfigEntity.OperationAuthMethodKey(request.getOperationName(), request.getAuthMethod());
-        final Optional<OperationMethodConfigEntity> operationMethodConfigOptional = operationMethodConfigRepository.findById(primaryKey);
-        if (!operationMethodConfigOptional.isPresent()) {
-            throw new OperationMethodConfigNotFoundException("Configuration not found, operation name: " + request.getOperationName() + ", authentication method: " + request.getAuthMethod());
-        }
-        final OperationMethodConfigEntity operationMethodConfig = operationMethodConfigOptional.get();
+        final OperationMethodConfigEntity operationMethodConfig = operationMethodConfigRepository.findById(primaryKey).orElseThrow(() ->
+                new OperationMethodConfigNotFoundException("Configuration not found, operation name: " + request.getOperationName() + ", authentication method: " + request.getAuthMethod()));
         final GetOperationMethodConfigDetailResponse response = new GetOperationMethodConfigDetailResponse();
         response.setOperationName(operationMethodConfig.getPrimaryKey().getOperationName());
         response.setAuthMethod(operationMethodConfig.getPrimaryKey().getAuthMethod());
@@ -234,11 +225,8 @@ public class OperationConfigurationService {
     @Transactional
     public DeleteOperationMethodConfigResponse deleteOperationMethodConfig(DeleteOperationMethodConfigRequest request) throws OperationMethodConfigNotFoundException {
         final OperationMethodConfigEntity.OperationAuthMethodKey primaryKey = new OperationMethodConfigEntity.OperationAuthMethodKey(request.getOperationName(), request.getAuthMethod());
-        final Optional<OperationMethodConfigEntity> operationMethodConfigOptional = operationMethodConfigRepository.findById(primaryKey);
-        if (!operationMethodConfigOptional.isPresent()) {
-            throw new OperationMethodConfigNotFoundException("Configuration not found, operation name: " + request.getOperationName() + ", authentication method: " + request.getAuthMethod());
-        }
-        final OperationMethodConfigEntity operationMethodConfig = operationMethodConfigOptional.get();
+        final OperationMethodConfigEntity operationMethodConfig = operationMethodConfigRepository.findById(primaryKey).orElseThrow(() ->
+                new OperationMethodConfigNotFoundException("Configuration not found, operation name: " + request.getOperationName() + ", authentication method: " + request.getAuthMethod()));
         operationMethodConfigRepository.delete(operationMethodConfig);
         logger.debug("Operation and authentication method configuration was deleted, operation name: {}, authentication method: {}", operationMethodConfig.getPrimaryKey().getOperationName(), operationMethodConfig.getPrimaryKey().getAuthMethod());
         audit.info("Operation and authentication method configuration was deleted", AuditDetail.builder()

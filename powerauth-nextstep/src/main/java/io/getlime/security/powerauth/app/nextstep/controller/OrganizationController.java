@@ -21,7 +21,6 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.service.OrganizationService;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOrganizationRequest;
@@ -175,7 +174,6 @@ public class OrganizationController {
      * @param request Delete organization request.
      * @return Delete organization response.
      * @throws OrganizationNotFoundException Thrown when organization is not found.
-     * @throws DeleteNotAllowedException Thrown when delete action is not allowed.
      */
     @Operation(summary = "Delete an organization")
     @ApiResponses(value = {
@@ -184,7 +182,7 @@ public class OrganizationController {
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteOrganizationResponse> deleteOrganization(@Valid @RequestBody ObjectRequest<DeleteOrganizationRequest> request) throws OrganizationNotFoundException, DeleteNotAllowedException {
+    public ObjectResponse<DeleteOrganizationResponse> deleteOrganization(@Valid @RequestBody ObjectRequest<DeleteOrganizationRequest> request) throws OrganizationNotFoundException {
         logger.info("Received deleteOrganization request, organization ID: {}", request.getRequestObject().getOrganizationId());
         final DeleteOrganizationResponse response = organizationService.deleteOrganization(request.getRequestObject());
         logger.info("The deleteOrganization request succeeded, organization ID: {}", request.getRequestObject().getOrganizationId());

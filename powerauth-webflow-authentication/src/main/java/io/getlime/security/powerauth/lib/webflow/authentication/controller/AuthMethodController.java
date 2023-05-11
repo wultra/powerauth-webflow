@@ -533,16 +533,16 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
             // TODO: Allow passing custom parameters
             switch (authOperationResponse.getAuthResult()) {
-                case DONE: {
+                case DONE -> {
                     return provider.doneAuthentication(userId);
                 }
-                case FAILED: {
+                case FAILED -> {
                     return provider.failedAuthentication(userId, authOperationResponse.getResultDescription());
                 }
-                case CONTINUE: {
+                case CONTINUE -> {
                     return provider.continueAuthentication(authOperationResponse.getOperationId(), userId, authOperationResponse.getSteps());
                 }
-                default: {
+                default -> {
                     return provider.failedAuthentication(userId, "error.unknown");
                 }
             }
@@ -550,15 +550,15 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             Error nextStepError = ex.getError();
             if (nextStepError != null) {
                 switch (nextStepError.getCode()) {
-                    case OperationAlreadyFinishedException.CODE:
-                        // Translate Next Step exception for update of a finished operation
-                        throw new OperationIsAlreadyFinished(ex.getMessage());
-                    case OperationAlreadyCanceledException.CODE:
-                        // Translate Next Step exception for update of a canceled operation
-                        throw new OperationIsAlreadyCanceledException(ex.getMessage());
-                    case OperationAlreadyFailedException.CODE:
-                        // Translate Next Step exception for update of a failed operation
-                        throw new OperationIsAlreadyFailedException(ex.getMessage());
+                    case OperationAlreadyFinishedException.CODE ->
+                            // Translate Next Step exception for update of a finished operation
+                            throw new OperationIsAlreadyFinished(ex.getMessage());
+                    case OperationAlreadyCanceledException.CODE ->
+                            // Translate Next Step exception for update of a canceled operation
+                            throw new OperationIsAlreadyCanceledException(ex.getMessage());
+                    case OperationAlreadyFailedException.CODE ->
+                            // Translate Next Step exception for update of a failed operation
+                            throw new OperationIsAlreadyFailedException(ex.getMessage());
                 }
             }
             // Generic Next Step error

@@ -32,7 +32,7 @@ public class ConsentInitResponse extends AuthStepResponse {
 
     private boolean shouldDisplayConsent;
     private String consentHtml;
-    private List<ConsentOption> options;
+    private final List<ConsentOption> options;
 
     /**
      * Default constructor.

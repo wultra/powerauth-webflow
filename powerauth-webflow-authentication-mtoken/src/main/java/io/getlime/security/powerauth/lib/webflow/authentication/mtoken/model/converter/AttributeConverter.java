@@ -38,28 +38,28 @@ public class AttributeConverter {
             return null;
         }
         switch (input.getType()) {
-            case AMOUNT: {
+            case AMOUNT -> {
                 OperationAmountFieldAttribute attr = (OperationAmountFieldAttribute) input;
                 return new AmountAttribute(attr.getId(), attr.getLabel(), attr.getAmount(), attr.getCurrency(),
                         attr.getFormattedValues().get("amount"), attr.getFormattedValues().get("currency"));
             }
-            case KEY_VALUE: {
+            case KEY_VALUE -> {
                 OperationKeyValueFieldAttribute attr = (OperationKeyValueFieldAttribute) input;
                 return new KeyValueAttribute(attr.getId(), attr.getLabel(), attr.getFormattedValues().get("value"));
             }
-            case NOTE: {
+            case NOTE -> {
                 OperationNoteFieldAttribute attr = (OperationNoteFieldAttribute) input;
                 return new NoteAttribute(attr.getId(), attr.getLabel(), attr.getFormattedValues().get("value"));
             }
-            case HEADING: {
+            case HEADING -> {
                 OperationHeadingFieldAttribute attr = (OperationHeadingFieldAttribute) input;
                 return new HeadingAttribute(attr.getId(), attr.getFormattedValues().get("value"));
             }
-            case PARTY_INFO: {
+            case PARTY_INFO -> {
                 OperationPartyInfoFieldAttribute attr = (OperationPartyInfoFieldAttribute) input;
                 return new PartyAttribute(attr.getId(), attr.getLabel(), fromPartyInfo(attr.getPartyInfo()));
             }
-            default: {
+            default -> {
                 return new KeyValueAttribute(input.getId(), input.getLabel(), null);
             }
         }

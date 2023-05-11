@@ -23,6 +23,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -39,6 +40,7 @@ import java.util.Set;
 @EqualsAndHashCode(of = "userId")
 public class UserIdentityEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -372574158382801384L;
 
     @Id

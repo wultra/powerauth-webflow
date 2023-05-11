@@ -17,6 +17,8 @@
  */
 package io.getlime.security.powerauth.app.webflow.exception;
 
+import java.io.Serial;
+
 /**
  * Exception used when access token or refresh token is invalid.
  *
@@ -24,6 +26,7 @@ package io.getlime.security.powerauth.app.webflow.exception;
  */
 public class InvalidTokenException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 8669519506272141604L;
 
     public InvalidTokenException(String message) {

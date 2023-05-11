@@ -107,11 +107,8 @@ public class UserConsentService {
     public UserConsentDetailResponse consentStatus(String userId, String consentId, String clientId) throws ConsentNotFoundException {
 
         // Check if a consent with given consent ID exists
-        final Optional<ConsentEntity> consentOptional = consentRepository.findFirstById(consentId);
-        if (!consentOptional.isPresent()) {
-            throw new ConsentNotFoundException(consentId);
-        }
-        final ConsentEntity consent = consentOptional.get();
+        final ConsentEntity consent = consentRepository.findFirstById(consentId).orElseThrow(() ->
+                new ConsentNotFoundException(consentId));
 
         final Optional<UserConsentEntity> consentStatusOptional = userConsentRepository.findConsentStatus(userId, consentId, clientId);
         if (consentStatusOptional.isPresent()) {
@@ -154,11 +151,8 @@ public class UserConsentService {
     public GiveConsentResponse giveConsent(GiveConsentRequest ro) throws ConsentNotFoundException {
 
         // Check if a consent with given consent exists
-        final Optional<ConsentEntity> consentOptional = consentRepository.findFirstById(ro.getConsentId());
-        if (!consentOptional.isPresent()) {
-            throw new ConsentNotFoundException(ro.getConsentId());
-        }
-        final ConsentEntity consent = consentOptional.get();
+        final ConsentEntity consent = consentRepository.findFirstById(ro.getConsentId()).orElseThrow(() ->
+                new ConsentNotFoundException(ro.getConsentId()));
 
         // Find if a user already gave this consent, so that it can be updated on save
         final Optional<UserConsentEntity> consentStatusOptional = userConsentRepository.findConsentStatus(ro.getUserId(), ro.getConsentId(), ro.getClientId());
@@ -219,7 +213,7 @@ public class UserConsentService {
 
         // Check if a consent with given consent exists
         final Optional<ConsentEntity> consentOptional = consentRepository.findFirstById(ro.getConsentId());
-        if (!consentOptional.isPresent()) {
+        if (consentOptional.isEmpty()) {
             throw new ConsentNotFoundException(ro.getConsentId());
         }
 
@@ -260,7 +254,7 @@ public class UserConsentService {
 
             // Check if a consent with given consent exists
             final Optional<ConsentEntity> consentOptional = consentRepository.findFirstById(consentStatus.getConsentId());
-            if (!consentOptional.isPresent()) { // should happen only in case of data inconsistency.
+            if (consentOptional.isEmpty()) { // should happen only in case of data inconsistency.
                 throw new ConsentNotFoundException(consentStatus.getConsentId());
             }
 
@@ -306,11 +300,8 @@ public class UserConsentService {
         for (UserConsentHistoryEntity uche: userConsentHistoryEntities) {
 
             // Find the consent template
-            final Optional<ConsentEntity> consentEntityOptional = consentRepository.findFirstById(uche.getConsentId());
-            if (!consentEntityOptional.isPresent()) {
-                throw new ConsentNotFoundException(uche.getConsentId());
-            }
-            final ConsentEntity consent = consentEntityOptional.get();
+            final ConsentEntity consent = consentRepository.findFirstById(uche.getConsentId()).orElseThrow(() ->
+                    new ConsentNotFoundException(uche.getConsentId()));
 
             //TODO: Replace by converter
             GivenConsentHistory givenConsentHistory = new GivenConsentHistory();
@@ -369,11 +360,8 @@ public class UserConsentService {
         for (UserConsentEntity uce: consentEntities) {
 
             // Find the consent template
-            final Optional<ConsentEntity> consentEntityOptional = consentRepository.findFirstById(uce.getConsentId());
-            if (!consentEntityOptional.isPresent()) {
-                throw new ConsentNotFoundException(uce.getConsentId());
-            }
-            final ConsentEntity consent = consentEntityOptional.get();
+            final ConsentEntity consent = consentRepository.findFirstById(uce.getConsentId()).orElseThrow(() ->
+                    new ConsentNotFoundException(uce.getConsentId()));
 
             // Prepare the consent entity for the response
             //TODO: Replace by converter

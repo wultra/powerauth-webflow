@@ -22,6 +22,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -36,6 +37,7 @@ import java.util.Date;
 @EqualsAndHashCode(of = "name")
 public class ApplicationEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 583672417376181537L;
 
     @Id

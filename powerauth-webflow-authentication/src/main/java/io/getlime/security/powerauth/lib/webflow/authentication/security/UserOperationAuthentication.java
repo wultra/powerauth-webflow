@@ -22,11 +22,9 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Object representing a user authentication.
@@ -35,6 +33,7 @@ import java.util.Locale;
  */
 public class UserOperationAuthentication extends AbstractAuthenticationToken implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 4514448849365459373L;
 
     private String userId;
@@ -76,9 +75,7 @@ public class UserOperationAuthentication extends AbstractAuthenticationToken imp
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
-        ArrayList<GrantedAuthority> authorities = new ArrayList<>(1);
-        authorities.add(new SimpleGrantedAuthority("USER"));
-        return Collections.unmodifiableList(authorities);
+        return List.of(new SimpleGrantedAuthority("USER"));
     }
 
     @Override

@@ -23,6 +23,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -34,6 +35,7 @@ import java.io.Serializable;
 @Table(name = "tpp_consent")
 public class ConsentEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -3031091688188605604L;
 
     @Id
