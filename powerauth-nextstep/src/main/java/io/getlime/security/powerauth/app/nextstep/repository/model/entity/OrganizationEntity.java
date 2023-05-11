@@ -24,6 +24,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -37,6 +38,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(of = "organizationId")
 public class OrganizationEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -3682348562614758414L;
 
     @Id

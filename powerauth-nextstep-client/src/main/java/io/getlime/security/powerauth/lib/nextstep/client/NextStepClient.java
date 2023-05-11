@@ -598,7 +598,7 @@ public class NextStepClient {
         final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("userId", Collections.singletonList(userId));
         params.put("mobileTokenOnly", Collections.singletonList(String.valueOf(mobileTokenOnly)));
-        return getImpl("/user/operation", params, new ParameterizedTypeReference<ObjectResponse<List<GetOperationDetailResponse>>>() {});
+        return getImpl("/user/operation", params, new ParameterizedTypeReference<>() {});
     }
 
     /**
@@ -613,7 +613,7 @@ public class NextStepClient {
         final GetPendingOperationsRequest request = new GetPendingOperationsRequest();
         request.setUserId(userId);
         request.setMobileTokenOnly(mobileTokenOnly);
-        return postImpl("/user/operation/list", new ObjectRequest<>(request), new ParameterizedTypeReference<ObjectResponse<List<GetOperationDetailResponse>>>() {});
+        return postImpl("/user/operation/list", new ObjectRequest<>(request), new ParameterizedTypeReference<>() {});
     }
 
     // Organization related methods

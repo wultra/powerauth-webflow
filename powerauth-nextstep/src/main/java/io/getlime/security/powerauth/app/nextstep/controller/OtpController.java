@@ -129,7 +129,6 @@ public class OtpController {
      * @param includeRemoved Whether removed OTPs should be included.
      * @return Get OTP list response.
      * @throws OperationNotFoundException Thrown when operation is not found.
-     * @throws EncryptionException Thrown when decryption fails.
      */
     @Operation(summary = "Get an OTP list")
     @ApiResponses(value = {
@@ -138,7 +137,7 @@ public class OtpController {
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetOtpListResponse> getOptList(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId, @RequestParam boolean includeRemoved) throws OperationNotFoundException, EncryptionException {
+    public ObjectResponse<GetOtpListResponse> getOptList(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId, @RequestParam boolean includeRemoved) throws OperationNotFoundException {
         logger.info("Received getOptList request, operation ID: {}", operationId);
         GetOtpListRequest request = new GetOtpListRequest();
         request.setOperationId(operationId);
@@ -153,7 +152,6 @@ public class OtpController {
      * @param request Get OTP list request.
      * @return Get OTP list response.
      * @throws OperationNotFoundException Thrown when operation is not found.
-     * @throws EncryptionException Thrown when decryption fails.
      */
     @Operation(summary = "Get an OTP list")
     @ApiResponses(value = {
@@ -162,7 +160,7 @@ public class OtpController {
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetOtpListResponse> getOptListPost(@Valid @RequestBody ObjectRequest<GetOtpListRequest> request) throws OperationNotFoundException, EncryptionException {
+    public ObjectResponse<GetOtpListResponse> getOptListPost(@Valid @RequestBody ObjectRequest<GetOtpListRequest> request) throws OperationNotFoundException {
         logger.info("Received getOptListPost request, operation ID: {}", request.getRequestObject().getOperationId());
         final GetOtpListResponse response = otpService.getOtpList(request.getRequestObject());
         logger.info("The getOptListPost request succeeded, operation ID: {}", request.getRequestObject().getOperationId());

@@ -32,16 +32,11 @@ public class BannerTypeConverter {
      * @return Data adapter BannerType.
      */
     public io.getlime.security.powerauth.lib.dataadapter.model.enumeration.BannerType fromOperationBannerType(BannerType input) {
-        switch (input) {
-            case BANNER_INFO:
-                return io.getlime.security.powerauth.lib.dataadapter.model.enumeration.BannerType.BANNER_INFO;
-            case BANNER_WARNING:
-                return io.getlime.security.powerauth.lib.dataadapter.model.enumeration.BannerType.BANNER_WARNING;
-            case BANNER_ERROR:
-                return io.getlime.security.powerauth.lib.dataadapter.model.enumeration.BannerType.BANNER_ERROR;
-            default:
-                throw new IllegalStateException("Unsupported banner type: "+input);
-        }
+        return switch (input) {
+            case BANNER_INFO -> io.getlime.security.powerauth.lib.dataadapter.model.enumeration.BannerType.BANNER_INFO;
+            case BANNER_WARNING -> io.getlime.security.powerauth.lib.dataadapter.model.enumeration.BannerType.BANNER_WARNING;
+            case BANNER_ERROR -> io.getlime.security.powerauth.lib.dataadapter.model.enumeration.BannerType.BANNER_ERROR;
+        };
     }
 
     /**
@@ -50,15 +45,10 @@ public class BannerTypeConverter {
      * @return Next step BannerType.
      */
     public BannerType fromBannerType(io.getlime.security.powerauth.lib.dataadapter.model.enumeration.BannerType input) {
-        switch (input) {
-            case BANNER_INFO:
-                return BannerType.BANNER_INFO;
-            case BANNER_WARNING:
-                return BannerType.BANNER_WARNING;
-            case BANNER_ERROR:
-                return BannerType.BANNER_ERROR;
-            default:
-                throw new IllegalStateException("Unsupported banner type: "+input);
-        }
+        return switch (input) {
+            case BANNER_INFO -> BannerType.BANNER_INFO;
+            case BANNER_WARNING -> BannerType.BANNER_WARNING;
+            case BANNER_ERROR -> BannerType.BANNER_ERROR;
+        };
     }
 }

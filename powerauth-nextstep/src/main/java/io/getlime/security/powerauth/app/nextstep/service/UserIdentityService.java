@@ -233,12 +233,9 @@ public class UserIdentityService {
         final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
         final CredentialService credentialService = serviceCatalogue.getCredentialService();
 
-        final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
-        if (!userOptional.isPresent()) {
-            throw new UserNotFoundException("User identity not found: " + request.getUserId());
-        }
+        UserIdentityEntity user = userIdentityRepository.findById(request.getUserId()).orElseThrow(() ->
+                new UserNotFoundException("User identity not found: " + request.getUserId()));
         // The findUser() method is not used to allow update REMOVED -> ACTIVE
-        UserIdentityEntity user = userOptional.get();
         Map<String, RoleEntity> roleEntities = new HashMap<>();
         if (request.getRoles() != null) {
             roleEntities = collectRoleEntities(request.getRoles());
@@ -373,7 +370,7 @@ public class UserIdentityService {
                 throw new InvalidRequestException(ex);
             }
         }
-        final List<UserRoleEntity> userRoles = user.getRoles().stream().filter(r -> r.getStatus() == UserRoleStatus.ACTIVE).collect(Collectors.toList());
+        final List<UserRoleEntity> userRoles = user.getRoles().stream().filter(r -> r.getStatus() == UserRoleStatus.ACTIVE).toList();
         userRoles.forEach(userRole -> response.getRoles().add(userRole.getRole().getName()));
         final Set<UserContactEntity> userContacts = user.getContacts();
         for (UserContactEntity userContact: userContacts) {
@@ -559,11 +556,9 @@ public class UserIdentityService {
     private Map<String, RoleEntity> collectRoleEntities(List<String> roles) throws InvalidRequestException {
         final Map<String, RoleEntity> roleEntities = new HashMap<>();
         for (String roleName : roles) {
-            final Optional<RoleEntity> roleOptional = roleRepository.findByName(roleName);
-            if (!roleOptional.isPresent()) {
-                throw new InvalidRequestException("User role not found: " + roleName);
-            }
-            roleEntities.put(roleName, roleOptional.get());
+            final RoleEntity role = roleRepository.findByName(roleName).orElseThrow(() ->
+                    new InvalidRequestException("User role not found: " + roleName));
+            roleEntities.put(roleName, role);
         }
         return roleEntities;
     }
@@ -664,7 +659,7 @@ public class UserIdentityService {
         final List<String> credentialsToKeep = activeCredentials
                 .stream()
                 .map(CredentialSecretDetail::getCredentialName)
-                .collect(Collectors.toList());
+                .toList();
         existingCredentials.forEach(credential -> {
             if (!credentialsToKeep.contains(credential.getCredentialDefinition().getName())
                     && credential.getStatus() != CredentialStatus.REMOVED) {

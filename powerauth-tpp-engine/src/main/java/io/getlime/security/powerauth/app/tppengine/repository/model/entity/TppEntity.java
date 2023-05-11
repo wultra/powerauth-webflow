@@ -20,6 +20,7 @@ package io.getlime.security.powerauth.app.tppengine.repository.model.entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -32,6 +33,7 @@ import java.util.List;
 @Table(name = "tpp_detail")
 public class TppEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -7089801604663605351L;
 
     @Id

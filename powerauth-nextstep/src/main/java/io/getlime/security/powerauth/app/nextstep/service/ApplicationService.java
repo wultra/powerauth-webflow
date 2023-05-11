@@ -109,11 +109,8 @@ public class ApplicationService {
      */
     @Transactional
     public UpdateApplicationResponse updateApplication(UpdateApplicationRequest request) throws ApplicationNotFoundException {
-        final Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
-        if (!applicationOptional.isPresent()) {
-            throw new ApplicationNotFoundException("Application not found: " + request.getApplicationName());
-        }
-        ApplicationEntity application = applicationOptional.get();
+        ApplicationEntity application = applicationRepository.findByName(request.getApplicationName()).orElseThrow(() ->
+                new ApplicationNotFoundException("Application not found: " + request.getApplicationName()));
         if (application.getStatus() != ApplicationStatus.ACTIVE && request.getApplicationStatus() != ApplicationStatus.ACTIVE) {
             throw new ApplicationNotFoundException("Application is not ACTIVE: " + request.getApplicationName());
         }
@@ -164,11 +161,8 @@ public class ApplicationService {
      */
     @Transactional
     public DeleteApplicationResponse deleteApplication(DeleteApplicationRequest request) throws ApplicationNotFoundException {
-        final Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
-        if (!applicationOptional.isPresent()) {
-            throw new ApplicationNotFoundException("Application not found: " + request.getApplicationName());
-        }
-        ApplicationEntity application = applicationOptional.get();
+        ApplicationEntity application = applicationRepository.findByName(request.getApplicationName()).orElseThrow(() ->
+                new ApplicationNotFoundException("Application not found: " + request.getApplicationName()));
         application.setStatus(ApplicationStatus.REMOVED);
         application.setTimestampLastUpdated(new Date());
         application = applicationRepository.save(application);

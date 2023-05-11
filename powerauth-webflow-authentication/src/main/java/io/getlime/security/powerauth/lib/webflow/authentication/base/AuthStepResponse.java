@@ -32,13 +32,9 @@ import java.util.List;
 public class AuthStepResponse {
 
     private AuthStepResult result;
-    private List<AuthStep> next;
+    private final List<AuthStep> next = new ArrayList<>();
     private String message;
     private Integer remainingAttempts;
-
-    public AuthStepResponse() {
-        this.next = new ArrayList<>();
-    }
 
     /**
      * Get the auth step result for the response - either success, or failure.

@@ -37,11 +37,11 @@ public class AesEncryptionPasswordProtection implements PasswordProtection {
     private static final Logger logger = LoggerFactory.getLogger(AesEncryptionPasswordProtection.class);
 
     private final AESEncryptionUtils aes = new AESEncryptionUtils();
-    private KeyGenerator keyGenerator = new KeyGenerator();
-    private KeyConvertor keyConvertor = new KeyConvertor();
+    private final KeyGenerator keyGenerator = new KeyGenerator();
+    private final KeyConvertor keyConvertor = new KeyConvertor();
 
-    private String cipherTransformation;
-    private String secretKeyBase64;
+    private final String cipherTransformation;
+    private final String secretKeyBase64;
 
     /**
      * Class constructor.

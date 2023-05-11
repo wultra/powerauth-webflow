@@ -25,7 +25,7 @@ import lombok.Data;
 
 /**
  * Request object used for updating a credential counter.
- *
+ * <p>
  * The counter is either reset or increased based on provided authentication result.
  *
  * @author Roman Strobl, roman.strobl@wultra.com

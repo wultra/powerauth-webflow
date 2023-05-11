@@ -277,7 +277,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         // generating of QR code
         OfflineSignatureQrCode qrCode = generateQrCode(activationEntity);
         initResponse.setQrCode(qrCode.generateImage());
-        initResponse.setNonce(qrCode.getNonce());
+        initResponse.setNonce(qrCode.nonce());
         initResponse.setChosenActivation(activationEntity);
         // currently the choice of activations is limited only to the configured activation, however list is kept in case we decide in future to re-enable the choice
         initResponse.setActivations(activationEntities);

@@ -50,7 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This service handles persistence of user authentication methods.
@@ -293,18 +292,18 @@ public class AuthMethodService {
         // Get all methods enabled for user
         final List<AuthMethod> enabledAuthMethods = listAuthMethodsEnabledForUser(userId).stream()
                 .map(UserAuthMethodDetail::getAuthMethod)
-                .collect(Collectors.toList());
+                .toList();
         // Filter methods by step definitions for given operation to return only relevant methods for the operation.
         // Do not return INIT method, it is not used for authentication.
         final List<StepDefinitionEntity> stepDefinitions = stepDefinitionRepository.findStepDefinitionsForOperation(operationName);
         final List<AuthMethod> methodsPerOperation = stepDefinitions.stream()
                 .map(StepDefinitionEntity::getRequestAuthMethod)
                 .filter(authMethod -> authMethod != AuthMethod.INIT)
-                .collect(Collectors.toList());
+                .toList();
         // Merge enabled methods and methods used in the operation
         final List<AuthMethod> filteredMethods = enabledAuthMethods.stream()
                 .filter(methodsPerOperation::contains)
-                .collect(Collectors.toList());
+                .toList();
         // Check mobile token status, remove POWERAUTH_TOKEN method in case it is not currently available
         if (filteredMethods.contains(AuthMethod.POWERAUTH_TOKEN)) {
             if (!mobileTokenConfigurationService.isMobileTokenActive(userId, operationName, AuthMethod.POWERAUTH_TOKEN)) {
@@ -334,10 +333,8 @@ public class AuthMethodService {
         final AuthMethodRepository authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
         final StepDefinitionRepository stepDefinitionRepository = repositoryCatalogue.getStepDefinitionRepository();
         final OperationHistoryRepository operationHistoryRepository = repositoryCatalogue.getOperationHistoryRepository();
-        final Optional<AuthMethodEntity> authMethodOptional = authMethodRepository.findByAuthMethod(request.getAuthMethod());
-        if (!authMethodOptional.isPresent()) {
-            throw new AuthMethodNotFoundException("Authentication method not found: " + request.getAuthMethod());
-        }
+        final AuthMethodEntity authMethod = authMethodRepository.findByAuthMethod(request.getAuthMethod()).orElseThrow(() ->
+                new AuthMethodNotFoundException("Authentication method not found: " + request.getAuthMethod()));
         final long requestAuthMethods = stepDefinitionRepository.countByRequestAuthMethod(request.getAuthMethod());
         final long responseAuthMethods = stepDefinitionRepository.countByResponseAuthMethod(request.getAuthMethod());
         final long historyRequestAuthMethods = operationHistoryRepository.countByRequestAuthMethod(request.getAuthMethod());
@@ -345,7 +342,6 @@ public class AuthMethodService {
         if (requestAuthMethods > 0 || responseAuthMethods > 0 || historyRequestAuthMethods > 0 || historyChosenAuthMethods > 0) {
             throw new DeleteNotAllowedException("Authentication method cannot be deleted because it is used: " + request.getAuthMethod());
         }
-        final AuthMethodEntity authMethod = authMethodOptional.get();
         authMethodRepository.delete(authMethod);
         logger.debug("Authentication method was deleted: {}", authMethod.getAuthMethod());
         audit.info("Authentication method was deleted", AuditDetail.builder()

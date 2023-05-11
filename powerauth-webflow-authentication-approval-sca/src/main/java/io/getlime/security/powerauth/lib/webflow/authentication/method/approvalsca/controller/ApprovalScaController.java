@@ -65,7 +65,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
 
     private static final Logger logger = LoggerFactory.getLogger(ApprovalScaController.class);
 
-    private final String FIELD_BANK_ACCOUNT_CHOICE_DISABLED = "operation.bankAccountChoice.disabled";
+    private static final String FIELD_BANK_ACCOUNT_CHOICE_DISABLED = "operation.bankAccountChoice.disabled";
 
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;

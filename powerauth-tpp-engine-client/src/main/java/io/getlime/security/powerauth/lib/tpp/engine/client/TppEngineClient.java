@@ -190,7 +190,7 @@ public class TppEngineClient {
     public ObjectResponse<List<TppAppDetailResponse>> fetchApplicationList(String tppLicense) throws TppEngineClientException {
         final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("tppLicense", Collections.singletonList(tppLicense));
-        return getImpl("/tpp/app/list", params, new ParameterizedTypeReference<ObjectResponse<List<TppAppDetailResponse>>>(){});
+        return getImpl("/tpp/app/list", params, new ParameterizedTypeReference<>(){});
     }
 
     /**
@@ -405,7 +405,7 @@ public class TppEngineClient {
         if (e.getErrorResponse() == null || e.getErrorResponse().getResponseObject() == null) {
             logger.trace("Wultra Java Core lib did not parse ErrorResponse for {}", e.getResponse());
             try {
-                final ObjectResponse<TppEngineError> errorResponse = new ObjectMapper().readValue(e.getResponse(), new TypeReference<ObjectResponse<TppEngineError>>(){});
+                final ObjectResponse<TppEngineError> errorResponse = new ObjectMapper().readValue(e.getResponse(), new TypeReference<>(){});
                 if (errorResponse != null && errorResponse.getResponseObject() != null) {
                     return errorResponse.getResponseObject();
                 }

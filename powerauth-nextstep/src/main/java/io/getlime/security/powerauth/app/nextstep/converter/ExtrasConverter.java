@@ -38,7 +38,7 @@ public class ExtrasConverter {
      * @return Map with deserialized extras.
      */
     public Map<String, Object> fromString(String extras) throws JsonProcessingException {
-        return objectMapper.readValue(extras, new TypeReference<Map<String, Object>>() {});
+        return objectMapper.readValue(extras, new TypeReference<>() {});
     }
 
     /**

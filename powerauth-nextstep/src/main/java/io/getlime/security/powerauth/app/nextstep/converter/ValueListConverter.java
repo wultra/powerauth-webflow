@@ -38,7 +38,7 @@ public class ValueListConverter {
      * @return List with deserialized values.
      */
     public List<String> fromString(String values) throws JsonProcessingException {
-        return objectMapper.readValue(values, new TypeReference<List<String>>() {});
+        return objectMapper.readValue(values, new TypeReference<>() {});
     }
 
     /**

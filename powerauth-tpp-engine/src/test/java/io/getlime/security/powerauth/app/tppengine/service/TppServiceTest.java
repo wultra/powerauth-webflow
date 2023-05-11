@@ -86,9 +86,8 @@ public class TppServiceTest {
     void testBlockTppWhenNotFound() {
         Mockito.when(tppRepository.findFirstByTppLicense(TPP_LICENSE)).thenReturn(Optional.empty());
 
-        assertThrows(TppNotFoundException.class, () -> {
-            tppService.blockTpp(TPP_LICENSE);
-        });
+        assertThrows(TppNotFoundException.class, () ->
+                tppService.blockTpp(TPP_LICENSE));
     }
 
     @Test
@@ -115,9 +114,8 @@ public class TppServiceTest {
     void testUnblockTppWhenNotFound() {
         Mockito.when(tppRepository.findFirstByTppLicense(TPP_LICENSE)).thenReturn(Optional.empty());
 
-        assertThrows(TppNotFoundException.class, () -> {
-            tppService.unblockTpp(TPP_LICENSE);
-        });
+        assertThrows(TppNotFoundException.class, () ->
+                tppService.unblockTpp(TPP_LICENSE));
     }
 
 }

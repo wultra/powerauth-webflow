@@ -34,14 +34,11 @@ public class OperationCancellationConverter {
         if (cancelReason == null) {
             return OperationTerminationReason.FAILED;
         }
-        switch (cancelReason) {
-            case INTERRUPTED_OPERATION:
-                return OperationTerminationReason.INTERRUPTED;
-            case TIMED_OUT_OPERATION:
-                return OperationTerminationReason.TIMED_OUT;
-            default:
-                return OperationTerminationReason.FAILED;
-        }
+        return switch (cancelReason) {
+            case INTERRUPTED_OPERATION -> OperationTerminationReason.INTERRUPTED;
+            case TIMED_OUT_OPERATION -> OperationTerminationReason.TIMED_OUT;
+            default -> OperationTerminationReason.FAILED;
+        };
     }
 
 }

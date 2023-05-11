@@ -89,11 +89,8 @@ public class UserRoleService {
         final UserIdentityService userIdentityService = serviceCatalogue.getUserIdentityService();
 
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        final Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
-        if (!roleOptional.isPresent()) {
-            throw new InvalidRequestException("Role not found: " + request.getRoleName());
-        }
-        final RoleEntity role = roleOptional.get();
+        final RoleEntity role = roleRepository.findByName(request.getRoleName()).orElseThrow(() ->
+                new InvalidRequestException("Role not found: " + request.getRoleName()));
         final Optional<UserRoleEntity> userRoleOptional = user.getRoles().stream().filter(r -> r.getRole().equals(role)).findFirst();
         final UserRoleEntity userRole;
         if (userRoleOptional.isPresent()) {
@@ -140,11 +137,8 @@ public class UserRoleService {
         final UserIdentityService userIdentityService = serviceCatalogue.getUserIdentityService();
 
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        final Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
-        if (!roleOptional.isPresent()) {
-            throw new InvalidRequestException("Role not found: " + request.getRoleName());
-        }
-        final RoleEntity role = roleOptional.get();
+        final RoleEntity role = roleRepository.findByName(request.getRoleName()).orElseThrow(() ->
+                new InvalidRequestException("Role not found: " + request.getRoleName()));
         final Optional<UserRoleEntity> userRoleOptional = user.getRoles().stream().filter(r -> r.getRole().equals(role)).findFirst();
         final UserRoleEntity userRole;
         if (userRoleOptional.isPresent()) {

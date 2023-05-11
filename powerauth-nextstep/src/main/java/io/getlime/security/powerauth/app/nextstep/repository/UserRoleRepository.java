@@ -33,7 +33,7 @@ public interface UserRoleRepository extends CrudRepository<UserRoleEntity, Long>
     /**
      * Count number of role records with a specified role.
      * @param role Role
-     * @return List of user roles.
+     * @return number of user roles.
      */
     long countByRole(RoleEntity role);
 

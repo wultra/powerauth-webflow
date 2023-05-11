@@ -38,17 +38,10 @@ public class UserAccountStatusConverter {
             return null;
         }
 
-        switch (userIdentityStatus) {
-            case ACTIVE:
-                return AccountStatus.ACTIVE;
-
-            case BLOCKED:
-            case REMOVED:
-                return AccountStatus.NOT_ACTIVE;
-
-            default:
-                return null;
-        }
+        return switch (userIdentityStatus) {
+            case ACTIVE -> AccountStatus.ACTIVE;
+            case BLOCKED, REMOVED -> AccountStatus.NOT_ACTIVE;
+        };
     }
 
     /**
@@ -61,17 +54,10 @@ public class UserAccountStatusConverter {
             return null;
         }
 
-        switch (userIdentityStatus) {
-            case ACTIVE:
-                return UserAccountStatus.ACTIVE;
-
-            case BLOCKED:
-            case REMOVED:
-                return UserAccountStatus.NOT_ACTIVE;
-
-            default:
-                return null;
-        }
+        return switch (userIdentityStatus) {
+            case ACTIVE -> UserAccountStatus.ACTIVE;
+            case BLOCKED, REMOVED -> UserAccountStatus.NOT_ACTIVE;
+        };
     }
 
     /**
@@ -84,16 +70,10 @@ public class UserAccountStatusConverter {
             return null;
         }
 
-        switch (accountStatus) {
-            case ACTIVE:
-                return AccountStatus.ACTIVE;
-
-            case NOT_ACTIVE:
-                return AccountStatus.NOT_ACTIVE;
-
-            default:
-                return null;
-        }
+        return switch (accountStatus) {
+            case ACTIVE -> AccountStatus.ACTIVE;
+            case NOT_ACTIVE -> AccountStatus.NOT_ACTIVE;
+        };
     }
 
     /**
@@ -106,16 +86,10 @@ public class UserAccountStatusConverter {
             return null;
         }
 
-        switch (userAccountStatus) {
-            case ACTIVE:
-                return UserAccountStatus.ACTIVE;
-
-            case NOT_ACTIVE:
-                return UserAccountStatus.NOT_ACTIVE;
-
-            default:
-                return null;
-        }
+        return switch (userAccountStatus) {
+            case ACTIVE -> UserAccountStatus.ACTIVE;
+            case NOT_ACTIVE -> UserAccountStatus.NOT_ACTIVE;
+        };
     }
 
 }

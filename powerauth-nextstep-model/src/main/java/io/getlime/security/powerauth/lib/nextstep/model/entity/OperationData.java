@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  * Operation data contains structured data used for signatures.
- *
+ * <p>
  * See <a href="https://developers.wultra.com/docs/develop/powerauth-webflow/Operation-Data">operation data documentation</a>.
  *
  * @author Roman Strobl, roman.strobl@wultra.com

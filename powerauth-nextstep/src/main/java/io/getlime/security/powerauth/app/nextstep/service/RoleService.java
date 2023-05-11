@@ -122,11 +122,8 @@ public class RoleService {
      */
     @Transactional
     public DeleteRoleResponse deleteRole(DeleteRoleRequest request) throws RoleNotFoundException, DeleteNotAllowedException {
-        final Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
-        if (!roleOptional.isPresent()) {
-            throw new RoleNotFoundException("Role not found: " + request.getRoleName());
-        }
-        final RoleEntity role = roleOptional.get();
+        final RoleEntity role = roleRepository.findByName(request.getRoleName()).orElseThrow(() ->
+                new RoleNotFoundException("Role not found: " + request.getRoleName()));
         final long existingRoleCount = userRoleRepository.countByRole(role);
         if (existingRoleCount > 0) {
             throw new DeleteNotAllowedException("Role cannot be deleted because it is used: " + request.getRoleName());

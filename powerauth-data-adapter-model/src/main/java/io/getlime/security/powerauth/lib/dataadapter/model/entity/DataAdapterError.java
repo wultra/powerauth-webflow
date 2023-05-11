@@ -34,7 +34,7 @@ public class DataAdapterError extends Error {
     /**
      * Response codes for different authentication failures.
      */
-    public class Code extends Error.Code {
+    public static class Code extends Error.Code {
 
         /**
          * User authentication failed.

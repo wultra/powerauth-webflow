@@ -20,6 +20,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.repository.mode
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import jakarta.persistence.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
@@ -33,6 +34,7 @@ import java.util.Objects;
 @Table(name = "wf_operation_session")
 public class OperationSessionEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -5370629764971469306L;
 
     @Id

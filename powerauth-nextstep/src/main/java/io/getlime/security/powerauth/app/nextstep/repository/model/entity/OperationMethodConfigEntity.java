@@ -24,6 +24,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -37,6 +38,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(of = "primaryKey")
 public class OperationMethodConfigEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 6602831455566058868L;
 
     @EmbeddedId
@@ -51,6 +53,7 @@ public class OperationMethodConfigEntity implements Serializable {
     @AllArgsConstructor
     public static class OperationAuthMethodKey implements Serializable {
 
+        @Serial
         private static final long serialVersionUID = -7631641120957350161L;
 
         @Column(name = "operation_name", nullable = false)

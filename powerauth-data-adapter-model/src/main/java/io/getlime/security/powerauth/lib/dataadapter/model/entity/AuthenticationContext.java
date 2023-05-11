@@ -35,8 +35,8 @@ public class AuthenticationContext {
 
     /**
      * Encryption cipher transformation in case password is encrypted.
-     *
-     * See: https://docs.oracle.com/javase/8/docs/api/javax/crypto/Cipher.html
+     * <p>
+     * @see javax.crypto.Cipher
      */
     private String cipherTransformation;
 

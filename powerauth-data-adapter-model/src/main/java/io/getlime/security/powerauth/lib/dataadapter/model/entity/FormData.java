@@ -37,20 +37,10 @@ public class FormData {
     private MessageAttribute title;
     private MessageAttribute greeting;
     private MessageAttribute summary;
-    private List<FormFieldConfig> config;
-    private List<FormBanner> banners;
-    private List<Attribute> parameters;
-    private Map<String, String> userInput;
-
-    /**
-     * Default constructor.
-     */
-    public FormData() {
-        this.config = new ArrayList<>();
-        this.parameters = new ArrayList<>();
-        this.banners = new ArrayList<>();
-        this.userInput = new LinkedHashMap<>();
-    }
+    private final List<FormFieldConfig> config = new ArrayList<>();
+    private final List<FormBanner> banners = new ArrayList<>();
+    private final List<Attribute> parameters = new ArrayList<>();
+    private Map<String, String> userInput = new LinkedHashMap<>();
 
     /**
      * Get form configuration.

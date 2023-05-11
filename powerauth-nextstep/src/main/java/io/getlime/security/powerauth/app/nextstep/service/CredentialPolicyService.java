@@ -160,11 +160,8 @@ public class CredentialPolicyService {
      */
     @Transactional
     public UpdateCredentialPolicyResponse updateCredentialPolicy(UpdateCredentialPolicyRequest request) throws CredentialPolicyNotFoundException, InvalidRequestException {
-        final Optional<CredentialPolicyEntity> credentialPolicyOptional = credentialPolicyRepository.findByName(request.getCredentialPolicyName());
-        if (!credentialPolicyOptional.isPresent()) {
-            throw new CredentialPolicyNotFoundException("Credential policy not found: " + request.getCredentialPolicyName());
-        }
-        CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
+        CredentialPolicyEntity credentialPolicy = credentialPolicyRepository.findByName(request.getCredentialPolicyName()).orElseThrow(() ->
+                new CredentialPolicyNotFoundException("Credential policy not found: " + request.getCredentialPolicyName()));
         if (credentialPolicy.getStatus() != CredentialPolicyStatus.ACTIVE && request.getCredentialPolicyStatus() != CredentialPolicyStatus.ACTIVE) {
             throw new CredentialPolicyNotFoundException("Credential policy is not ACTIVE: " + request.getCredentialPolicyName());
         }
@@ -271,11 +268,8 @@ public class CredentialPolicyService {
      */
     @Transactional
     public DeleteCredentialPolicyResponse deleteCredentialPolicy(DeleteCredentialPolicyRequest request) throws CredentialPolicyNotFoundException {
-        final Optional<CredentialPolicyEntity> credentialPolicyOptional = credentialPolicyRepository.findByName(request.getCredentialPolicyName());
-        if (!credentialPolicyOptional.isPresent()) {
-            throw new CredentialPolicyNotFoundException("Credential policy not found: " + request.getCredentialPolicyName());
-        }
-        CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
+        CredentialPolicyEntity credentialPolicy = credentialPolicyRepository.findByName(request.getCredentialPolicyName()).orElseThrow(() ->
+            new CredentialPolicyNotFoundException("Credential policy not found: " + request.getCredentialPolicyName()));
         if (credentialPolicy.getStatus() == CredentialPolicyStatus.REMOVED) {
             throw new CredentialPolicyNotFoundException("Credential policy is already REMOVED: " + request.getCredentialPolicyName());
         }

@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.error;
 
 import io.getlime.core.rest.model.base.entity.Error;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -28,12 +29,13 @@ import java.io.Serializable;
  */
 public class NextStepError extends Error implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -4275815737896000891L;
 
     /**
      * Response codes for different failures.
      */
-    public class Code extends Error.Code {
+    public static class Code extends Error.Code {
 
         /**
          * Error caused by the client.

@@ -69,38 +69,26 @@ public class ValueFormatterService {
         ValueFormatType valueFormatType = attribute.getValueFormatType();
 
         switch (valueFormatType) {
-
-            case TEXT: {
+            case TEXT -> {
                 attribute.addFormattedValue("value", getValue(attribute));
-                return;
             }
-
-            case AMOUNT: {
-                if (attribute instanceof OperationAmountFieldAttribute) {
-                    OperationAmountFieldAttribute amountAttribute = (OperationAmountFieldAttribute) attribute;
+            case AMOUNT -> {
+                if (attribute instanceof final OperationAmountFieldAttribute amountAttribute) {
                     addFormattedAmount(amountAttribute, locale);
                     return;
                 }
                 addNumericValue(attribute, locale);
-                return;
             }
-
-            case NUMBER: {
+            case NUMBER -> {
                 addNumericValue(attribute, locale);
-                return;
             }
-
-            case DATE:
+            case DATE -> {
                 attribute.addFormattedValue("value", formatDate(getValue(attribute), locale));
-                return;
-
-            case ACCOUNT:
+            }
+            case ACCOUNT -> {
                 attribute.addFormattedValue("value", formatAccount(getValue(attribute), locale));
-                return;
-
-            default:
-                throw new IllegalStateException("Unexpected value format type: "+attribute.getValueFormatType());
-
+            }
+            default -> throw new IllegalStateException("Unexpected value format type: " + attribute.getValueFormatType());
         }
     }
 
@@ -114,11 +102,9 @@ public class ValueFormatterService {
         try {
             BigDecimal numericValue = new BigDecimal(value);
             attribute.addFormattedValue("value", formatNumber(numericValue, locale));
-            return;
         } catch (NumberFormatException ex) {
             // do not interrupt operation by exception due to broken formatting
             attribute.addFormattedValue("value", value);
-            return;
         }
     }
 
@@ -131,14 +117,11 @@ public class ValueFormatterService {
         if (attribute == null) {
             return "";
         }
-        if (attribute instanceof OperationKeyValueFieldAttribute) {
-            OperationKeyValueFieldAttribute keyValueAttribute = (OperationKeyValueFieldAttribute) attribute;
+        if (attribute instanceof final OperationKeyValueFieldAttribute keyValueAttribute) {
             return keyValueAttribute.getValue();
-        } else if (attribute instanceof OperationNoteFieldAttribute) {
-            OperationNoteFieldAttribute noteAttribute = (OperationNoteFieldAttribute) attribute;
+        } else if (attribute instanceof final OperationNoteFieldAttribute noteAttribute) {
             return noteAttribute.getNote();
-        } else if (attribute instanceof OperationAmountFieldAttribute) {
-            OperationAmountFieldAttribute amountAttribute = (OperationAmountFieldAttribute) attribute;
+        } else if (attribute instanceof final OperationAmountFieldAttribute amountAttribute) {
             return amountAttribute.getAmount().toPlainString() + " " + amountAttribute.getCurrency();
         }
         throw new IllegalArgumentException("Attribute does not support formatting: "+attribute.getClass().getName());

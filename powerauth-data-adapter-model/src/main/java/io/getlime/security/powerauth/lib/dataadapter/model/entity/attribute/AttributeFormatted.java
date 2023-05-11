@@ -38,7 +38,7 @@ public class AttributeFormatted extends Attribute {
     /**
      * Formatted values.
      */
-    protected Map<String, String> formattedValues = new HashMap<>();
+    private final Map<String, String> formattedValues = new HashMap<>();
 
     /**
      * Get value format type of this attribute.

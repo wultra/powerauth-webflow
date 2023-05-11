@@ -20,6 +20,7 @@ package io.getlime.security.powerauth.app.tppengine.repository.model.entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -32,6 +33,7 @@ import java.util.Date;
 @Table(name = "tpp_user_consent")
 public class UserConsentEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 4873304514084189625L;
 
     @Id

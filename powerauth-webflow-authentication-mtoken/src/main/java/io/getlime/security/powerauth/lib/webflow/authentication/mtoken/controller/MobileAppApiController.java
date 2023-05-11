@@ -407,14 +407,14 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         // Evaluate various signature types
         if (allowedSignatureType != null) {
             switch (allowedSignatureType.getType()) {
-                case MULTIFACTOR_1FA: {
+                case MULTIFACTOR_1FA -> {
                     // Is the signature correct 1FA type - "possession"?
                     // Also, allow any 2FA signature as they are more strict than 1FA signature, as a fallback
                     return PowerAuthSignatureTypes.POSSESSION.equals(signatureTypes)
                             || PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)
                             || PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes);
                 }
-                case MULTIFACTOR_2FA: {
+                case MULTIFACTOR_2FA -> {
                     // Is the signature correct 2FA type - "possession_knowledge" or "possession_biometry"?
                     // Check for "possession_knowledge" first
                     if (PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)) {
@@ -424,9 +424,8 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                     if (PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes)) {
                         return allowedSignatureType.getVariants() != null && allowedSignatureType.getVariants().contains("possession_biometry");
                     }
-                    break;
                 }
-                case ASYMMETRIC_ECDSA: {
+                case ASYMMETRIC_ECDSA -> {
                     // Not allowed at this moment
                     return false;
                 }
