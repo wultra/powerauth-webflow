@@ -69,12 +69,13 @@ public class TppEngineClient {
      */
     public TppEngineClient(String serviceUrl) throws TppEngineClientException {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            final RestClientConfiguration.JacksonConfiguration jacksonConfiguration = new RestClientConfiguration.JacksonConfiguration();
+            jacksonConfiguration.getSerialization().put(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+            jacksonConfiguration.getDeserialization().put(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
             RestClientConfiguration config = new RestClientConfiguration();
             config.setBaseUrl(serviceUrl);
-            config.setObjectMapper(objectMapper);
+            config.setJacksonConfiguration(jacksonConfiguration);
             restClient = new DefaultRestClient(config);
         } catch (RestClientException ex) {
             TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(Error.Code.ERROR_GENERIC, "Rest client initialization failed."));

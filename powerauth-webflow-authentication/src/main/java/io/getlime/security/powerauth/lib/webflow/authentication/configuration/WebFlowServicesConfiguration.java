@@ -19,7 +19,6 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.configuration;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.wultra.core.rest.client.base.RestClientConfiguration;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
@@ -156,14 +155,14 @@ public class WebFlowServicesConfiguration {
     }
 
     /**
-     * Construct object mapper with default configuration which allows sending empty objects and allows unknown properties.
-     * @return Constructed object mapper.
+     * Construct jackson configuration which allows sending empty objects and allows unknown properties.
+     * @return jackson configuration
      */
-    private ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return mapper;
+    private static RestClientConfiguration.JacksonConfiguration createJacksonConfiguration() {
+        final RestClientConfiguration.JacksonConfiguration jacksonConfiguration = new RestClientConfiguration.JacksonConfiguration();
+        jacksonConfiguration.getSerialization().put(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        jacksonConfiguration.getDeserialization().put(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return jacksonConfiguration;
     }
 
     /**
@@ -176,7 +175,7 @@ public class WebFlowServicesConfiguration {
         RestClientConfiguration restClientConfiguration = new RestClientConfiguration();
         restClientConfiguration.setBaseUrl(dataAdapterServiceUrl);
         restClientConfiguration.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
-        restClientConfiguration.setObjectMapper(objectMapper());
+        restClientConfiguration.setJacksonConfiguration(createJacksonConfiguration());
         try {
             return new DataAdapterClient(restClientConfiguration);
         } catch (DataAdapterClientErrorException ex) {
@@ -195,7 +194,7 @@ public class WebFlowServicesConfiguration {
         RestClientConfiguration restClientConfiguration = new RestClientConfiguration();
         restClientConfiguration.setBaseUrl(nextstepServiceUrl);
         restClientConfiguration.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
-        restClientConfiguration.setObjectMapper(objectMapper());
+        restClientConfiguration.setJacksonConfiguration(createJacksonConfiguration());
         try {
             return new NextStepClient(restClientConfiguration);
         } catch (NextStepClientException ex) {

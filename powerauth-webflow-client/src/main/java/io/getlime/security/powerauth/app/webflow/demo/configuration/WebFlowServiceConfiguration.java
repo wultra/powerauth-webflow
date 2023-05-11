@@ -19,7 +19,6 @@
 package io.getlime.security.powerauth.app.webflow.demo.configuration;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.wultra.core.rest.client.base.RestClientConfiguration;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
@@ -221,27 +220,20 @@ public class WebFlowServiceConfiguration {
     }
 
     /**
-     * Construct object mapper with default configuration which allows sending empty objects and allows unknown properties.
-     * @return Constructed object mapper.
-     */
-    private ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return mapper;
-    }
-
-    /**
      * Default Next Step service client.
      *
      * @return Next Step service client.
      */
     @Bean
     public NextStepClient defaultNextStepClient() {
+        final RestClientConfiguration.JacksonConfiguration jacksonConfiguration = new RestClientConfiguration.JacksonConfiguration();
+        jacksonConfiguration.getSerialization().put(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        jacksonConfiguration.getDeserialization().put(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         RestClientConfiguration restClientConfiguration = new RestClientConfiguration();
         restClientConfiguration.setBaseUrl(nextstepServiceUrl);
         restClientConfiguration.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
-        restClientConfiguration.setObjectMapper(objectMapper());
+        restClientConfiguration.setJacksonConfiguration(jacksonConfiguration);
         try {
             return new NextStepClient(restClientConfiguration);
         } catch (NextStepClientException ex) {
