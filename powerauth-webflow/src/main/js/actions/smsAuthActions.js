@@ -28,7 +28,7 @@ export function getOperationData(component) {
     return function (dispatch) {
         axios.post("./api/auth/operation/detail", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             dispatch({
@@ -51,7 +51,7 @@ export function init(component) {
     return function (dispatch) {
         axios.post("./api/auth/sms/init", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
@@ -104,7 +104,7 @@ export function resend(component) {
     return function (dispatch) {
         axios.post("./api/auth/sms/resend", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
@@ -165,7 +165,7 @@ export function authenticate(userAuthCode, userPassword, signedMessage, componen
             signedMessage: signedMessage
         }, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             switch (response.data.result) {
@@ -175,7 +175,7 @@ export function authenticate(userAuthCode, userPassword, signedMessage, componen
                     if (component === "TOKEN") {
                         axios.post("./api/auth/token/web/authenticate", {}, {
                             headers: {
-                                'X-OPERATION-HASH': operationHash,
+                                'X-OPERATION-HASH': operationHash
                             }
                         }).then((response) => {
                             dispatchAction(dispatch, response);
@@ -244,7 +244,7 @@ export function cancel(component) {
     return function (dispatch) {
         axios.post("./api/auth/sms/cancel", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             // Make sure to cancel token authentication in case it is still enabled - send push message
@@ -252,7 +252,7 @@ export function cancel(component) {
             if (component === "TOKEN") {
                 axios.post("./api/auth/token/web/authenticate", {}, {
                     headers: {
-                        'X-OPERATION-HASH': operationHash,
+                        'X-OPERATION-HASH': operationHash
                     }
                 }).then((response) => {
                     dispatch({

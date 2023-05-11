@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from "axios/index";
+import axios from "axios";
 import {dispatchError} from "../dispatcher/dispatcher";
 
 /**
@@ -30,7 +30,7 @@ export function updateFormData(formData) {
             formData: formData
         }, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).catch((error) => {
             dispatchError(dispatch, error);
