@@ -99,8 +99,8 @@ public class SecurityConfiguration {
                 );
         http
                 // Apply OAuth 2.1 authorization server configuration
-                .apply(authorizationServerConfigurer)
-                .and()
+                .apply(authorizationServerConfigurer);
+        http
                 // Accept access tokens for user info endpoints in resource server, use token introspection
                 .oauth2ResourceServer((oauth2) -> oauth2
                         .opaqueToken((opaque) -> opaque
@@ -112,10 +112,9 @@ public class SecurityConfiguration {
                 .securityContext((securityContext) -> securityContext
                         .securityContextRepository(securityContextRepository)
                 )
-                .csrf()
+                .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**", "/oauth2/**")
-                        .ignoringRequestMatchers(authorizationServerConfigurer.getEndpointsMatcher())
-                .and()
+                        .ignoringRequestMatchers(authorizationServerConfigurer.getEndpointsMatcher()))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/", "/authenticate", "/authenticate/**", "/oauth2/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/actuator/**", "/tls/client/**", "/signer/**").permitAll()
                         // Authenticate OAuth 2.1 endpoints
