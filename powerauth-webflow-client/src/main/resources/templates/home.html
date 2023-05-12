@@ -57,7 +57,7 @@
                                             <p>
                                                 Select the third party connection type:
                                             </p>
-                                            <form th:action="@{/oauth2/authorization/democlient}" method="POST">
+                                            <form th:action="@{${authorizationUrl}}" method="POST">
                                                 <p>
                                                     <label class="radio"><input id="scope_aisp" type="radio" name="scope" value="aisp" checked="checked"/> AIS - Account Information Service Provider</label>
                                                 </p>
@@ -83,7 +83,7 @@
                                         <p>
                                             Authorize operation with ID:
                                         </p>
-                                        <form th:action="@{/oauth2/authorization/democlient}" method="POST" id="operationAuthorizeForm">
+                                        <form th:action="@{${authorizationUrl}}" method="POST" id="operationAuthorizeForm">
                                             <div class="input-group input-group-lg">
                                                 <input type="text" class="form-control" name="operation_id"
                                                        th:value="${operationId}" placeholder="Operation ID"/>

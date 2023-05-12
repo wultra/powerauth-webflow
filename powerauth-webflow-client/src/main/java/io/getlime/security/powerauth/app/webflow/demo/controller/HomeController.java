@@ -17,13 +17,14 @@
 package io.getlime.security.powerauth.app.webflow.demo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getlime.security.powerauth.app.webflow.demo.configuration.WebFlowServiceConfiguration;
 import io.getlime.security.powerauth.app.webflow.demo.model.AvailableOperation;
 import io.getlime.security.powerauth.app.webflow.demo.model.OperationForm;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,14 +39,11 @@ import java.util.List;
  * Default demo controller class.
  */
 @Controller
+@RequiredArgsConstructor
 public class HomeController {
 
     private final HttpSession httpSession;
-
-    @Autowired
-    public HomeController(HttpSession httpSession) {
-        this.httpSession = httpSession;
-    }
+    private final WebFlowServiceConfiguration webFlowConfig;
 
     @RequestMapping("/")
     public String home(Model model, OAuth2AuthenticationToken user) throws NextStepServiceException {
@@ -59,6 +57,7 @@ public class HomeController {
 
         // Add attributes
         model.addAttribute("operationId", operationId);
+        model.addAttribute("authorizationUrl", "/oauth2/authorization/" + webFlowConfig.getClientId());
         model.addAttribute("authenticated", user != null);
         if (user != null) {
             model.addAttribute("userName", user.getName());
