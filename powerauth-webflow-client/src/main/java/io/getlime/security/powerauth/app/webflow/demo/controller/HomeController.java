@@ -17,6 +17,7 @@
 package io.getlime.security.powerauth.app.webflow.demo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getlime.security.powerauth.app.webflow.demo.configuration.WebFlowServiceConfiguration;
 import io.getlime.security.powerauth.app.webflow.demo.model.AvailableOperation;
 import io.getlime.security.powerauth.app.webflow.demo.model.OperationForm;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
@@ -41,10 +42,12 @@ import java.util.List;
 public class HomeController {
 
     private final HttpSession httpSession;
+    private final WebFlowServiceConfiguration webFlowConfig;
 
     @Autowired
-    public HomeController(HttpSession httpSession) {
+    public HomeController(HttpSession httpSession, WebFlowServiceConfiguration webFlowConfig) {
         this.httpSession = httpSession;
+        this.webFlowConfig = webFlowConfig;
     }
 
     @RequestMapping("/")
@@ -59,6 +62,7 @@ public class HomeController {
 
         // Add attributes
         model.addAttribute("operationId", operationId);
+        model.addAttribute("authorizationUrl", "/oauth2/authorization/" + webFlowConfig.getClientId());
         model.addAttribute("authenticated", user != null);
         if (user != null) {
             model.addAttribute("userName", user.getName());
