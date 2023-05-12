@@ -24,7 +24,7 @@ import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,16 +39,11 @@ import java.util.List;
  * Default demo controller class.
  */
 @Controller
+@RequiredArgsConstructor
 public class HomeController {
 
     private final HttpSession httpSession;
     private final WebFlowServiceConfiguration webFlowConfig;
-
-    @Autowired
-    public HomeController(HttpSession httpSession, WebFlowServiceConfiguration webFlowConfig) {
-        this.httpSession = httpSession;
-        this.webFlowConfig = webFlowConfig;
-    }
 
     @RequestMapping("/")
     public String home(Model model, OAuth2AuthenticationToken user) throws NextStepServiceException {
