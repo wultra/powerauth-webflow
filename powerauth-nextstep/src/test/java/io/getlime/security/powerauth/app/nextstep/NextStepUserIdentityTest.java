@@ -184,6 +184,8 @@ public class NextStepUserIdentityTest extends NextStepTest {
         assertNotNull(r4.getContacts().get(0).getTimestampLastUpdated());
         DeleteUserContactResponse r5 = nextStepClient.deleteUserContact(userId,"TEST_CONTACT", ContactType.PHONE).getResponseObject();
         assertEquals(userId, r5.getUserId());
+        GetUserContactListResponse r6 = nextStepClient.getUserContactList(userId).getResponseObject();
+        assertEquals(0, r6.getContacts().size());
     }
 
     @Test
