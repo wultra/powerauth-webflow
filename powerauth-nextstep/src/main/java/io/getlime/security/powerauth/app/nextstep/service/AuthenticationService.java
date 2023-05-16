@@ -422,7 +422,7 @@ public class AuthenticationService {
         }
 
         final Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
-        if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
+        if (Integer.valueOf(0).equals(remainingAttempts) && otp.getStatus() == OtpStatus.ACTIVE) {
             logger.debug("OTP was blocked because there are no remaining attempts left, OTP ID: {}", otp.getOtpId());
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
@@ -667,7 +667,7 @@ public class AuthenticationService {
         }
 
         final Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
-        if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
+        if (Integer.valueOf(0).equals(remainingAttempts) && otp.getStatus() == OtpStatus.ACTIVE) {
             logger.debug("OTP was blocked because there are no remaining attempts left, OTP ID: {}", otp.getOtpId());
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
@@ -983,7 +983,7 @@ public class AuthenticationService {
      * @param credential Credential entity or null for no credential.
      * @param otp OTP entity or null for no OTP.
      * @param operation Operation entity or null for no operation.
-     * @return Remaining attempts.
+     * @return Remaining attempts or {@code null}.
      */
     private Integer resolveRemainingAttempts(CredentialEntity credential, OtpEntity otp, OperationEntity operation) {
         final StepResolutionService stepResolutionService = serviceCatalogue.getStepResolutionService();
