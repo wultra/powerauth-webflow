@@ -20,10 +20,10 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.CredentialGenerationAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.UsernameGenerationAlgorithm;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.*;
 import java.util.Date;
 
 /**

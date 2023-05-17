@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.8</version>
+        <version>3.0.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -89,29 +89,28 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <maven.compiler.release>8</maven.compiler.release>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <maven-deploy-plugin.version>3.0.0</maven-deploy-plugin.version>
         <maven-enforcer-plugin.version>3.1.0</maven-enforcer-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
-        <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
         <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
-        <bc.version>1.72</bc.version>
+        <bc.version>1.73</bc.version>
         <zxing.version>3.5.0</zxing.version>
-        <passay.version>1.6.1</passay.version>
+        <passay.version>1.6.3</passay.version>
         <springdoc-openapi.version>1.6.14</springdoc-openapi.version>
         <guava.version>31.1-jre</guava.version>
         <moneta.version>1.4.2</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
-        <wultra-java-core.version>1.6.0</wultra-java-core.version>
-        <powerauth-java-crypto.version>1.4.0</powerauth-java-crypto.version>
-        <powerauth.version>1.4.0</powerauth.version>
+        <wultra-java-core.version>1.7.0-SNAPSHOT</wultra-java-core.version>
+        <powerauth-java-crypto.version>1.5.0-SNAPSHOT</powerauth-java-crypto.version>
+        <powerauth.version>1.5.0-SNAPSHOT</powerauth.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- PowerAuth 2.0 Web Flow Dependencies -->
+            <!-- PowerAuth Web Flow Dependencies -->
             <dependency>
                 <groupId>io.getlime.security</groupId>
                 <artifactId>powerauth-data-adapter-client</artifactId>
@@ -265,6 +264,14 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

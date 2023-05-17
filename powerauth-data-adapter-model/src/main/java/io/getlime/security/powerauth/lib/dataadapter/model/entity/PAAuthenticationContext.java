@@ -18,9 +18,8 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.entity;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PowerAuthSignatureType;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
-
-import javax.validation.constraints.PositiveOrZero;
 
 /**
  * PowerAuth authentication context.

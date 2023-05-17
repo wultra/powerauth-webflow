@@ -18,9 +18,8 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * Request object used for deleting an authentication method.

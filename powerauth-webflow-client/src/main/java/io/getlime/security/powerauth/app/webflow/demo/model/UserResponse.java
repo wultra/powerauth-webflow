@@ -28,7 +28,7 @@ public class UserResponse {
     /**
      * Information about the user.
      */
-    public class User {
+    public static class User {
 
         private String id;
         private String givenName;
@@ -63,7 +63,7 @@ public class UserResponse {
     /**
      * Information about the connection.
      */
-    public class Connection {
+    public static class Connection {
 
         private String language;
         private boolean sca;

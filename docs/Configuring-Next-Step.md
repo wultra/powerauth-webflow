@@ -12,7 +12,7 @@ Following authentication methods are available:
 - `POWERAUTH_TOKEN` - user authorizes the operation using PowerAuth mobile token
 - `SMS_KEY` - user authorizes the operation using SMS message with OTP
 - `APPROVAL_SCA` - operation approval with either mobile token or SMS and password supporting strong customer authentication 
-- `CONSENT` - OAuth 2.0 consent form with options to approve by the user
+- `CONSENT` - OAuth 2.1 consent form with options to approve by the user
 - `OTP_CODE` - a generic OTP code authentication method which may be delivered by other channel than SMS
 
 The following parameters can be configured:

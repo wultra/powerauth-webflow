@@ -26,7 +26,7 @@ export function verifyOperationTimeout() {
     return function (dispatch) {
         axios.post("./api/auth/timeout/verify", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             dispatch({

@@ -28,7 +28,7 @@ import {FormattedMessage} from "react-intl";
 import sanitizeHTML from 'sanitize-html';
 
 /**
- * OAuth 2.0 consent form.
+ * OAuth 2.1 consent form.
  */
 @connect((store) => {
     return {

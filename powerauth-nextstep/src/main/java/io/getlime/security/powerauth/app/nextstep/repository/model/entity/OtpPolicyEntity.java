@@ -19,10 +19,11 @@ package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OtpGenerationAlgorithm;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -37,10 +38,11 @@ import java.util.Date;
 @EqualsAndHashCode(of = "name")
 public class OtpPolicyEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -1157742528088577985L;
 
     @Id
-    @SequenceGenerator(name = "ns_otp_policy", sequenceName = "ns_otp_policy_seq")
+    @SequenceGenerator(name = "ns_otp_policy", sequenceName = "ns_otp_policy_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_otp_policy")
     @Column(name = "otp_policy_id", nullable = false)
     private Long otpPolicyId;

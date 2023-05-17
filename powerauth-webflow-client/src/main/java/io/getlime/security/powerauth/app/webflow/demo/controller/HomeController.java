@@ -17,20 +17,19 @@
 package io.getlime.security.powerauth.app.webflow.demo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getlime.security.powerauth.app.webflow.demo.configuration.WebFlowServiceConfiguration;
 import io.getlime.security.powerauth.app.webflow.demo.model.AvailableOperation;
 import io.getlime.security.powerauth.app.webflow.demo.model.OperationForm;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.social.connect.ConnectionFactoryLocator;
-import org.springframework.social.connect.ConnectionRepository;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.inject.Provider;
-import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,21 +39,14 @@ import java.util.List;
  * Default demo controller class.
  */
 @Controller
+@RequiredArgsConstructor
 public class HomeController {
 
-    private final Provider<ConnectionRepository> connectionRepositoryProvider;
-    private final ConnectionFactoryLocator connectionFactoryLocator;
     private final HttpSession httpSession;
-
-    @Autowired
-    public HomeController(Provider<ConnectionRepository> connectionRepositoryProvider, ConnectionFactoryLocator connectionFactoryLocator, HttpSession httpSession) {
-        this.connectionRepositoryProvider = connectionRepositoryProvider;
-        this.connectionFactoryLocator = connectionFactoryLocator;
-        this.httpSession = httpSession;
-    }
+    private final WebFlowServiceConfiguration webFlowConfig;
 
     @RequestMapping("/")
-    public String home(Model model) throws NextStepServiceException {
+    public String home(Model model, OAuth2AuthenticationToken user) throws NextStepServiceException {
 
         // Fetch operation ID, if any
         String operationId;
@@ -64,9 +56,12 @@ public class HomeController {
         }
 
         // Add attributes
-        model.addAttribute("connectionMap", getConnectionRepository().findAllConnections());
-        model.addAttribute("providerIds", connectionFactoryLocator.registeredProviderIds());
         model.addAttribute("operationId", operationId);
+        model.addAttribute("authorizationUrl", "/oauth2/authorization/" + webFlowConfig.getClientId());
+        model.addAttribute("authenticated", user != null);
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+        }
 
         PaymentForm paymentForm, paymentFormSca;
         OperationForm loginFormSca;
@@ -110,10 +105,6 @@ public class HomeController {
         return "home";
     }
 
-    private ConnectionRepository getConnectionRepository() {
-        return connectionRepositoryProvider.get();
-    }
-
     private ApplicationContext getApplicationContext(OperationForm form) throws NextStepServiceException {
         try {
             return new ObjectMapper().readValue(form.getAppContext(), ApplicationContext.class);
@@ -123,7 +114,7 @@ public class HomeController {
     }
 
     private String createApplicationContext(List<String> requestedScopes) throws NextStepServiceException {
-        // Sample specification of ApplicationContext for OAuth 2.0 consent screen
+        // Sample specification of ApplicationContext for OAuth 2.1 consent screen
         ApplicationContext applicationContext = new ApplicationContext();
         applicationContext.setId("democlient");
         applicationContext.setName("Demo application");

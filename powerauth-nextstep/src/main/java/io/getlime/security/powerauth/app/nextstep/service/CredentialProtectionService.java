@@ -95,15 +95,12 @@ public class CredentialProtectionService {
             throw new InvalidConfigurationException(ex);
         }
         switch (algorithm) {
-            case ARGON_2D:
-            case ARGON_2I:
-            case ARGON_2ID:
+            case ARGON_2D, ARGON_2I, ARGON_2ID -> {
                 final Argon2Hash argon2Hash = hashCredentialUsingArgon2(credentialValue, algorithm, param);
                 final String hashedValue = argon2Hash.toString();
                 return credentialValueConverter.toDBValue(hashedValue, userId, credentialDefinition);
-
-            default:
-                throw new InvalidConfigurationException("Unsupported hashing algorithm: " + algorithm);
+            }
+            default -> throw new InvalidConfigurationException("Unsupported hashing algorithm: " + algorithm);
         }
     }
 
@@ -128,17 +125,14 @@ public class CredentialProtectionService {
         }
         final HashAlgorithm algorithm = hashingConfig.getAlgorithm();
         switch (algorithm) {
-            case ARGON_2I:
-            case ARGON_2D:
-            case ARGON_2ID:
+            case ARGON_2I, ARGON_2D, ARGON_2ID -> {
                 final boolean succeeded = verifyCredentialUsingArgon2(credentialValue, algorithm, decryptedCredentialValue);
                 if (succeeded) {
                     updateStoredCredentialValueIfRequired(credentialValue, credential);
                 }
                 return succeeded;
-
-            default:
-                throw new InvalidConfigurationException("Unsupported hashing algorithm: " + algorithm);
+            }
+            default -> throw new InvalidConfigurationException("Unsupported hashing algorithm: " + algorithm);
         }
     }
 
@@ -158,15 +152,9 @@ public class CredentialProtectionService {
             return credentialValue.equals(decryptedCredentialValue);
         }
         final HashAlgorithm algorithm = hashingConfig.getAlgorithm();
-        switch (algorithm) {
-            case ARGON_2I:
-            case ARGON_2D:
-            case ARGON_2ID:
-                return verifyCredentialUsingArgon2(credentialValue, algorithm, decryptedCredentialValue);
-
-            default:
-                throw new InvalidConfigurationException("Unsupported hashing algorithm: " + algorithm);
-        }
+        return switch (algorithm) {
+            case ARGON_2I, ARGON_2D, ARGON_2ID -> verifyCredentialUsingArgon2(credentialValue, algorithm, decryptedCredentialValue);
+        };
     }
 
     /**

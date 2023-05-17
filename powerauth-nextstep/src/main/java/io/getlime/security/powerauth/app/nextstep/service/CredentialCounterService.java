@@ -35,8 +35,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 
 /**
@@ -101,12 +101,11 @@ public class CredentialCounterService {
         final Integer softLimit = credentialDefinition.getCredentialPolicy().getLimitSoft();
         final Integer hardLimit = credentialDefinition.getCredentialPolicy().getLimitHard();
         switch (authenticationResult) {
-            case SUCCEEDED:
+            case SUCCEEDED -> {
                 credential.setFailedAttemptCounterSoft(0);
                 credential.setFailedAttemptCounterHard(0);
-                break;
-
-            case FAILED:
+            }
+            case FAILED -> {
                 credential.setFailedAttemptCounterSoft(credential.getFailedAttemptCounterSoft() + 1);
                 credential.setFailedAttemptCounterHard(credential.getFailedAttemptCounterHard() + 1);
                 if (hardLimit != null && credential.getFailedAttemptCounterHard() >= hardLimit
@@ -118,11 +117,8 @@ public class CredentialCounterService {
                     credential.setStatus(CredentialStatus.BLOCKED_TEMPORARY);
                     credential.setTimestampBlocked(new Date());
                 }
-                break;
-
-            default:
-                throw new InvalidRequestException("Invalid authentication result: " + authenticationResult);
-
+            }
+            default -> throw new InvalidRequestException("Invalid authentication result: " + authenticationResult);
         }
         credential = credentialRepository.save(credential);
         logger.info("Credential counter updated, user ID: {}, credential definition name: {}, attempt counter: {}, soft counter: {}, hard counter: {}, status: {}",
@@ -133,7 +129,7 @@ public class CredentialCounterService {
 
     /**
      * Reset all soft failed attempt counters.
-     *
+     * <p>
      * Method behavior depends on the counter reset mode:
      * <ul>
      *     <li>RESET_BLOCKED_TEMPORARY - reset soft failed attempt counters for credentials with BLOCKED_TEMPORARY status, change status to ACTIVE</li>
@@ -147,20 +143,16 @@ public class CredentialCounterService {
     public ResetCountersResponse resetCounters(ResetCountersRequest request) throws InvalidRequestException {
         int resetCounter = 0;
         switch (request.getResetMode()) {
-            case RESET_BLOCKED_TEMPORARY:
+            case RESET_BLOCKED_TEMPORARY -> {
                 resetCounter += credentialRepository.resetSoftFailedCountersForBlockedTemporaryStatus();
                 logger.info("Soft failed attempt credential counters were reset for status BLOCKED_TEMPORARY and status was changed to ACTIVE, updated record count: {}", resetCounter);
-                break;
-
-            case RESET_ACTIVE_AND_BLOCKED_TEMPORARY:
+            }
+            case RESET_ACTIVE_AND_BLOCKED_TEMPORARY -> {
                 resetCounter += credentialRepository.resetSoftFailedCountersForBlockedTemporaryStatus();
                 resetCounter += credentialRepository.resetSoftFailedCountersForActiveStatus();
                 logger.info("Soft failed attempt credential counters were reset for statuses ACTIVE and BLOCKED_TEMPORARY, status was changed to ACTIVE, updated record count: {}", resetCounter);
-                break;
-
-            default:
-                throw new InvalidRequestException("Invalid counter reset mode: " + request.getResetMode());
-
+            }
+            default -> throw new InvalidRequestException("Invalid counter reset mode: " + request.getResetMode());
         }
         final ResetCountersResponse response = new ResetCountersResponse();
         response.setResetCounterCount(resetCounter);

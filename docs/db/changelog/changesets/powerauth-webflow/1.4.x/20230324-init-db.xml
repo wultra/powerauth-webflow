@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="1" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="wf_operation_session"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table wf_operation_session</comment>
+        <createTable tableName="wf_operation_session">
+            <column name="operation_id" type="varchar(256)">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="http_session_id" type="varchar(256)">
+                <constraints nullable="false" />
+            </column>
+            <column name="operation_hash" type="varchar(256)" />
+            <column name="websocket_session_id" type="varchar(32)" />
+            <column name="client_ip_address" type="varchar(32)" />
+            <column name="result" type="varchar(32)">
+                <constraints nullable="false" />
+            </column>
+            <column name="timestamp_created" type="timestamp" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="wf_afs_config"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table wf_afs_config</comment>
+        <createTable tableName="wf_afs_config">
+            <column name="config_id" type="varchar(256)">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="js_snippet_url" type="varchar(256)">
+                <constraints nullable="false" />
+            </column>
+            <column name="parameters" type="text" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="wf_certificate_verification"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table wf_certificate_verification</comment>
+        <createTable tableName="wf_certificate_verification" remarks="Table wf_certificate_verification is used for storing information about verified client TLS certificates.">
+            <column name="operation_id" type="varchar(256)" remarks="Operation ID associated with the certificate verification.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="auth_method" type="varchar(32)" remarks="Authentication method in which the certificate authentication was used.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="client_certificate_issuer" type="varchar(4000)" remarks="Certificate attribute representing the certificate issuer.">
+                <constraints nullable="false" />
+            </column>
+            <column name="client_certificate_subject" type="varchar(4000)" remarks="Certificate attribute representing the certificate subject.">
+                <constraints nullable="false" />
+            </column>
+            <column name="client_certificate_sn" type="varchar(256)" remarks="Certificate attribute representing the certificate serial number.">
+                <constraints nullable="false" />
+            </column>
+            <column name="operation_data" type="text" remarks="Operation data that were included in the certificate authentication request.">
+                <constraints nullable="false" />
+            </column>
+            <column name="timestamp_verified" type="timestamp" defaultValueDate="${now}" remarks="Timestamp of the certificate verification.">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="4" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="wf_operation_session" indexName="wf_operation_hash"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index wf_operation_session(operation_hash)</comment>
+        <createIndex tableName="wf_operation_session" indexName="wf_operation_hash">
+            <column name="operation_hash" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="5" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="wf_operation_session" indexName="wf_websocket_session"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index wf_operation_session(websocket_session_id)</comment>
+        <createIndex tableName="wf_operation_session" indexName="wf_websocket_session">
+            <column name="websocket_session_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="6" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="wf_certificate_verification" indexName="wf_certificate_operation"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index wf_certificate_verification(operation_id)</comment>
+        <createIndex tableName="wf_operation_session" indexName="wf_certificate_operation">
+            <column name="operation_id" />
+        </createIndex>
+    </changeSet>
+
+    <!--  See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/JdbcClientDetailsService.java  -->
+    <changeSet id="7" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="oauth_client_details"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table oauth_client_details</comment>
+        <createTable tableName="oauth_client_details" remarks="Table oauth_client_details stores details about OAuth2 client applications. Every Web Flow client application should have a record in this table.">
+            <column name="client_id" type="varchar(256)" remarks="OAuth 2.0 protocol client ID.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="resource_ids" type="varchar(256)" remarks="Identifiers of the OAuth 2.0 resource servers." />
+            <column name="client_secret" type="varchar(256)" remarks="OAuth 2.0 protocol client secret." />
+            <column name="scope" type="varchar(256)" remarks="OAuth 2.0 scopes, comma-separated values." />
+            <column name="authorized_grant_types" type="varchar(256)" remarks="OAuth 2.0 authorization grant types, comma-separated values." />
+            <column name="web_server_redirect_uri" type="varchar(256)" remarks="OAuth 2.0 redirect URIs, comma-separated values." />
+            <column name="authorities" type="varchar(256)" remarks="OAuth 2.0 resource grant authorities." />
+            <column name="access_token_validity" type="integer" remarks="Validity of the OAuth 2.0 access tokens, in seconds." />
+            <column name="refresh_token_validity" type="integer" remarks="Validity of the OAuth 2.0 refresh tokens, in seconds." />
+            <column name="additional_information" type="varchar(4000)" remarks="Field reserved for additional information about the client." />
+            <column name="autoapprove" type="varchar(256)" remarks="Flag indicating if scopes should be automatically approved." />
+        </createTable>
+    </changeSet>
+
+    <!--  See: https://docs.spring.io/spring-security/oauth/apidocs/org/springframework/security/oauth2/client/token/JdbcClientTokenServices.html  -->
+    <changeSet id="8" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="oauth_client_token"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table oauth_client_token</comment>
+        <createTable tableName="oauth_client_token" remarks="Table oauth_client_token stores OAuth2 tokens for retrieval by client applications.">
+            <column name="authentication_id" type="varchar(256)" remarks="Authentication ID related to client token.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="token_id" type="varchar(256)" remarks="Token ID." />
+            <column name="token" type="${blob_type}" remarks="Token value." />
+            <column name="user_name" type="varchar(256)" remarks="Username, identification of the user." />
+            <column name="client_id" type="varchar(256)" remarks="OAuth 2.0 Client ID." />
+        </createTable>
+    </changeSet>
+
+    <!--  See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java  -->
+    <changeSet id="9" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="oauth_access_token"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table oauth_access_token</comment>
+        <createTable tableName="oauth_access_token" remarks="Table oauth_access_token stores OAuth2 access tokens.">
+            <column name="authentication_id" type="varchar(256)" remarks="Authentication ID related to client token.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="token_id" type="varchar(256)" remarks="Token ID." />
+            <column name="token" type="${blob_type}" remarks="Token value." />
+            <column name="user_name" type="varchar(256)" remarks="Username, identification of the user." />
+            <column name="client_id" type="varchar(256)" remarks="OAuth 2.0 Client ID." />
+            <column name="authentication" type="${blob_type}" remarks="Encoded authentication details." />
+            <column name="refresh_token" type="varchar(256)" remarks="Refresh token ID." />
+        </createTable>
+    </changeSet>
+
+    <!--  See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java  -->
+    <changeSet id="10" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="oauth_refresh_token"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table oauth_refresh_token</comment>
+        <createTable tableName="oauth_refresh_token" remarks="Table oauth_access_token stores OAuth2 refresh tokens.">
+            <column name="token_id" type="varchar(256)" remarks="Refresh token ID." />
+            <column name="token" type="${blob_type}" remarks="Token value." />
+            <column name="authentication" type="${blob_type}" remarks="Encoded authentication details." />
+        </createTable>
+    </changeSet>
+
+    <!--  See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/code/JdbcAuthorizationCodeServices.java  -->
+    <changeSet id="11" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="oauth_code"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table oauth_code</comment>
+        <createTable tableName="oauth_code" remarks="Table oauth_code stores data for the OAuth2 authorization code grant.">
+            <column name="code" type="varchar(256)" remarks="OAuth 2.0 protocol 'codes'." />
+            <column name="authentication" type="${blob_type}" remarks="Encoded authentication details." />
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

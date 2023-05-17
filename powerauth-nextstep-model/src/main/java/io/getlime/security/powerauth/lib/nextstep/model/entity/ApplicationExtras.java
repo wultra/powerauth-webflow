@@ -17,15 +17,15 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extras for application context for OAuth 2.0 consent screen.
+ * Extras for application context for OAuth 2.1 consent screen.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

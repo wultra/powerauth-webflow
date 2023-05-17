@@ -40,8 +40,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -314,10 +314,9 @@ public class OtpService {
      * @param request Get OTP list request.
      * @return Get OTP list response.
      * @throws OperationNotFoundException Thrown when operation is not found.
-     * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public GetOtpListResponse getOtpList(GetOtpListRequest request) throws OperationNotFoundException, EncryptionException {
+    public GetOtpListResponse getOtpList(GetOtpListRequest request) throws OperationNotFoundException {
         final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
         final OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
         final GetOtpListResponse response = new GetOtpListResponse();
@@ -402,11 +401,8 @@ public class OtpService {
         final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
         final OtpEntity otp;
         if (otpId != null) {
-            final Optional<OtpEntity> otpOptional = otpRepository.findById(otpId);
-            if (!otpOptional.isPresent()) {
-                throw new OtpNotFoundException("OTP not found: " + otpId);
-            }
-            otp = otpOptional.get();
+            otp = otpRepository.findById(otpId).orElseThrow(() ->
+                    new OtpNotFoundException("OTP not found: " + otpId));
             if (operationId != null) {
                 if (otp.getOperation() == null) {
                     throw new InvalidRequestException("OTP was not created within an operation: " + otpId);
@@ -417,11 +413,8 @@ public class OtpService {
             }
         } else if (operationId != null) {
             final OperationEntity operation = operationPersistenceService.getOperation(operationId);
-            final Optional<OtpEntity> otpOptional = otpRepository.findFirstByOperationOrderByTimestampCreatedDesc(operation);
-            if (!otpOptional.isPresent()) {
-                throw new OtpNotFoundException("No OTP found for operation: " + operation.getOperationId());
-            }
-            otp = otpOptional.get();
+            otp = otpRepository.findFirstByOperationOrderByTimestampCreatedDesc(operation).orElseThrow(() ->
+                    new OtpNotFoundException("No OTP found for operation: " + operation.getOperationId()));
         } else {
             throw new InvalidRequestException("Missing otp ID or operation ID");
         }

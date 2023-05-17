@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.*;
 
 /**
@@ -177,7 +177,7 @@ public class CredentialService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
+        if (credentialOptional.isEmpty()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         boolean updateCredentialExpiration = false;
@@ -413,7 +413,7 @@ public class CredentialService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
+        if (credentialOptional.isEmpty()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         final CredentialEntity credential = credentialOptional.get();
@@ -484,7 +484,7 @@ public class CredentialService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
+        if (credentialOptional.isEmpty()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         final CredentialEntity credential = credentialOptional.get();
@@ -524,7 +524,7 @@ public class CredentialService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
+        if (credentialOptional.isEmpty()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         final CredentialEntity credential = credentialOptional.get();
@@ -565,7 +565,7 @@ public class CredentialService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
+        if (credentialOptional.isEmpty()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         final CredentialEntity credential = credentialOptional.get();
@@ -620,11 +620,10 @@ public class CredentialService {
      * @throws CredentialNotFoundException Thrown when credential is not found.
      */
     public CredentialEntity findCredential(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user) throws CredentialNotFoundException {
-        final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
-            throw new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName());
-        }
-        return credentialOptional.get();
+        return user.getCredentials().stream()
+                .filter(c -> c.getCredentialDefinition().equals(credentialDefinition))
+                .findFirst().orElseThrow(() ->
+                        new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName()));
     }
 
     /**

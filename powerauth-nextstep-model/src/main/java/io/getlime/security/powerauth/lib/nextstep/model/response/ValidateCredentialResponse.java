@@ -19,9 +19,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationResult;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 

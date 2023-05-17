@@ -43,8 +43,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.Optional;
 
@@ -130,11 +130,8 @@ public class OtpPolicyService {
      */
     @Transactional
     public UpdateOtpPolicyResponse updateOtpPolicy(UpdateOtpPolicyRequest request) throws OtpPolicyNotFoundException, InvalidRequestException {
-        final Optional<OtpPolicyEntity> otpPolicyOptional = otpPolicyRepository.findByName(request.getOtpPolicyName());
-        if (!otpPolicyOptional.isPresent()) {
-            throw new OtpPolicyNotFoundException("One time password policy not found: " + request.getOtpPolicyName());
-        }
-        OtpPolicyEntity otpPolicy = otpPolicyOptional.get();
+        OtpPolicyEntity otpPolicy = otpPolicyRepository.findByName(request.getOtpPolicyName()).orElseThrow(() ->
+                new OtpPolicyNotFoundException("One time password policy not found: " + request.getOtpPolicyName()));
         if (otpPolicy.getStatus() != OtpPolicyStatus.ACTIVE && request.getOtpPolicyStatus() != OtpPolicyStatus.ACTIVE) {
             throw new OtpPolicyNotFoundException("One time password policy is not ACTIVE: " + request.getOtpPolicyName());
         }
@@ -205,11 +202,8 @@ public class OtpPolicyService {
      */
     @Transactional
     public DeleteOtpPolicyResponse deleteOtpPolicy(DeleteOtpPolicyRequest request) throws OtpPolicyNotFoundException {
-        final Optional<OtpPolicyEntity> otpPolicyOptional = otpPolicyRepository.findByName(request.getOtpPolicyName());
-        if (!otpPolicyOptional.isPresent()) {
-            throw new OtpPolicyNotFoundException("One time password policy not found: " + request.getOtpPolicyName());
-        }
-        OtpPolicyEntity otpPolicy = otpPolicyOptional.get();
+        OtpPolicyEntity otpPolicy = otpPolicyRepository.findByName(request.getOtpPolicyName()).orElseThrow(() ->
+                new OtpPolicyNotFoundException("One time password policy not found: " + request.getOtpPolicyName()));
         if (otpPolicy.getStatus() == OtpPolicyStatus.REMOVED) {
             throw new OtpPolicyNotFoundException("One time password policy is already REMOVED: " + request.getOtpPolicyName());
         }

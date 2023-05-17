@@ -21,7 +21,6 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.service.OrganizationService;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOrganizationRequest;
@@ -35,15 +34,14 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganization
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * REST controller class related to Next Step organizations.
@@ -176,7 +174,6 @@ public class OrganizationController {
      * @param request Delete organization request.
      * @return Delete organization response.
      * @throws OrganizationNotFoundException Thrown when organization is not found.
-     * @throws DeleteNotAllowedException Thrown when delete action is not allowed.
      */
     @Operation(summary = "Delete an organization")
     @ApiResponses(value = {
@@ -185,7 +182,7 @@ public class OrganizationController {
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteOrganizationResponse> deleteOrganization(@Valid @RequestBody ObjectRequest<DeleteOrganizationRequest> request) throws OrganizationNotFoundException, DeleteNotAllowedException {
+    public ObjectResponse<DeleteOrganizationResponse> deleteOrganization(@Valid @RequestBody ObjectRequest<DeleteOrganizationRequest> request) throws OrganizationNotFoundException {
         logger.info("Received deleteOrganization request, organization ID: {}", request.getRequestObject().getOrganizationId());
         final DeleteOrganizationResponse response = organizationService.deleteOrganization(request.getRequestObject());
         logger.info("The deleteOrganization request succeeded, organization ID: {}", request.getRequestObject().getOrganizationId());

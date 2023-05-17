@@ -17,10 +17,9 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 
 /**
  * Response object used for resetting counters.

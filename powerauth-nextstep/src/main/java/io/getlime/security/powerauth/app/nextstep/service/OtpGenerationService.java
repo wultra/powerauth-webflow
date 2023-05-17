@@ -59,7 +59,7 @@ public class OtpGenerationService {
         final Integer length = otpPolicy.getLength();
         final OtpGenerationAlgorithm otpGenAlgorithm = otpPolicy.getGenAlgorithm();
         switch (otpGenAlgorithm) {
-            case OTP_DATA_DIGEST:
+            case OTP_DATA_DIGEST -> {
                 try {
                     final DataDigest dataDigest = new DataDigest(length);
                     final DataDigest.Result result = dataDigest.generateDigest(Collections.singletonList(otpData));
@@ -73,8 +73,8 @@ public class OtpGenerationService {
                     throw new InvalidConfigurationException("OTP generation failed, error: " + ex.getMessage());
                 }
                 return otpValueDetail;
-
-            case OTP_RANDOM_DIGIT_GROUPS:
+            }
+            case OTP_RANDOM_DIGIT_GROUPS -> {
                 final OtpGenerationParam otpGenerationParam;
                 try {
                     otpGenerationParam = parameterConverter.fromString(otpPolicy.getGenParam(), OtpGenerationParam.class);
@@ -112,9 +112,8 @@ public class OtpGenerationService {
                 }
                 otpValueDetail.setOtpValue(otpBuilder.toString());
                 return otpValueDetail;
-
-            default:
-                throw new OtpGenAlgorithmNotSupportedException("OTP generation algorithm is not supported: " + otpGenAlgorithm);
+            }
+            default -> throw new OtpGenAlgorithmNotSupportedException("OTP generation algorithm is not supported: " + otpGenAlgorithm);
         }
     }
 }

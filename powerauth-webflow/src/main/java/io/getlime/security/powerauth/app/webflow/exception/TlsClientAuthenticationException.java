@@ -19,6 +19,8 @@ package io.getlime.security.powerauth.app.webflow.exception;
 
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 
+import java.io.Serial;
+
 /**
  * Authentication exception used when TLS client authentication fails.
  *
@@ -26,6 +28,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
  */
 public class TlsClientAuthenticationException extends AuthStepException {
 
+    @Serial
     private static final long serialVersionUID = 210138878105518589L;
 
     /**

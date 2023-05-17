@@ -20,8 +20,6 @@ package io.getlime.security.powerauth.app.tppengine.service;
 import io.getlime.security.powerauth.app.tppengine.configuration.TppEngineConfiguration;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.model.entity.TppInfo;
-import io.getlime.security.powerauth.app.tppengine.repository.OAuthAccessTokenRepository;
-import io.getlime.security.powerauth.app.tppengine.repository.OAuthClientDetailsRepository;
 import io.getlime.security.powerauth.app.tppengine.repository.TppAppDetailRepository;
 import io.getlime.security.powerauth.app.tppengine.repository.TppRepository;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppEntity;
@@ -31,6 +29,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 
 import java.util.Optional;
 
@@ -57,8 +57,8 @@ public class TppServiceTest {
                 tppRepository,
                 Mockito.mock(TppAppDetailRepository.class),
                 Mockito.mock(TppEngineConfiguration.class),
-                Mockito.mock(OAuthClientDetailsRepository.class),
-                Mockito.mock(OAuthAccessTokenRepository.class)
+                Mockito.mock(RegisteredClientRepository.class),
+                Mockito.mock(JdbcTemplate.class)
         );
     }
 
@@ -86,9 +86,8 @@ public class TppServiceTest {
     void testBlockTppWhenNotFound() {
         Mockito.when(tppRepository.findFirstByTppLicense(TPP_LICENSE)).thenReturn(Optional.empty());
 
-        assertThrows(TppNotFoundException.class, () -> {
-            tppService.blockTpp(TPP_LICENSE);
-        });
+        assertThrows(TppNotFoundException.class, () ->
+                tppService.blockTpp(TPP_LICENSE));
     }
 
     @Test
@@ -115,9 +114,8 @@ public class TppServiceTest {
     void testUnblockTppWhenNotFound() {
         Mockito.when(tppRepository.findFirstByTppLicense(TPP_LICENSE)).thenReturn(Optional.empty());
 
-        assertThrows(TppNotFoundException.class, () -> {
-            tppService.unblockTpp(TPP_LICENSE);
-        });
+        assertThrows(TppNotFoundException.class, () ->
+                tppService.unblockTpp(TPP_LICENSE));
     }
 
 }

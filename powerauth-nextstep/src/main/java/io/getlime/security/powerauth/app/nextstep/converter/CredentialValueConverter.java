@@ -17,7 +17,6 @@
  */
 package io.getlime.security.powerauth.app.nextstep.converter;
 
-import com.google.common.io.BaseEncoding;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
@@ -38,6 +37,7 @@ import javax.crypto.SecretKey;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 
 /**
  * Converter for credential value which handles key encryption and decryption in case it is configured.
@@ -81,11 +81,10 @@ public class CredentialValueConverter {
         }
 
         switch (credentialValue.getEncryptionAlgorithm()) {
-
-            case NO_ENCRYPTION:
+            case NO_ENCRYPTION -> {
                 return credentialValue.getValue();
-
-            case AES_HMAC:
+            }
+            case AES_HMAC -> {
                 final String masterDbEncryptionKeyBase64 = configuration.getMasterDbEncryptionKey();
 
                 // In case master DB encryption key does not exist, do not encrypt the server private key
@@ -94,13 +93,13 @@ public class CredentialValueConverter {
                 }
 
                 // Convert master DB encryption key
-                final SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(BaseEncoding.base64().decode(masterDbEncryptionKeyBase64));
+                final SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(Base64.getDecoder().decode(masterDbEncryptionKeyBase64));
 
                 // Derive secret key from master DB encryption key, userId and activationId
                 final SecretKey secretKey = deriveSecretKey(masterDbEncryptionKey, userId, credentialDefinition.getName());
 
                 // Base64-decode credential value
-                final byte[] credentialValueBytes = BaseEncoding.base64().decode(credentialValue.getValue());
+                final byte[] credentialValueBytes = Base64.getDecoder().decode(credentialValue.getValue());
 
                 // IV is present in first 16 bytes
                 final byte[] iv = Arrays.copyOfRange(credentialValueBytes, 0, 16);
@@ -115,9 +114,8 @@ public class CredentialValueConverter {
                 } catch (Exception ex) {
                     throw new EncryptionException(ex);
                 }
-
-            default:
-                throw new InvalidConfigurationException("Unsupported encryption algorithm: " + credentialValue.getEncryptionAlgorithm());
+            }
+            default -> throw new InvalidConfigurationException("Unsupported encryption algorithm: " + credentialValue.getEncryptionAlgorithm());
         }
 
     }
@@ -138,11 +136,10 @@ public class CredentialValueConverter {
         }
 
         switch (credentialDefinition.getEncryptionAlgorithm()) {
-
-            case NO_ENCRYPTION:
+            case NO_ENCRYPTION -> {
                 return new CredentialValue(EncryptionAlgorithm.NO_ENCRYPTION, credentialValue);
-
-            case AES_HMAC:
+            }
+            case AES_HMAC -> {
                 final String masterDbEncryptionKeyBase64 = configuration.getMasterDbEncryptionKey();
 
                 // In case master DB encryption key does not exist, do not encrypt the server private key
@@ -151,11 +148,10 @@ public class CredentialValueConverter {
                 }
 
                 // Convert master DB encryption key
-                final SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(BaseEncoding.base64().decode(masterDbEncryptionKeyBase64));
+                final SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(Base64.getDecoder().decode(masterDbEncryptionKeyBase64));
 
                 // Derive secret key from master DB encryption key, userId and activationId
                 final SecretKey secretKey = deriveSecretKey(masterDbEncryptionKey, userId, credentialDefinition.getName());
-
                 try {
                     // Generate random IV
                     final byte[] iv = keyGenerator.generateRandomBytes(16);
@@ -170,16 +166,16 @@ public class CredentialValueConverter {
                     final byte[] record = baos.toByteArray();
 
                     // Base64-encode output
-                    final String encoded = BaseEncoding.base64().encode(record);
+                    final String encoded = Base64.getEncoder().encodeToString(record);
 
                     // Return encrypted record including encryption algorithm
                     return new CredentialValue(EncryptionAlgorithm.AES_HMAC, encoded);
                 } catch (Exception ex) {
                     throw new EncryptionException(ex);
                 }
-
-            default:
-                throw new InvalidConfigurationException("Unsupported encryption algorithm: " + credentialDefinition.getEncryptionAlgorithm());
+            }
+            default ->
+                    throw new InvalidConfigurationException("Unsupported encryption algorithm: " + credentialDefinition.getEncryptionAlgorithm());
         }
 
     }

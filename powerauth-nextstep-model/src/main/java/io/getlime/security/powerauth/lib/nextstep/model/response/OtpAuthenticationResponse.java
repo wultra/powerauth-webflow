@@ -21,11 +21,11 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Authe
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
-import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**

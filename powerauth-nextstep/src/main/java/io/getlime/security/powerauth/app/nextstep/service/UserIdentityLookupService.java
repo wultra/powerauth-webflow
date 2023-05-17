@@ -36,8 +36,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.LookupUsersResp
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -99,21 +99,15 @@ public class UserIdentityLookupService {
         boolean dateFiltered = false;
 
         if (credentialName!= null) {
-            final Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credentialName);
-            if (!credentialDefinitionOptional.isPresent()) {
-                throw new InvalidRequestException("Credential definition not found: " + credentialName);
-            }
-            credentialDefinition = credentialDefinitionOptional.get();
+            credentialDefinition = credentialDefinitionRepository.findByName(credentialName).orElseThrow(() ->
+                    new InvalidRequestException("Credential definition not found: " + credentialName));
         }
 
         // Choose main query based on most exact parameters, filter lookup results in code by additional parameters
         if (username != null && credentialName != null) {
             // When username and credentialName are present, lookup the user identity, single result or no result is found
-            final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
-            if (!credentialOptional.isPresent()) {
-                throw new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username);
-            }
-            final CredentialEntity credential = credentialOptional.get();
+            final CredentialEntity credential = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username).orElseThrow(() ->
+                    new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username));
             if (credentialStatus == null || credential.getStatus() == credentialStatus) {
                 // Filter by credentialStatus in case it is also specified
                 UserIdentityEntity user = credential.getUser();
@@ -159,11 +153,11 @@ public class UserIdentityLookupService {
             // Filter by roles
             final List<UserIdentityEntity> filteredList = new ArrayList<>();
             for (UserIdentityEntity user: lookupResult) {
-                final List<UserRoleEntity> userRoles = user.getRoles().stream().filter(r -> r.getStatus() == UserRoleStatus.ACTIVE).collect(Collectors.toList());
+                final List<UserRoleEntity> userRoles = user.getRoles().stream().filter(r -> r.getStatus() == UserRoleStatus.ACTIVE).toList();
                 final List<String> roleNames = userRoles.stream()
                         .map(roleEntity -> roleEntity.getRole().getName())
-                        .collect(Collectors.toList());
-                if (roleNames.containsAll(roles)) {
+                        .toList();
+                if (new HashSet<>(roleNames).containsAll(roles)) {
                     filteredList.add(user);
                 }
             }
@@ -200,11 +194,8 @@ public class UserIdentityLookupService {
         CredentialDefinitionEntity credentialDefinition = null;
 
         if (credentialName!= null) {
-            final Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credentialName);
-            if (!credentialDefinitionOptional.isPresent()) {
-                throw new InvalidRequestException("Credential definition not found: " + credentialName);
-            }
-            credentialDefinition = credentialDefinitionOptional.get();
+            credentialDefinition = credentialDefinitionRepository.findByName(credentialName).orElseThrow(() ->
+                    new InvalidRequestException("Credential definition not found: " + credentialName));
             if (credentialDefinition.isDataAdapterProxyEnabled()) {
                 // Lookup is performed using Data Adapter
                 if (operationId == null) {
@@ -232,11 +223,8 @@ public class UserIdentityLookupService {
         }
 
         // When username and credentialName are present, lookup the user identity, single result or no result is found
-        final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
-        if (!credentialOptional.isPresent()) {
-            throw new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username);
-        }
-        final CredentialEntity credential = credentialOptional.get();
+        final CredentialEntity credential = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username).orElseThrow(() ->
+                new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username));
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username);
         }
@@ -254,11 +242,8 @@ public class UserIdentityLookupService {
      * @throws UserNotFoundException Thrown when user identity entity is not found.
      */
     public UserIdentityEntity findUser(String userId) throws UserNotFoundException {
-        final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
-        if (!userOptional.isPresent()) {
-            throw new UserNotFoundException("User identity not found: " + userId);
-        }
-        final UserIdentityEntity user = userOptional.get();
+        final UserIdentityEntity user = userIdentityRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("User identity not found: " + userId));
         if (user.getStatus() == UserIdentityStatus.REMOVED) {
             throw new UserNotFoundException("User identity is REMOVED: " + userId);
         }
@@ -273,11 +258,8 @@ public class UserIdentityLookupService {
      * @throws UserNotFoundException Thrown when user identity entity is not found.
      */
     public UserIdentityEntity findUser(String userId, boolean includeRemoved) throws UserNotFoundException {
-        final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
-        if (!userOptional.isPresent()) {
-            throw new UserNotFoundException("User identity not found: " + userId);
-        }
-        final UserIdentityEntity user = userOptional.get();
+        final UserIdentityEntity user = userIdentityRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("User identity not found: " + userId));
         if (!includeRemoved &&  user.getStatus() == UserIdentityStatus.REMOVED) {
             throw new UserNotFoundException("User identity is REMOVED: " + userId);
         }
@@ -290,15 +272,8 @@ public class UserIdentityLookupService {
      * @return Optional user identity.
      */
     public Optional<UserIdentityEntity> findUserOptional(String userId) {
-        final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
-        if (!userOptional.isPresent()) {
-            return Optional.empty();
-        }
-        final UserIdentityEntity user = userOptional.get();
-        if (user.getStatus() == UserIdentityStatus.REMOVED) {
-            return Optional.empty();
-        }
-        return Optional.of(user);
+        return userIdentityRepository.findById(userId)
+                .filter(user -> user.getStatus() != UserIdentityStatus.REMOVED);
     }
 
     /**
@@ -308,14 +283,7 @@ public class UserIdentityLookupService {
      * @return Optional user identity.
      */
     public Optional<UserIdentityEntity> findUserOptional(String userId, boolean includeRemoved) {
-        final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
-        if (!userOptional.isPresent()) {
-            return Optional.empty();
-        }
-        final UserIdentityEntity user = userOptional.get();
-        if (!includeRemoved && user.getStatus() == UserIdentityStatus.REMOVED) {
-            return Optional.empty();
-        }
-        return Optional.of(user);
+        return userIdentityRepository.findById(userId)
+                .filter(user -> includeRemoved || user.getStatus() != UserIdentityStatus.REMOVED);
     }
 }

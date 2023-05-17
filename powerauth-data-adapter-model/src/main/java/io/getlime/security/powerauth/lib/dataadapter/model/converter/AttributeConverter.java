@@ -27,10 +27,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
  */
 public class AttributeConverter {
 
-    private ValueFormatTypeConverter valueFormatTypeConverter = new ValueFormatTypeConverter();
-    private BannerTypeConverter bannerTypeConverter = new BannerTypeConverter();
-    private BankAccountListConverter bankAccountListConverter = new BankAccountListConverter();
-    private PartyInfoConverter partyInfoConverter = new PartyInfoConverter();
+    private final ValueFormatTypeConverter valueFormatTypeConverter = new ValueFormatTypeConverter();
+    private final BannerTypeConverter bannerTypeConverter = new BannerTypeConverter();
+    private final BankAccountListConverter bankAccountListConverter = new BankAccountListConverter();
+    private final PartyInfoConverter partyInfoConverter = new PartyInfoConverter();
 
     /**
      * Converter from OperationFormFieldAttribute.
@@ -42,37 +42,36 @@ public class AttributeConverter {
             return null;
         }
         switch (input.getType()) {
-            case AMOUNT: {
+            case AMOUNT -> {
                 OperationAmountFieldAttribute attr = (OperationAmountFieldAttribute) input;
                 return new AmountAttribute(attr.getId(), attr.getLabel(), attr.getAmount(), attr.getCurrency(), attr.getCurrencyId(), attr.getFormattedValues());
             }
-            case KEY_VALUE: {
+            case KEY_VALUE -> {
                 OperationKeyValueFieldAttribute attr = (OperationKeyValueFieldAttribute) input;
                 return new KeyValueAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromOperationValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
-            case NOTE: {
+            case NOTE -> {
                 OperationNoteFieldAttribute attr = (OperationNoteFieldAttribute) input;
                 return new NoteAttribute(attr.getId(), attr.getLabel(), attr.getNote(), valueFormatTypeConverter.fromOperationValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
-            case BANK_ACCOUNT_CHOICE: {
+            case BANK_ACCOUNT_CHOICE -> {
                 OperationBankAccountChoiceFieldAttribute attr = (OperationBankAccountChoiceFieldAttribute) input;
                 return new BankAccountChoiceAttribute(attr.getId(), attr.getLabel(), bankAccountListConverter.fromBankAccountDetailList(attr.getBankAccounts()), attr.isEnabled(), attr.getDefaultValue());
             }
-            case BANNER: {
+            case BANNER -> {
                 OperationBannerFieldAttribute attr = (OperationBannerFieldAttribute) input;
                 return new BannerAttribute(attr.getId(), attr.getLabel(), bannerTypeConverter.fromOperationBannerType(attr.getBannerType()), attr.getMessage());
             }
-            case HEADING: {
+            case HEADING -> {
                 OperationHeadingFieldAttribute attr = (OperationHeadingFieldAttribute) input;
                 return new HeadingAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromOperationValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
-            case PARTY_INFO: {
+            case PARTY_INFO -> {
                 OperationPartyInfoFieldAttribute attr = (OperationPartyInfoFieldAttribute) input;
                 return new PartyInfoAttribute(attr.getId(), partyInfoConverter.fromOperationPartyInfo(attr.getPartyInfo()));
             }
-            default: {
-                throw new IllegalStateException("Unsupported attribute type: "+input.getType());
-            }
+            default ->
+                throw new IllegalStateException("Unsupported attribute type: " + input.getType());
         }
     }
 
@@ -86,37 +85,36 @@ public class AttributeConverter {
             return null;
         }
         switch (input.getType()) {
-            case AMOUNT: {
+            case AMOUNT -> {
                 AmountAttribute attr = (AmountAttribute) input;
                 return new OperationAmountFieldAttribute(attr.getId(), attr.getLabel(), attr.getAmount(), attr.getCurrency(), attr.getCurrencyId(), attr.getFormattedValues());
             }
-            case KEY_VALUE: {
+            case KEY_VALUE -> {
                 KeyValueAttribute attr = (KeyValueAttribute) input;
                 return new OperationKeyValueFieldAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
-            case NOTE: {
+            case NOTE -> {
                 NoteAttribute attr = (NoteAttribute) input;
                 return new OperationNoteFieldAttribute(attr.getId(), attr.getLabel(), attr.getNote(), valueFormatTypeConverter.fromValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
-            case BANK_ACCOUNT_CHOICE: {
+            case BANK_ACCOUNT_CHOICE -> {
                 BankAccountChoiceAttribute attr = (BankAccountChoiceAttribute) input;
                 return new OperationBankAccountChoiceFieldAttribute(attr.getId(), attr.getLabel(), bankAccountListConverter.fromBankAccountList(attr.getBankAccounts()), attr.isEnabled(), attr.getDefaultValue());
             }
-            case BANNER: {
+            case BANNER -> {
                 BannerAttribute attr = (BannerAttribute) input;
                 return new OperationBannerFieldAttribute(attr.getId(), attr.getLabel(), bannerTypeConverter.fromBannerType(attr.getBannerType()), attr.getMessage());
             }
-            case HEADING: {
+            case HEADING -> {
                 HeadingAttribute attr = (HeadingAttribute) input;
                 return new OperationHeadingFieldAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
-            case PARTY_INFO: {
+            case PARTY_INFO -> {
                 PartyInfoAttribute attr = (PartyInfoAttribute) input;
                 return new OperationPartyInfoFieldAttribute(attr.getId(), partyInfoConverter.fromPartyInfo(attr.getPartyInfo()));
             }
-            default: {
-                throw new IllegalStateException("Unsupported attribute type: "+input.getType());
-            }
+            default ->
+                throw new IllegalStateException("Unsupported attribute type: " + input.getType());
         }
     }
 

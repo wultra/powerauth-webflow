@@ -103,7 +103,7 @@ public class DefaultExceptionResolver {
         logger.warn("Error occurred in Web Flow server: {}", ex.getMessage());
         audit.warn("Error occurred in Web Flow server", AUDIT_DETAIL_UNAUTHORIZED, ex);
         authenticationManagementService.clearContext();
-        return "redirect:/oauth/error";
+        return "redirect:/oauth2/error";
     }
 
     /**

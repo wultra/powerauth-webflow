@@ -17,10 +17,11 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -35,10 +36,11 @@ import java.util.Date;
 @EqualsAndHashCode(of = "name")
 public class RoleEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1997494646745106999L;
 
     @Id
-    @SequenceGenerator(name = "ns_role", sequenceName = "ns_role_seq")
+    @SequenceGenerator(name = "ns_role", sequenceName = "ns_role_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_role")
     @Column(name = "role_id", nullable = false)
     private Long roleId;

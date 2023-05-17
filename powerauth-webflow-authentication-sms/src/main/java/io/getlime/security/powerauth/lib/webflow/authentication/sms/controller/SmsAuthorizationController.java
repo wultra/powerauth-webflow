@@ -17,7 +17,6 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.sms.controller;
 
-import com.google.common.io.BaseEncoding;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
@@ -54,6 +53,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.reques
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.InitSmsAuthorizationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.ResendSmsAuthorizationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.SmsAuthorizationResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,13 +64,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Controller which provides endpoints for SMS authorization.
@@ -205,21 +201,19 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 String cipherTransformation = configuration.getCipherTransformation();
                 io.getlime.security.powerauth.lib.webflow.authentication.encryption.PasswordProtection passwordProtection;
                 switch (passwordProtectionType) {
-                    case NO_PROTECTION:
+                    case NO_PROTECTION -> {
                         // Password is sent in plain text
                         passwordProtection = new NoPasswordProtection();
                         logger.info("No protection is used for protecting user password");
-                        break;
-
-                    case PASSWORD_ENCRYPTION_AES:
+                    }
+                    case PASSWORD_ENCRYPTION_AES -> {
                         // Encrypt user password in case password encryption is configured in Web Flow
                         passwordProtection = new AesEncryptionPasswordProtection(cipherTransformation, configuration.getPasswordEncryptionKey());
                         logger.info("User password is protected using transformation: {}", cipherTransformation);
-                        break;
-
-                    default:
+                    }
+                    default ->
                         // Unsupported authentication type
-                        throw new InvalidRequestException("Invalid authentication type");
+                            throw new InvalidRequestException("Invalid authentication type");
                 }
 
                 String protectedPassword = passwordProtection.protect(request.getPassword());
@@ -621,8 +615,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             logger.warn("Error occurred while verifying authorization code from SMS message: {}", e.getMessage());
             if (afsAction != null) {
                 final List<AfsAuthInstrument> authInstruments = authInstrumentConverter.fromAuthInstruments(request.getAuthInstruments());
-                if (e instanceof AuthenticationFailedException) {
-                    AuthenticationFailedException authEx = (AuthenticationFailedException) e;
+                if (e instanceof final AuthenticationFailedException authEx) {
                     if (authEx.getAccountStatus() != UserAccountStatus.ACTIVE) {
                         // notify AFS about failed authentication method due to the fact that user account is not active
                         afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_METHOD_FAILED);
@@ -736,13 +729,9 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     private AfsAction determineAfsActionInit(AuthMethod authMethod, String operationName) throws AuthStepException {
         AfsAction afsAction;
         switch (authMethod) {
-            case LOGIN_SCA:
-                afsAction = AfsAction.LOGIN_INIT;
-                break;
-            case APPROVAL_SCA:
-                afsAction = AfsAction.APPROVAL_INIT;
-                break;
-            case SMS_KEY:
+            case LOGIN_SCA -> afsAction = AfsAction.LOGIN_INIT;
+            case APPROVAL_SCA -> afsAction = AfsAction.APPROVAL_INIT;
+            case SMS_KEY -> {
                 GetOperationConfigDetailResponse config = getOperationConfig(operationName);
                 if (config == null) {
                     throw new OperationNotConfiguredException("Operation not configured, operation name: " + operationName);
@@ -755,9 +744,8 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     // Unknown template, do not execute AFS action
                     afsAction = null;
                 }
-                break;
-            default:
-                afsAction = null;
+            }
+            default -> afsAction = null;
         }
         return afsAction;
     }
@@ -772,13 +760,9 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     private AfsAction determineAfsActionAuth(AuthMethod authMethod, String operationName) throws AuthStepException {
         AfsAction afsAction;
         switch (authMethod) {
-            case LOGIN_SCA:
-                afsAction = AfsAction.LOGIN_AUTH;
-                break;
-            case APPROVAL_SCA:
-                afsAction = AfsAction.APPROVAL_AUTH;
-                break;
-            case SMS_KEY:
+            case LOGIN_SCA -> afsAction = AfsAction.LOGIN_AUTH;
+            case APPROVAL_SCA -> afsAction = AfsAction.APPROVAL_AUTH;
+            case SMS_KEY -> {
                 GetOperationConfigDetailResponse config = getOperationConfig(operationName);
                 if (config == null) {
                     throw new OperationNotConfiguredException("Operation not configured, operation name: " + operationName);
@@ -791,9 +775,8 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     // Unknown template, do not execute AFS action
                     afsAction = null;
                 }
-                break;
-            default:
-                afsAction = null;
+            }
+            default -> afsAction = null;
         }
         return afsAction;
     }
@@ -888,6 +871,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             return operationDataExternal;
         }
         // Otherwise, convert operation data into Base-64 and use this data for calculating signature with certificate
-        return BaseEncoding.base64().encode(operationData.getBytes(StandardCharsets.UTF_8));
+        return Base64.getEncoder().encodeToString(operationData.getBytes(StandardCharsets.UTF_8));
     }
 }

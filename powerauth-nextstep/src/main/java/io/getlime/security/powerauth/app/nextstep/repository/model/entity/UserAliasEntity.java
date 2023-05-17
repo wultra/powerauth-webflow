@@ -18,10 +18,11 @@
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAliasStatus;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -36,10 +37,11 @@ import java.util.Date;
 @EqualsAndHashCode(of = {"name", "user"})
 public class UserAliasEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -6855066974507308862L;
 
     @Id
-    @SequenceGenerator(name = "ns_user_alias", sequenceName = "ns_user_alias_seq")
+    @SequenceGenerator(name = "ns_user_alias", sequenceName = "ns_user_alias_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_user_alias")
     @Column(name = "user_alias_id", nullable = false)
     private Long userAliasId;

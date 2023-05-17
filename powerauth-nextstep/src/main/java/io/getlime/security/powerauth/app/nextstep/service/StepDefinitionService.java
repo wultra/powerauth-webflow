@@ -35,8 +35,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 
 /**
@@ -117,11 +117,8 @@ public class StepDefinitionService {
     @Transactional
     public DeleteStepDefinitionResponse deleteStepDefinition(DeleteStepDefinitionRequest request) throws StepDefinitionNotFoundException {
         final StepResolutionService stepResolutionService = serviceCatalogue.getStepResolutionService();
-        final Optional<StepDefinitionEntity> stepDefinitionOptional = stepDefinitionRepository.findById(request.getStepDefinitionId());
-        if (!stepDefinitionOptional.isPresent()) {
-            throw new StepDefinitionNotFoundException("Step definition not found, ID: " + request.getStepDefinitionId());
-        }
-        final StepDefinitionEntity stepDefinition = stepDefinitionOptional.get();
+        final StepDefinitionEntity stepDefinition = stepDefinitionRepository.findById(request.getStepDefinitionId()).orElseThrow(() ->
+                new StepDefinitionNotFoundException("Step definition not found, ID: " + request.getStepDefinitionId()));
         stepDefinitionRepository.delete(stepDefinition);
         logger.debug("Step definition was deleted, step definition ID: {}", stepDefinition.getStepDefinitionId());
         audit.info("Step definition was deleted", AuditDetail.builder()

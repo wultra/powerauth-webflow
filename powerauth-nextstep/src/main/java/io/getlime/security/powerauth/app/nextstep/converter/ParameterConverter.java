@@ -38,7 +38,7 @@ public class ParameterConverter {
      * @return Map with deserialized parameters.
      */
     public Map<String, String> fromString(String param) throws JsonProcessingException {
-        return objectMapper.readValue(param, new TypeReference<Map<String, String>>() {});
+        return objectMapper.readValue(param, new TypeReference<>() {});
     }
 
     /**

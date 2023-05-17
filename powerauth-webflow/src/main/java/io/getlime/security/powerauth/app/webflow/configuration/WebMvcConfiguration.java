@@ -54,7 +54,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Autowired
     private WebFlowServerConfiguration configuration;
 
-    /* Register PowerAuth 2.0 Server Beans */
+    /* Register PowerAuth Server Beans */
 
     /**
      * Register PowerAuth web argument resolver.
@@ -102,9 +102,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public LocaleResolver localeResolver() {
-        CookieLocaleResolver resolver = new CookieLocaleResolver();
-        resolver.setCookieName("lang");
-        return resolver;
+        return new CookieLocaleResolver("lang");
     }
 
     /**

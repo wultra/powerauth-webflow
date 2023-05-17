@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="1" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="tpp_detail_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence tpp_detail_seq</comment>
+        <createSequence sequenceName="tpp_detail_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="2" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="tpp_user_consent_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence tpp_user_consent_seq</comment>
+        <createSequence sequenceName="tpp_user_consent_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="3" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="tpp_user_consent_history_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence tpp_user_consent_history_seq</comment>
+        <createSequence sequenceName="tpp_user_consent_history_seq" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="4" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tpp_consent"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table tpp_consent</comment>
+        <createTable tableName="tpp_consent" remarks="Table for the list of consent currently given by a user">
+            <column name="consent_id" type="varchar(64)" remarks="Consent ID.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="consent_name" type="varchar(128)" remarks="Consent name, localization key or full displayable value.">
+                <constraints nullable="false" />
+            </column>
+            <column name="consent_text" type="text" remarks="Consent text, localization key or full displayable value with optional placeholders.">
+                <constraints nullable="false" />
+            </column>
+            <column name="version" type="int" remarks="Consent version.">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="5" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tpp_user_consent"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table tpp_user_consent</comment>
+        <createTable tableName="tpp_user_consent" remarks="Table for the list of changes in consent history by given user">
+            <column name="id" type="integer" remarks="User given consent ID.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="user_id" type="varchar(256)" remarks="User ID.">
+                <constraints nullable="false" />
+            </column>
+            <column name="client_id" type="varchar(256)" remarks="OAuth 2.0 client ID.">
+                <constraints nullable="false" />
+            </column>
+            <column name="consent_id" type="varchar(64)" remarks="Consent ID.">
+                <constraints nullable="false" />
+            </column>
+            <column name="external_id" type="varchar(256)" remarks="External ID associated with the consent approval, usually the operation ID." />
+            <column name="consent_parameters" type="text" remarks="Specific parameters that were filled in into the user consent template.">
+                <constraints nullable="false" />
+            </column>
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp the consent with given ID was first created." />
+            <column name="timestamp_updated" type="timestamp" remarks="Timestamp the consent with given ID was given again before it was revoked (updated, prolonged)." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="6" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tpp_user_consent_history"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table tpp_user_consent_history</comment>
+        <createTable tableName="tpp_user_consent_history">
+            <column name="id" type="integer" remarks="ID of the consent history record.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="user_id" type="varchar(256)" remarks="User ID.">
+                <constraints nullable="false" />
+            </column>
+            <column name="client_id" type="varchar(256)" remarks="Client ID.">
+                <constraints nullable="false" />
+            </column>
+            <column name="consent_id" type="varchar(64)" remarks="Consent ID.">
+                <constraints nullable="false" />
+            </column>
+            <column name="consent_change" type="varchar(16)" remarks="Type of the consent change: APPROVE, PROLONG, REJECT">
+                <constraints nullable="false" />
+            </column>
+            <column name="consent_parameters" type="text" remarks="Specific parameters that were filled in into the user consent template in this consent change.">
+                <constraints nullable="false" />
+            </column>
+            <column name="external_id" type="varchar(256)" remarks="External ID associated with the consent approval, usually the operation ID." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp of the consent change." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="7" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tpp_detail"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table tpp_detail</comment>
+        <createTable tableName="tpp_detail">
+            <column name="tpp_id" type="integer" remarks="ID of the TPP provider.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="tpp_name" type="varchar(256)" remarks="Name of the TPP provider.">
+                <constraints nullable="false" />
+            </column>
+            <column name="tpp_license" type="varchar(256)" remarks="Information about the TPP license.">
+                <constraints nullable="false" />
+            </column>
+            <column name="tpp_info" type="text" remarks="Additional information about the TPP provider, if available." />
+            <column name="tpp_address" type="text" remarks="TPP address, if available." />
+            <column name="tpp_website" type="text" remarks="TPP website, if available." />
+            <column name="tpp_phone" type="varchar(256)" remarks="TPP phone number, if available." />
+            <column name="tpp_email" type="varchar(256)" remarks="TPP e-mail, if available." />
+            <column name="tpp_logo" type="text" remarks="TPP logo, if available." />
+            <column name="tpp_blocked" type="boolean" defaultValueBoolean="false" remarks="Indication if this TPP provider is blocked or not.">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="8" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tpp_app_detail"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table tpp_app_detail</comment>
+        <createTable tableName="tpp_app_detail">
+            <column name="tpp_id" type="integer" remarks="TPP ID.">
+                <constraints primaryKey="true" foreignKeyName="tpp_detail_fk" referencedTableName="tpp_detail" referencedColumnNames="tpp_id" />
+            </column>
+            <column name="app_client_id" type="varchar(256)" remarks="TPP app ID, represented as OAuth 2.0 client ID and connecting the application to OAuth 2.0 credentials.">
+                <constraints primaryKey="true" foreignKeyName="tpp_client_secret_fk" referencedTableName="oauth_client_details" referencedColumnNames="client_id" />
+            </column>
+            <column name="app_name" type="varchar(256)" remarks="TPP app name.">
+                <constraints nullable="false" />
+            </column>
+            <column name="app_info" type="text" remarks="An arbitrary additional info about TPP app, if available." />
+            <column name="app_type" type="varchar(32)" remarks="Application type, 'web' or 'native'." />
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

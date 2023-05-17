@@ -28,8 +28,8 @@ import static io.getlime.security.powerauth.lib.nextstep.model.entity.OperationD
 
 /**
  * Builder for operation data.
- *
- * See <a href='https://github.com/wultra/powerauth-webflow/wiki/Off-line-Signatures-QR-Code#operation-data'>operation data documentation</a>.
+ * <p>
+ * See <a href="https://github.com/wultra/powerauth-webflow/wiki/Off-line-Signatures-QR-Code#operation-data">operation data documentation</a>.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -124,7 +124,7 @@ public class OperationDataBuilder {
      */
     public class OperationAttributeBuilder {
 
-        private int attributeId;
+        private final int attributeId;
 
         /**
          * Constructor for operation attributes.

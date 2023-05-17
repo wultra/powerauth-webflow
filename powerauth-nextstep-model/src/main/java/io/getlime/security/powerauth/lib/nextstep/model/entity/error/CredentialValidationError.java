@@ -20,6 +20,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.error;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.List;
  */
 public class CredentialValidationError extends Error implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -4674388987180219329L;
 
     /**

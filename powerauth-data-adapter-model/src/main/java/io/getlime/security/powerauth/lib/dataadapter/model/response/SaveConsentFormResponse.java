@@ -18,7 +18,7 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.response;
 
 /**
- * Response after saving the OAuth 2.0 consent form options.
+ * Response after saving the OAuth 2.1 consent form options.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

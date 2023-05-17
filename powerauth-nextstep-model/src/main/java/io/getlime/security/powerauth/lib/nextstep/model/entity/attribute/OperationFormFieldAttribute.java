@@ -25,7 +25,7 @@ import java.util.Objects;
 
 /**
  * Abstract class that represents a form field attribute.
- *
+ * <p>
  * This class requires JSON annotation since it is a base class that is extended with specific types.
  *
  * @author Petr Dvorak, petr@wultra.com

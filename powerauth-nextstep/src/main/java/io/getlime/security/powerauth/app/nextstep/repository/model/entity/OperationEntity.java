@@ -19,12 +19,13 @@ package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +41,7 @@ import java.util.List;
 @EqualsAndHashCode(of = "operationId")
 public class OperationEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -8991119412441607003L;
 
     @Id

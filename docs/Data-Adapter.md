@@ -24,8 +24,8 @@ Following functionality needs to be customized during Web Flow deployment by imp
 - verify OTP authorization code from SMS
 - authenticate user using user ID, password and OTP authorization code
 - verify a client TLS certificate 
-- initialize OAuth 2.0 consent form
-- create OAuth 2.0 consent form
-- validate OAuth 2.0 consent form options
-- save OAuth 2.0 consent form options
+- initialize OAuth 2.1 consent form
+- create OAuth 2.1 consent form
+- validate OAuth 2.1 consent form options
+- save OAuth 2.1 consent form options
 - execute an anti-fraud system (AFS) action and react on response from AFS

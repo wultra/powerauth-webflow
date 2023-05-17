@@ -18,8 +18,9 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
@@ -33,6 +34,7 @@ import java.util.Objects;
 @Table(name = "wf_certificate_verification")
 public class CertificateVerificationEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 6993451807635603808L;
 
     @EmbeddedId
@@ -151,6 +153,7 @@ public class CertificateVerificationEntity implements Serializable {
     @Embeddable
     public static class CertificateVerificationKey implements Serializable {
 
+        @Serial
         private static final long serialVersionUID = -8783963465967422879L;
 
         @Column(name = "operation_id", nullable = false)

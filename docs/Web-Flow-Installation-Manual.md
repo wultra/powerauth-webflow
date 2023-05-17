@@ -267,7 +267,7 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
 
-    <!-- PowerAuth OAuth 2.0 API Config -->
+    <!-- PowerAuth OAuth 2.1 API Config -->
     <Parameter name="powerauth.webflow.service.url" value="http://10.x.x.x:8080/powerauth-webflow"/>
     <Parameter name="powerauth.webflow.service.oauth.authorizeUrl" value="http://10.x.x.x:8080/powerauth-webflow/oauth/authorize"/>
     <Parameter name="powerauth.webflow.service.oauth.tokenUrl" value="http://10.x.x.x:8080/powerauth-webflow/oauth/token"/>

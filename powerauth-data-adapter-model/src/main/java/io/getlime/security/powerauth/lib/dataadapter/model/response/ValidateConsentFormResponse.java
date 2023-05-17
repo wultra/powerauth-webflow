@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Response with OAuth 2.0 consent form validation result.
+ * Response with OAuth 2.1 consent form validation result.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

@@ -231,8 +231,7 @@ public class OperationConverter {
      */
     private Map<String, Object> convertExtrasToMap(String extras) {
         try {
-            final TypeReference<Map<String, Object>> typeRef
-                    = new TypeReference<Map<String, Object>>() {};
+            final TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
             return objectMapper.readValue(extras, typeRef);
         } catch (IOException e) {
             logger.error("Error occurred while deserializing data", e);

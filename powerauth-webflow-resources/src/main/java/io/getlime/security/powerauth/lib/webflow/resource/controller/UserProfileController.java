@@ -29,9 +29,8 @@ import io.getlime.security.powerauth.lib.webflow.resource.model.UserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.common.exceptions.UnauthorizedUserException;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,7 +49,6 @@ import java.util.Map;
 public class UserProfileController {
 
     private final DataAdapterClient client;
-    private final AuthorizationServerTokenServices tokenServices;
     private final WebFlowResourcesServerConfiguration webFlowResourcesServerConfiguration;
 
     private static final String LANGUAGE = "language";
@@ -62,9 +60,8 @@ public class UserProfileController {
     private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
 
     @Autowired
-    public UserProfileController(DataAdapterClient client, AuthorizationServerTokenServices tokenServices, WebFlowResourcesServerConfiguration webFlowResourcesServerConfiguration) {
+    public UserProfileController(DataAdapterClient client, WebFlowResourcesServerConfiguration webFlowResourcesServerConfiguration) {
         this.client = client;
-        this.tokenServices = tokenServices;
         this.webFlowResourcesServerConfiguration = webFlowResourcesServerConfiguration;
     }
 
@@ -74,22 +71,23 @@ public class UserProfileController {
      * such as info about if SCA (Strong Customer Authentication) was used or not, or about a language used to finalize
      * the flow.
      *
-     * @param authentication Original authentication of the currently logged user.
+     * @param principal Original authentication principal of the currently logged user.
      * @return User profile.
      */
     @RequestMapping(value = "me", method = RequestMethod.GET)
-    public @ResponseBody UserResponse me(OAuth2Authentication authentication) {
-        UserResponse userResponse = new UserResponse();
+    public @ResponseBody UserResponse me(@AuthenticationPrincipal OAuth2AuthenticatedPrincipal principal) {
+        final UserResponse userResponse = new UserResponse();
 
         // Try to fetch user details from the service
         try {
             // Get additional information stored with the token
-            Map<String, Object> additionalInfo = tokenServices.getAccessToken(authentication).getAdditionalInformation();
-            String language = (String) additionalInfo.get(LANGUAGE);
-            Boolean sca = (Boolean) additionalInfo.get(SCA);
-            String organizationId = (String) additionalInfo.get(ORGANIZATION_ID);
+            Map<String, Object> attributes = principal.getAttributes();
 
-            final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(authentication.getUserAuthentication().getName(), organizationId);
+            String language = (String) attributes.get(LANGUAGE);
+            Boolean sca = (Boolean) attributes.get(SCA);
+            String organizationId = (String) attributes.get(ORGANIZATION_ID);
+
+            final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(principal.getName(), organizationId);
 
             if (userDetailResponse.getResponseObject().getAccountStatus() == null
                     || userDetailResponse.getResponseObject().getAccountStatus() != AccountStatus.ACTIVE) {
@@ -112,6 +110,7 @@ public class UserProfileController {
             }
             userResponse.getConnection().setOrganizationId(organizationId);
         } catch (DataAdapterClientErrorException e) {
+            logger.warn(e.getMessage(), e);
             return anonymousUser();
         }
         // Save service information
@@ -128,17 +127,17 @@ public class UserProfileController {
      * Returns user profile of authenticated user, or anonymous user in case there is an error fetching user details.
      * This method returns a minimal format compatible with OpenID Connect specification (basic JWT claims).
      *
-     * @param authentication Original authentication of the currently logged user.
+     * @param principal Original authentication principal of the currently logged user.
      * @return User profile.
      */
     @RequestMapping(value = "me/info", method = { RequestMethod.GET, RequestMethod.POST })
-    public @ResponseBody UserInfoResponse userInfo(OAuth2Authentication authentication) {
+    public @ResponseBody UserInfoResponse userInfo(@AuthenticationPrincipal OAuth2AuthenticatedPrincipal principal) {
         // Try to fetch user details from the service
         try {
-            final String usedId = authentication.getUserAuthentication().getName();
+            final String usedId = principal.getName();
             // Get additional information stored with the token
-            final Map<String, Object> additionalInfo = tokenServices.getAccessToken(authentication).getAdditionalInformation();
-            final String organizationId = (String) additionalInfo.get(ORGANIZATION_ID);
+            final Map<String, Object> attributes = principal.getAttributes();
+            final String organizationId = (String) attributes.get(ORGANIZATION_ID);
             logger.info("Fetching user details for user with ID: {}, organization ID: {}", usedId, organizationId);
             final ObjectResponse<UserDetailResponse> userDetail = client.fetchUserDetail(usedId, organizationId);
             if (userDetail.getResponseObject().getAccountStatus() != AccountStatus.ACTIVE) {
@@ -152,7 +151,8 @@ public class UserProfileController {
             logger.info("Found user with ID: {}, given name: {}, family name: {}", usedId, givenName, familyName);
             return new UserInfoResponse(id, id, givenName, familyName, extras);
         } catch (DataAdapterClientErrorException e) {
-            throw new UnauthorizedUserException("Unable to fetch user details from data adapter");
+            logger.warn(e.getMessage(), e);
+            return anonymousUserDetail();
         }
     }
 
@@ -168,6 +168,19 @@ public class UserProfileController {
         userResponse.getConnection().setLanguage("en");
         userResponse.getConnection().setSca(false);
         userResponse.getConnection().setOrganizationId(null);
+        return userResponse;
+    }
+
+    /**
+     * Create dummy user detail for case when user does not exist or user account is not active.
+     * @return Dummy user detail response.
+     */
+    private UserInfoResponse anonymousUserDetail() {
+        UserInfoResponse userResponse = new UserInfoResponse();
+        userResponse.setId(ANONYMOUS_USER);
+        userResponse.setSub(ANONYMOUS_USER);
+        userResponse.setGivenName(null);
+        userResponse.setFamilyName(null);
         return userResponse;
     }
 

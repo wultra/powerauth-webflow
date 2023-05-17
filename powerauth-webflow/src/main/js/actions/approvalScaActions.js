@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import axios from "axios";
-import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
+import {dispatchError} from "../dispatcher/dispatcher";
 import {handleAuthFailedError} from "./errorHandling";
 
 /**
@@ -56,7 +56,7 @@ export function getOperationData() {
     return function (dispatch) {
         axios.post("./api/auth/operation/detail", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             dispatch({
@@ -88,7 +88,7 @@ export function confirm() {
         });
         axios.post("./api/auth/approval-sca/authenticate", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             switch (response.data.result) {
@@ -144,7 +144,7 @@ export function cancel() {
     return function (dispatch) {
         axios.post("./api/auth/approval-sca/cancel", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             dispatch({

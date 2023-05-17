@@ -57,6 +57,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.Organizati
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.OrganizationConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +67,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
@@ -242,8 +242,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             // Send error to client
             LoginScaAuthResponse response = new LoginScaAuthResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            if (ex instanceof DataAdapterClientErrorException) {
-                DataAdapterClientErrorException ex2 = (DataAdapterClientErrorException) ex;
+            if (ex instanceof final DataAdapterClientErrorException ex2) {
                 response.setRemainingAttempts(ex2.getError().getRemainingAttempts());
                 response.setMessage(ex2.getError().getMessage());
             } else {
@@ -275,17 +274,18 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             ObjectResponse<InitAuthMethodResponse> objectResponse = dataAdapterClient.initAuthMethod(operation.getUserId(), operation.getOrganizationId(), AuthMethod.LOGIN_SCA, operationContext);
             InitAuthMethodResponse initResponse = objectResponse.getResponseObject();
             switch (initResponse.getCertificateAuthenticationMode()) {
-                case ENABLED:
+                case ENABLED -> {
                     response.setClientCertificateAuthenticationAvailable(true);
                     response.setClientCertificateAuthenticationEnabled(true);
-                    break;
-                case DISABLED:
+                }
+                case DISABLED -> {
                     response.setClientCertificateAuthenticationAvailable(true);
                     response.setClientCertificateAuthenticationEnabled(false);
-                    break;
-                default:
+                }
+                default -> {
                     response.setClientCertificateAuthenticationAvailable(false);
                     response.setClientCertificateAuthenticationEnabled(false);
+                }
             }
             response.setClientCertificateVerificationUrl(initResponse.getCertificateVerificationUrl());
             if (operation.getUserId() != null && operation.getOrganizationId() != null) {

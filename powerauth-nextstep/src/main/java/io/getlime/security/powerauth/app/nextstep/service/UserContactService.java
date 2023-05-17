@@ -43,8 +43,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -156,10 +156,10 @@ public class UserContactService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         Set<UserContactEntity> contacts = user.getContacts();
         Optional<UserContactEntity> contactOptional = contacts.stream().filter(c -> c.getName().equals(request.getContactName()) && c.getType().equals(request.getContactType())).findFirst();
-        if (!contactOptional.isPresent()) {
+        if (contactOptional.isEmpty()) {
             throw new UserContactNotFoundException("User contact not found: " + request.getContactName() + ", user ID: " + user.getUserId() + ", type: " + request.getContactType());
         }
-        UserContactEntity contact = contactOptional.get();
+        final UserContactEntity contact = contactOptional.get();
         contact.setUser(user);
         contact.setName(request.getContactName());
         contact.setType(request.getContactType());
@@ -197,10 +197,10 @@ public class UserContactService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         Set<UserContactEntity> contacts = user.getContacts();
         Optional<UserContactEntity> contactOptional = contacts.stream().filter(c -> c.getName().equals(request.getContactName()) && c.getType().equals(request.getContactType())).findFirst();
-        if (!contactOptional.isPresent()) {
+        if (contactOptional.isEmpty()) {
             throw new UserContactNotFoundException("No user contact found: " + request.getContactName() + ", user ID: " + user.getUserId() + ", type: " + request.getContactType());
         }
-        UserContactEntity contact = contactOptional.get();
+        final UserContactEntity contact = contactOptional.get();
         user.getContacts().remove(contact);
         user = userIdentityRepository.save(user);
         logger.debug("User contact was deleted, user ID: {}, contact name: {}", user.getUserId(), contact.getName());
@@ -228,7 +228,7 @@ public class UserContactService {
             List<UserContactEntity> contactListPrimary = contacts.stream()
                     .filter(c -> c.getType().equals(ct))
                     .filter(UserContactEntity::isPrimary)
-                    .collect(Collectors.toList());
+                    .toList();
             if (contactListPrimary.size() > 1) {
                 // Multiple primary contacts exists, find the newest one by created or last updated date
                 Date maxDate = new Date(0);
