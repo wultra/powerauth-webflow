@@ -18,8 +18,12 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.UserContact;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Request for sending SMS OTP authorization message.
@@ -37,6 +41,11 @@ public class SendAuthorizationSmsRequest {
      * Organization ID for this authorization request.
      */
     private String organizationId;
+
+    /**
+     * User contact information.
+     */
+    private List<UserContact> userContacts = new ArrayList<>();
 
     /**
      * User account status.
@@ -91,9 +100,10 @@ public class SendAuthorizationSmsRequest {
      * @param lang SMS language.
      * @param resend Whether SMS is being resent.
      */
-    public SendAuthorizationSmsRequest(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String messageId, String authorizationCode, String lang, boolean resend) {
+    public SendAuthorizationSmsRequest(String userId, String organizationId, List<UserContact> userContacts, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String messageId, String authorizationCode, String lang, boolean resend) {
         this.userId = userId;
         this.organizationId = organizationId;
+        this.userContacts = userContacts;
         this.accountStatus = accountStatus;
         this.authMethod = authMethod;
         this.operationContext = operationContext;
@@ -133,6 +143,14 @@ public class SendAuthorizationSmsRequest {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+     * Get user contacts.
+     * @return User contacts.
+     */
+    public List<UserContact> getUserContacts() {
+        return userContacts;
     }
 
     /**

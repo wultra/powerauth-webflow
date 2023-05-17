@@ -18,7 +18,9 @@
 package io.getlime.security.powerauth.app.nextstep.converter;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserContactEntity;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.UserContact;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserContactDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ContactType;
 
 /**
  * Converter for user contacts.
@@ -41,6 +43,38 @@ public class UserContactConverter {
         contactDetail.setTimestampCreated(contact.getTimestampCreated());
         contactDetail.setTimestampLastUpdated(contact.getTimestampLastUpdated());
         return contactDetail;
+    }
+
+    /**]
+     * Convert NextStep representation of user contact to Data Adapter representation.
+     * @param source User contact in NextStep.
+     * @return User contact in Data Adapter.
+     */
+    public UserContact toUserContact(UserContactDetail source) {
+        if (source == null) {
+            return null;
+        }
+        final UserContact destination = new UserContact();
+        destination.setContactName(source.getContactName());
+        destination.setContactValue(source.getContactValue());
+        destination.setContactType(convertContactType(source.getContactType()));
+        destination.setPrimary(source.isPrimary());
+        destination.setTimestampCreated(source.getTimestampCreated());
+        destination.setTimestampLastUpdated(source.getTimestampLastUpdated());
+        return destination;
+    }
+
+    /**
+     * Helper method for converting contact type enum.
+     * @param source Contact type in NextStep.
+     * @return Contact type in Data Adapter.
+     */
+    private UserContact.Type convertContactType(ContactType source) {
+        switch (source) {
+            case EMAIL: return UserContact.Type.EMAIL;
+            case PHONE: return UserContact.Type.PHONE;
+            default: return UserContact.Type.OTHER;
+        }
     }
 
 }
