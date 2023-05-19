@@ -108,11 +108,15 @@ public class CredentialCounterService {
             case FAILED -> {
                 credential.setFailedAttemptCounterSoft(credential.getFailedAttemptCounterSoft() + 1);
                 credential.setFailedAttemptCounterHard(credential.getFailedAttemptCounterHard() + 1);
-                if (hardLimit != null && credential.getFailedAttemptCounterHard() >= hardLimit
+                if (hardLimit != null
+                        && hardLimit > 0
+                        && credential.getFailedAttemptCounterHard() >= hardLimit
                         && credential.getStatus() != CredentialStatus.BLOCKED_PERMANENT) {
                     credential.setStatus(CredentialStatus.BLOCKED_PERMANENT);
                     credential.setTimestampBlocked(new Date());
-                } else if (softLimit != null && credential.getFailedAttemptCounterSoft() >= softLimit
+                } else if (softLimit != null
+                        && softLimit > 0
+                        && credential.getFailedAttemptCounterSoft() >= softLimit
                         && credential.getStatus() != CredentialStatus.BLOCKED_TEMPORARY) {
                     credential.setStatus(CredentialStatus.BLOCKED_TEMPORARY);
                     credential.setTimestampBlocked(new Date());

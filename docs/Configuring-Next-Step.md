@@ -175,8 +175,8 @@ The credential policy requires following configuration:
 - `username_allowed_pattern` - regular expression for checking the username pattern, use `NULL` value for no check
 - `credential_length_min` - minimum length of the credential, use `NULL` value for no limit
 - `credential_length_max` - maximum length of the credential, use `NULL` value for no limit
-- `limit_soft` - soft limit for failed authentication attempts using credential (credential status `BLOCKED_TEMPORARY` when limit is exceeded), use `0` for no limit
-- `limit_hard` - hard limit for failed authentication attempts using credential (credential status `BLOCKED_PERMANENT` when limit is exceeded), use `0` for no limit
+- `limit_soft` - soft limit for failed authentication attempts using credential (credential status `BLOCKED_TEMPORARY` when limit is exceeded), use `null` value for no limit (e.g. for development purposes)
+- `limit_hard` - hard limit for failed authentication attempts using credential (credential status `BLOCKED_PERMANENT` when limit is exceeded), use `null` value for no limit (e.g. for development purposes)
 - `check_history_count` - count of historical credential values which should be checked when changing the credential, use `0` for skipping the check
 - `rotation_enabled` - whether credential rotation is enabled
 - `rotation_days`- number of days for credential rotation, only specify when credential rotation is enabled
