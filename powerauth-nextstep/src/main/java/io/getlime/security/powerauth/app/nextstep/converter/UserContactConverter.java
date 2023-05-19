@@ -45,7 +45,7 @@ public class UserContactConverter {
         return contactDetail;
     }
 
-    /**]
+    /**
      * Convert NextStep representation of user contact to Data Adapter representation.
      * @param source User contact in NextStep.
      * @return User contact in Data Adapter.
