@@ -24,7 +24,6 @@
 
     <name>powerauth-data-adapter-model</name>
     <artifactId>powerauth-data-adapter-model</artifactId>
-    <groupId>io.getlime.security</groupId>
     <packaging>jar</packaging>
 
     <parent>

@@ -18,8 +18,12 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.UserContact;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Request for creating SMS OTP authorization message.
@@ -37,6 +41,12 @@ public class CreateSmsAuthorizationRequest {
      * Organization ID for this authorization request.
      */
     private String organizationId;
+
+    /**
+     * User contact information.
+     */
+    private List<UserContact> userContacts = new ArrayList<>();
+
 
     /**
      * User account status.
@@ -79,9 +89,10 @@ public class CreateSmsAuthorizationRequest {
      * @param operationContext Operation context.
      * @param resend Whether SMS is being resent.
      */
-    public CreateSmsAuthorizationRequest(String userId, String organizationId, AccountStatus accountStatus, String lang, AuthMethod authMethod, OperationContext operationContext, boolean resend) {
+    public CreateSmsAuthorizationRequest(String userId, String organizationId, List<UserContact> userContacts, AccountStatus accountStatus, String lang, AuthMethod authMethod, OperationContext operationContext, boolean resend) {
         this.userId = userId;
         this.organizationId = organizationId;
+        this.userContacts = userContacts;
         this.accountStatus = accountStatus;
         this.lang = lang;
         this.authMethod = authMethod;
@@ -119,6 +130,14 @@ public class CreateSmsAuthorizationRequest {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+     * Get user contacts.
+     * @return User contacts.
+     */
+    public List<UserContact> getUserContacts() {
+        return userContacts;
     }
 
     /**

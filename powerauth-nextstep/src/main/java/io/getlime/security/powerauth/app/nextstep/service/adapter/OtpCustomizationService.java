@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.UserContact;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsDeliveryResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSmsAuthorizationResponse;
@@ -33,6 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * This service handles OTP customization.
@@ -61,19 +64,20 @@ public class OtpCustomizationService {
     /**
      * Create and send OTP code using Data Adapter.
      * @param userId User ID.
+     * @param userContacts User contacts.
      * @param operation Operation entity.
      * @param language Language as defined in ISO-639 with 2 characters.
      * @param resend Whether OTP code is being resent.
      * @return OTP delivery result.
      */
-    public OtpDeliveryResult createAndSendOtp(String userId, OperationEntity operation, String language, boolean resend) {
+    public OtpDeliveryResult createAndSendOtp(String userId, List<UserContact> userContacts, OperationEntity operation, String language, boolean resend) {
         final OtpDeliveryResult otpDeliveryResult = new OtpDeliveryResult();
         try {
             final GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
             final String organizationId = operationDetail.getOrganizationId();
             final AuthMethod authMethod = operationDetail.getChosenAuthMethod();
             final OperationContext operationContext = operationConverter.toOperationContext(operation);
-            final CreateSmsAuthorizationResponse response = dataAdapterClient.createAndSendAuthorizationSms(userId, organizationId, AccountStatus.ACTIVE, authMethod, operationContext, language, resend).getResponseObject();
+            final CreateSmsAuthorizationResponse response = dataAdapterClient.createAndSendAuthorizationSms(userId, organizationId, userContacts, AccountStatus.ACTIVE, authMethod, operationContext, language, resend).getResponseObject();
             otpDeliveryResult.setOtpId(response.getMessageId());
             otpDeliveryResult.setDelivered(response.getSmsDeliveryResult() == SmsDeliveryResult.SUCCEEDED);
             otpDeliveryResult.setErrorMessage(response.getErrorMessage());
@@ -88,6 +92,7 @@ public class OtpCustomizationService {
     /**
      * Send OTP code using Data Adapter.
      * @param userId User ID.
+     * @param userContacts User contacts.
      * @param operation Operation entity.
      * @param otpId OTP ID.
      * @param otpValue OTP value.
@@ -95,7 +100,7 @@ public class OtpCustomizationService {
      * @param resend Whether OTP code is being resent.
      * @return OTP delivery result.
      */
-    public OtpDeliveryResult sendOtp(String userId, OperationEntity operation, String otpId, String otpValue, String language, boolean resend) {
+    public OtpDeliveryResult sendOtp(String userId, List<UserContact> userContacts, OperationEntity operation, String otpId, String otpValue, String language, boolean resend) {
         final OtpDeliveryResult otpDeliveryResult = new OtpDeliveryResult();
         otpDeliveryResult.setOtpId(otpId);
         try {
@@ -103,7 +108,7 @@ public class OtpCustomizationService {
             final String organizationId = operationDetail.getOrganizationId();
             final AuthMethod authMethod = operationDetail.getChosenAuthMethod();
             final OperationContext operationContext = operationConverter.toOperationContext(operation);
-            final SendAuthorizationSmsResponse response = dataAdapterClient.sendAuthorizationSms(userId, organizationId, AccountStatus.ACTIVE, authMethod, operationContext, otpId, otpValue, language, resend).getResponseObject();
+            final SendAuthorizationSmsResponse response = dataAdapterClient.sendAuthorizationSms(userId, organizationId, userContacts, AccountStatus.ACTIVE, authMethod, operationContext, otpId, otpValue, language, resend).getResponseObject();
             otpDeliveryResult.setOtpId(response.getMessageId());
             otpDeliveryResult.setDelivered(response.getSmsDeliveryResult() == SmsDeliveryResult.SUCCEEDED);
             otpDeliveryResult.setErrorMessage(response.getErrorMessage());

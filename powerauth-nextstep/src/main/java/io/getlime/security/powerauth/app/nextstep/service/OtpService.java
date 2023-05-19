@@ -20,15 +20,14 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.OtpValueConverter;
+import io.getlime.security.powerauth.app.nextstep.converter.UserContactConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.OtpCustomizationService;
 import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDeliveryResult;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValue;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValueDetail;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.UserContact;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
@@ -60,6 +59,7 @@ public class OtpService {
     private final OtpRepository otpRepository;
     private final ServiceCatalogue serviceCatalogue;
     private final OtpValueConverter otpValueConverter;
+    private final UserContactConverter userContactConverter = new UserContactConverter(); //TODO: Review autowiring
     private final Audit audit;
 
     /**
@@ -149,9 +149,11 @@ public class OtpService {
             credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(credentialName);
         }
 
+        final List<UserContact> contacts = getUserContacts(userId);
+
         if (dataAdapterProxyEnabled) {
             // Create and send OTP code via Data Adapter
-            final OtpDeliveryResult result = otpCustomizationService.createAndSendOtp(userId, operation, language, resend);
+            final OtpDeliveryResult result = otpCustomizationService.createAndSendOtp(userId, contacts, operation, language, resend);
             // Store a local OTP record so that OTP can be found during authentication
             final OtpEntity otp = new OtpEntity();
             otp.setOtpId(result.getOtpId());
@@ -178,7 +180,7 @@ public class OtpService {
         } else {
             // Create OTP in Next Step and send it via Data Adapter
             final CreateOtpResponse otpResponse = createOtpInternal(otpDefinition, userId, credentialName, otpData, operationId);
-            final OtpDeliveryResult result = otpCustomizationService.sendOtp(userId, operation, otpResponse.getOtpId(), otpResponse.getOtpValue(), language, resend);
+            final OtpDeliveryResult result = otpCustomizationService.sendOtp(userId, contacts, operation, otpResponse.getOtpId(), otpResponse.getOtpValue(), language, resend);
             final CreateAndSendOtpResponse response = new CreateAndSendOtpResponse();
             response.setOtpName(otpDefinition.getName());
             response.setUserId(userId);
@@ -478,6 +480,30 @@ public class OtpService {
         } else {
             return remainingAttempts;
         }
+    }
+
+    /**
+     * Obtain contacts for given user ID.
+     * @param userId User ID.
+     * @return Contacts for given user.
+     */
+    private List<UserContact> getUserContacts(String userId) {
+        final List<UserContact> contacts = new ArrayList<>();
+        try {
+            final GetUserContactListRequest userContactListRequest = new GetUserContactListRequest();
+            userContactListRequest.setUserId(userId);
+            final GetUserContactListResponse userContactList = serviceCatalogue.getUserContactService().getUserContactList(userContactListRequest);
+            for (UserContactDetail ucd: userContactList.getContacts()) {
+                final UserContact userContact = userContactConverter.toUserContact(ucd);
+                if (userContact != null) {
+                    contacts.add(userContact);
+                }
+            }
+        } catch (UserNotFoundException ex) {
+            // Should not happen, the method is called with user ID that exists
+            logger.error("User ID was not found in method that should have granted user ID existence, user ID: {}", userId, ex);
+        }
+        return contacts;
     }
 
 }
