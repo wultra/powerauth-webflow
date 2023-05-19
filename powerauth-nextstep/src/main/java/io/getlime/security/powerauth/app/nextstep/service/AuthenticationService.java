@@ -1002,13 +1002,13 @@ public class AuthenticationService {
             if (credential.getStatus() != CredentialStatus.ACTIVE) {
                 remainingAttempts = 0;
             }
-            if (credential.getStatus() == CredentialStatus.ACTIVE && softLimit != null) {
+            if (credential.getStatus() == CredentialStatus.ACTIVE && softLimit != null && softLimit > 0) {
                 final int remainingAttemptsSoft = softLimit - credential.getFailedAttemptCounterSoft();
                 if (remainingAttempts == null || remainingAttemptsSoft < remainingAttempts) {
                     remainingAttempts = remainingAttemptsSoft;
                 }
             }
-            if (credential.getStatus() == CredentialStatus.ACTIVE && hardLimit != null) {
+            if (credential.getStatus() == CredentialStatus.ACTIVE && hardLimit != null && hardLimit > 0) {
                 final int remainingAttemptsHard = hardLimit - credential.getFailedAttemptCounterHard();
                 if (remainingAttempts == null || remainingAttemptsHard < remainingAttempts) {
                     remainingAttempts = remainingAttemptsHard;
