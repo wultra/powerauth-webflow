@@ -124,7 +124,8 @@ export default class SmsAuthorization extends React.Component {
                                   smsResendCallback={this.handleSmsResend} cancelCallback={this.handleCancel} parentComponent="SMS"
                                   message={this.state.message} signatureDataBase64={this.state.signatureDataBase64}
                                   error={this.state.error} remainingAttempts={this.state.remainingAttempts}
-                                  certificateEnabled={this.state.certificateEnabled} initialized={this.state.initialized}/>
+                                  certificateEnabled={this.state.certificateEnabled} initialized={this.state.initialized}
+                                  intl={this.props.intl}/>
                 </Panel>
                 {this.props.context.loading ? <Spinner/> : undefined}
             </div>

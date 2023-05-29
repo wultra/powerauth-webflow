@@ -32,6 +32,10 @@ import ApprovalSca from "./approvalSca";
 import Consent from "./consent";
 // i18n
 import {injectIntl} from "react-intl";
+import Select from 'react-select';
+import ReactFlagsSelect from "react-flags-select";
+
+
 
 /**
  * The App class is the main React component of this application. It handles incoming WebSocket messages
@@ -45,10 +49,28 @@ import {injectIntl} from "react-intl";
     }
 })
 export class App extends React.Component {
-
     constructor() {
         super();
         this.changeLang = this.changeLang.bind(this);
+        this.languagesMapping = [
+                               {"code":"en", "country" :  "US"},
+                               {"code":"cs", "country" :  "CZ"},
+                               {"code":"ro", "country" :  "RO"},
+                               {"code":"ua", "country" :  "UA"}
+                             ];
+        this.state = {languageSetting : {
+                         languageList : ["US"],
+                         languageLabels : {"US": "English" }
+                         }
+                   };
+    }
+
+
+
+    componentWillMount() {
+        this.fetchLang().then (data => {
+            this.setState({languageSetting : data});
+            });
     }
 
     /**
@@ -66,6 +88,30 @@ export class App extends React.Component {
         // cookie expiration is set to 30 days
         d.setTime(d.getTime() + (30 * 24 * 60 * 60 * 1000));
         document.cookie = "lang=" + lang + ";expires=" + d.toUTCString() + ";path=/";
+    }
+
+     async fetchLang() {
+        const response = await fetch( "./ext-resources/lang.json");
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        } else {
+            return {
+                languageSetting: {
+                          languageList : ["US", "CZ"],
+                          languageLabels : {"US": "English", "CZ": "Čeština" }
+                    }
+                };
+        }
+
+    }
+
+    mapLanguageToCountry (locale) {
+        return this.languagesMapping.find(item => { return item.code == locale; }).country;
+    }
+
+    mapCountryToLanguage (flag) {
+        return this.languagesMapping.find(item => { return item.country == flag; }).code;
     }
 
     render() {
@@ -116,24 +162,34 @@ export class App extends React.Component {
                 }
             }
         }
+        const languagesMapping = this.languagesMapping;
+        const { languageSetting: {languageList, languageLabels}  } = this.state;
+        const selectedLanguage = this.mapLanguageToCountry ((this.props.intl.locale === undefined ) ? 'en': this.props.intl.locale);
+
         return (
             <div>
                 <div id="lang">
-                    {(this.props.intl.locale === undefined || this.props.intl.locale === 'en') ? (
-                        <a href="#" onClick={() => {
-                            this.changeLang('cs')
-                        }}>Čeština</a>
-                    ) : (
-                        <a href="#" onClick={() => {
-                            this.changeLang('en')
-                        }}>English</a>
-                    )}
+                    <ReactFlagsSelect
+                      countries={languageList}
+                      customLabels={languageLabels}
+                      selected={selectedLanguage}
+                      onSelect={(code) => {
+                            const language = this.mapCountryToLanguage(code);
+                            this.changeLang(language);
+                            }
+                      }
+                    />
                 </div>
                 <div className="row">
                     <div id="main-panel" className="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
                         <div id="home" className="text-center">
                             <div id="logo"/>
                             <Component intl={this.props.intl}/>
+                            <div id="help" className={(this.props.intl.formatMessage({id: 'main.help.img'}) != 'main.help.img' )?"":"hidden"}>
+                                <a href={this.props.intl.formatMessage({id: 'main.help.url'})}>
+                                    <img src="main.help.img" alt={this.props.intl.formatMessage({id: 'main.help.alt'})}/>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
