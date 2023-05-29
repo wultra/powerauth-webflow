@@ -38,7 +38,7 @@
     "react-intl-redux": "^2.2.0",
     "bluebird": "^3.7.2",
     "intl": "^1.2.5",
-    "sanitize-html": "^2.8.1",
+    "sanitize-html": "^2.10.0",
     "snyk": "^1.1152.0",
     "@snyk/protect": "^1.1155.0",
     "lodash": "^4.17.21",
