@@ -410,3 +410,13 @@ a:hover, a:active, a:focus {
 .spinner {
     color: #000000;
 }
+
+.hr-row-separator {
+    display: none;
+    margin: 0px
+}
+
+.hidden {
+    display: none;
+    margin: 0px
+}

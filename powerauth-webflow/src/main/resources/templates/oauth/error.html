@@ -30,13 +30,15 @@
 
 <div id="page-wrap">
     <div id="react">
-        <div>
-            <div id="home" className="text-center">
-                <div id="logo"></div>
-                <div class="text-center">
-                    <div class="message-error title" th:text="#{error.authPage}"/>
-                    <div class="image-result error"></div>
-                    <div class="message-error" th:text="#{error.sessionTerminated}"/>
+        <div class="row">
+            <div id="main-panel" class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
+                <div id="home" className="text-center">
+                    <div id="logo"></div>
+                    <div id="error-page" class="text-center">
+                        <div class="message-error title" th:text="#{error.authPage}"/>
+                        <div class="image-result error"></div>
+                        <div class="message-error" th:text="#{error.sessionTerminated}"/>
+                    </div>
                 </div>
             </div>
         </div>
