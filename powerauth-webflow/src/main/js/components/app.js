@@ -185,10 +185,8 @@ export class App extends React.Component {
                         <div id="home" className="text-center">
                             <div id="logo"/>
                             <Component intl={this.props.intl}/>
-                            <div id="help" className={(this.props.intl.formatMessage({id: 'main.help.img'}) != 'main.help.img' )?"":"hidden"}>
-                                <a href={this.props.intl.formatMessage({id: 'main.help.url'})}>
-                                    <img src="main.help.img" alt={this.props.intl.formatMessage({id: 'main.help.alt'})}/>
-                                </a>
+                            <div id="help" className={(this.props.intl.formatMessage({id: 'main.help.url'}) != 'main.help.url' )?"":"hidden"}>
+                                <a href={this.props.intl.formatMessage({id: 'main.help.url'})}  />
                             </div>
                         </div>
                     </div>
