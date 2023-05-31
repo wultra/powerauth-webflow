@@ -58,7 +58,7 @@ public class UserIdentityEntity implements Serializable {
     @Column(name = "timestamp_last_updated")
     private Date timestampLastUpdated;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("timestampCreated")
     @ToString.Exclude
     private Set<UserContactEntity> contacts = new LinkedHashSet<>();
@@ -73,7 +73,7 @@ public class UserIdentityEntity implements Serializable {
     @ToString.Exclude
     private Set<UserAliasEntity> aliases = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("timestampCreated")
     @ToString.Exclude
     private Set<UserRoleEntity> roles = new LinkedHashSet<>();
