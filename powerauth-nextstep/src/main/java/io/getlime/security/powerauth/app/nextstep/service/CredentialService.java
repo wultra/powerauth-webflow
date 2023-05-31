@@ -199,13 +199,13 @@ public class CredentialService {
         }
         CredentialValidationMode validationMode = CredentialValidationMode.NO_VALIDATION;
         if (request.getUsername() != null && request.getCredentialValue() != null) {
-            username = request.getUsername();
+            username = request.getUsername().toLowerCase();
             validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
         } else if (request.getCredentialValue() != null) {
-            username = credential.getUsername();
+            username = credential.getUsername().toLowerCase();
             validationMode = CredentialValidationMode.VALIDATE_CREDENTIAL;
         } else if (request.getUsername() != null) {
-            username = request.getUsername();
+            username = request.getUsername().toLowerCase();
             validationMode = CredentialValidationMode.VALIDATE_USERNAME;
         }
         if (request.getUsername() != null || request.getCredentialValue() != null) {
@@ -679,7 +679,7 @@ public class CredentialService {
         if (username != null) {
             // Username has to be checked for duplicates even when username validation is disabled
             if (validationMode == CredentialValidationMode.NO_VALIDATION || validationMode == CredentialValidationMode.VALIDATE_CREDENTIAL) {
-                final Optional<CredentialEntity> existingCredentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+                final Optional<CredentialEntity> existingCredentialOptional = credentialRepository.findByCredentialDefinitionAndUsernameIgnoreCase(credentialDefinition, username);
                 if (existingCredentialOptional.isPresent()) {
                     final CredentialEntity existingCredential = existingCredentialOptional.get();
                     if (!existingCredential.getUser().equals(user)) {
@@ -697,6 +697,7 @@ public class CredentialService {
                 username = credentialGenerationService.generateUsername(credentialDefinition);
             }
         }
+        username = username.toLowerCase();
         credential.setType(credentialType);
         if (timestampExpires != null) {
             // Credential expiration is set in the request

@@ -159,7 +159,7 @@ public class CredentialGenerationService {
                 // This can happen with leading zeros
                 continue;
             }
-            final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+            final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsernameIgnoreCase(credentialDefinition, username);
             if (credentialOptional.isPresent()) {
                 // Username is already taken
                 continue;
@@ -193,7 +193,7 @@ public class CredentialGenerationService {
                 usernameBuilder.append(c);
             }
             final String username = usernameBuilder.toString();
-            final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+            final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsernameIgnoreCase(credentialDefinition, username);
             if (credentialOptional.isPresent()) {
                 // Username is already taken
                 continue;

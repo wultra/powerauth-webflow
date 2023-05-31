@@ -142,7 +142,7 @@ public class CredentialValidationService {
         if (allowedPattern != null && !username.matches(allowedPattern)) {
             validationFailures.add(CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED);
         }
-        final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+        final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsernameIgnoreCase(credentialDefinition, username);
         if (credentialOptional.isPresent()) {
             final CredentialEntity credential = credentialOptional.get();
             if (!credential.getUser().equals(user)) {
