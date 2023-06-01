@@ -30,9 +30,9 @@ export default function reducer(state = {locale: I18N_EN.locale, messages: I18N_
             } else if (action.locale === "cs") {
                 return {...state, locale: I18N_CS.locale, messages: I18N_CS.messages};
             } else if (action.locale === "uk") {
-                return {...state, locale: I18N_UK.locale, messages: I18N_CS.messages};
+                return {...state, locale: I18N_UK.locale, messages: I18N_UK.messages};
             } else if (action.locale === "ro") {
-                return {...state, locale: I18N_RO.locale, messages: I18N_CS.messages};
+                return {...state, locale: I18N_RO.locale, messages: I18N_RO.messages};
             }
 
             return state;
