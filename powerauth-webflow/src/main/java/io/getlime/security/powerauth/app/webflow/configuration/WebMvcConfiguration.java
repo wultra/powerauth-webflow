@@ -30,6 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -41,6 +43,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 /**
@@ -130,6 +133,16 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setCacheSeconds(Math.toIntExact(configuration.getResourcesCacheDuration().getSeconds()));
         return messageSource;
+    }
+
+    @Bean
+    public Resource languageSettingSource() {
+        try {
+            return new UrlResource(configuration.getResourcesLocation() + "lang.json");
+        } catch (MalformedURLException ex) {
+            // TODO proper error handling
+            return null;
+        }
     }
 
     @Override

@@ -184,10 +184,15 @@ public class HomeController {
         model.put("consentPanelLimitEnabled", webFlowConfig.isConsentPanelLimitEnabled());
         model.put("consentPanelLimitCharacters", webFlowConfig.getConsentPanelLimitCharacters());
         model.put("stylesheet", webFlowConfig.getCustomStyleSheetUrl());
+        // get supported languages
+        model.put("languageSetting", i18nService.readLanguageSetting());
+        // default to the supported language
         model.put("lang", LocaleContextHolder.getLocale().getLanguage());
         // JSON objects with i18n messages are inserted into the model to provide localization for the frontend
         model.put("i18n_CS", i18nService.generateMessages(new Locale("cs")));
         model.put("i18n_EN", i18nService.generateMessages(Locale.ENGLISH));
+        model.put("i18n_UK", i18nService.generateMessages(new Locale("uk")));
+        model.put("i18n_RO", i18nService.generateMessages(new Locale("ro")));
         model.put("operationHash", operationSessionService.generateOperationHash(operationId));
         model.put("showAndroidSecurityWarning", webFlowConfig.getShowAndroidSecurityWarning());
         model.put("usernameMaxLength", webFlowConfig.getUsernameMaxLength());

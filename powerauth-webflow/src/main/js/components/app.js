@@ -56,21 +56,8 @@ export class App extends React.Component {
                                {"code":"en", "country" :  "US"},
                                {"code":"cs", "country" :  "CZ"},
                                {"code":"ro", "country" :  "RO"},
-                               {"code":"ua", "country" :  "UA"}
+                               {"code":"uk", "country" :  "UA"}
                              ];
-        this.state = {languageSetting : {
-                         languageList : ["US"],
-                         languageLabels : {"US": "English" }
-                         }
-                   };
-    }
-
-
-
-    componentWillMount() {
-        this.fetchLang().then (data => {
-            this.setState({languageSetting : data});
-            });
     }
 
     /**
@@ -88,22 +75,6 @@ export class App extends React.Component {
         // cookie expiration is set to 30 days
         d.setTime(d.getTime() + (30 * 24 * 60 * 60 * 1000));
         document.cookie = "lang=" + lang + ";expires=" + d.toUTCString() + ";path=/";
-    }
-
-     async fetchLang() {
-        const response = await fetch( "./ext-resources/lang.json");
-        if (response.ok) {
-            const data = await response.json();
-            return data;
-        } else {
-            return {
-                languageSetting: {
-                          languageList : ["US", "CZ"],
-                          languageLabels : {"US": "English", "CZ": "Čeština" }
-                    }
-                };
-        }
-
     }
 
     mapLanguageToCountry (locale) {
@@ -162,8 +133,9 @@ export class App extends React.Component {
                 }
             }
         }
+
         const languagesMapping = this.languagesMapping;
-        const { languageSetting: {languageList, languageLabels}  } = this.state;
+        const { languageList, languageLabels  } = languageSetting;
         const selectedLanguage = this.mapLanguageToCountry ((this.props.intl.locale === undefined ) ? 'en': this.props.intl.locale);
 
         return (
