@@ -33,14 +33,49 @@ import {addLocaleData} from "react-intl";
 
 import enLocaleData from "react-intl/locale-data/en";
 import csLocaleData from "react-intl/locale-data/cs";
+import ukLocaleData from "react-intl/locale-data/uk";
+import roLocaleData from "react-intl/locale-data/ro";
 
 // currently only EN and CS languages are supported
 addLocaleData([
     ...enLocaleData,
     ...csLocaleData,
+    ...ukLocaleData,
+    ...roLocaleData
 ]);
+const languagesMapping = [
+                           {"code":"en", "country" :  "US"},
+                           {"code":"cs", "country" :  "CZ"},
+                           {"code":"ro", "country" :  "RO"},
+                           {"code":"uk", "country" :  "UA"}
+                         ];
 
-// default locale is set according to JS variable lang, which is set by backend
+//  check if language is supported
+const { languageList  } = languageSetting;
+
+// default locale is set according to JS variable lang, which is set by backend as locle from the browser
+
+// if locale is not set to supported language return first supported locale
+
+// check if mapping to country exists
+// get mapped locale to country
+const mappedLang = languagesMapping.find (item => item.code === lang)
+
+//if mapping isn't exists or mapped country is not in the list
+if (!mappedLang || !languageList.includes(lang)) {
+    // pick first country from the list
+
+    //map it to locale
+    lang = languagesMapping.find(item => { return item.country == languageList.at(0); }).code
+
+    // cookie is set, so that the backend is aware of the locale change on next request
+    const d = new Date();
+    // cookie expiration is set to 30 days
+    d.setTime(d.getTime() + (30 * 24 * 60 * 60 * 1000));
+    document.cookie = "lang=" + lang + ";expires=" + d.toUTCString() + ";path=/";
+
+}
+
 store.dispatch({
     type: "CHANGE_LOCALE",
     locale: lang
@@ -54,7 +89,12 @@ var msie = document.documentMode;
 if (msie && msie < 9) {
     if (lang === "cs") {
         window.alert(I18N_CS.messages["browser.unsupported"]);
-    } else {
+    } else if (lang === "uk") {
+        window.alert(I18N_UK.messages["browser.unsupported"]);
+    } else if (lang === "ro") {
+        window.alert(I18N_RO.messages["browser.unsupported"]);
+        window.alert(I18N_RO.messages["browser.unsupported"]);
+    }  else {
         window.alert(I18N_EN.messages["browser.unsupported"]);
     }
 }
