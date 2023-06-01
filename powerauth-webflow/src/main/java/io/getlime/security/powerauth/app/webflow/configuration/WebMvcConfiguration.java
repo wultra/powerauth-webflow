@@ -136,13 +136,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public Resource languageSettingSource() {
-        try {
-            return new UrlResource(configuration.getResourcesLocation() + "lang.json");
-        } catch (MalformedURLException ex) {
-            // TODO proper error handling
-            return null;
-        }
+    public Resource languageSettingSource() throws MalformedURLException {
+        return new UrlResource(configuration.getResourcesLocation() + "lang.json");
     }
 
     @Override
