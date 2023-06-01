@@ -45,12 +45,12 @@ public interface CredentialRepository extends CrudRepository<CredentialEntity, S
     Stream<CredentialEntity> findAllByCredentialDefinitionAndStatus(CredentialDefinitionEntity credentialDefinition, CredentialStatus status);
 
     /**
-     * Find credential by credential name and username.
+     * Find credential by credential name and username (performing case insensitive matching).
      * @param credentialDefinition Credential definition.
      * @param username Username.
      * @return Credential matching query criteria.
      */
-    Optional<CredentialEntity> findByCredentialDefinitionAndUsername(CredentialDefinitionEntity credentialDefinition, String username);
+    Optional<CredentialEntity> findByCredentialDefinitionAndUsernameIgnoreCase(CredentialDefinitionEntity credentialDefinition, String username);
 
     /**
      * Reset soft failed attempt counters for credentials in BLOCKED_TEMPORARY status and change credential status to ACTIVE.
