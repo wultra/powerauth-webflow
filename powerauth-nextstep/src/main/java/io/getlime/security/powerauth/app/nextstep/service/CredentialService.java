@@ -698,7 +698,9 @@ public class CredentialService {
                 username = credentialGenerationService.generateUsername(credentialDefinition);
             }
         }
-        username = username.toLowerCase();
+        if (username != null) {
+            username = username.toLowerCase();
+        }
         credential.setType(credentialType);
         if (timestampExpires != null) {
             // Credential expiration is set in the request
