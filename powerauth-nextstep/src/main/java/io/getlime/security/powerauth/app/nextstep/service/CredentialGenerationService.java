@@ -189,7 +189,7 @@ public class CredentialGenerationService {
         for (int i = 0; i < generateUsernameMaxAttempts; i++) {
             final StringBuilder usernameBuilder = new StringBuilder();
             for (int j = 0; j < length; j++) {
-                final char c = (char) (secureRandom.nextInt(26) + 'a');
+                final char c = (char) (secureRandom.nextInt(26) + 'a'); // username is always lowercase
                 usernameBuilder.append(c);
             }
             final String username = usernameBuilder.toString();
