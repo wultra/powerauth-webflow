@@ -23,10 +23,12 @@ import jakarta.annotation.Resource;
 import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Locale;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service which converts resource bundle messages for given locale to JSON and provides access to the MessageSource.
@@ -35,6 +37,8 @@ import java.util.Locale;
  */
 @Service
 public class I18NService {
+
+    private final Logger logger = LoggerFactory.getLogger(I18NService.class);
 
     private final ObjectMapper objectMapper;
 
@@ -85,6 +89,7 @@ public class I18NService {
             return new String(Files.readAllBytes(languageSettingSource.getFile().toPath()));
         } catch (IOException ex) {
             // language setting is not configured return null
+            logger.warn("Error occurred while retrieving the language setting ", ex);
             return null;
         }
     }
