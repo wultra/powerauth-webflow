@@ -27,7 +27,7 @@
     "react-redux": "^5.1.2",
     "spin.js": "^2.3.2",
     "react-device-detect": "^2.2.3",
-    "redux": "^3.7.2",
+    "redux": "^4.2.1",
     "redux-thunk": "^2.3.0",
     "redux-promise-middleware": "^4.4.2",
     "webpack": "^5.76.0",
