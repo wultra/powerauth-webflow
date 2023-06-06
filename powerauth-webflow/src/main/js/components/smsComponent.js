@@ -203,6 +203,7 @@ export default class SmsComponent extends React.Component {
     }
 
     render() {
+       const formatMessage = this.props.intl.formatMessage;
         return (
             <form onSubmit={this.handleSubmit}>
                 {(this.props.initialized) ? (
@@ -223,7 +224,7 @@ export default class SmsComponent extends React.Component {
                             undefined
                         )}
                         {(this.props.username) ? (
-                            <div>
+                            <div id="smsComponent-loginNumber">
                                 <FormGroup>
                                     <div className="attribute row">
                                         <div className="message-information">
@@ -308,7 +309,7 @@ export default class SmsComponent extends React.Component {
                         )}
                         {(this.props.passwordEnabled && !this.state.signedMessage) ? (
                             <div>
-                                <FormGroup>
+                                <FormGroup id="smsComponent-loginSca-password">
                                     <div className="attribute row">
                                         <div className="message-information">
                                             <FormattedMessage id="loginSca.password"/>
@@ -320,6 +321,7 @@ export default class SmsComponent extends React.Component {
                                         <div className="col-xs-12">
                                             <FormControl id="password" autoComplete="new-password" type="password"
                                                          value={this.state.password} onChange={this.handlePasswordChange}
+                                                         placeholder={formatMessage({id: 'loginSca.password.placeholder'})}
                                                          maxLength={passwordMaxLength}/>
                                         </div>
                                     </div>
@@ -330,7 +332,7 @@ export default class SmsComponent extends React.Component {
                         )}
                         {(this.props.smsOtpEnabled) ? (
                             <div>
-                                <FormGroup>
+                                <FormGroup id="smsComponent-smsAuthorization-authCodeText">
                                     <div className="attribute row">
                                         <div className="message-information">
                                             <FormattedMessage id="smsAuthorization.authCodeText"/>
@@ -342,12 +344,18 @@ export default class SmsComponent extends React.Component {
                                         <div className="col-xs-12">
                                             <FormControl id="sms-otp" autoComplete="new-password" type="text"
                                                          value={this.state.authCode} onChange={this.handleAuthCodeChange}
+                                                         placeholder={formatMessage({id: 'smsAuthorization.authCodeText.placeholder'})}
                                                          maxLength={smsOtpMaxLength}/>
                                         </div>
                                     </div>
                                 </FormGroup>
-                                <FormGroup>
+                                <FormGroup id="smsComponent-smsAuthorization-textLine">
                                     <div className="font-small message-information">
+                                        <div id="smsComponent-smsAuthorization-textLine-forgotPassword" className={(formatMessage({id: 'smsAuthorization.forgotPassword.url'}) != 'smsAuthorization.forgotPassword.url' )?"":"hidden"}>
+                                            <a href={formatMessage({id: 'smsAuthorization.forgotPassword.url'})}>
+                                                    <FormattedMessage id="smsAuthorization.forgotPassword"/>
+                                            </a>
+                                        </div>
                                         {(this.props.resendEnabled) ? (
                                             <div id="resend-active" onClick={this.props.smsResendCallback} className="sms-resend-active">
                                                 <FormattedMessage id="smsAuthorization.resendActive"/>
@@ -366,12 +374,13 @@ export default class SmsComponent extends React.Component {
                         <FormGroup>
 
                             <div className="row buttons">
-                                <div className="col-xs-6">
+                                <hr className="hr-row-separator" />
+                                <div className="col-xs-6" id="smsComponent-cancel">
                                     <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
                                         <FormattedMessage id="operation.cancel"/>
                                     </a>
                                 </div>
-                                <div className="col-xs-6">
+                                <div className="col-xs-6" id="smsComponent-confirm">
                                     <Button bsSize="lg" type="submit" bsStyle="success" block disabled={this.state.confirmDisabled}>
                                         {(this.props.username && this.props.passwordEnabled) ? (
                                             <FormattedMessage id="loginSca.confirm"/>
