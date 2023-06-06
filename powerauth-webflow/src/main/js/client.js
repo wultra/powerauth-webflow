@@ -93,7 +93,6 @@ if (msie && msie < 9) {
         window.alert(I18N_UK.messages["browser.unsupported"]);
     } else if (lang === "ro") {
         window.alert(I18N_RO.messages["browser.unsupported"]);
-        window.alert(I18N_RO.messages["browser.unsupported"]);
     }  else {
         window.alert(I18N_EN.messages["browser.unsupported"]);
     }
