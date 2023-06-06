@@ -109,7 +109,7 @@ public class UserIdentityLookupService {
         // Choose main query based on most exact parameters, filter lookup results in code by additional parameters
         if (username != null && credentialName != null) {
             // When username and credentialName are present, lookup the user identity, single result or no result is found
-            final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+            final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsernameIgnoreCase(credentialDefinition, username);
             if (!credentialOptional.isPresent()) {
                 throw new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username);
             }
@@ -232,7 +232,7 @@ public class UserIdentityLookupService {
         }
 
         // When username and credentialName are present, lookup the user identity, single result or no result is found
-        final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+        final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsernameIgnoreCase(credentialDefinition, username);
         if (!credentialOptional.isPresent()) {
             throw new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username);
         }
