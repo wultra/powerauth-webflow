@@ -375,6 +375,7 @@ export default class SmsComponent extends React.Component {
                          )}
                         <FormGroup>
                             <div className="row buttons">
+                                <hr className="hr-row-separator" />
                                 <div className="col-xs-6" id="smsComponent-cancel">
                                     <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
                                         <FormattedMessage id="operation.cancel"/>
