@@ -157,9 +157,11 @@ export class App extends React.Component {
                         <div id="home" className="text-center">
                             <div id="logo"/>
                             <Component intl={this.props.intl}/>
-                            <div id="help" className={(this.props.intl.formatMessage({id: 'main.help.url'}) != 'main.help.url' )?"":"hidden"}>
-                                <a href={this.props.intl.formatMessage({id: 'main.help.url'})}  />
-                            </div>
+                            {(this.props.intl.formatMessage({id: 'main.help.url'}) != 'main.help.url' )?(
+                                <div id="help">
+                                    <a href={this.props.intl.formatMessage({id: 'main.help.url'})}  />
+                                </div>
+                            ) : undefined }
                         </div>
                     </div>
                 </div>
