@@ -86,7 +86,7 @@ public class I18NService {
     public String readLanguageSetting() {
         try {
             // language setting is possible only via extension and external resources
-            byte[] languageData = FileCopyUtils.copyToByteArray(languageSettingSource.getInputStream());
+            final byte[] languageData = FileCopyUtils.copyToByteArray(languageSettingSource.getInputStream());
             return new String(languageData, StandardCharsets.UTF_8);
         } catch (IOException ex) {
             // language setting is not configured return null
