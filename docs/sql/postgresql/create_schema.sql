@@ -590,7 +590,7 @@ CREATE TABLE tpp_app_detail (
   app_type              VARCHAR(32) NULL,                            -- Application type, "web" or "native".
   CONSTRAINT tpp_detail_pk PRIMARY KEY (tpp_id, app_client_id),
   CONSTRAINT tpp_detail_fk FOREIGN KEY (tpp_id) REFERENCES tpp_detail (tpp_id),
-  CONSTRAINT tpp_client_secret_fk FOREIGN KEY (app_client_id) REFERENCES oauth_client_details (client_id)
+  CONSTRAINT tpp_client_secret_fk FOREIGN KEY (app_client_id) REFERENCES oauth2_registered_client (client_id)
 );
 
 -- Table audit_log stores auditing information

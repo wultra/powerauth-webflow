@@ -217,6 +217,16 @@ INSERT INTO oauth2_registered_client (id, client_id, client_id_issued_at, client
 SELECT uuid_generate_v4(), client_id, now(), client_secret, null, client_id, 'client_secret_basic', authorized_grant_types, web_server_redirect_uri, null, scope, '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false}', '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":true,"settings.token.id-token-signature-algorithm":["org.springframework.security.oauth2.jose.jws.SignatureAlgorithm","RS256"],"settings.token.access-token-time-to-live":["java.time.Duration",300],"settings.token.access-token-format":{"@class":"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat","value":"reference"},"settings.token.refresh-token-time-to-live":["java.time.Duration",1296000],"settings.token.authorization-code-time-to-live":["java.time.Duration",300]}}' FROM oauth_client_details;
 ```
 
+### Updated Foreign Keys
+
+
+Due to migration to Spring Authorization Server the following migration is necessary.
+
+```sql```
+ALTER TABLE tpp_app_detail DROP CONSTRAINT tpp_client_secret_fk;
+ALTER TABLE tpp_app_detail ADD CONSTRAINT tpp_client_secret_fk FOREIGN KEY (app_client_id) REFERENCES oauth2_registered_client (client_id);
+```
+
 ### Dropped Tables
 
 Due to migration to Spring Authorization Server the following tables are no longer required:
