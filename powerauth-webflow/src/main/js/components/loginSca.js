@@ -229,14 +229,17 @@ export default class LoginSca extends React.Component {
     }
 
     title() {
+        const formatMessage = this.props.intl.formatMessage;
         return (
             <div>
                 <FormGroup className="title">
                     <FormattedMessage id="login.pleaseLogIn"/>
                 </FormGroup>
-                <FormGroup>
-                    <FormattedMessage id="login.initial.subtitle"/>
-                </FormGroup>
+                { (formatMessage({id: 'login.info.text'}) != 'login.info.text' )? (
+                    <FormGroup>
+                        <FormattedMessage id="login.initial.subtitle"/>
+                    </FormGroup>
+                ) : undefined }
             </div>
         )
     }
@@ -320,13 +323,15 @@ export default class LoginSca extends React.Component {
                                 </Button>
                             </div>
                         </div>
-                        <div className="row buttons">
-                            <div className={(formatMessage({id: 'login.info.text'}) != 'login.info.text' )?"":"hidden"}>
-                                <a href={formatMessage({id: 'login.info.text.url'})}>
-                                    <FormattedMessage id="login.info.text"/>
-                                </a>
+                        {(formatMessage({id: 'login.info.text'}) != 'login.info.text')?(
+                            <div className="row buttons">
+                                <div>
+                                    <a href={formatMessage({id: 'login.info.text.url'})}>
+                                        <FormattedMessage id="login.info.text"/>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        ) : undefined }
                     </FormGroup>
                 )}
             </div>

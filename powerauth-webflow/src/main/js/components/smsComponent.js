@@ -321,7 +321,7 @@ export default class SmsComponent extends React.Component {
                                         <div className="col-xs-12">
                                             <FormControl id="password" autoComplete="new-password" type="password"
                                                          value={this.state.password} onChange={this.handlePasswordChange}
-                                                         placeholder={formatMessage({id: 'loginSca.password.placeholder'})}
+                                                         placeholder={formatMessage({id: 'loginSca.password.placeholder',defaultMessage: ' '})}
                                                          maxLength={passwordMaxLength}/>
                                         </div>
                                     </div>
@@ -344,18 +344,20 @@ export default class SmsComponent extends React.Component {
                                         <div className="col-xs-12">
                                             <FormControl id="sms-otp" autoComplete="new-password" type="text"
                                                          value={this.state.authCode} onChange={this.handleAuthCodeChange}
-                                                         placeholder={formatMessage({id: 'smsAuthorization.authCodeText.placeholder'})}
+                                                         placeholder={formatMessage({id: 'smsAuthorization.authCodeText.placeholder', defaultMessage: ' '})}
                                                          maxLength={smsOtpMaxLength}/>
                                         </div>
                                     </div>
                                 </FormGroup>
                                 <FormGroup id="smsComponent-smsAuthorization-textLine">
                                     <div className="font-small message-information">
-                                        <div id="smsComponent-smsAuthorization-textLine-forgotPassword" className={(formatMessage({id: 'smsAuthorization.forgotPassword.url'}) != 'smsAuthorization.forgotPassword.url' )?"":"hidden"}>
-                                            <a href={formatMessage({id: 'smsAuthorization.forgotPassword.url'})}>
-                                                    <FormattedMessage id="smsAuthorization.forgotPassword"/>
-                                            </a>
-                                        </div>
+                                        {(this.props.intl.formatMessage({id: 'smsAuthorization.forgotPassword.url'}) != 'smsAuthorization.forgotPassword.url' )?(
+                                            <div id="smsComponent-smsAuthorization-textLine-forgotPassword">
+                                                <a href={formatMessage({id: 'smsAuthorization.forgotPassword.url'})}>
+                                                        <FormattedMessage id="smsAuthorization.forgotPassword"/>
+                                                </a>
+                                            </div>
+                                        ) : undefined }
                                         {(this.props.resendEnabled) ? (
                                             <div id="resend-active" onClick={this.props.smsResendCallback} className="sms-resend-active">
                                                 <FormattedMessage id="smsAuthorization.resendActive"/>
@@ -372,7 +374,6 @@ export default class SmsComponent extends React.Component {
                              undefined
                          )}
                         <FormGroup>
-
                             <div className="row buttons">
                                 <div className="col-xs-6" id="smsComponent-cancel">
                                     <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
