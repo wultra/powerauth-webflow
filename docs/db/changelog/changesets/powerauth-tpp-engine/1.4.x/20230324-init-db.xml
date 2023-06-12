@@ -145,11 +145,13 @@
         </createTable>
     </changeSet>
 
+    <!-- Schema version for release 1.4.x with foreign key to table oauth_client_details -->
     <changeSet id="8" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="tpp_app_detail"/>
             </not>
+            <tableExists tableName="oauth_client_details"/>
         </preConditions>
         <comment>Create a new table tpp_app_detail</comment>
         <createTable tableName="tpp_app_detail">
@@ -158,6 +160,30 @@
             </column>
             <column name="app_client_id" type="varchar(256)" remarks="TPP app ID, represented as OAuth 2.0 client ID and connecting the application to OAuth 2.0 credentials.">
                 <constraints primaryKey="true" foreignKeyName="tpp_client_secret_fk" referencedTableName="oauth_client_details" referencedColumnNames="client_id" />
+            </column>
+            <column name="app_name" type="varchar(256)" remarks="TPP app name.">
+                <constraints nullable="false" />
+            </column>
+            <column name="app_info" type="text" remarks="An arbitrary additional info about TPP app, if available." />
+            <column name="app_type" type="varchar(32)" remarks="Application type, 'web' or 'native'." />
+        </createTable>
+    </changeSet>
+
+    <!-- Schema version for release 1.5.x with foreign key to table oauth2_registered_client -->
+    <changeSet id="9" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Roman Strobl">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tpp_app_detail"/>
+            </not>
+            <tableExists tableName="oauth2_registered_client"/>
+        </preConditions>
+        <comment>Create a new table tpp_app_detail</comment>
+        <createTable tableName="tpp_app_detail">
+            <column name="tpp_id" type="integer" remarks="TPP ID.">
+                <constraints primaryKey="true" foreignKeyName="tpp_detail_fk" referencedTableName="tpp_detail" referencedColumnNames="tpp_id" />
+            </column>
+            <column name="app_client_id" type="varchar(256)" remarks="TPP app ID, represented as OAuth 2.0 client ID and connecting the application to OAuth 2.0 credentials.">
+                <constraints primaryKey="true" foreignKeyName="tpp_client_secret_fk" referencedTableName="oauth2_registered_client" referencedColumnNames="client_id" />
             </column>
             <column name="app_name" type="varchar(256)" remarks="TPP app name.">
                 <constraints nullable="false" />
