@@ -118,7 +118,7 @@ public class SecurityConfiguration {
                         .ignoringRequestMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**", "/oauth2/**")
                         .ignoringRequestMatchers(authorizationServerConfigurer.getEndpointsMatcher()))
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "/authenticate", "/authenticate/**", "/oauth2/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/actuator/**", "/tls/client/**", "/signer/**").permitAll()
+                        .requestMatchers("/", "/authenticate", "/authenticate/**", "/oauth2/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/actuator/**", "/tls/client/**", "/signer/**", "/favicon.ico").permitAll()
                         // Authenticate OAuth 2.1 endpoints
                         .requestMatchers(authorizationServerConfigurer.getEndpointsMatcher()).fullyAuthenticated()
                         // Resource server endpoints
