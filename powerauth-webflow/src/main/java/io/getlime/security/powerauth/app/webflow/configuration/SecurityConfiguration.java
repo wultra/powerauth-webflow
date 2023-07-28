@@ -39,6 +39,8 @@ import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -110,19 +112,19 @@ public class SecurityConfiguration {
                                 .introspectionClientCredentials(this.clientId, this.clientSecret)
                         )
                 )
-                // Configure securityContextRepository for session managemet, see: https://docs.spring.io/spring-security/reference/migration/servlet/session-management.html
+                // Configure securityContextRepository for session management, see: https://docs.spring.io/spring-security/reference/migration/servlet/session-management.html
                 .securityContext((securityContext) -> securityContext
                         .securityContextRepository(securityContextRepository)
                 )
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**", "/oauth2/**")
+                        .ignoringRequestMatchers(createAntPathRequestMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**", "/oauth2/**"))
                         .ignoringRequestMatchers(authorizationServerConfigurer.getEndpointsMatcher()))
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "/authenticate", "/authenticate/**", "/oauth2/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/actuator/**", "/tls/client/**", "/signer/**", "/favicon.ico").permitAll()
+                        .requestMatchers(createAntPathRequestMatchers("/", "/authenticate", "/authenticate/**", "/oauth2/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/actuator/**", "/tls/client/**", "/signer/**", "/favicon.ico")).permitAll()
                         // Authenticate OAuth 2.1 endpoints
                         .requestMatchers(authorizationServerConfigurer.getEndpointsMatcher()).fullyAuthenticated()
                         // Resource server endpoints
-                        .requestMatchers("/api/secure/**").fullyAuthenticated()
+                        .requestMatchers(new AntPathRequestMatcher("/api/secure/**")).fullyAuthenticated()
                         .anyRequest().fullyAuthenticated()
                 )
                 // Redirect to the login page when not authenticated from the authorization endpoint
@@ -132,6 +134,14 @@ public class SecurityConfiguration {
                 );
 
         return http.cors().and().build();
+    }
+
+    private static RequestMatcher[] createAntPathRequestMatchers(final String... patterns) {
+        final RequestMatcher[] result = new RequestMatcher[patterns.length];
+        for (int i = 0; i < patterns.length; i++) {
+            result[i] = new AntPathRequestMatcher(patterns[i]);
+        }
+        return result;
     }
 
     /**
