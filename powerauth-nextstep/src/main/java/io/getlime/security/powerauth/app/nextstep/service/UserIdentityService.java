@@ -677,6 +677,7 @@ public class UserIdentityService {
         existingCredentials.forEach(credential -> {
             if (credential.getStatus() != CredentialStatus.REMOVED) {
                 credential.setStatus(CredentialStatus.REMOVED);
+                credential.setUsername(null);
             }
         });
     }

@@ -492,6 +492,7 @@ public class CredentialService {
             throw new CredentialNotFoundException("Credential is already REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         credential.setStatus(CredentialStatus.REMOVED);
+        credential.setUsername(null);
         user = userIdentityRepository.save(user);
         logger.debug("Credential was removed for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         audit.info("Credential was removed", AuditDetail.builder()
