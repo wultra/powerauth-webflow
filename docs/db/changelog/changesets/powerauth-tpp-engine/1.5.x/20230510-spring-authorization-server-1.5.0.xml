@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <!-- Migration to Spring authorization server: add constraint tpp_client_secret_fk in table tpp_app_detail -->
+    <changeSet id="1" logicalFilePath="powerauth-tpp-engine/1.5.x/20230510-spring-authorization-server-1.5.0.xml" author="Roman Strobl">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="tpp_app_detail" foreignKeyName="tpp_client_secret_fk"/>
+            </not>
+        </preConditions>
+        <comment>Add constraint tpp_client_secret_fk in table tpp_app_detail</comment>
+        <addForeignKeyConstraint baseTableName="tpp_app_detail" baseColumnNames="app_client_id" constraintName="tpp_client_secret_fk" referencedTableName="oauth2_registered_client" referencedColumnNames="client_id"/>
+    </changeSet>
+
+</databaseChangeLog>
