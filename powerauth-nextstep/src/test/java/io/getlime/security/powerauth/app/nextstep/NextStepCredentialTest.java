@@ -46,16 +46,16 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Roman Strobl, roman.strobl@wulta.com
  */
-public class NextStepCredentialTest extends NextStepTest {
+class NextStepCredentialTest extends NextStepTest {
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         nextStepClient = nextStepClientFactory.createNextStepClient("http://localhost:" + port);
         nextStepTestConfiguration.configure(nextStepClient);
     }
 
     @Test
-    public void testGenerateCredential() throws NextStepClientException {
+    void testGenerateCredential() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         // Create credential policy
         CredentialGenerationParam credentialGenParam = new CredentialGenerationParam();
@@ -101,7 +101,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential1() throws NextStepClientException {
+    void testValidateCredential1() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeCharacterRule(true);
@@ -114,7 +114,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential2() throws NextStepClientException {
+    void testValidateCredential2() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeCharacterRule(true);
@@ -127,7 +127,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential3() throws NextStepClientException {
+    void testValidateCredential3() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeCharacterRule(true);
@@ -140,7 +140,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential4() throws NextStepClientException {
+    void testValidateCredential4() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeCharacterRule(true);
@@ -153,7 +153,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential5() throws NextStepClientException {
+    void testValidateCredential5() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeAllowedCharacterRule(true);
@@ -165,7 +165,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential6() throws NextStepClientException {
+    void testValidateCredential6() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeIllegalCharacterRule(true);
@@ -177,7 +177,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential7() throws NextStepClientException {
+    void testValidateCredential7() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeAllowedRegexRule(true);
@@ -189,7 +189,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential8() throws NextStepClientException {
+    void testValidateCredential8() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeIllegalRegexRule(true);
@@ -201,7 +201,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential9() throws NextStepClientException {
+    void testValidateCredential9() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeWhitespaceRule(true);
@@ -212,7 +212,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential10() throws NextStepClientException {
+    void testValidateCredential10() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeUsernameRule(true);
@@ -223,7 +223,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential11() throws NextStepClientException {
+    void testValidateCredential11() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeUsernameRule(true);
@@ -234,7 +234,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential12() throws NextStepClientException {
+    void testValidateCredential12() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         credentialValParam.setIncludeCharacterRule(true);
@@ -247,7 +247,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential13() throws NextStepClientException {
+    void testValidateCredential13() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         updateCredentialDefinition(name, null, credentialValParam);
@@ -257,7 +257,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential14() throws NextStepClientException {
+    void testValidateCredential14() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         updateCredentialDefinition(name, null, credentialValParam);
@@ -267,7 +267,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateCredential15() throws NextStepClientException {
+    void testValidateCredential15() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialValidationParam credentialValParam = new CredentialValidationParam();
         updateCredentialDefinition(name, null, credentialValParam);
@@ -277,7 +277,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateUsername1() throws NextStepClientException {
+    void testValidateUsername1() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
                 " ", null, CredentialValidationMode.VALIDATE_USERNAME).getResponseObject();
@@ -285,7 +285,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateUsername2() throws NextStepClientException {
+    void testValidateUsername2() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
                 "1", null, CredentialValidationMode.VALIDATE_USERNAME).getResponseObject();
@@ -293,7 +293,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateUsername3() throws NextStepClientException {
+    void testValidateUsername3() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
                 "12345678901234567890123456789012345678901234567890", null, CredentialValidationMode.VALIDATE_USERNAME).getResponseObject();
@@ -301,7 +301,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateUsername5() throws NextStepClientException {
+    void testValidateUsername5() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
                 "12345 67890", null, CredentialValidationMode.VALIDATE_USERNAME).getResponseObject();
@@ -309,7 +309,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateUsername6() throws NextStepClientException {
+    void testValidateUsername6() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(name);
@@ -320,14 +320,14 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testValidateUsername7() throws NextStepClientException {
+    void testValidateUsername7() throws NextStepClientException {
         ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
                 "testuser$", null, CredentialValidationMode.VALIDATE_USERNAME).getResponseObject();
         assertEquals(Collections.singletonList(CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED), r1.getValidationErrors());
     }
 
     @Test
-    public void testResetCredential() throws NextStepClientException {
+    void testResetCredential() throws NextStepClientException {
         String userId = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userId);
@@ -344,7 +344,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testChangeUsername() throws NextStepClientException {
+    void testChangeUsername() throws NextStepClientException {
         String userId = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userId);
@@ -364,7 +364,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testChangeUsernameValidation() throws NextStepClientException {
+    void testChangeUsernameValidation() throws NextStepClientException {
         String userId = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userId);
@@ -384,7 +384,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testChangeUsernameAndCredential() throws NextStepClientException {
+    void testChangeUsernameAndCredential() throws NextStepClientException {
         String userId = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userId);
@@ -403,7 +403,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testChangeUsernameAndCredentialValidation() throws NextStepClientException {
+    void testChangeUsernameAndCredentialValidation() throws NextStepClientException {
         String userId = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userId);
@@ -423,7 +423,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testChangeCredential() throws NextStepClientException {
+    void testChangeCredential() throws NextStepClientException {
         String userId = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userId);
@@ -442,7 +442,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testChangeCredentialValidation() throws NextStepClientException {
+    void testChangeCredentialValidation() throws NextStepClientException {
         String userId = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userId);
@@ -462,7 +462,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testChangeUsernameAlreadyExists() throws NextStepClientException {
+    void testChangeUsernameAlreadyExists() throws NextStepClientException {
         String userId1 = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest1 = new CreateUserRequest();
         createUserRequest1.setUserId(userId1);
@@ -492,24 +492,34 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testDeleteCredential() throws NextStepClientException {
-        String userId = UUID.randomUUID().toString();
-        CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setUserId(userId);
-        CreateUserRequest.NewCredential credential = new CreateUserRequest.NewCredential();
+    void testDeleteCredential() throws NextStepClientException {
+        final String userId = UUID.randomUUID().toString();
+
+        final CreateUserRequest.NewCredential credential = new CreateUserRequest.NewCredential();
         credential.setCredentialName("TEST_CREDENTIAL");
         credential.setCredentialType(CredentialType.PERMANENT);
+
+        final CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUserId(userId);
         createUserRequest.getCredentials().add(credential);
-        CreateUserResponse r1 = nextStepClient.createUser(createUserRequest).getResponseObject();
-        String credentialValue = r1.getCredentials().get(0).getCredentialValue();
-        DeleteCredentialResponse r2 = nextStepClient.deleteCredential(userId, "TEST_CREDENTIAL").getResponseObject();
+
+        final CreateUserResponse r1 = nextStepClient.createUser(createUserRequest).getResponseObject();
+        final String credentialValue = r1.getCredentials().get(0).getCredentialValue();
+
+        final DeleteCredentialResponse r2 = nextStepClient.deleteCredential(userId, "TEST_CREDENTIAL").getResponseObject();
         assertEquals(CredentialStatus.REMOVED, r2.getCredentialStatus());
-        CredentialAuthenticationResponse r3 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", userId, credentialValue).getResponseObject();
-        assertEquals(AuthenticationResult.FAILED, r3.getAuthenticationResult());
+
+        final GetUserCredentialListResponse r3 = nextStepClient.getUserCredentialList(userId, true).getResponseObject();
+        assertEquals(1, r3.getCredentials().size());
+        assertEquals(CredentialStatus.REMOVED, r3.getCredentials().get(0).getCredentialStatus());
+        assertNull(r3.getCredentials().get(0).getUsername());
+
+        final CredentialAuthenticationResponse r4 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", userId, credentialValue).getResponseObject();
+        assertEquals(AuthenticationResult.FAILED, r4.getAuthenticationResult());
     }
 
     @Test
-    public void testGenerateUsernameRandomLetters() throws NextStepClientException {
+    void testGenerateUsernameRandomLetters() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CredentialGenerationParam credentialGenParam = new CredentialGenerationParam();
         credentialGenParam.setLength(10);
@@ -535,7 +545,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testGenerateRandomPin() throws NextStepClientException {
+    void testGenerateRandomPin() throws NextStepClientException {
         String name = UUID.randomUUID().toString();
         CreateCredentialPolicyRequest credentialPolicyRequest = new CreateCredentialPolicyRequest();
         credentialPolicyRequest.setUsernameGenAlgorithm(UsernameGenerationAlgorithm.NO_USERNAME);
@@ -571,7 +581,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testCredentialHistory1() throws NextStepClientException {
+    void testCredentialHistory1() throws NextStepClientException {
         String userId1 = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userId1);
@@ -595,7 +605,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testCredentialHistory2() throws NextStepClientException {
+    void testCredentialHistory2() throws NextStepClientException {
         String userId1 = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userId1);
@@ -623,7 +633,7 @@ public class NextStepCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testCredentialHistory3() throws NextStepClientException {
+    void testCredentialHistory3() throws NextStepClientException {
         String userId1 = UUID.randomUUID().toString();
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userId1);
