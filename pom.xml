@@ -91,7 +91,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <bc.version>1.75</bc.version>
+        <bc.version>1.76</bc.version>
         <zxing.version>3.5.0</zxing.version>
         <passay.version>1.6.3</passay.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.1.0</springdoc-openapi-starter-webmvc-ui.version>
