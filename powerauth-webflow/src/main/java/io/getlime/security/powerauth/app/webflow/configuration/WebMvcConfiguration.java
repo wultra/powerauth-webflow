@@ -30,7 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean;
@@ -56,6 +58,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Autowired
     private WebFlowServerConfiguration configuration;
+
+    @Autowired
+    ResourceLoader resourceLoader;
 
     /* Register PowerAuth Server Beans */
 
@@ -137,7 +142,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public Resource languageSettingSource() throws MalformedURLException {
-        return new UrlResource(configuration.getResourcesLocation() + "lang.json");
+        return resourceLoader.getResource(configuration.getResourcesLocation() + "lang.json");
     }
 
     @Override
