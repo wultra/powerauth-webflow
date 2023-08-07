@@ -58,7 +58,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     private WebFlowServerConfiguration configuration;
 
     @Autowired
-    ResourceLoader resourceLoader;
+    private ResourceLoader resourceLoader;
 
     /* Register PowerAuth Server Beans */
 
