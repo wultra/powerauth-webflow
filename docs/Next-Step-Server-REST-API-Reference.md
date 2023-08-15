@@ -7974,7 +7974,8 @@ The list of expected status codes:
     "credentialType": "PERMANENT",
     "username": "username1234",
     "credentialValue": "JeM1vr%GyJFh",
-    "credentialStatus": "ACTIVE"
+    "credentialStatus": "ACTIVE",
+    "timestampExpires": "2021-07-02T13:07:55+0000"
   }
 }
 ```
