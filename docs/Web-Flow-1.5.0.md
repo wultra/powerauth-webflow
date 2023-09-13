@@ -227,7 +227,7 @@ INSERT INTO oauth2_registered_client (id, client_id, client_id_issued_at, client
 
 Due to migration to Spring Authorization Server the following migration is necessary.
 
-```sql```
+```sql
 ALTER TABLE tpp_app_detail DROP CONSTRAINT tpp_client_secret_fk;
 ALTER TABLE tpp_app_detail ADD CONSTRAINT tpp_client_secret_fk FOREIGN KEY (app_client_id) REFERENCES oauth2_registered_client (client_id);
 ```
