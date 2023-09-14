@@ -75,9 +75,7 @@ https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc8
 
 #### PostgreSQL:
 
-Copy "postgresql-[version].jar" to "/opt/tomcat/lib" folder, so that the PostgreSQL DB connector is on classpath. You can get the required JAR here:
-
-https://mvnrepository.com/artifact/org.postgresql/postgresql
+PostgreSQL JDBC driver is already included in the WAR files.
 
 #### Other databases
 
