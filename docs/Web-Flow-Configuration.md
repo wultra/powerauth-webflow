@@ -279,7 +279,7 @@ Complete configuration file:
 spring.profiles.active=ext
 
 # Database Configuration - PostgreSQL
-spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.hikari.auto-commit=false
