@@ -219,8 +219,8 @@ public class TppService {
         registeredClientBuilder.scopes(s -> s.addAll(scopes));
         registeredClientBuilder.clientSettings(ClientSettings.builder().build());
         registeredClientBuilder.tokenSettings(TokenSettings.builder()
-                        .refreshTokenTimeToLive(Duration.ofSeconds(tppEngineConfiguration.getDefaultRefreshTokenValidity().getSeconds()))
-                        .accessTokenTimeToLive(Duration.ofSeconds(tppEngineConfiguration.getDefaultAccessTokenValidityInSeconds()))
+                .refreshTokenTimeToLive(tppEngineConfiguration.getDefaultRefreshTokenValidity())
+                .accessTokenTimeToLive(Duration.ofSeconds(tppEngineConfiguration.getDefaultAccessTokenValidityInSeconds()))
                 .build());
         final RegisteredClient registeredClient = registeredClientBuilder.build();
         registeredClientRepository.save(registeredClient);
