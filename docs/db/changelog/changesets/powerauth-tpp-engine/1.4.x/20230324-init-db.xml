@@ -10,7 +10,7 @@
             </not>
         </preConditions>
         <comment>Create a new sequence tpp_detail_seq</comment>
-        <createSequence sequenceName="tpp_detail_seq" startValue="1" incrementBy="1" cacheSize="20" maxValue="9999999999999999999999999999" minValue="1" />
+        <createSequence sequenceName="tpp_detail_seq" startValue="1" incrementBy="1" cacheSize="20" />
     </changeSet>
 
     <changeSet id="2" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
@@ -20,7 +20,7 @@
             </not>
         </preConditions>
         <comment>Create a new sequence tpp_user_consent_seq</comment>
-        <createSequence sequenceName="tpp_user_consent_seq" startValue="1" incrementBy="1" cacheSize="20" maxValue="9999999999999999999999999999" minValue="1" />
+        <createSequence sequenceName="tpp_user_consent_seq" startValue="1" incrementBy="1" cacheSize="20" />
     </changeSet>
 
     <changeSet id="3" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
@@ -30,7 +30,7 @@
             </not>
         </preConditions>
         <comment>Create a new sequence tpp_user_consent_history_seq</comment>
-        <createSequence sequenceName="tpp_user_consent_history_seq" startValue="1" incrementBy="1" cacheSize="20" maxValue="9999999999999999999999999999" minValue="1" />
+        <createSequence sequenceName="tpp_user_consent_history_seq" startValue="1" incrementBy="1" cacheSize="20"/>
     </changeSet>
 
     <changeSet id="4" logicalFilePath="powerauth-tpp-engine/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
