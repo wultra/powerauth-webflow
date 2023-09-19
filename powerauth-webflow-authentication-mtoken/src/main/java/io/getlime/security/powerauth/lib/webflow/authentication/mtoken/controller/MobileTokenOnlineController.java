@@ -41,9 +41,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -112,7 +112,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
      * @return Initialization response.
      * @throws AuthStepException Thrown when authentication fails.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    @PostMapping("/init")
     public @ResponseBody MobileTokenInitResponse initPushMessage() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
@@ -152,7 +152,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
      * @return Authentication result.
      * @throws AuthStepException Thrown when authentication fails.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     public @ResponseBody MobileTokenAuthenticationResponse authenticateHandler(@RequestBody MobileTokenAuthenticationRequest request) throws AuthStepException {
 
         final GetOperationDetailResponse operation = getOperation(false);
@@ -277,7 +277,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
      * @return Object response.
      * @throws AuthStepException Thrown when operation could not be canceled.
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    @PostMapping("/cancel")
     public @ResponseBody MobileTokenAuthenticationResponse cancelAuthentication() throws AuthStepException {
         try {
             GetOperationDetailResponse operation = getOperation();

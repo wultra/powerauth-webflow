@@ -46,8 +46,7 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Locale;
@@ -105,7 +104,7 @@ public class HomeController {
      *
      * @return Redirect to /authenticate endpoint.
      */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @GetMapping("/")
     public String index() {
         return "redirect:/authenticate";
     }
@@ -118,7 +117,7 @@ public class HomeController {
      * @param response Reference to current HttpServletResponse.
      * @return index page
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.GET)
+    @GetMapping("/authenticate")
     public String authenticate(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) {
         logger.info("Received /authenticate request");
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
@@ -219,7 +218,7 @@ public class HomeController {
      * @param response Reference to current HttpServletResponse.
      * @return Redirect to the /oauth/authorize page
      */
-    @RequestMapping(value = "/authenticate/continue", method = RequestMethod.GET)
+    @GetMapping("/authenticate/continue")
     public String continueToRedirect(HttpServletRequest request, HttpServletResponse response) {
         logger.info("Received /authenticate/continue request");
         final HttpSessionRequestCache cache = new HttpSessionRequestCache();
@@ -253,7 +252,7 @@ public class HomeController {
      * @param response Reference to current HttpServletResponse.
      * @return Redirect to the originating page
      */
-    @RequestMapping(value = "/authenticate/cancel", method = RequestMethod.GET)
+    @GetMapping("/authenticate/cancel")
     public String cancelAuthentication(HttpServletRequest request, HttpServletResponse response) {
         logger.info("Received /authenticate/cancel request");
         final HttpSessionRequestCache cache = new HttpSessionRequestCache();
@@ -367,7 +366,7 @@ public class HomeController {
      * @param model Model.
      * @return Return oauth/error template.
      */
-    @RequestMapping(value = "/oauth2/error", method = RequestMethod.GET)
+    @GetMapping("/oauth2/error")
     public String oauthError(Map<String, Object> model) {
         // Make sure HTTP session is cleaned when error is displayed
         cleanHttpSession();

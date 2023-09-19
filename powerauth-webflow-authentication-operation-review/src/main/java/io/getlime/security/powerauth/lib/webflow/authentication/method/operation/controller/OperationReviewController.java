@@ -52,10 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -124,7 +121,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @return Operation detail response.
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
-    @RequestMapping(value = "/detail", method = RequestMethod.POST)
+    @PostMapping("/detail")
     public @ResponseBody OperationReviewDetailResponse getOperationDetails(@RequestBody OperationDetailRequest request) throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
@@ -151,7 +148,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @param request Operation review request.
      * @return Operation review response.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     public @ResponseBody OperationReviewResponse getOperationDetails(@RequestBody OperationReviewRequest request) {
         try {
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
@@ -206,7 +203,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @return Object response.
      * @throws AuthStepException Thrown when operation could not be canceled.
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    @PostMapping("/cancel")
     public @ResponseBody OperationReviewResponse cancelAuthentication() throws AuthStepException {
         try {
             GetOperationDetailResponse operation = getOperation();
@@ -231,7 +228,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @return Object response.
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
-    @RequestMapping(value = "/formData", method = RequestMethod.PUT)
+    @PutMapping("/formData")
     public @ResponseBody Response updateFormData(@RequestBody UpdateOperationFormDataRequest request) throws AuthStepException {
         return updateFormDataImpl(request);
     }
@@ -242,7 +239,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @return Object response.
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
-    @RequestMapping(value = "/formData/update", method = RequestMethod.POST)
+    @PostMapping("/formData/update")
     public @ResponseBody Response updateFormDataPost(@RequestBody UpdateOperationFormDataRequest request) throws AuthStepException {
         return updateFormDataImpl(request);
     }
@@ -275,7 +272,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @param request Update chosen authentication method request.
      * @return Object response.
      */
-    @RequestMapping(value = "/chosenAuthMethod", method = RequestMethod.PUT)
+    @PutMapping("/chosenAuthMethod")
     public @ResponseBody Response updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) throws AuthStepException {
         return updateChosenAuthenticationMethodImpl(request);
     }
@@ -286,7 +283,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @return Object response.
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
-    @RequestMapping(value = "/chosenAuthMethod/update", method = RequestMethod.POST)
+    @PostMapping("/chosenAuthMethod/update")
     public @ResponseBody Response updateChosenAuthenticationMethodPost(@RequestBody UpdateOperationChosenAuthMethodRequest request) throws AuthStepException {
         return updateChosenAuthenticationMethodImpl(request);
     }

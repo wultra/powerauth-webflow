@@ -42,9 +42,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -84,7 +84,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
      * @return Authentication initialization response.
      * @throws CommunicationFailedException In case the network communication fails when creating an implicit login operation.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) throws CommunicationFailedException {
         logger.info("Operation INIT started");
 

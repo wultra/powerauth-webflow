@@ -77,7 +77,7 @@ public class AuthMethodController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, AUTH_METHOD_ALREADY_EXISTS"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "auth-method", method = RequestMethod.POST)
+    @PostMapping("auth-method")
     public ObjectResponse<CreateAuthMethodResponse> createAuthMethod(@Valid @RequestBody ObjectRequest<CreateAuthMethodRequest> request) throws AuthMethodAlreadyExistsException {
         logger.info("Received createAuthMethod request, authentication method: {}", request.getRequestObject().getAuthMethod());
         final CreateAuthMethodResponse response = authMethodService.createAuthMethod(request.getRequestObject());
@@ -97,7 +97,7 @@ public class AuthMethodController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "auth-method", method = RequestMethod.GET)
+    @GetMapping("auth-method")
     public ObjectResponse<GetAuthMethodsResponse> getAuthMethodList() throws InvalidConfigurationException {
         logger.info("Received getAuthMethodList request");
         final List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
@@ -124,7 +124,7 @@ public class AuthMethodController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "auth-method/list", method = RequestMethod.POST)
+    @PostMapping("auth-method/list")
     public ObjectResponse<GetAuthMethodsResponse> getAuthMethodListPost(@Valid @RequestBody ObjectRequest<GetAuthMethodListRequest> request) throws InvalidConfigurationException {
         logger.info("Received getAuthMethodListPost request");
         final List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
@@ -151,7 +151,7 @@ public class AuthMethodController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "user/auth-method", method = RequestMethod.GET)
+    @GetMapping("user/auth-method")
     public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestParam @Nullable @Size(min = 1, max = 256) String userId) throws InvalidConfigurationException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getAuthMethodsEnabledForUser request, user ID: {}", userId);
@@ -176,7 +176,7 @@ public class AuthMethodController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "user/auth-method/list", method = RequestMethod.POST)
+    @PostMapping("user/auth-method/list")
     public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUserPost(@Valid @RequestBody ObjectRequest<GetUserAuthMethodsRequest> request) throws InvalidConfigurationException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getAuthMethodsEnabledForUserPost request, user ID: {}", request.getRequestObject().getUserId());
@@ -204,7 +204,7 @@ public class AuthMethodController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "user/auth-method", method = RequestMethod.POST)
+    @PostMapping("user/auth-method")
     public ObjectResponse<GetUserAuthMethodsResponse> enableAuthMethodForUser(@Valid @RequestBody ObjectRequest<UpdateAuthMethodRequest> request) throws InvalidRequestException, InvalidConfigurationException {
         logger.info("Received enableAuthMethodForUser request, user ID: {}, authentication method: {}", request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString());
         final UpdateAuthMethodRequest requestObject = request.getRequestObject();
@@ -241,7 +241,7 @@ public class AuthMethodController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "user/auth-method/delete", method = RequestMethod.POST)
+    @PostMapping("user/auth-method/delete")
     public ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUser(@Valid @RequestBody ObjectRequest<UpdateAuthMethodRequest> request) throws InvalidRequestException, InvalidConfigurationException {
         return disableAuthMethodForUserImpl(request);
     }
@@ -281,7 +281,7 @@ public class AuthMethodController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "user/auth-method/enabled", method = RequestMethod.GET)
+    @GetMapping("user/auth-method/enabled")
     public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam @NotBlank @Size(min = 2, max = 256) String operationName) throws InvalidConfigurationException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getEnabledMethodList request, user ID: {}", userId);
@@ -305,7 +305,7 @@ public class AuthMethodController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "user/auth-method/enabled/list", method = RequestMethod.POST)
+    @PostMapping("user/auth-method/enabled/list")
     public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodListPost(@Valid @RequestBody ObjectRequest<GetEnabledMethodListRequest> request) throws InvalidConfigurationException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getEnabledMethodListPost request, user ID: {}", request.getRequestObject().getUserId());
@@ -327,7 +327,7 @@ public class AuthMethodController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, AUTH_METHOD_NOT_FOUND, DELETE_NOT_ALLOWED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "auth-method/delete", method = RequestMethod.POST)
+    @PostMapping("auth-method/delete")
     public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod(@Valid @RequestBody ObjectRequest<DeleteAuthMethodRequest> request) throws AuthMethodNotFoundException, DeleteNotAllowedException {
         logger.info("Received deleteAuthMethod request, authentication method: {}", request.getRequestObject().getAuthMethod());
         final DeleteAuthMethodResponse response = authMethodService.deleteAuthMethod(request.getRequestObject());

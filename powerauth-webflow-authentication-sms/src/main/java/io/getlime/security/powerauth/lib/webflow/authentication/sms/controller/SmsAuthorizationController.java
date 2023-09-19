@@ -59,9 +59,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
@@ -410,7 +410,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @return Authorization response.
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    @PostMapping("/init")
     public InitSmsAuthorizationResponse initSmsAuthorization() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
@@ -509,7 +509,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @return Authorization response.
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
-    @RequestMapping(value = "/resend", method = RequestMethod.POST)
+    @PostMapping("/resend")
     public ResendSmsAuthorizationResponse resendSmsAuthorization() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
@@ -551,7 +551,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @return Authorization response.
      * @throws AuthStepException In case authentication fails.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     public SmsAuthorizationResponse authenticateHandler(@Valid @RequestBody SmsAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
@@ -651,7 +651,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @return Authorization response.
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    @PostMapping("/cancel")
     public SmsAuthorizationResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
