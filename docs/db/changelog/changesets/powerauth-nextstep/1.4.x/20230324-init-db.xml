@@ -10,7 +10,7 @@
             </not>
         </preConditions>
         <comment>Create a new sequence ns_operation_afs_seq</comment>
-        <createSequence sequenceName="ns_operation_afs_seq" startValue="1" incrementBy="1" cacheSize="20" minValue="1" />
+        <createSequence sequenceName="ns_operation_afs_seq" startValue="1" incrementBy="1" cacheSize="20" />
     </changeSet>
 
     <changeSet id="2" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
