@@ -63,9 +63,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigInteger;
@@ -213,7 +213,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
      * @return Response with QR code as String-based PNG image.
      * @throws AuthStepException In case authorization fails.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    @PostMapping("/init")
     @ResponseBody
     public QrCodeInitResponse initQrCode(@RequestBody QrCodeInitRequest request) throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
@@ -292,7 +292,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
      * @return Authorization response.
      * @throws AuthStepException Thrown when authentication fails.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     @ResponseBody
     public QrCodeAuthenticationResponse verifyAuthCode(@RequestBody QrCodeAuthenticationRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
@@ -356,7 +356,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
      * @return Authorization response.
      * @throws AuthStepException In case authorization fails.
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    @PostMapping("/cancel")
     @ResponseBody
     public QrCodeAuthenticationResponse cancelAuthentication() throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {

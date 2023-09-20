@@ -41,7 +41,7 @@ public class ConsentInfoController {
         this.consentService = consentService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ObjectResponse<ConsentDetailResponse> consentDetail(@RequestParam("id") String id) throws ConsentNotFoundException {
         final ConsentDetailResponse response = consentService.consentDetail(id);
         if (response == null) {

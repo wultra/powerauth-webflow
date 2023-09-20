@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -74,7 +75,7 @@ public class UserProfileController {
      * @param principal Original authentication principal of the currently logged user.
      * @return User profile.
      */
-    @RequestMapping(value = "me", method = RequestMethod.GET)
+    @GetMapping("me")
     public @ResponseBody UserResponse me(@AuthenticationPrincipal OAuth2AuthenticatedPrincipal principal) {
         final UserResponse userResponse = new UserResponse();
 

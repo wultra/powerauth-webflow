@@ -50,7 +50,7 @@ public class TppRegistryController {
         this.tppService = tppService;
     }
 
-    @RequestMapping(value = "app", method = RequestMethod.GET)
+    @GetMapping("app")
     public ObjectResponse<TppAppDetailResponse> fetchAppInfoFromClientId(
             @RequestParam("clientId") String clientId,
             @RequestParam(value = "tppLicense", required = false) String tppLicense) throws TppAppNotFoundException, TppNotFoundException {
@@ -63,7 +63,7 @@ public class TppRegistryController {
         }
     }
 
-    @RequestMapping(value = "app/list", method = RequestMethod.GET)
+    @GetMapping("app/list")
     public ObjectResponse<List<TppAppDetailResponse>> getAppList(@RequestParam("tppLicense") String tppLicense) throws TppNotFoundException {
         final List<TppAppDetailResponse> response = tppService.fetchAppListByTppLicense(tppLicense);
         if (response != null) {
@@ -73,7 +73,7 @@ public class TppRegistryController {
         }
     }
 
-    @RequestMapping(value = "app", method = RequestMethod.POST)
+    @PostMapping("app")
     public ObjectResponse<TppAppDetailResponse> createApp(@RequestBody ObjectRequest<CreateTppAppRequest> request) throws UnableToCreateAppException {
         final CreateTppAppRequest requestObject = request.getRequestObject();
         final List<String> errors = CreateTppAppRequestValidator.validate(requestObject);
@@ -84,7 +84,7 @@ public class TppRegistryController {
         return new ObjectResponse<>(tppAppDetailResponse);
     }
 
-    @RequestMapping(value = "app", method = RequestMethod.PUT)
+    @PutMapping("app")
     public ObjectResponse<TppAppDetailResponse> updateApp(
             @RequestParam("clientId") String clientId,
             @RequestBody ObjectRequest<CreateTppAppRequest> request) throws UnableToCreateAppException, TppNotFoundException, TppAppNotFoundException {
@@ -97,7 +97,7 @@ public class TppRegistryController {
         return new ObjectResponse<>(tppAppDetailResponse);
     }
 
-    @RequestMapping(value = "app/renewSecret", method = RequestMethod.POST)
+    @PostMapping("app/renewSecret")
     public ObjectResponse<TppAppDetailResponse> updateApp(
             @RequestParam("clientId") String clientId,
             @RequestParam("tppLicense") String tppLicense) throws TppNotFoundException, TppAppNotFoundException {
@@ -105,7 +105,7 @@ public class TppRegistryController {
         return new ObjectResponse<>(tppAppDetailResponse);
     }
 
-    @RequestMapping(value = "app", method = RequestMethod.DELETE)
+    @DeleteMapping("app")
     public Response deleteApp(
             @RequestParam("clientId") String clientId,
             @RequestParam("tppLicense") String tppLicense) throws TppNotFoundException, TppAppNotFoundException {
@@ -113,13 +113,13 @@ public class TppRegistryController {
         return new Response();
     }
 
-    @RequestMapping(value = "block", method = RequestMethod.POST)
+    @PostMapping("block")
     public ObjectResponse<TppInfo> blockTpp(@RequestParam("tppLicense") String tppLicense) throws TppNotFoundException {
         final TppInfo tppInfo = tppService.blockTpp(tppLicense);
         return new ObjectResponse<>(tppInfo);
     }
 
-    @RequestMapping(value = "unblock", method = RequestMethod.POST)
+    @PostMapping("unblock")
     public ObjectResponse<TppInfo> unblockTpp(@RequestParam("tppLicense") String tppLicense) throws TppNotFoundException {
         final TppInfo tppInfo = tppService.unblockTpp(tppLicense);
         return new ObjectResponse<>(tppInfo);

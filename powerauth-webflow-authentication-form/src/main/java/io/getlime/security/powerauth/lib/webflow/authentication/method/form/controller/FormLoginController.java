@@ -60,9 +60,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -233,7 +233,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @return Authentication response.
      * @throws AuthStepException Thrown in case authentication fails.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     public @ResponseBody UsernamePasswordAuthResponse authenticateHandler(@RequestBody UsernamePasswordAuthRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final String username = request.getUsername();
@@ -323,7 +323,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @return Object response.
      * @throws AuthStepException Thrown when operation could not be canceled.
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    @PostMapping("/cancel")
     public @ResponseBody
     UsernamePasswordAuthResponse cancelAuthentication() throws AuthStepException {
         try {
@@ -349,7 +349,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @return Prepare login form response.
      * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    @PostMapping("/init")
     public @ResponseBody UsernamePasswordInitResponse initLoginForm(@RequestBody UsernamePasswordInitRequest request) throws AuthStepException {
         if (request == null) {
             throw new AuthStepException("Invalid request", "error.invalidRequest");

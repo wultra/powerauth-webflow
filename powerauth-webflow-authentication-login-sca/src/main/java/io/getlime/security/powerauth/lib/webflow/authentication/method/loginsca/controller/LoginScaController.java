@@ -62,9 +62,9 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
@@ -117,7 +117,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @return SCA login initialization response.
      * @throws AuthStepException In case SCA login initialization fails.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     public LoginScaAuthResponse authenticateScaLogin(@Valid @RequestBody LoginScaAuthRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
@@ -258,7 +258,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @return Prepare login form response.
      * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    @PostMapping("/init")
     public LoginScaInitResponse initScaLogin(@RequestBody LoginScaInitRequest request) throws AuthStepException {
         final LoginScaInitResponse response = new LoginScaInitResponse();
         final GetOperationDetailResponse operation = getOperation();
@@ -358,7 +358,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @return Object response.
      * @throws AuthStepException Thrown when operation could not be canceled.
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    @PostMapping("/cancel")
     public AuthStepResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
