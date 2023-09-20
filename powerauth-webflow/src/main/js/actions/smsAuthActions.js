@@ -146,9 +146,10 @@ export function resend(component) {
  * @param userPassword User supplied password.
  * @param signedMessage Message signed using qualified certificate.
  * @param component Component requesting the action.
+ * @param callback callback after finished request of sms/authentication endpoint, both successful or error
  * @returns {Function} No return value.
  */
-export function authenticate(userAuthCode, userPassword, signedMessage, component) {
+export function authenticate(userAuthCode, userPassword, signedMessage, component, callback) {
     return function (dispatch) {
         dispatch({
             type: getActionType(component),
@@ -168,6 +169,7 @@ export function authenticate(userAuthCode, userPassword, signedMessage, componen
                 'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
+            callback();
             switch (response.data.result) {
                 case 'CONFIRMED': {
                     // Make sure to complete token authentication in case it is still enabled - send push message
@@ -218,6 +220,7 @@ export function authenticate(userAuthCode, userPassword, signedMessage, componen
             }
             return null;
         }).catch((error) => {
+            callback();
             // Handle request validation errors
             if (error.response.status === 400 && error.response.data.message !== undefined) {
                 dispatch({
