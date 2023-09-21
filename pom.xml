@@ -101,6 +101,7 @@
         <wultra-java-core.version>1.7.0</wultra-java-core.version>
         <powerauth-java-crypto.version>1.5.1</powerauth-java-crypto.version>
         <powerauth.version>1.5.0</powerauth.version>
+        <powerauth-push.version>1.5.0</powerauth-push.version>
     </properties>
 
     <dependencyManagement>
