@@ -98,9 +98,10 @@
         <guava.version>32.1.2-jre</guava.version>
         <moneta.version>1.4.2</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
-        <wultra-java-core.version>1.7.0-SNAPSHOT</wultra-java-core.version>
-        <powerauth-java-crypto.version>1.5.0-SNAPSHOT</powerauth-java-crypto.version>
-        <powerauth.version>1.5.0-SNAPSHOT</powerauth.version>
+        <wultra-core.version>1.7.0</wultra-core.version>
+        <powerauth.version>1.5.0</powerauth.version>
+        <powerauth-crypto.version>1.5.1</powerauth-crypto.version>
+        <powerauth-push.version>1.5.0</powerauth-push.version>
     </properties>
 
     <dependencyManagement>
@@ -211,19 +212,19 @@
             <dependency>
                 <groupId>io.getlime.core</groupId>
                 <artifactId>rest-client-base</artifactId>
-                <version>${wultra-java-core.version}</version>
+                <version>${wultra-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>io.getlime.core</groupId>
                 <artifactId>rest-model-base</artifactId>
-                <version>${wultra-java-core.version}</version>
+                <version>${wultra-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>io.getlime.security</groupId>
                 <artifactId>powerauth-java-crypto</artifactId>
-                <version>${powerauth-java-crypto.version}</version>
+                <version>${powerauth-crypto.version}</version>
             </dependency>
 
             <dependency>
@@ -235,7 +236,7 @@
             <dependency>
                 <groupId>io.getlime.core</groupId>
                 <artifactId>audit-base</artifactId>
-                <version>${wultra-java-core.version}</version>
+                <version>${wultra-core.version}</version>
             </dependency>
 
             <!-- 3rd party libs -->
