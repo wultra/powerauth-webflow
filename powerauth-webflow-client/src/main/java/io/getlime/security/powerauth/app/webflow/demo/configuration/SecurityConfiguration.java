@@ -33,6 +33,7 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepo
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -63,7 +64,12 @@ public class SecurityConfiguration {
         return http
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/", "/home", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/"),
+                                new AntPathRequestMatcher("/home"),
+                                new AntPathRequestMatcher("/css/**"),
+                                new AntPathRequestMatcher("/js/**"),
+                                new AntPathRequestMatcher("/images/**"))
+                        .permitAll()
                         .anyRequest().fullyAuthenticated()
                 )
                 .oauth2Login(login -> login
