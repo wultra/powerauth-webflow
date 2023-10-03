@@ -98,6 +98,9 @@
         <guava.version>32.1.2-jre</guava.version>
         <moneta.version>1.4.2</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
+        <logstash.version>7.4</logstash.version>
+
+        <!--  Wultra dependencies  -->
         <wultra-core.version>1.7.0</wultra-core.version>
         <powerauth.version>1.5.0</powerauth.version>
         <powerauth-crypto.version>1.5.1</powerauth-crypto.version>
@@ -257,6 +260,13 @@
                 <groupId>org.javamoney.moneta</groupId>
                 <artifactId>moneta-core</artifactId>
                 <version>${moneta.version}</version>
+            </dependency>
+
+            <!-- Logging -->
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
