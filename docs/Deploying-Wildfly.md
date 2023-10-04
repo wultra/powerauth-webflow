@@ -25,7 +25,7 @@ Web Flow contains the following configuration in `jboss-deployment-structure.xml
 		
 		<resources>
 			<!-- use WAR provided Bouncy Castle -->
-			<resource-root path="WEB-INF/lib/bcprov-jdk18on-1.72.jar" use-physical-code-source="true"/>
+			<resource-root path="WEB-INF/lib/bcprov-jdk18on-1.76.jar" use-physical-code-source="true"/>
 		</resources>
 
 		<local-last value="true" />
@@ -49,7 +49,7 @@ Similarly, Next Step contains the following configuration in `jboss-deployment-s
 		
 		<resources>
 			<!-- use WAR provided Bouncy Castle -->
-			<resource-root path="WEB-INF/lib/bcprov-jdk18on-1.72.jar" use-physical-code-source="true"/>
+			<resource-root path="WEB-INF/lib/bcprov-jdk18on-1.76.jar" use-physical-code-source="true"/>
 		</resources>
 
 		<local-last value="true" />
