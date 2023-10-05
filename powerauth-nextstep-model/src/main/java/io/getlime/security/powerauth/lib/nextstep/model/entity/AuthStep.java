@@ -18,9 +18,9 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 

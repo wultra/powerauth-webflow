@@ -24,7 +24,6 @@ import io.getlime.security.powerauth.app.nextstep.converter.OrganizationConverte
 import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OrganizationEntity;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOrganizationRequest;
@@ -38,8 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -113,11 +112,8 @@ public class OrganizationService {
      */
     @Transactional
     public GetOrganizationDetailResponse getOrganizationDetail(GetOrganizationDetailRequest request) throws OrganizationNotFoundException {
-        final Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
-        if (!organizationOptional.isPresent()) {
-            throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
-        }
-        final OrganizationEntity organization = organizationOptional.get();
+        final OrganizationEntity organization = organizationRepository.findById(request.getOrganizationId()).orElseThrow(() ->
+                new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId()));
         return organizationConverter.fromOrganizationEntity(organization);
     }
 
@@ -141,15 +137,11 @@ public class OrganizationService {
      * @param request Delete organization request.
      * @return Delete organization response.
      * @throws OrganizationNotFoundException Thrown when organization is not found.
-     * @throws DeleteNotAllowedException Thrown when record cannot be deleted.
      */
     @Transactional
-    public DeleteOrganizationResponse deleteOrganization(DeleteOrganizationRequest request) throws OrganizationNotFoundException, DeleteNotAllowedException {
-        final Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
-        if (!organizationOptional.isPresent()) {
-            throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
-        }
-        final OrganizationEntity organization = organizationOptional.get();
+    public DeleteOrganizationResponse deleteOrganization(DeleteOrganizationRequest request) throws OrganizationNotFoundException {
+        final OrganizationEntity organization = organizationRepository.findById(request.getOrganizationId()).orElseThrow(() ->
+                new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId()));
         organizationRepository.delete(organization);
         logger.debug("Organization was deleted: {}", organization.getOrganizationId());
         audit.info("Organization was deleted", AuditDetail.builder()

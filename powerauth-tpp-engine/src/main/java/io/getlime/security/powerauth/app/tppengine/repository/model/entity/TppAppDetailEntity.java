@@ -18,14 +18,16 @@
 
 package io.getlime.security.powerauth.app.tppengine.repository.model.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * Entity representing a TPP application details. This entity is connected to TPP via tpp_id on one end,
- * and to OAuth 2.0 client details via client_id on the other hand. As a result, this table does not contain
- * association with the OAuth 2.0 credentials. It only stores connection between TPP and the credentials and
+ * and to OAuth 2.1 client details via client_id on the other hand. As a result, this table does not contain
+ * association with the OAuth 2.1 credentials. It only stores connection between TPP and the credentials and
  * also some basic metadata info related to the app.
  *
  * @author Petr Dvorak, petr@wultra.com
@@ -34,6 +36,7 @@ import java.util.Objects;
 @Table(name = "tpp_app_detail")
 public class TppAppDetailEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 4100688209055833070L;
 
     @EmbeddedId
@@ -102,6 +105,7 @@ public class TppAppDetailEntity implements Serializable {
     @Embeddable
     public static class TppAppDetailKey implements Serializable {
 
+        @Serial
         private static final long serialVersionUID = -527239721500406289L;
 
         @Column(name = "app_client_id", nullable = false)
@@ -137,8 +141,7 @@ public class TppAppDetailEntity implements Serializable {
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (!(o instanceof TppAppDetailKey)) return false;
-            TppAppDetailKey that = (TppAppDetailKey) o;
+            if (!(o instanceof final TppAppDetailKey that)) return false;
             return Objects.equals(appClientId, that.appClientId) && Objects.equals(tppId, that.tppId);
         }
 

@@ -28,7 +28,7 @@ export function getOperationData(component) {
     return function (dispatch) {
         axios.post("./api/auth/operation/detail", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             dispatch({
@@ -51,7 +51,7 @@ export function init(component) {
     return function (dispatch) {
         axios.post("./api/auth/sms/init", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
@@ -104,7 +104,7 @@ export function resend(component) {
     return function (dispatch) {
         axios.post("./api/auth/sms/resend", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
@@ -146,9 +146,10 @@ export function resend(component) {
  * @param userPassword User supplied password.
  * @param signedMessage Message signed using qualified certificate.
  * @param component Component requesting the action.
+ * @param callback callback after finished request of sms/authentication endpoint, both successful or error
  * @returns {Function} No return value.
  */
-export function authenticate(userAuthCode, userPassword, signedMessage, component) {
+export function authenticate(userAuthCode, userPassword, signedMessage, component, callback) {
     return function (dispatch) {
         dispatch({
             type: getActionType(component),
@@ -165,9 +166,10 @@ export function authenticate(userAuthCode, userPassword, signedMessage, componen
             signedMessage: signedMessage
         }, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
+            callback();
             switch (response.data.result) {
                 case 'CONFIRMED': {
                     // Make sure to complete token authentication in case it is still enabled - send push message
@@ -175,7 +177,7 @@ export function authenticate(userAuthCode, userPassword, signedMessage, componen
                     if (component === "TOKEN") {
                         axios.post("./api/auth/token/web/authenticate", {}, {
                             headers: {
-                                'X-OPERATION-HASH': operationHash,
+                                'X-OPERATION-HASH': operationHash
                             }
                         }).then((response) => {
                             dispatchAction(dispatch, response);
@@ -218,6 +220,7 @@ export function authenticate(userAuthCode, userPassword, signedMessage, componen
             }
             return null;
         }).catch((error) => {
+            callback();
             // Handle request validation errors
             if (error.response.status === 400 && error.response.data.message !== undefined) {
                 dispatch({
@@ -244,7 +247,7 @@ export function cancel(component) {
     return function (dispatch) {
         axios.post("./api/auth/sms/cancel", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             // Make sure to cancel token authentication in case it is still enabled - send push message
@@ -252,7 +255,7 @@ export function cancel(component) {
             if (component === "TOKEN") {
                 axios.post("./api/auth/token/web/authenticate", {}, {
                     headers: {
-                        'X-OPERATION-HASH': operationHash,
+                        'X-OPERATION-HASH': operationHash
                     }
                 }).then((response) => {
                     dispatch({

@@ -17,9 +17,12 @@
  */
 package io.getlime.security.powerauth.app.nextstep.configuration;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Default Spring Security configuration.
@@ -27,17 +30,20 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  * @author Petr Dvorak, petr@wultra.com
  */
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity
+public class SecurityConfig {
 
     /**
      * Configures HTTP security.
      * @param http HTTP security.
      * @throws Exception Thrown when configuration fails.
      */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.httpBasic().disable();
-        http.csrf().disable();
+    @Bean
+    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
+        return http
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .build();
     }
 
 }

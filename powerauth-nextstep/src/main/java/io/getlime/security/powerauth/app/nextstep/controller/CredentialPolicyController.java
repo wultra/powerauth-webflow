@@ -36,13 +36,12 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCredentia
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 /**
  * REST controller for credential policy definitions.
@@ -80,7 +79,7 @@ public class CredentialPolicyController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, CREDENTIAL_POLICY_ALREADY_EXISTS"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public ObjectResponse<CreateCredentialPolicyResponse> createCredentialPolicy(@Valid @RequestBody ObjectRequest<CreateCredentialPolicyRequest> request) throws CredentialPolicyAlreadyExistsException, InvalidRequestException {
         logger.info("Received createCredentialPolicy request, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
         final CreateCredentialPolicyResponse response = credentialPolicyService.createCredentialPolicy(request.getRequestObject());
@@ -101,7 +100,7 @@ public class CredentialPolicyController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_POLICY_NOT_FOUND, INVALID_REQUEST"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.PUT)
+    @PutMapping
     public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicy(@Valid @RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException, InvalidRequestException {
         logger.info("Received updateCredentialPolicy request, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
         final UpdateCredentialPolicyResponse response = credentialPolicyService.updateCredentialPolicy(request.getRequestObject());
@@ -122,7 +121,7 @@ public class CredentialPolicyController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_POLICY_NOT_FOUND, INVALID_REQUEST"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @PostMapping("update")
     public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicyPost(@Valid @RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException, InvalidRequestException {
         logger.info("Received updateCredentialPolicyPost request, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
         final UpdateCredentialPolicyResponse response = credentialPolicyService.updateCredentialPolicy(request.getRequestObject());
@@ -142,7 +141,7 @@ public class CredentialPolicyController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyList(@RequestParam boolean includeRemoved) throws InvalidConfigurationException {
         logger.info("Received getCredentialPolicyList request");
         GetCredentialPolicyListRequest request = new GetCredentialPolicyListRequest();
@@ -164,7 +163,7 @@ public class CredentialPolicyController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "list", method = RequestMethod.POST)
+    @PostMapping("list")
     public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyListPost(@Valid @RequestBody ObjectRequest<GetCredentialPolicyListRequest> request) throws InvalidConfigurationException {
         logger.info("Received getCredentialPolicyListPost request");
         final GetCredentialPolicyListResponse response = credentialPolicyService.getCredentialPolicyList(request.getRequestObject());
@@ -184,7 +183,7 @@ public class CredentialPolicyController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_POLICY_NOT_FOUND"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping("delete")
     public ObjectResponse<DeleteCredentialPolicyResponse> deleteCredentialPolicy(@Valid @RequestBody ObjectRequest<DeleteCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException {
         logger.info("Received deleteCredentialPolicy request, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
         final DeleteCredentialPolicyResponse response = credentialPolicyService.deleteCredentialPolicy(request.getRequestObject());

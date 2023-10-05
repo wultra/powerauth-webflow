@@ -27,16 +27,12 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller for credential management.
@@ -78,7 +74,7 @@ public class CredentialController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_CONFIGURATION, INVALID_REQUEST, CREDENTIAL_VALIDATION_FAILED, ENCRYPTION_FAILED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public ObjectResponse<CreateCredentialResponse> createCredential(@Valid @RequestBody ObjectRequest<CreateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, InvalidRequestException, CredentialValidationFailedException, EncryptionException {
         logger.info("Received createCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         final CreateCredentialResponse response = credentialService.createCredential(request.getRequestObject());
@@ -104,7 +100,7 @@ public class CredentialController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, CREDENTIAL_NOT_FOUND, INVALID_REQUEST, CREDENTIAL_VALIDATION_FAILED, INVALID_CONFIGURATION, ENCRYPTION_FAILED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.PUT)
+    @PutMapping
     public ObjectResponse<UpdateCredentialResponse> updateCredential(@Valid @RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialValidationFailedException, InvalidConfigurationException, EncryptionException {
         logger.info("Received updateCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         final UpdateCredentialResponse response = credentialService.updateCredential(request.getRequestObject());
@@ -130,7 +126,7 @@ public class CredentialController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, CREDENTIAL_NOT_FOUND, INVALID_REQUEST, CREDENTIAL_VALIDATION_FAILED, INVALID_CONFIGURATION, ENCRYPTION_FAILED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @PostMapping("update")
     public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@Valid @RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialValidationFailedException, InvalidConfigurationException, EncryptionException {
         logger.info("Received updateCredentialPost request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         final UpdateCredentialResponse response = credentialService.updateCredential(request.getRequestObject());
@@ -153,7 +149,7 @@ public class CredentialController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_REQUEST, USER_IDENTITY_NOT_FOUND, INVALID_CONFIGURATION, ENCRYPTION_FAILED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "validate", method = RequestMethod.POST)
+    @PostMapping("validate")
     public ObjectResponse<ValidateCredentialResponse> validateCredential(@Valid @RequestBody ObjectRequest<ValidateCredentialRequest> request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException, InvalidConfigurationException, EncryptionException {
         logger.info("Received validateCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         final ValidateCredentialResponse response = credentialService.validateCredential(request.getRequestObject());
@@ -177,7 +173,7 @@ public class CredentialController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, CREDENTIAL_NOT_FOUND, INVALID_CONFIGURATION, ENCRYPTION_FAILED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "reset", method = RequestMethod.POST)
+    @PostMapping("reset")
     public ObjectResponse<ResetCredentialResponse> resetCredential(@Valid @RequestBody ObjectRequest<ResetCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidConfigurationException, EncryptionException {
         logger.info("Received resetCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         final ResetCredentialResponse response = credentialService.resetCredential(request.getRequestObject());
@@ -199,7 +195,7 @@ public class CredentialController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, CREDENTIAL_NOT_FOUND"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping("delete")
     public ObjectResponse<DeleteCredentialResponse> deleteCredential(@Valid @RequestBody ObjectRequest<DeleteCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
         logger.info("Received deleteCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         final DeleteCredentialResponse response = credentialService.deleteCredential(request.getRequestObject());
@@ -222,7 +218,7 @@ public class CredentialController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, CREDENTIAL_NOT_FOUND, CREDENTIAL_NOT_ACTIVE"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "block", method = RequestMethod.POST)
+    @PostMapping("block")
     public ObjectResponse<BlockCredentialResponse> blockCredential(@Valid @RequestBody ObjectRequest<BlockCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotActiveException {
         logger.info("Received blockCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         final BlockCredentialResponse response = credentialService.blockCredential(request.getRequestObject());
@@ -245,7 +241,7 @@ public class CredentialController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, CREDENTIAL_NOT_FOUND, CREDENTIAL_NOT_BLOCKED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "unblock", method = RequestMethod.POST)
+    @PostMapping("unblock")
     public ObjectResponse<UnblockCredentialResponse> unblockCredential(@Valid @RequestBody ObjectRequest<UnblockCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotBlockedException {
         logger.info("Received unblockCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         final UnblockCredentialResponse response = credentialService.unblockCredential(request.getRequestObject());

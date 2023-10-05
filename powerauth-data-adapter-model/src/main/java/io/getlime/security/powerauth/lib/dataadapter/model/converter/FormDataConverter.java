@@ -33,7 +33,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.Operati
  */
 public class FormDataConverter {
 
-    private AttributeConverter attributeConverter = new AttributeConverter();
+    private final AttributeConverter attributeConverter = new AttributeConverter();
 
     /**
      * Converter from OperationFormData.

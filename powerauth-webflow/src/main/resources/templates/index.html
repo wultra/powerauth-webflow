@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="./ext-resources/css/base.css"/>
     <link rel="stylesheet" th:if="${stylesheet != null}" th:href="${stylesheet}"/>
     <link rel="stylesheet" href="./ext-resources/css/customization.css"/>
+    <link rel="shortcut icon" type="image/png" href="./ext-resources/images/favicon.png"/>
     <th:block th:if="${afs_js_snippet_url != null and !afs_js_snippet_url.empty}">
         <!-- AFS integration -->
         <script type="text/javascript" th:src="${afs_js_snippet_url}" async="async"></script>
@@ -37,9 +38,11 @@
 <script type="text/javascript" th:inline="javascript">
     /*<![CDATA[*/
     var lang = [[${lang}]];
-
+    var languageSetting = JSON.parse([[${languageSetting}]]);
     var I18N_EN = {locale: 'en', messages: JSON.parse(/*[[${i18n_EN}]]*/)};
     var I18N_CS = {locale: 'cs', messages: JSON.parse(/*[[${i18n_CS}]]*/)};
+    var I18N_UK = {locale: 'uk', messages: JSON.parse(/*[[${i18n_UK}]]*/)};
+    var I18N_RO = {locale: 'ro', messages: JSON.parse(/*[[${i18n_RO}]]*/)};
 
     var csrf = {headerName: [[${_csrf.headerName}]], token: [[${_csrf.token}]]};
 

@@ -144,6 +144,7 @@ public class DataAdapterClient {
      *
      * @param userId           User ID.
      * @param organizationId   Organization ID.
+     * @param userContacts     User contacts.
      * @param accountStatus    User account status.
      * @param authMethod       Authentication method.
      * @param operationContext Operation context.
@@ -152,8 +153,8 @@ public class DataAdapterClient {
      * @return Response with generated messageId.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
      */
-    public ObjectResponse<CreateSmsAuthorizationResponse> createAndSendAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
-        CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, accountStatus, lang, authMethod, operationContext, resend);
+    public ObjectResponse<CreateSmsAuthorizationResponse> createAndSendAuthorizationSms(String userId, String organizationId, List<UserContact> userContacts, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
+        CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, userContacts, accountStatus, lang, authMethod, operationContext, resend);
         return postObjectImpl("/api/auth/sms/create", new ObjectRequest<>(request), CreateSmsAuthorizationResponse.class);
     }
 
@@ -162,6 +163,7 @@ public class DataAdapterClient {
      *
      * @param userId            User ID.
      * @param organizationId    Organization ID.
+     * @param userContacts      User contacts.
      * @param accountStatus     User account status.
      * @param authMethod        Authentication method.
      * @param operationContext  Operation context.
@@ -172,8 +174,8 @@ public class DataAdapterClient {
      * @return Response with generated messageId.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
      */
-    public ObjectResponse<SendAuthorizationSmsResponse> sendAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String messageId, String authorizationCode, String lang, boolean resend) throws DataAdapterClientErrorException {
-        SendAuthorizationSmsRequest request = new SendAuthorizationSmsRequest(userId, organizationId, accountStatus, authMethod, operationContext, messageId, authorizationCode, lang, resend);
+    public ObjectResponse<SendAuthorizationSmsResponse> sendAuthorizationSms(String userId, String organizationId, List<UserContact> userContacts, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String messageId, String authorizationCode, String lang, boolean resend) throws DataAdapterClientErrorException {
+        SendAuthorizationSmsRequest request = new SendAuthorizationSmsRequest(userId, organizationId, userContacts, accountStatus, authMethod, operationContext, messageId, authorizationCode, lang, resend);
         return postObjectImpl("/api/auth/sms/send", new ObjectRequest<>(request), SendAuthorizationSmsResponse.class);
     }
 
@@ -214,10 +216,10 @@ public class DataAdapterClient {
     }
 
     /**
-     * Create a new login operation from the OAuth 2.0 login context.
+     * Create a new login operation from the OAuth 2.1 login context.
      *
-     * @param clientId OAuth 2.0 Client ID.
-     * @param scopes OAuth 2.0 Scopes.
+     * @param clientId OAuth 2.1 Client ID.
+     * @param scopes OAuth 2.1 Scopes.
      * @return Information about a new operation.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
@@ -318,7 +320,7 @@ public class DataAdapterClient {
     }
 
     /**
-     * Initialize OAuth 2.0 consent form.
+     * Initialize OAuth 2.1 consent form.
      * @param userId User ID.
      * @param organizationId Organization ID.
      * @param operationContext Operation context.
@@ -331,7 +333,7 @@ public class DataAdapterClient {
     }
 
     /**
-     * Create OAuth 2.0 consent form.
+     * Create OAuth 2.1 consent form.
      * @param userId User ID.
      * @param organizationId Organization ID.
      * @param operationContext Operation context.
@@ -345,7 +347,7 @@ public class DataAdapterClient {
     }
 
     /**
-     * Validate options selected by the user in the OAuth 2.0 consent form.
+     * Validate options selected by the user in the OAuth 2.1 consent form.
      * @param userId User ID.
      * @param organizationId Organization ID.
      * @param operationContext Operation context.
@@ -360,7 +362,7 @@ public class DataAdapterClient {
     }
 
     /**
-     * Save options selected by the user in the OAuth 2.0 consent form.
+     * Save options selected by the user in the OAuth 2.1 consent form.
      * @param userId User ID.
      * @param organizationId Organization ID.
      * @param operationContext Operation context.

@@ -21,9 +21,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.OperationSessionRepository;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.OperationSessionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.codec.Hex;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -115,7 +115,7 @@ public class OperationSessionService {
             return null;
         }
         try {
-            return DatatypeConverter.printHexBinary(MessageDigest.getInstance("SHA-512").digest(operationId.getBytes(StandardCharsets.UTF_8)));
+            return String.valueOf(Hex.encode(MessageDigest.getInstance("SHA-512").digest(operationId.getBytes(StandardCharsets.UTF_8))));
         } catch (NoSuchAlgorithmException e) {
             return null;
         }

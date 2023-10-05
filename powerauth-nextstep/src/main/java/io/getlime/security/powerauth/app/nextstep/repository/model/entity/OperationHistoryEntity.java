@@ -21,9 +21,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -38,6 +39,7 @@ import java.util.Date;
 @EqualsAndHashCode(of = "primaryKey")
 public class OperationHistoryEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 4536813173706547247L;
 
     @EmbeddedId
@@ -118,6 +120,7 @@ public class OperationHistoryEntity implements Serializable {
     @AllArgsConstructor
     public static class OperationHistoryKey implements Serializable {
 
+        @Serial
         private static final long serialVersionUID = 7125401949386229372L;
 
         @Column(name = "operation_id")

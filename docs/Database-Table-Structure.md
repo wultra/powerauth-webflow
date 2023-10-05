@@ -1,15 +1,10 @@
 # Database Table Structure
 
-Web Flow requires a database to store data. It is tested with Oracle, MySQL and PostgreSQL. It should be easily adapted to any other SQL database which supports JDBC.
+Web Flow requires a database to store data. It is tested with Oracle and PostgreSQL. It should be easily adapted to any other SQL database which supports JDBC.
 
 Web Flow can coexist with PowerAuth in the same database schema, or it can use a different database schema.
 
 ## Database Scripts
-
-### MySQL
-- [create_schema.sql](./sql/mysql/create_schema.sql) - DDL script for creating the database schema
-- [initial_data.sql](./sql/mysql/initial_data.sql) - script with initial data
-- [drop_schema.sql](./sql/mysql/drop_schema.sql) - drop schema script
 
 ### Oracle
 
@@ -25,17 +20,13 @@ Web Flow can coexist with PowerAuth in the same database schema, or it can use a
 
 ## Database Tables
 
-### Database Tables for the OAuth 2.0 protocol
+### Database Tables for the OAuth 2.1 protocol
 
-- **oauth_client_details** - the table stores details about OAuth2 client applications. Every Web Flow client application should have a record in this table. See [JdbcClientDetailsService.java](https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/JdbcClientDetailsService.java).
+- **oauth2_authorization** - the table stores OAuth 2.1 authorization codes, access tokens and refresh tokens
 
-- **oauth_client_token** - the table stores OAuth2 tokens for retrieval by client applications. See [JdbcClientTokenServices.java](https://docs.spring.io/spring-security/oauth/apidocs/org/springframework/security/oauth2/client/token/JdbcClientTokenServices.html).
+- **oauth2_registered_client** - the table stores OAuth 2.1 client registrations
 
-- **oauth_access_token** - the table stores OAuth2 access tokens. See [JdbcTokenStore.java](https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java).
-
-- **oauth_refresh_token** - the table stores OAuth2 refresh tokens. See [JdbcTokenStore.java](https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java).
-
-- **oauth_code** - the table stores data for the OAuth2 authorization code grant. See [JdbcAuthorizationCodeServices.java](https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/code/JdbcAuthorizationCodeServices.java).
+- **oauth2_authorization_consent** - the table stores OAuth 2.1 consents (only added for compatibility with Spring Authorization Server)
 
 ### Database Tables for the Next Step Server
 

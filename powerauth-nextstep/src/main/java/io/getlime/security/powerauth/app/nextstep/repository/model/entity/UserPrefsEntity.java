@@ -18,13 +18,14 @@
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -38,6 +39,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(of = "userId")
 public class UserPrefsEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -7165002311514127800L;
 
     @Id
@@ -82,20 +84,14 @@ public class UserPrefsEntity implements Serializable {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public Boolean getAuthMethodEnabled(int columnNumber) throws InvalidConfigurationException {
-        switch (columnNumber) {
-            case 1:
-                return getAuthMethod1Enabled();
-            case 2:
-                return getAuthMethod2Enabled();
-            case 3:
-                return getAuthMethod3Enabled();
-            case 4:
-                return getAuthMethod4Enabled();
-            case 5:
-                return getAuthMethod5Enabled();
-            default:
-                throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
-        }
+        return switch (columnNumber) {
+            case 1 -> getAuthMethod1Enabled();
+            case 2 -> getAuthMethod2Enabled();
+            case 3 -> getAuthMethod3Enabled();
+            case 4 -> getAuthMethod4Enabled();
+            case 5 -> getAuthMethod5Enabled();
+            default -> throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
+        };
     }
 
     /**
@@ -107,23 +103,12 @@ public class UserPrefsEntity implements Serializable {
      */
     public void setAuthMethodEnabled(int columnNumber, Boolean enabled) throws InvalidConfigurationException {
         switch (columnNumber) {
-            case 1:
-                setAuthMethod1Enabled(enabled);
-                break;
-            case 2:
-                setAuthMethod2Enabled(enabled);
-                break;
-            case 3:
-                setAuthMethod3Enabled(enabled);
-                break;
-            case 4:
-                setAuthMethod4Enabled(enabled);
-                break;
-            case 5:
-                setAuthMethod5Enabled(enabled);
-                break;
-            default:
-                throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
+            case 1 -> setAuthMethod1Enabled(enabled);
+            case 2 -> setAuthMethod2Enabled(enabled);
+            case 3 -> setAuthMethod3Enabled(enabled);
+            case 4 -> setAuthMethod4Enabled(enabled);
+            case 5 -> setAuthMethod5Enabled(enabled);
+            default -> throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
         }
     }
 
@@ -134,20 +119,14 @@ public class UserPrefsEntity implements Serializable {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public String getAuthMethodConfig(int columnNumber) throws InvalidConfigurationException {
-        switch (columnNumber) {
-            case 1:
-                return getAuthMethod1Config();
-            case 2:
-                return getAuthMethod2Config();
-            case 3:
-                return getAuthMethod3Config();
-            case 4:
-                return getAuthMethod4Config();
-            case 5:
-                return getAuthMethod5Config();
-            default:
-                throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
-        }
+        return switch (columnNumber) {
+            case 1 -> getAuthMethod1Config();
+            case 2 -> getAuthMethod2Config();
+            case 3 -> getAuthMethod3Config();
+            case 4 -> getAuthMethod4Config();
+            case 5 -> getAuthMethod5Config();
+            default -> throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
+        };
     }
 
     /**
@@ -158,23 +137,12 @@ public class UserPrefsEntity implements Serializable {
      */
     public void setAuthMethodConfig(int columnNumber, String config) throws InvalidConfigurationException {
         switch (columnNumber) {
-            case 1:
-                setAuthMethod1Config(config);
-                break;
-            case 2:
-                setAuthMethod2Config(config);
-                break;
-            case 3:
-                setAuthMethod3Config(config);
-                break;
-            case 4:
-                setAuthMethod4Config(config);
-                break;
-            case 5:
-                setAuthMethod5Config(config);
-                break;
-            default:
-                throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
+            case 1 -> setAuthMethod1Config(config);
+            case 2 -> setAuthMethod2Config(config);
+            case 3 -> setAuthMethod3Config(config);
+            case 4 -> setAuthMethod4Config(config);
+            case 5 -> setAuthMethod5Config(config);
+            default -> throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
         }
 
     }

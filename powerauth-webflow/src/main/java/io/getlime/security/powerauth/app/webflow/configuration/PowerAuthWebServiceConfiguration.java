@@ -23,17 +23,15 @@ import com.wultra.security.powerauth.rest.client.PowerAuthRestClient;
 import com.wultra.security.powerauth.rest.client.PowerAuthRestClientConfiguration;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for the PowerAuth 2.0 Server connector.
+ * Configuration for the PowerAuth Server connector.
  *
  * @author Petr Dvorak, petr@wultra.com
  */
@@ -42,11 +40,6 @@ import org.springframework.context.annotation.Configuration;
 public class PowerAuthWebServiceConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(PowerAuthWebServiceConfiguration.class);
-
-    private SSLConfigurationService sslConfigurationService;
-
-    @Autowired
-    private com.fasterxml.jackson.databind.ObjectMapper mapper;
 
     @Value("${powerauth.service.url}")
     private String powerAuthRestUrl;
@@ -62,15 +55,6 @@ public class PowerAuthWebServiceConfiguration {
 
     @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
     private boolean acceptInvalidSslCertificate;
-
-    /**
-     * Configuration constructor.
-     * @param sslConfigurationService SSL configuration service.
-     */
-    @Autowired
-    public PowerAuthWebServiceConfiguration(SSLConfigurationService sslConfigurationService) {
-        this.sslConfigurationService = sslConfigurationService;
-    }
 
     /**
      * Initialize PowerAuth REST client.
@@ -91,7 +75,7 @@ public class PowerAuthWebServiceConfiguration {
     }
 
     /**
-     * Initialize PowerAuth 2.0 Push server client.
+     * Initialize PowerAuth Push server client.
      * @return Push server client.
      */
     @Bean

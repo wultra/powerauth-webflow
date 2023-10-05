@@ -37,8 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.Optional;
 
@@ -122,11 +122,8 @@ public class RoleService {
      */
     @Transactional
     public DeleteRoleResponse deleteRole(DeleteRoleRequest request) throws RoleNotFoundException, DeleteNotAllowedException {
-        final Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
-        if (!roleOptional.isPresent()) {
-            throw new RoleNotFoundException("Role not found: " + request.getRoleName());
-        }
-        final RoleEntity role = roleOptional.get();
+        final RoleEntity role = roleRepository.findByName(request.getRoleName()).orElseThrow(() ->
+                new RoleNotFoundException("Role not found: " + request.getRoleName()));
         final long existingRoleCount = userRoleRepository.countByRole(role);
         if (existingRoleCount > 0) {
             throw new DeleteNotAllowedException("Role cannot be deleted because it is used: " + request.getRoleName());

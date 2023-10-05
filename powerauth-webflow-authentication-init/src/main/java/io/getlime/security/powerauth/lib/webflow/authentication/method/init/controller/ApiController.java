@@ -42,9 +42,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -84,7 +84,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
      * @return Authentication initialization response.
      * @throws CommunicationFailedException In case the network communication fails when creating an implicit login operation.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) throws CommunicationFailedException {
         logger.info("Operation INIT started");
 
@@ -112,7 +112,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
             OAuthBasicContext oAuthBasicContext = extractOAuthBasicContext(savedRequest);
 
             if (oAuthBasicContext == null) {
-                logger.error("OAuth 2.0 operation context was not extracted correctly and hence the process cannot continue.");
+                logger.error("OAuth 2.1 operation context was not extracted correctly and hence the process cannot continue.");
                 return failedOperationResponse(null, "operationConfig.missing");
             }
 
@@ -239,29 +239,29 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
     }
 
     /**
-     * Extract OAuth 2.0 context from the saved request. Namely, fetch client_id value and
+     * Extract OAuth 2.1 context from the saved request. Namely, fetch client_id value and
      * array with requested scopes.
      *
-     * @param savedRequest Saved request with OAuth 2.0 attributes.
-     * @return OAuth 2.0 context information, or null in case context cannot be extracted.
+     * @param savedRequest Saved request with OAuth 2.1 attributes.
+     * @return OAuth 2.1 context information, or null in case context cannot be extracted.
      */
     private OAuthBasicContext extractOAuthBasicContext(DefaultSavedRequest savedRequest) {
 
         // Check saved request for null
-        if (savedRequest == null) { // OAuth 2.0 context missing
-            logger.debug("OAuth 2.0 context was not found.");
+        if (savedRequest == null) { // OAuth 2.1 context missing
+            logger.warn("OAuth 2.1 context was not found.");
             return null;
         }
 
-        // Get OAuth 2.0 Client ID
+        // Get OAuth 2.1 Client ID
         final String[] clientIds = savedRequest.getParameterValues("client_id");
         if (clientIds == null || clientIds.length != 1) { // no client ID is present, or worse - more are present
-            logger.debug("OAuth 2.0 Client ID must be present and unique.");
+            logger.warn("OAuth 2.1 Client ID must be present and unique.");
             return null;
         }
         final String clientId = clientIds[0];
 
-        // Get OAuth 2.0 Scopes
+        // Get OAuth 2.1 Scopes
         final String[] scopes = savedRequest.getParameterValues("scope");
 
         // Return the result

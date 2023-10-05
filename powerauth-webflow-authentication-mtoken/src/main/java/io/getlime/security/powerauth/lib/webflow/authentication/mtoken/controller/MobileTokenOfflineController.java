@@ -18,14 +18,13 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
-import com.google.common.io.BaseEncoding;
 import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
 import com.wultra.security.powerauth.client.model.enumeration.SignatureType;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
-import com.wultra.security.powerauth.client.v3.ActivationStatus;
-import com.wultra.security.powerauth.client.v3.CreatePersonalizedOfflineSignaturePayloadResponse;
-import com.wultra.security.powerauth.client.v3.GetActivationStatusResponse;
-import com.wultra.security.powerauth.client.v3.VerifyOfflineSignatureResponse;
+import com.wultra.security.powerauth.client.model.response.CreatePersonalizedOfflineSignaturePayloadResponse;
+import com.wultra.security.powerauth.client.model.response.GetActivationStatusResponse;
+import com.wultra.security.powerauth.client.model.response.VerifyOfflineSignatureResponse;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.http.PowerAuthHttpBody;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
@@ -59,19 +58,20 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.res
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.PushMessageService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.PowerAuthOperationService;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -99,7 +99,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
 
     /**
      * Controller constructor.
-     * @param powerAuthClient PowerAuth 2.0 service client.
+     * @param powerAuthClient PowerAuth service client.
      * @param authMethodQueryService Authentication method query service.
      * @param webFlowServicesConfiguration Web Flow configuration.
      * @param pushMessageService Push message service.
@@ -139,7 +139,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         String nonce = request.getNonce();
         // data for signature is {OPERATION_ID}&{OPERATION_DATA}
         String data = operation.getOperationId() + '&' + operation.getOperationData();
-        String signatureBaseString = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", BaseEncoding.base64().decode(nonce), data.getBytes());
+        String signatureBaseString = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", Base64.getDecoder().decode(nonce), data.getBytes());
         // determine whether biometry is allowed in offline mode
         boolean biometryAllowed = isBiometryAllowedInOfflineMode(operationName);
         VerifyOfflineSignatureResponse signatureResponse;
@@ -213,7 +213,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
      * @return Response with QR code as String-based PNG image.
      * @throws AuthStepException In case authorization fails.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    @PostMapping("/init")
     @ResponseBody
     public QrCodeInitResponse initQrCode(@RequestBody QrCodeInitRequest request) throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
@@ -270,14 +270,14 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         activationEntity.setActivationId(activationStatusResponse.getActivationId());
         activationEntity.setActivationName(activationStatusResponse.getActivationName());
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        Date timestampLastUsed = activationStatusResponse.getTimestampLastUsed().toGregorianCalendar().getTime();
+        Date timestampLastUsed = activationStatusResponse.getTimestampLastUsed();
         activationEntity.setTimestampLastUsed(formatter.format(timestampLastUsed));
         activationEntities.add(activationEntity);
 
         // generating of QR code
         OfflineSignatureQrCode qrCode = generateQrCode(activationEntity);
         initResponse.setQrCode(qrCode.generateImage());
-        initResponse.setNonce(qrCode.getNonce());
+        initResponse.setNonce(qrCode.nonce());
         initResponse.setChosenActivation(activationEntity);
         // currently the choice of activations is limited only to the configured activation, however list is kept in case we decide in future to re-enable the choice
         initResponse.setActivations(activationEntities);
@@ -292,7 +292,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
      * @return Authorization response.
      * @throws AuthStepException Thrown when authentication fails.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     @ResponseBody
     public QrCodeAuthenticationResponse verifyAuthCode(@RequestBody QrCodeAuthenticationRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
@@ -356,7 +356,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
      * @return Authorization response.
      * @throws AuthStepException In case authorization fails.
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    @PostMapping("/cancel")
     @ResponseBody
     public QrCodeAuthenticationResponse cancelAuthentication() throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {

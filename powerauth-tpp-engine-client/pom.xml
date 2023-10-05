@@ -25,7 +25,7 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.4.0</version>
+        <version>1.5.0</version>
     </parent>
 
     <name>powerauth-tpp-engine-client</name>
@@ -58,7 +58,7 @@
             <artifactId>rest-client-base</artifactId>
         </dependency>
 
-        <!-- PowerAuth 2.0 Web Flow Dependencies -->
+        <!-- PowerAuth Web Flow Dependencies -->
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-tpp-engine-model</artifactId>

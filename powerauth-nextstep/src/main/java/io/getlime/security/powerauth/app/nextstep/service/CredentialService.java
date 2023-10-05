@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.*;
 
 /**
@@ -177,7 +177,7 @@ public class CredentialService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
+        if (credentialOptional.isEmpty()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         boolean updateCredentialExpiration = false;
@@ -199,13 +199,13 @@ public class CredentialService {
         }
         CredentialValidationMode validationMode = CredentialValidationMode.NO_VALIDATION;
         if (request.getUsername() != null && request.getCredentialValue() != null) {
-            username = request.getUsername();
+            username = request.getUsername().toLowerCase();
             validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
         } else if (request.getCredentialValue() != null) {
-            username = credential.getUsername();
+            username = credential.getUsername().toLowerCase();
             validationMode = CredentialValidationMode.VALIDATE_CREDENTIAL;
         } else if (request.getUsername() != null) {
-            username = request.getUsername();
+            username = request.getUsername().toLowerCase();
             validationMode = CredentialValidationMode.VALIDATE_USERNAME;
         }
         if (request.getUsername() != null || request.getCredentialValue() != null) {
@@ -413,7 +413,7 @@ public class CredentialService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
+        if (credentialOptional.isEmpty()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         final CredentialEntity credential = credentialOptional.get();
@@ -484,7 +484,7 @@ public class CredentialService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
+        if (credentialOptional.isEmpty()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         final CredentialEntity credential = credentialOptional.get();
@@ -492,6 +492,7 @@ public class CredentialService {
             throw new CredentialNotFoundException("Credential is already REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         credential.setStatus(CredentialStatus.REMOVED);
+        credential.setUsername(null);
         user = userIdentityRepository.save(user);
         logger.debug("Credential was removed for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         audit.info("Credential was removed", AuditDetail.builder()
@@ -524,7 +525,7 @@ public class CredentialService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
+        if (credentialOptional.isEmpty()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         final CredentialEntity credential = credentialOptional.get();
@@ -565,7 +566,7 @@ public class CredentialService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
+        if (credentialOptional.isEmpty()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         final CredentialEntity credential = credentialOptional.get();
@@ -620,11 +621,10 @@ public class CredentialService {
      * @throws CredentialNotFoundException Thrown when credential is not found.
      */
     public CredentialEntity findCredential(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user) throws CredentialNotFoundException {
-        final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        if (!credentialOptional.isPresent()) {
-            throw new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName());
-        }
-        return credentialOptional.get();
+        return user.getCredentials().stream()
+                .filter(c -> c.getCredentialDefinition().equals(credentialDefinition))
+                .findFirst().orElseThrow(() ->
+                        new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName()));
     }
 
     /**
@@ -680,7 +680,7 @@ public class CredentialService {
         if (username != null) {
             // Username has to be checked for duplicates even when username validation is disabled
             if (validationMode == CredentialValidationMode.NO_VALIDATION || validationMode == CredentialValidationMode.VALIDATE_CREDENTIAL) {
-                final Optional<CredentialEntity> existingCredentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+                final Optional<CredentialEntity> existingCredentialOptional = credentialRepository.findByCredentialDefinitionAndUsernameIgnoreCase(credentialDefinition, username);
                 if (existingCredentialOptional.isPresent()) {
                     final CredentialEntity existingCredential = existingCredentialOptional.get();
                     if (!existingCredential.getUser().equals(user)) {
@@ -697,6 +697,9 @@ public class CredentialService {
             } else {
                 username = credentialGenerationService.generateUsername(credentialDefinition);
             }
+        }
+        if (username != null) {
+            username = username.toLowerCase();
         }
         credential.setType(credentialType);
         if (timestampExpires != null) {

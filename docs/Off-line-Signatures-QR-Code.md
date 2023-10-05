@@ -208,7 +208,7 @@ Code example in Java:
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(image, "png", baos);
             byte[] bytes = baos.toByteArray();
-            return "data:image/png;base64," + BaseEncoding.base64().encode(bytes);
+            return "data:image/png;base64," + Base64.getEncoder().encodeToString(bytes);
 ```
 
 The user can now scan the QR code via the mobile token app.
@@ -253,7 +253,7 @@ String signatureBaseString
     = PowerAuthHttpBody.getSignatureBaseString(
         "POST",
         "/operation/authorize/offline",
-        BaseEncoding.base64().decode(nonce),
+        Base64.getDecoder().decode(nonce),
         data.getBytes()
 );
 ```

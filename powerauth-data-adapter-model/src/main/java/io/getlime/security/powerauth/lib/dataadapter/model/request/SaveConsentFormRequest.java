@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Request for saving the OAuth 2.0 consent form options.
+ * Request for saving the OAuth 2.1 consent form options.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -48,7 +48,7 @@ public class SaveConsentFormRequest {
     /**
      * Consent options with values set by the user.
      */
-    private List<ConsentOption> options;
+    private final List<ConsentOption> options;
 
     /**
      * Default constructor.

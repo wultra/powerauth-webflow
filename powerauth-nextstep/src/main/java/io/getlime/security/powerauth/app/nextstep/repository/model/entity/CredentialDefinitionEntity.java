@@ -21,10 +21,11 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialDefinitionStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EndToEndEncryptionAlgorithm;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -39,10 +40,11 @@ import java.util.Date;
 @EqualsAndHashCode(of = {"name"})
 public class CredentialDefinitionEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1113222092995641439L;
 
     @Id
-    @SequenceGenerator(name = "ns_credential_definition", sequenceName = "ns_credential_definition_seq")
+    @SequenceGenerator(name = "ns_credential_definition", sequenceName = "ns_credential_definition_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_credential_definition")
     @Column(name = "credential_definition_id", nullable = false)
     private Long credentialDefinitionId;

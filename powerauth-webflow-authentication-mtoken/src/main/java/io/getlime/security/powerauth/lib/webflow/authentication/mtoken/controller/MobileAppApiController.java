@@ -66,9 +66,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Collections;
@@ -126,7 +126,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      */
-    @RequestMapping(value = "/operation/list/signature", method = RequestMethod.POST)
+    @PostMapping("/operation/list/signature")
     @PowerAuth(resourceId = "/operation/list/signature", signatureType = {PowerAuthSignatureTypes.POSSESSION})
     public @ResponseBody ObjectResponse<OperationListResponse> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
         return getOperationListImpl(apiAuthentication);
@@ -139,7 +139,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      */
-    @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
+    @PostMapping("/operation/list")
     @PowerAuthToken(signatureType = {
             PowerAuthSignatureTypes.POSSESSION,
             PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
@@ -234,7 +234,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      * @throws AuthStepException Thrown when operation is invalid.
      */
-    @RequestMapping(value = "/operation/authorize", method = RequestMethod.POST)
+    @PostMapping("/operation/authorize")
     @PowerAuth(resourceId = "/operation/authorize", signatureType = {
             PowerAuthSignatureTypes.POSSESSION,
             PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
@@ -332,7 +332,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      * @throws AuthStepException Thrown when operation is invalid.
      */
-    @RequestMapping(value = "/operation/cancel", method = RequestMethod.POST)
+    @PostMapping("/operation/cancel")
     @PowerAuth(resourceId = "/operation/cancel", signatureType = {PowerAuthSignatureTypes.POSSESSION})
     public @ResponseBody Response cancelOperation(@RequestBody ObjectRequest<OperationRejectRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
 
@@ -407,14 +407,14 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         // Evaluate various signature types
         if (allowedSignatureType != null) {
             switch (allowedSignatureType.getType()) {
-                case MULTIFACTOR_1FA: {
+                case MULTIFACTOR_1FA -> {
                     // Is the signature correct 1FA type - "possession"?
                     // Also, allow any 2FA signature as they are more strict than 1FA signature, as a fallback
                     return PowerAuthSignatureTypes.POSSESSION.equals(signatureTypes)
                             || PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)
                             || PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes);
                 }
-                case MULTIFACTOR_2FA: {
+                case MULTIFACTOR_2FA -> {
                     // Is the signature correct 2FA type - "possession_knowledge" or "possession_biometry"?
                     // Check for "possession_knowledge" first
                     if (PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)) {
@@ -424,9 +424,8 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                     if (PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes)) {
                         return allowedSignatureType.getVariants() != null && allowedSignatureType.getVariants().contains("possession_biometry");
                     }
-                    break;
                 }
-                case ASYMMETRIC_ECDSA: {
+                case ASYMMETRIC_ECDSA -> {
                     // Not allowed at this moment
                     return false;
                 }

@@ -229,10 +229,18 @@ export default class LoginSca extends React.Component {
     }
 
     title() {
+        const formatMessage = this.props.intl.formatMessage;
         return (
-            <FormGroup className="title">
-                <FormattedMessage id="login.pleaseLogIn"/>
-            </FormGroup>
+            <div>
+                <FormGroup className="title">
+                    <FormattedMessage id="login.pleaseLogIn"/>
+                </FormGroup>
+                { (formatMessage({id: 'login.info.text'}) != 'login.info.text' )? (
+                    <FormGroup>
+                        <FormattedMessage id="login.initial.subtitle"/>
+                    </FormGroup>
+                ) : undefined }
+            </div>
         )
     }
 
@@ -303,17 +311,27 @@ export default class LoginSca extends React.Component {
                 ) : (
                     <FormGroup>
                         <div className="row buttons">
-                            <div className="col-xs-6">
+                            <hr className="hr-row-separator" />
+                            <div className="col-xs-6" id="loginSca-init-cancel">
                                 <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
                                     <FormattedMessage id="login.cancel"/>
                                 </a>
                             </div>
-                            <div className="col-xs-6">
+                            <div className="col-xs-6" id="loginSca-init-continue">
                                 <Button bsSize="lg" type="submit" bsStyle="success" block disabled={this.state.continueDisabled}>
                                     <FormattedMessage id="loginSca.continue"/>
                                 </Button>
                             </div>
                         </div>
+                        {(formatMessage({id: 'login.info.text'}) != 'login.info.text')?(
+                            <div className="row buttons">
+                                <div>
+                                    <a href={formatMessage({id: 'login.info.text.url'})}>
+                                        <FormattedMessage id="login.info.text"/>
+                                    </a>
+                                </div>
+                            </div>
+                        ) : undefined }
                     </FormGroup>
                 )}
             </div>

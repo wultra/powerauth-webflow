@@ -33,13 +33,12 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateApplicati
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 /**
  * REST controller for Next Step applications.
@@ -76,7 +75,7 @@ public class ApplicationController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, APPLICATION_ALREADY_EXISTS"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public ObjectResponse<CreateApplicationResponse> createApplication(@Valid @RequestBody ObjectRequest<CreateApplicationRequest> request) throws ApplicationAlreadyExistsException {
         logger.info("Received createApplication request, application name: {}", request.getRequestObject().getApplicationName());
         final CreateApplicationResponse response = applicationService.createApplication(request.getRequestObject());
@@ -96,7 +95,7 @@ public class ApplicationController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, APPLICATION_NOT_FOUND"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.PUT)
+    @PutMapping
     public ObjectResponse<UpdateApplicationResponse> updateApplication(@Valid @RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException {
         logger.info("Received updateApplication request, application name: {}", request.getRequestObject().getApplicationName());
         final UpdateApplicationResponse response = applicationService.updateApplication(request.getRequestObject());
@@ -116,7 +115,7 @@ public class ApplicationController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, APPLICATION_NOT_FOUND"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @PostMapping("update")
     public ObjectResponse<UpdateApplicationResponse> updateApplicationPost(@Valid @RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException {
         logger.info("Received updateApplicationPost request, application name: {}", request.getRequestObject().getApplicationName());
         final UpdateApplicationResponse response = applicationService.updateApplication(request.getRequestObject());
@@ -135,7 +134,7 @@ public class ApplicationController {
             @ApiResponse(responseCode = "400", description = "Invalid request"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ObjectResponse<GetApplicationListResponse> getApplicationList(@RequestParam boolean includeRemoved) {
         logger.info("Received getApplicationList request");
         GetApplicationListRequest request = new GetApplicationListRequest();
@@ -156,7 +155,7 @@ public class ApplicationController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "list", method = RequestMethod.POST)
+    @PostMapping("list")
     public ObjectResponse<GetApplicationListResponse> getApplicationListPost(@Valid @RequestBody ObjectRequest<GetApplicationListRequest> request) {
         logger.info("Received getApplicationListPost request");
         final GetApplicationListResponse response = applicationService.getApplicationList(request.getRequestObject());
@@ -176,7 +175,7 @@ public class ApplicationController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, APPLICATION_NOT_FOUND"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping("delete")
     public ObjectResponse<DeleteApplicationResponse> deleteApplication(@Valid @RequestBody ObjectRequest<DeleteApplicationRequest> request) throws ApplicationNotFoundException {
         logger.info("Received deleteApplication request, application name: {}", request.getRequestObject().getApplicationName());
         final DeleteApplicationResponse response = applicationService.deleteApplication(request.getRequestObject());

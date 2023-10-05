@@ -41,7 +41,7 @@ export function authenticate(username, password, organizationId) {
             organizationId: organizationId
         }, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             switch (response.data.result) {
@@ -94,7 +94,7 @@ export function cancel() {
     return function (dispatch) {
         axios.post("./api/auth/form/cancel", {}, {
             headers: {
-                'X-OPERATION-HASH': operationHash,
+                'X-OPERATION-HASH': operationHash
             }
         }).then((response) => {
             dispatch({

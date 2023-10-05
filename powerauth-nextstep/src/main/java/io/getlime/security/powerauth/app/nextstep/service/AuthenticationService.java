@@ -47,8 +47,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -422,7 +422,7 @@ public class AuthenticationService {
         }
 
         final Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
-        if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
+        if (Integer.valueOf(0).equals(remainingAttempts) && otp.getStatus() == OtpStatus.ACTIVE) {
             logger.debug("OTP was blocked because there are no remaining attempts left, OTP ID: {}", otp.getOtpId());
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
@@ -667,7 +667,7 @@ public class AuthenticationService {
         }
 
         final Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
-        if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
+        if (Integer.valueOf(0).equals(remainingAttempts) && otp.getStatus() == OtpStatus.ACTIVE) {
             logger.debug("OTP was blocked because there are no remaining attempts left, OTP ID: {}", otp.getOtpId());
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
@@ -835,7 +835,7 @@ public class AuthenticationService {
         }
         final CredentialAuthenticationMode authModeResolved = authenticationMode != null ? authenticationMode : CredentialAuthenticationMode.MATCH_EXACT;
         switch (authModeResolved) {
-            case MATCH_EXACT:
+            case MATCH_EXACT -> {
                 final boolean credentialMatched = credentialProtectionService.verifyCredential(credentialValue, credential);
                 if (credentialMatched) {
                     logger.info("Credential verification succeeded, user ID: {}, credential definition name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
@@ -844,15 +844,14 @@ public class AuthenticationService {
                     logger.info("Credential verification failed, user ID: {}, credential definition name: {}, attempt counter: {}, soft counter: {}, hard counter: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName(), credential.getAttemptCounter(), credential.getFailedAttemptCounterSoft(), credential.getFailedAttemptCounterHard());
                     return AuthenticationResult.FAILED;
                 }
-
-            case MATCH_ONLY_SPECIFIED_POSITIONS:
+            }
+            case MATCH_ONLY_SPECIFIED_POSITIONS -> {
                 if (credentialPositionsToVerify.isEmpty()) {
                     throw new InvalidRequestException("No positions specified for authentication mode MATCH_ONLY_SPECIFIED_POSITIONS");
                 }
                 if (credential.getHashingConfig() != null) {
                     throw new InvalidConfigurationException("Credential verification is not possible in MATCH_ONLY_SPECIFIED_POSITIONS mode when credential hashing is enabled");
                 }
-
                 final String expectedCredentialValue = credentialProtectionService.extractCredentialValue(credential);
                 int counter = 0;
                 for (Integer position : credentialPositionsToVerify) {
@@ -872,9 +871,8 @@ public class AuthenticationService {
                 }
                 logger.info("Credential verification succeeded for position match, user ID: {}, credential definition name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
                 return AuthenticationResult.SUCCEEDED;
-
-            default:
-                throw new InvalidRequestException("Invalid authentication mode: " + authenticationMode);
+            }
+            default -> throw new InvalidRequestException("Invalid authentication mode: " + authenticationMode);
         }
     }
 
@@ -950,7 +948,7 @@ public class AuthenticationService {
             }
             try {
 
-                final List<AuthStep> authSteps = objectMapper.readValue(currentHistory.getResponseSteps(), new TypeReference<List<AuthStep>>() {});
+                final List<AuthStep> authSteps = objectMapper.readValue(currentHistory.getResponseSteps(), new TypeReference<>() {});
                 if (authSteps.size() != 1) {
                     throw new InvalidRequestException("Authentication method could not be determined " +
                             "during credential authentication, operation ID: " + operation.getOperationId());
@@ -985,7 +983,7 @@ public class AuthenticationService {
      * @param credential Credential entity or null for no credential.
      * @param otp OTP entity or null for no OTP.
      * @param operation Operation entity or null for no operation.
-     * @return Remaining attempts.
+     * @return Remaining attempts or {@code null}.
      */
     private Integer resolveRemainingAttempts(CredentialEntity credential, OtpEntity otp, OperationEntity operation) {
         final StepResolutionService stepResolutionService = serviceCatalogue.getStepResolutionService();
@@ -1004,13 +1002,13 @@ public class AuthenticationService {
             if (credential.getStatus() != CredentialStatus.ACTIVE) {
                 remainingAttempts = 0;
             }
-            if (credential.getStatus() == CredentialStatus.ACTIVE && softLimit != null) {
+            if (credential.getStatus() == CredentialStatus.ACTIVE && softLimit != null && softLimit > 0) {
                 final int remainingAttemptsSoft = softLimit - credential.getFailedAttemptCounterSoft();
                 if (remainingAttempts == null || remainingAttemptsSoft < remainingAttempts) {
                     remainingAttempts = remainingAttemptsSoft;
                 }
             }
-            if (credential.getStatus() == CredentialStatus.ACTIVE && hardLimit != null) {
+            if (credential.getStatus() == CredentialStatus.ACTIVE && hardLimit != null && hardLimit > 0) {
                 final int remainingAttemptsHard = hardLimit - credential.getFailedAttemptCounterHard();
                 if (remainingAttempts == null || remainingAttemptsHard < remainingAttempts) {
                     remainingAttempts = remainingAttemptsHard;

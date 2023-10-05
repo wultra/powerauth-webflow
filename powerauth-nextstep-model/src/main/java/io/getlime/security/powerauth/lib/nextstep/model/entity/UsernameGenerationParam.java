@@ -17,9 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
-
-import javax.validation.constraints.Positive;
 
 /**
  * Username generation parameters.

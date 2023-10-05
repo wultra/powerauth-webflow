@@ -19,20 +19,39 @@
 package io.getlime.security.powerauth.app.webflow.configuration;
 
 import com.google.common.collect.ImmutableList;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationToken;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * Default Spring Security configuration.
@@ -40,46 +59,103 @@ import java.util.Collections;
  * @author Petr Dvorak, petr@wultra.com
  */
 @Configuration
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity
+public class SecurityConfiguration {
 
-    @Value("${powerauth.webflow.security.cors.enabled:false}")
-    private boolean corsConfigurationEnabled;
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Value("${powerauth.webflow.security.cors.allowOrigin:*}")
     private String corsAllowOrigin;
 
-    private final static String OAUTH2_TOKEN_REVOKE_ENDPOINT = "/oauth/token/revoke";
-    private final static String OAUTH2_CLIENT_REALM_NAME = "oauth2/client";
+    @Value("${powerauth.webflow.service.oauth2.introspection.uri}")
+    private String introspectionUri;
 
-    private final OAuth2AuthorizationServerConfiguration authConfig;
+    @Value("${powerauth.webflow.service.oauth2.introspection.clientId}")
+    private String clientId;
 
-    /**
-     * Configuration class constructor.
-     * @param authConfig OAuth 2.0 authorization server configuration.
-     */
-    public SecurityConfiguration(OAuth2AuthorizationServerConfiguration authConfig) {
-        this.authConfig = authConfig;
+    @Value("${powerauth.webflow.service.oauth2.introspection.clientSecret}")
+    private String clientSecret;
+
+    private final SecurityContextRepository securityContextRepository;
+    private final AuthenticationManagementService authenticationManagementService;
+
+    @Autowired
+    public SecurityConfiguration(SecurityContextRepository securityContextRepository, AuthenticationManagementService authenticationManagementService) {
+        this.securityContextRepository = securityContextRepository;
+        this.authenticationManagementService = authenticationManagementService;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
+        final OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
+        authorizationServerConfigurer
+                .authorizationEndpoint(authorizationEndpoint ->
+                        authorizationEndpoint
+                                .authorizationResponseHandler((request, response, authentication) -> {
+                                    // Clear the security context just before the redirect
+                                    logger.info("Clearing security context after successful OAuth 2.1 authorization");
+                                    authenticationManagementService.clearContext();
+
+                                    // Redirect user to the original application.
+                                    logger.info("Redirecting user back to the original application");
+                                    redirectToOriginalApplication(request, response, authentication);
+                                })
+                );
+        http
+                // Apply OAuth 2.1 authorization server configuration
+                .apply(authorizationServerConfigurer);
+        return http
+                // Accept access tokens for user info endpoints in resource server, use token introspection
+                .oauth2ResourceServer((oauth2) -> oauth2
+                        .opaqueToken((opaque) -> opaque
+                                .introspectionUri(this.introspectionUri)
+                                .introspectionClientCredentials(this.clientId, this.clientSecret)
+                        )
+                )
+                // Configure securityContextRepository for session management, see: https://docs.spring.io/spring-security/reference/migration/servlet/session-management.html
+                .securityContext((securityContext) -> securityContext
+                        .securityContextRepository(securityContextRepository)
+                )
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers(createAntPathRequestMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**", "/oauth2/**"))
+                        .ignoringRequestMatchers(authorizationServerConfigurer.getEndpointsMatcher()))
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers(createAntPathRequestMatchers("/", "/authenticate", "/authenticate/**", "/oauth2/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/actuator/**", "/tls/client/**", "/signer/**", "/favicon.ico")).permitAll()
+                        // Authenticate OAuth 2.1 endpoints
+                        .requestMatchers(authorizationServerConfigurer.getEndpointsMatcher()).fullyAuthenticated()
+                        // Resource server endpoints
+                        .requestMatchers(new AntPathRequestMatcher("/api/secure/**")).fullyAuthenticated()
+                        .anyRequest().fullyAuthenticated()
+                )
+                // Redirect to the login page when not authenticated from the authorization endpoint
+                .exceptionHandling((exceptions) -> exceptions
+                        .authenticationEntryPoint(
+                                new LoginUrlAuthenticationEntryPoint("/authenticate"))
+                )
+                .cors(Customizer.withDefaults())
+                .build();
+    }
+
+    private static RequestMatcher[] createAntPathRequestMatchers(final String... patterns) {
+        final RequestMatcher[] result = new RequestMatcher[patterns.length];
+        for (int i = 0; i < patterns.length; i++) {
+            result[i] = new AntPathRequestMatcher(patterns[i]);
+        }
+        return result;
     }
 
     /**
-     * Configure http security for OAuth 2.0 authentication, URL exceptions, CSRF tokens, etc.
-     * @param http HTTP security.
-     * @throws Exception Thrown when configuration fails.
+     * Perform redirect back to the original application.
      */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().ignoringAntMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**", OAUTH2_TOKEN_REVOKE_ENDPOINT)
-                .and()
-                    .antMatcher(OAUTH2_TOKEN_REVOKE_ENDPOINT).httpBasic().realmName(OAUTH2_CLIENT_REALM_NAME)
-                .and()
-                    .antMatcher("/**").authorizeRequests()
-                    .antMatchers("/", "/authenticate", "/authenticate/**", "/oauth/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**", "/actuator/**", "/tls/client/**", "/signer/**").permitAll()
-                    .anyRequest().fullyAuthenticated()
-                .and()
-                    .exceptionHandling()
-                    .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/authenticate"));
-        http.cors();
+    private void redirectToOriginalApplication(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+        final OAuth2AuthorizationCodeRequestAuthenticationToken authorizationCodeRequestAuthentication = (OAuth2AuthorizationCodeRequestAuthenticationToken) authentication;
+        final UriComponentsBuilder uriBuilder = UriComponentsBuilder
+                .fromUriString(Objects.requireNonNull(authorizationCodeRequestAuthentication.getRedirectUri()))
+                .queryParam(OAuth2ParameterNames.CODE, Objects.requireNonNull(authorizationCodeRequestAuthentication.getAuthorizationCode()).getTokenValue())
+                .queryParam(OAuth2ParameterNames.STATE, UriUtils.encode(Objects.requireNonNull(authorizationCodeRequestAuthentication.getState()), StandardCharsets.UTF_8));
+        final String redirectUri = uriBuilder.build(true).toUriString();
+        new DefaultRedirectStrategy().sendRedirect(request, response, redirectUri);
     }
 
     /**
@@ -101,8 +177,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return source;
     }
 
-    @Bean
-    UserDetailsService clientUserDetailsService() {
-        return new ClientDetailsUserDetailsService(authConfig.clientDetailsService());
-    }
 }

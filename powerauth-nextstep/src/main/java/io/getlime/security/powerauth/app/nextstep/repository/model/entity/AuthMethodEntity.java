@@ -18,10 +18,11 @@
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -35,6 +36,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(of = "authMethod")
 public class AuthMethodEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -2015768978885351433L;
 
     @Id

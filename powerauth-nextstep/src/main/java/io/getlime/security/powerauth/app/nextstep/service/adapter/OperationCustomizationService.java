@@ -77,19 +77,18 @@ public class OperationCustomizationService {
         final OperationContext operationContext = operationConverter.toOperationContext(operation);
         final OperationChange operationChange;
         switch (operationDetail.getResult()) {
-            case DONE:
-                operationChange = OperationChange.DONE;
-                break;
-            case FAILED:
+            case DONE -> operationChange = OperationChange.DONE;
+            case FAILED -> {
                 if (operation.getCurrentOperationHistoryEntity() != null && operation.getCurrentOperationHistoryEntity().getRequestAuthStepResult() == AuthStepResult.CANCELED) {
                     operationChange = OperationChange.CANCELED;
                     break;
                 }
                 operationChange = OperationChange.FAILED;
-                break;
-            default:
+            }
+            default -> {
                 // Notification is not sent when authResult is CONTINUE
                 return;
+            }
         }
         List<OperationHistoryEntity> operationHistory = new ArrayList<>(operation.getOperationHistory());
         Collections.reverse(operationHistory);

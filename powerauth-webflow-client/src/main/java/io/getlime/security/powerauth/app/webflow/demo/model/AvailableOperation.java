@@ -30,10 +30,10 @@ public class AvailableOperation {
         AUTHORIZATION
     }
 
-    private String name;
+    private final String name;
 
     private boolean isDefault;
-    private Type type;
+    private final Type type;
 
     public AvailableOperation(Type type, String name) {
         this.name = name;

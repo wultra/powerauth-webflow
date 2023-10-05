@@ -39,8 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.Optional;
 
@@ -109,11 +109,8 @@ public class ApplicationService {
      */
     @Transactional
     public UpdateApplicationResponse updateApplication(UpdateApplicationRequest request) throws ApplicationNotFoundException {
-        final Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
-        if (!applicationOptional.isPresent()) {
-            throw new ApplicationNotFoundException("Application not found: " + request.getApplicationName());
-        }
-        ApplicationEntity application = applicationOptional.get();
+        ApplicationEntity application = applicationRepository.findByName(request.getApplicationName()).orElseThrow(() ->
+                new ApplicationNotFoundException("Application not found: " + request.getApplicationName()));
         if (application.getStatus() != ApplicationStatus.ACTIVE && request.getApplicationStatus() != ApplicationStatus.ACTIVE) {
             throw new ApplicationNotFoundException("Application is not ACTIVE: " + request.getApplicationName());
         }
@@ -164,11 +161,8 @@ public class ApplicationService {
      */
     @Transactional
     public DeleteApplicationResponse deleteApplication(DeleteApplicationRequest request) throws ApplicationNotFoundException {
-        final Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
-        if (!applicationOptional.isPresent()) {
-            throw new ApplicationNotFoundException("Application not found: " + request.getApplicationName());
-        }
-        ApplicationEntity application = applicationOptional.get();
+        ApplicationEntity application = applicationRepository.findByName(request.getApplicationName()).orElseThrow(() ->
+                new ApplicationNotFoundException("Application not found: " + request.getApplicationName()));
         application.setStatus(ApplicationStatus.REMOVED);
         application.setTimestampLastUpdated(new Date());
         application = applicationRepository.save(application);

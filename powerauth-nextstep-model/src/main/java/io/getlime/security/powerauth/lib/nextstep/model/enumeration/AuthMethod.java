@@ -45,7 +45,7 @@ public enum AuthMethod {
     USERNAME_PASSWORD_AUTH,
 
     /**
-     * Authorize step using PowerAuth 2.0 mobile token.
+     * Authorize step using PowerAuth mobile token.
      */
     POWERAUTH_TOKEN,
 

@@ -46,8 +46,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
@@ -179,15 +179,13 @@ public class UserAliasService {
     public UpdateUserAliasResponse updateUserAlias(UpdateUserAliasRequest request) throws UserNotFoundException, InvalidRequestException, UserAliasNotFoundException {
         final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        final Optional<UserAliasEntity> aliasOptional = user.getAliases().stream().filter(alias -> alias.getName().equals(request.getAliasName())).findFirst();
-        final UserAliasEntity alias;
-        if (!aliasOptional.isPresent()) {
-            throw new UserAliasNotFoundException("User alias not found: " + request.getAliasName() + ", user ID: " + request.getUserId());
-        } else {
-            alias = aliasOptional.get();
-            if (alias.getStatus() == UserAliasStatus.REMOVED && request.getUserAliasStatus() != UserAliasStatus.ACTIVE) {
-                throw new UserAliasNotFoundException("User alias is REMOVED: " + request.getAliasName() + ", user ID: " + user.getUserId());
-            }
+        final UserAliasEntity alias = user.getAliases().stream()
+                .filter(it -> it.getName().equals(request.getAliasName()))
+                .findFirst()
+                .orElseThrow(() ->
+                        new UserAliasNotFoundException("User alias not found: " + request.getAliasName() + ", user ID: " + request.getUserId()));
+        if (alias.getStatus() == UserAliasStatus.REMOVED && request.getUserAliasStatus() != UserAliasStatus.ACTIVE) {
+            throw new UserAliasNotFoundException("User alias is REMOVED: " + request.getAliasName() + ", user ID: " + user.getUserId());
         }
         alias.setTimestampLastUpdated(new Date());
         alias.setValue(request.getAliasValue());
@@ -231,15 +229,13 @@ public class UserAliasService {
     public DeleteUserAliasResponse deleteUserAlias(DeleteUserAliasRequest request) throws UserNotFoundException, UserAliasNotFoundException {
         final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        final Optional<UserAliasEntity> aliasOptional = user.getAliases().stream().filter(alias -> alias.getName().equals(request.getAliasName())).findFirst();
-        final UserAliasEntity alias;
-        if (!aliasOptional.isPresent()) {
-            throw new UserAliasNotFoundException("User alias not found: " + request.getAliasName() + ", user ID: " + request.getUserId());
-        } else {
-            alias = aliasOptional.get();
-            if (alias.getStatus() == UserAliasStatus.REMOVED) {
-                throw new UserAliasNotFoundException("User alias is already REMOVED: " + request.getAliasName());
-            }
+        final UserAliasEntity alias = user.getAliases().stream()
+                .filter(it -> it.getName().equals(request.getAliasName()))
+                .findFirst()
+                .orElseThrow(() ->
+                        new UserAliasNotFoundException("User alias not found: " + request.getAliasName() + ", user ID: " + request.getUserId()));
+        if (alias.getStatus() == UserAliasStatus.REMOVED) {
+            throw new UserAliasNotFoundException("User alias is already REMOVED: " + request.getAliasName());
         }
         alias.setStatus(UserAliasStatus.REMOVED);
         alias.setTimestampLastUpdated(new Date());

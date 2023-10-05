@@ -142,7 +142,7 @@ public class CredentialValidationService {
         if (allowedPattern != null && !username.matches(allowedPattern)) {
             validationFailures.add(CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED);
         }
-        final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+        final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsernameIgnoreCase(credentialDefinition, username);
         if (credentialOptional.isPresent()) {
             final CredentialEntity credential = credentialOptional.get();
             if (!credential.getUser().equals(user)) {
@@ -319,31 +319,42 @@ public class CredentialValidationService {
      */
     private CredentialValidationFailure convertToValidationFailure(String errorCode) throws InvalidConfigurationException {
         switch (errorCode) {
-            case "ILLEGAL_WHITESPACE":
+            case "ILLEGAL_WHITESPACE" -> {
                 return CredentialValidationFailure.CREDENTIAL_ILLEGAL_WHITESPACE;
-            case "ILLEGAL_USERNAME":
+            }
+            case "ILLEGAL_USERNAME" -> {
                 return CredentialValidationFailure.CREDENTIAL_ILLEGAL_USERNAME;
-            case "ILLEGAL_USERNAME_REVERSED":
+            }
+            case "ILLEGAL_USERNAME_REVERSED" -> {
                 return CredentialValidationFailure.CREDENTIAL_ILLEGAL_USERNAME_REVERSED;
-            case "ALLOWED_CHAR":
+            }
+            case "ALLOWED_CHAR" -> {
                 return CredentialValidationFailure.CREDENTIAL_ALLOWED_CHAR_FAILED;
-            case "ALLOWED_MATCH":
+            }
+            case "ALLOWED_MATCH" -> {
                 return CredentialValidationFailure.CREDENTIAL_ALLOWED_MATCH_FAILED;
-            case "ILLEGAL_CHAR":
+            }
+            case "ILLEGAL_CHAR" -> {
                 return CredentialValidationFailure.CREDENTIAL_ILLEGAL_CHAR;
-            case "ILLEGAL_MATCH":
+            }
+            case "ILLEGAL_MATCH" -> {
                 return CredentialValidationFailure.CREDENTIAL_ILLEGAL_MATCH;
-            case "INSUFFICIENT_UPPERCASE":
+            }
+            case "INSUFFICIENT_UPPERCASE" -> {
                 return CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_UPPERCASE;
-            case "INSUFFICIENT_LOWERCASE":
+            }
+            case "INSUFFICIENT_LOWERCASE" -> {
                 return CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_LOWERCASE;
-            case "INSUFFICIENT_ALPHABETICAL":
+            }
+            case "INSUFFICIENT_ALPHABETICAL" -> {
                 return CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_ALPHABETICAL;
-            case "INSUFFICIENT_DIGIT":
+            }
+            case "INSUFFICIENT_DIGIT" -> {
                 return CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_DIGIT;
-            case "INSUFFICIENT_SPECIAL":
+            }
+            case "INSUFFICIENT_SPECIAL" -> {
                 return CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_SPECIAL;
-
+            }
         }
         throw new InvalidConfigurationException("Unknown error code: " + errorCode);
     }

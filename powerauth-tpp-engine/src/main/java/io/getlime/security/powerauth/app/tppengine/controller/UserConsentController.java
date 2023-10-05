@@ -55,7 +55,7 @@ public class UserConsentController {
      * @return Response with consent created.
      * @throws ConsentNotFoundException In case the consent with given ID is not found.
      */
-    @RequestMapping(value = "consent", method = RequestMethod.POST)
+    @PostMapping("consent")
     public ObjectResponse<GiveConsentResponse> giveConsent(@RequestBody ObjectRequest<GiveConsentRequest> request) throws ConsentNotFoundException {
         final GiveConsentRequest requestObject = request.getRequestObject();
         //TODO: add validator
@@ -70,7 +70,7 @@ public class UserConsentController {
      * @return Information about success or failure.
      * @throws ConsentNotFoundException In case the consent with given ID is not found.
      */
-    @RequestMapping(value = "consent", method = RequestMethod.DELETE)
+    @DeleteMapping("consent")
     public Response removeConsent(@RequestBody ObjectRequest<RemoveConsentRequest> request) throws ConsentNotFoundException {
         RemoveConsentRequest requestObject = request.getRequestObject();
         //TODO: add validator
@@ -85,7 +85,7 @@ public class UserConsentController {
      * @return Information about success or failure.
      * @throws ConsentNotFoundException In case the consent with given ID is not found.
      */
-    @RequestMapping(value = "consent/delete", method = RequestMethod.POST)
+    @PostMapping("consent/delete")
     public Response removeConsentPost(@RequestBody ObjectRequest<RemoveConsentRequest> request) throws ConsentNotFoundException {
         RemoveConsentRequest requestObject = request.getRequestObject();
         //TODO: add validator
@@ -100,7 +100,7 @@ public class UserConsentController {
      * @return Information about success or failure.
      * @throws ConsentNotFoundException In case the consent with given ID is not found.
      */
-    @RequestMapping(value = "consent/id", method = RequestMethod.DELETE)
+    @DeleteMapping("consent/id")
     public Response removeConsent(@RequestParam("cid") Long consentId) throws ConsentNotFoundException {
         userConsentService.removeConsent(consentId);
         return new Response();
@@ -113,7 +113,7 @@ public class UserConsentController {
      * @return Information about success or failure.
      * @throws ConsentNotFoundException In case the consent with given ID is not found.
      */
-    @RequestMapping(value = "consent/id/delete", method = RequestMethod.POST)
+    @PostMapping("consent/id/delete")
     public Response removeConsentPost(@RequestParam("cid") Long consentId) throws ConsentNotFoundException {
         userConsentService.removeConsent(consentId);
         return new Response();
@@ -127,7 +127,7 @@ public class UserConsentController {
      * @return List of consents that are currently active.
      * @throws ConsentNotFoundException In case the consent with given ID is not found.
      */
-    @RequestMapping(value = "consent", method = RequestMethod.GET)
+    @GetMapping("consent")
     public ObjectResponse<ConsentListResponse> consentList(@RequestParam("userId") String userId, @RequestParam(value = "clientId", required = false) String clientId) throws ConsentNotFoundException {
         final ConsentListResponse response = userConsentService.consentListForUser(userId, clientId);
         return new ObjectResponse<>(response);
@@ -142,7 +142,7 @@ public class UserConsentController {
      * @return Check the consent status
      * @throws ConsentNotFoundException In case the consent with given ID is not found.
      */
-    @RequestMapping(value = "consent/status", method = RequestMethod.GET)
+    @GetMapping("consent/status")
     public ObjectResponse<UserConsentDetailResponse> consentStatus(@RequestParam("userId") String userId, @RequestParam("clientId") String clientId, @RequestParam("consentId") String consentId) throws ConsentNotFoundException {
         UserConsentDetailResponse response = userConsentService.consentStatus(userId, consentId, clientId);
         return new ObjectResponse<>(response);
@@ -157,7 +157,7 @@ public class UserConsentController {
      * @return List of history items.
      * @throws ConsentNotFoundException In case the consent with given ID is not found.
      */
-    @RequestMapping(value = "consent/history", method = RequestMethod.GET)
+    @GetMapping("consent/history")
     public ObjectResponse<ConsentHistoryListResponse> consentHistory(@RequestParam("userId") String userId, @RequestParam(value = "clientId", required = false) String clientId) throws ConsentNotFoundException {
         ConsentHistoryListResponse response = userConsentService.consentHistoryForUser(userId, clientId);
         return new ObjectResponse<>(response);

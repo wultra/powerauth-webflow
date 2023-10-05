@@ -57,16 +57,16 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.Organizati
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.OrganizationConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
@@ -117,7 +117,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @return SCA login initialization response.
      * @throws AuthStepException In case SCA login initialization fails.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     public LoginScaAuthResponse authenticateScaLogin(@Valid @RequestBody LoginScaAuthRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
@@ -242,8 +242,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             // Send error to client
             LoginScaAuthResponse response = new LoginScaAuthResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            if (ex instanceof DataAdapterClientErrorException) {
-                DataAdapterClientErrorException ex2 = (DataAdapterClientErrorException) ex;
+            if (ex instanceof final DataAdapterClientErrorException ex2) {
                 response.setRemainingAttempts(ex2.getError().getRemainingAttempts());
                 response.setMessage(ex2.getError().getMessage());
             } else {
@@ -259,7 +258,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @return Prepare login form response.
      * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    @PostMapping("/init")
     public LoginScaInitResponse initScaLogin(@RequestBody LoginScaInitRequest request) throws AuthStepException {
         final LoginScaInitResponse response = new LoginScaInitResponse();
         final GetOperationDetailResponse operation = getOperation();
@@ -275,17 +274,18 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             ObjectResponse<InitAuthMethodResponse> objectResponse = dataAdapterClient.initAuthMethod(operation.getUserId(), operation.getOrganizationId(), AuthMethod.LOGIN_SCA, operationContext);
             InitAuthMethodResponse initResponse = objectResponse.getResponseObject();
             switch (initResponse.getCertificateAuthenticationMode()) {
-                case ENABLED:
+                case ENABLED -> {
                     response.setClientCertificateAuthenticationAvailable(true);
                     response.setClientCertificateAuthenticationEnabled(true);
-                    break;
-                case DISABLED:
+                }
+                case DISABLED -> {
                     response.setClientCertificateAuthenticationAvailable(true);
                     response.setClientCertificateAuthenticationEnabled(false);
-                    break;
-                default:
+                }
+                default -> {
                     response.setClientCertificateAuthenticationAvailable(false);
                     response.setClientCertificateAuthenticationEnabled(false);
+                }
             }
             response.setClientCertificateVerificationUrl(initResponse.getCertificateVerificationUrl());
             if (operation.getUserId() != null && operation.getOrganizationId() != null) {
@@ -358,7 +358,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @return Object response.
      * @throws AuthStepException Thrown when operation could not be canceled.
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    @PostMapping("/cancel")
     public AuthStepResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();

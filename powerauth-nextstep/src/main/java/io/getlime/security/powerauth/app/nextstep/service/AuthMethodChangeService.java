@@ -38,7 +38,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * This service handles authentication method changes within an operation with specific logic
@@ -125,11 +124,8 @@ public class AuthMethodChangeService {
             logger.info("Set chosen authentication method failed for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
             return response;
         }
-        final Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
-        if (!operationOptional.isPresent()) {
-            throw new OperationNotFoundException("Operation not found, operation ID: " + operationId);
-        }
-        final OperationEntity operation = operationOptional.get();
+        final OperationEntity operation = operationRepository.findById(operationId).orElseThrow(() ->
+                new OperationNotFoundException("Operation not found, operation ID: " + operationId));
         if (operation.getResult() != AuthResult.CONTINUE) {
             // Invalid request - authentication method choice expects a CONTINUE operation result
             response.setResult(AuthResult.FAILED);

@@ -69,15 +69,15 @@ export default class Error extends React.Component {
         return (
             <div>
                 {(this.state.networkError) ? (
-                    <div className="network-error">
+                    <div id="error-page" className="network-error">
                         <FormattedMessage id="message.networkError"/>
                     </div>
                 ) : (
-                    <div className="panel panel-body text-center">
+                    <div id="error-page" className="panel panel-body text-center">
                         <div>
                             <div className={"message-error title" + (this.props.context.message == 'operation.canceled' ? ' operation-cancel' : '')}>
                                 {(this.props.context.message) ? (
-                                    <FormattedMessage id={this.props.context.message}/>
+                                       <FormattedMessage id={this.props.context.message}/>
                                 ) : (
                                     <FormattedMessage id="error.unknown"/>
                                 )}

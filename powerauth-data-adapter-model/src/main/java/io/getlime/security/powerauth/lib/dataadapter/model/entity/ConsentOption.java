@@ -19,7 +19,7 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.entity;
 
 /**
- * Option in OAuth 2.0 consent the user can either confirm or reject.
+ * Option in OAuth 2.1 consent the user can either confirm or reject.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

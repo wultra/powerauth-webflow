@@ -12,7 +12,7 @@ Following authentication methods are available:
 - `POWERAUTH_TOKEN` - user authorizes the operation using PowerAuth mobile token
 - `SMS_KEY` - user authorizes the operation using SMS message with OTP
 - `APPROVAL_SCA` - operation approval with either mobile token or SMS and password supporting strong customer authentication 
-- `CONSENT` - OAuth 2.0 consent form with options to approve by the user
+- `CONSENT` - OAuth 2.1 consent form with options to approve by the user
 - `OTP_CODE` - a generic OTP code authentication method which may be delivered by other channel than SMS
 
 The following parameters can be configured:
@@ -54,30 +54,6 @@ VALUES ('OTP_CODE', 10, 0, NULL, NULL, 1, 3, 1, 0, 'method.otpCode');
 
 ```
 
-MySQL:
-```sql
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('INIT', 1, FALSE, NULL, NULL, FALSE, NULL, FALSE, FALSE, NULL);
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('USER_ID_ASSIGN', 2, FALSE, NULL, NULL, FALSE, NULL, FALSE, FALSE, NULL);
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('USERNAME_PASSWORD_AUTH', 3, FALSE, NULL, NULL, TRUE, 5, TRUE, FALSE, 'method.usernamePassword');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('SHOW_OPERATION_DETAIL', 4, FALSE, NULL, NULL, FALSE, NULL, TRUE, FALSE, 'method.showOperationDetail');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('POWERAUTH_TOKEN', 5, TRUE, 1, FALSE, TRUE, 5, TRUE, TRUE, 'method.powerauthToken');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('SMS_KEY', 6, FALSE, NULL, NULL, TRUE, 5, TRUE, FALSE, 'method.smsKey');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('CONSENT', 7, FALSE, NULL, NULL, TRUE, 5, TRUE, FALSE, 'method.consent');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('LOGIN_SCA', 8, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.loginSca');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('APPROVAL_SCA', 9, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.approvalSca');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('OTP_CODE', 10, FALSE, NULL, NULL, TRUE, 3, TRUE, FALSE, 'method.otpCode');
-```
-
 PostgreSQL:
 ```sql
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
@@ -111,11 +87,6 @@ Oracle:
 INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, 1, 1);
 ```
 
-MySQL:
-```sql
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, TRUE, 1);
-```
-
 The default configuration assigns the `DEFAULT` organization to all operations. You can define multiple organizations to support
 authentication for multiple segments which can have overlapping user IDs, e.g.:
 
@@ -123,12 +94,6 @@ Oracle:
 ```sql
 INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', 1, 1);
 INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', 0, 2);
-```
-
-MySQL:
-```sql
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', TRUE, 1);
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', FALSE, 2);
 ```
 
 Such configuration defines two organizations `RETAIL` and `SME`. The user sees two tabs when authenticating with localized labels
@@ -210,8 +175,8 @@ The credential policy requires following configuration:
 - `username_allowed_pattern` - regular expression for checking the username pattern, use `NULL` value for no check
 - `credential_length_min` - minimum length of the credential, use `NULL` value for no limit
 - `credential_length_max` - maximum length of the credential, use `NULL` value for no limit
-- `limit_soft` - soft limit for failed authentication attempts using credential (credential status `BLOCKED_TEMPORARY` when limit is exceeded), use `0` for no limit
-- `limit_hard` - hard limit for failed authentication attempts using credential (credential status `BLOCKED_PERMANENT` when limit is exceeded), use `0` for no limit
+- `limit_soft` - soft limit for failed authentication attempts using credential (credential status `BLOCKED_TEMPORARY` when limit is exceeded), use `null` value for no limit (e.g. for development purposes)
+- `limit_hard` - hard limit for failed authentication attempts using credential (credential status `BLOCKED_PERMANENT` when limit is exceeded), use `null` value for no limit (e.g. for development purposes)
 - `check_history_count` - count of historical credential values which should be checked when changing the credential, use `0` for skipping the check
 - `rotation_enabled` - whether credential rotation is enabled
 - `rotation_days`- number of days for credential rotation, only specify when credential rotation is enabled

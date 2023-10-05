@@ -32,6 +32,10 @@ import ApprovalSca from "./approvalSca";
 import Consent from "./consent";
 // i18n
 import {injectIntl} from "react-intl";
+import Select from 'react-select';
+import ReactFlagsSelect from "react-flags-select";
+
+
 
 /**
  * The App class is the main React component of this application. It handles incoming WebSocket messages
@@ -45,10 +49,15 @@ import {injectIntl} from "react-intl";
     }
 })
 export class App extends React.Component {
-
     constructor() {
         super();
         this.changeLang = this.changeLang.bind(this);
+        this.languagesMapping = [
+                               {"code":"en", "country" :  "US"},
+                               {"code":"cs", "country" :  "CZ"},
+                               {"code":"ro", "country" :  "RO"},
+                               {"code":"uk", "country" :  "UA"}
+                             ];
     }
 
     /**
@@ -66,6 +75,14 @@ export class App extends React.Component {
         // cookie expiration is set to 30 days
         d.setTime(d.getTime() + (30 * 24 * 60 * 60 * 1000));
         document.cookie = "lang=" + lang + ";expires=" + d.toUTCString() + ";path=/";
+    }
+
+    mapLanguageToCountry (locale) {
+        return this.languagesMapping.find(item => { return item.code == locale; }).country;
+    }
+
+    mapCountryToLanguage (flag) {
+        return this.languagesMapping.find(item => { return item.country == flag; }).code;
     }
 
     render() {
@@ -116,24 +133,37 @@ export class App extends React.Component {
                 }
             }
         }
+
+        const languagesMapping = this.languagesMapping;
+        const { languageList, languageLabels  } = languageSetting;
+        const selectedLanguage = this.mapLanguageToCountry ((this.props.intl.locale === undefined ) ? 'en': this.props.intl.locale);
+
         return (
             <div>
                 <div id="lang">
-                    {(this.props.intl.locale === undefined || this.props.intl.locale === 'en') ? (
-                        <a href="#" onClick={() => {
-                            this.changeLang('cs')
-                        }}>Čeština</a>
-                    ) : (
-                        <a href="#" onClick={() => {
-                            this.changeLang('en')
-                        }}>English</a>
-                    )}
+                    <ReactFlagsSelect
+                      className="menu-flags"
+                      selectButtonClassName="menu-flags-button"
+                      countries={languageList}
+                      customLabels={languageLabels}
+                      selected={selectedLanguage}
+                      onSelect={(code) => {
+                            const language = this.mapCountryToLanguage(code);
+                            this.changeLang(language);
+                            }
+                      }
+                    />
                 </div>
                 <div className="row">
                     <div id="main-panel" className="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
                         <div id="home" className="text-center">
                             <div id="logo"/>
                             <Component intl={this.props.intl}/>
+                            {(this.props.intl.formatMessage({id: 'main.help.url'}) != 'main.help.url' )?(
+                                <div id="help">
+                                    <a href={this.props.intl.formatMessage({id: 'main.help.url'})}  />
+                                </div>
+                            ) : undefined }
                         </div>
                     </div>
                 </div>

@@ -50,20 +50,20 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAtt
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
- * Controller which provides endpoints for OAuth 2.0 consent screen.
+ * Controller which provides endpoints for OAuth 2.1 consent screen.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -180,12 +180,12 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     }
 
     /**
-     * Initializes the OAuth 2.0 consent form.
+     * Initializes the OAuth 2.1 consent form.
      *
      * @return Authorization response.
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    @PostMapping("/init")
     public ConsentInitResponse initConsentForm() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
@@ -269,7 +269,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
      * @param request Authorization request which includes the authorization code.
      * @return Authorization response.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     public ConsentAuthResponse authenticateHandler(@RequestBody ConsentAuthRequest request) {
         try {
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
@@ -311,8 +311,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             final ConsentAuthResponse response = new ConsentAuthResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
-            if (e instanceof ConsentValidationFailedException) {
-                ConsentValidationFailedException validationEx = (ConsentValidationFailedException) e;
+            if (e instanceof final ConsentValidationFailedException validationEx) {
                 response.setConsentValidationPassed(false);
                 response.setValidationErrorMessage(validationEx.getErrorMessage());
                 response.setOptionValidationResults(validationEx.getOptionValidationResults());
@@ -331,12 +330,12 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     }
 
     /**
-     * Cancels the OAuth 2.0 consent.
+     * Cancels the OAuth 2.1 consent.
      *
      * @return Authorization response.
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    @PostMapping("/cancel")
     public ConsentAuthResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();

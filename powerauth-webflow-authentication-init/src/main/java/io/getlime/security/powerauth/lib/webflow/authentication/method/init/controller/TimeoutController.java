@@ -27,8 +27,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.init.serv
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -60,7 +60,7 @@ public class TimeoutController extends AuthMethodController<VerifyTimeoutRequest
      * @return Init timeout response.
      * @throws AuthStepException Thrown when request is invalid.
      */
-    @RequestMapping(value = "/verify", method = RequestMethod.POST)
+    @PostMapping("/verify")
     public VerifyTimeoutResponse verifyTimeout(VerifyTimeoutRequest request) throws AuthStepException {
         if (request == null) {
             throw new AuthStepException("Invalid request in verifyTimeout", "error.invalidRequest");

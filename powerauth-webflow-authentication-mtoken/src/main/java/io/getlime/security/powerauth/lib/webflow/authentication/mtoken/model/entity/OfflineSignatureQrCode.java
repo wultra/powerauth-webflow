@@ -18,7 +18,6 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity;
 
-import com.google.common.io.BaseEncoding;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -31,63 +30,30 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 /**
  * Signature and data for QR code in offline mode for mobile token.
+ *
+ * @param size  QR code size.
+ * @param data  QR code data.
+ * @param nonce Nonce.
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class OfflineSignatureQrCode {
+public record OfflineSignatureQrCode(int size, String data, String nonce) {
 
     private static final Logger logger = LoggerFactory.getLogger(OfflineSignatureQrCode.class);
 
-    private final int size;
-    private final String data;
-    private final String nonce;
-
-    /**
-     * QR code constructor.
-     * @param size QR code size.
-     * @param data QR code data.
-     * @param nonce Nonce.
-     */
-    public OfflineSignatureQrCode(int size, String data, String nonce) {
-        this.size = size;
-        this.data = data;
-        this.nonce = nonce;
-    }
-
-    /**
-     * Get QR code size.
-     * @return QR code size.
-     */
-    public int getSize() {
-        return size;
-    }
-
-    /**
-     * Get QR code data.
-     * @return QR code data.
-     */
-    public String getData() {
-        return data;
-    }
-
-    /**
-     * Get nonce.
-     * @return Nonce.
-     */
-    public String getNonce() {
-        return nonce;
-    }
-
     /**
      * Encodes the QR code data into a String-based PNG image.
+     *
      * @return Generated QR code.
      */
     public String generateImage() {
         try {
             BitMatrix matrix = new MultiFormatWriter().encode(
-                    new String(data.getBytes("UTF-8"), "ISO-8859-1"),
+                    new String(data.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1),
                     BarcodeFormat.QR_CODE,
                     size,
                     size);
@@ -95,7 +61,7 @@ public class OfflineSignatureQrCode {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(image, "png", baos);
             byte[] bytes = baos.toByteArray();
-            return "data:image/png;base64," + BaseEncoding.base64().encode(bytes);
+            return "data:image/png;base64," + Base64.getEncoder().encodeToString(bytes);
         } catch (WriterException | IOException e) {
             logger.error(
                     "Error occurred while generating QR code",

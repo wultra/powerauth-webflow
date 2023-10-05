@@ -47,8 +47,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.Optional;
 
@@ -97,19 +97,13 @@ public class OtpDefinitionService {
         if (otpDefinitionOptional.isPresent()) {
             throw new OtpDefinitionAlreadyExistsException("One time password already exists: " + request.getOtpDefinitionName());
         }
-        final Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
-        if (!applicationOptional.isPresent()) {
-            throw new ApplicationNotFoundException("Application does not exist: " + request.getApplicationName());
-        }
-        final ApplicationEntity application = applicationOptional.get();
+        final ApplicationEntity application = applicationRepository.findByName(request.getApplicationName()).orElseThrow(() ->
+                new ApplicationNotFoundException("Application does not exist: " + request.getApplicationName()));
         if (application.getStatus() != ApplicationStatus.ACTIVE) {
             throw new ApplicationNotFoundException("Application is not ACTIVE: " + request.getApplicationName());
         }
-        final Optional<OtpPolicyEntity> otpPolicyOptional = otpPolicyRepository.findByName(request.getOtpPolicyName());
-        if (!otpPolicyOptional.isPresent()) {
-            throw new OtpPolicyNotFoundException("Otp policy does not exist: " + request.getOtpPolicyName());
-        }
-        final OtpPolicyEntity otpPolicy = otpPolicyOptional.get();
+        final OtpPolicyEntity otpPolicy = otpPolicyRepository.findByName(request.getOtpPolicyName()).orElseThrow(() ->
+                new OtpPolicyNotFoundException("Otp policy does not exist: " + request.getOtpPolicyName()));
         if (otpPolicy.getStatus() != OtpPolicyStatus.ACTIVE) {
             throw new OtpPolicyNotFoundException("Otp policy is not ACTIVE: " + request.getOtpPolicyName());
         }
@@ -150,27 +144,18 @@ public class OtpDefinitionService {
      */
     @Transactional
     public UpdateOtpDefinitionResponse updateOtpDefinition(UpdateOtpDefinitionRequest request) throws OtpDefinitionNotFoundException, ApplicationNotFoundException, OtpPolicyNotFoundException {
-        final Optional<OtpDefinitionEntity> otpDefinitionOptional = otpDefinitionRepository.findByName(request.getOtpDefinitionName());
-        if (!otpDefinitionOptional.isPresent()) {
-            throw new OtpDefinitionNotFoundException("One time password definition not found: " + request.getOtpDefinitionName());
-        }
-        OtpDefinitionEntity otpDefinition = otpDefinitionOptional.get();
+        OtpDefinitionEntity otpDefinition = otpDefinitionRepository.findByName(request.getOtpDefinitionName()).orElseThrow(() ->
+                new OtpDefinitionNotFoundException("One time password definition not found: " + request.getOtpDefinitionName()));
         if (otpDefinition.getStatus() != OtpDefinitionStatus.ACTIVE && request.getOtpDefinitionStatus() != OtpDefinitionStatus.ACTIVE) {
             throw new OtpDefinitionNotFoundException("One time password definition is not ACTIVE: " + request.getOtpDefinitionName());
         }
-        final Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
-        if (!applicationOptional.isPresent()) {
-            throw new ApplicationNotFoundException("Application does not exist: " + request.getApplicationName());
-        }
-        final ApplicationEntity application = applicationOptional.get();
+        final ApplicationEntity application = applicationRepository.findByName(request.getApplicationName()).orElseThrow(() ->
+                new ApplicationNotFoundException("Application does not exist: " + request.getApplicationName()));
         if (application.getStatus() != ApplicationStatus.ACTIVE) {
             throw new ApplicationNotFoundException("Application is not ACTIVE: " + request.getApplicationName());
         }
-        final Optional<OtpPolicyEntity> otpPolicyOptional = otpPolicyRepository.findByName(request.getOtpPolicyName());
-        if (!otpPolicyOptional.isPresent()) {
-            throw new OtpPolicyNotFoundException("Otp policy does not exist: " + request.getOtpPolicyName());
-        }
-        final OtpPolicyEntity otpPolicy = otpPolicyOptional.get();
+        final OtpPolicyEntity otpPolicy = otpPolicyRepository.findByName(request.getOtpPolicyName()).orElseThrow(() ->
+                new OtpPolicyNotFoundException("Otp policy does not exist: " + request.getOtpPolicyName()));
         if (otpPolicy.getStatus() != OtpPolicyStatus.ACTIVE) {
             throw new OtpPolicyNotFoundException("Otp policy is not ACTIVE: " + request.getOtpPolicyName());
         }
@@ -232,11 +217,8 @@ public class OtpDefinitionService {
      */
     @Transactional
     public DeleteOtpDefinitionResponse deleteOtpDefinition(DeleteOtpDefinitionRequest request) throws OtpDefinitionNotFoundException {
-        final Optional<OtpDefinitionEntity> otpDefinitionOptional = otpDefinitionRepository.findByName(request.getOtpDefinitionName());
-        if (!otpDefinitionOptional.isPresent()) {
-            throw new OtpDefinitionNotFoundException("One time password definition not found: " + request.getOtpDefinitionName());
-        }
-        OtpDefinitionEntity otpDefinition = otpDefinitionOptional.get();
+        OtpDefinitionEntity otpDefinition = otpDefinitionRepository.findByName(request.getOtpDefinitionName()).orElseThrow(() ->
+                new OtpDefinitionNotFoundException("One time password definition not found: " + request.getOtpDefinitionName()));
         if (otpDefinition.getStatus() == OtpDefinitionStatus.REMOVED) {
             throw new OtpDefinitionNotFoundException("One time password definition is already REMOVED: " + request.getOtpDefinitionName());
         }
@@ -261,11 +243,8 @@ public class OtpDefinitionService {
      * @throws OtpDefinitionNotFoundException Thrown when OTP definition is not found.
      */
     public OtpDefinitionEntity findActiveOtpDefinition(String otpDefinitionName) throws OtpDefinitionNotFoundException {
-        final Optional<OtpDefinitionEntity> otpDefinitionOptional = otpDefinitionRepository.findByName(otpDefinitionName);
-        if (!otpDefinitionOptional.isPresent()) {
-            throw new OtpDefinitionNotFoundException("OTP definition not found: " + otpDefinitionName);
-        }
-        final OtpDefinitionEntity otpDefinition = otpDefinitionOptional.get();
+        final OtpDefinitionEntity otpDefinition = otpDefinitionRepository.findByName(otpDefinitionName).orElseThrow(() ->
+                new OtpDefinitionNotFoundException("OTP definition not found: " + otpDefinitionName));
         if (otpDefinition.getStatus() != OtpDefinitionStatus.ACTIVE) {
             throw new OtpDefinitionNotFoundException("OTP definition is not ACTIVE: " + otpDefinitionName);
         }

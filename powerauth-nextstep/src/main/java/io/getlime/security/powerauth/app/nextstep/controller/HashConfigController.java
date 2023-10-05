@@ -36,13 +36,12 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateHashConfi
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 /**
  * REST controller for hashing configurations.
@@ -80,7 +79,7 @@ public class HashConfigController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, HASHING_CONFIG_ALREADY_EXISTS"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public ObjectResponse<CreateHashConfigResponse> createHashConfig(@Valid @RequestBody ObjectRequest<CreateHashConfigRequest> request) throws InvalidRequestException, HashConfigAlreadyExistsException {
         logger.info("Received createHashConfig request, hash config name: {}", request.getRequestObject().getHashConfigName());
         final CreateHashConfigResponse response = hashConfigService.createHashConfig(request.getRequestObject());
@@ -101,7 +100,7 @@ public class HashConfigController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, HASHING_CONFIG_NOT_FOUND, INVALID_REQUEST"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.PUT)
+    @PutMapping
     public ObjectResponse<UpdateHashConfigResponse> updateHashConfig(@Valid @RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashConfigNotFoundException, InvalidRequestException {
         logger.info("Received updateHashConfig request, hash config name: {}", request.getRequestObject().getHashConfigName());
         final UpdateHashConfigResponse response = hashConfigService.updateHashConfig(request.getRequestObject());
@@ -122,7 +121,7 @@ public class HashConfigController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, HASHING_CONFIG_NOT_FOUND, INVALID_REQUEST"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @PostMapping("update")
     public ObjectResponse<UpdateHashConfigResponse> updateHashConfigPost(@Valid @RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashConfigNotFoundException, InvalidRequestException {
         logger.info("Received updateHashConfigPost request, hash config name: {}", request.getRequestObject().getHashConfigName());
         final UpdateHashConfigResponse response = hashConfigService.updateHashConfig(request.getRequestObject());
@@ -142,7 +141,7 @@ public class HashConfigController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ObjectResponse<GetHashConfigListResponse> getHashConfigList(@RequestParam boolean includeRemoved) throws InvalidConfigurationException {
         logger.info("Received getHashConfigListPost request");
         GetHashConfigListRequest request = new GetHashConfigListRequest();
@@ -164,7 +163,7 @@ public class HashConfigController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "list", method = RequestMethod.POST)
+    @PostMapping("list")
     public ObjectResponse<GetHashConfigListResponse> getHashConfigListPost(@Valid @RequestBody ObjectRequest<GetHashConfigListRequest> request) throws InvalidConfigurationException {
         logger.info("Received getHashConfigListPost request");
         final GetHashConfigListResponse response = hashConfigService.getHashConfigList(request.getRequestObject());
@@ -184,7 +183,7 @@ public class HashConfigController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, HASHING_CONFIG_NOT_FOUND"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping("delete")
     public ObjectResponse<DeleteHashConfigResponse> deleteHashConfig(@Valid @RequestBody ObjectRequest<DeleteHashConfigRequest> request) throws HashConfigNotFoundException {
         logger.info("Received deleteHashConfig request, hash config name: {}", request.getRequestObject().getHashConfigName());
         final DeleteHashConfigResponse response = hashConfigService.deleteHashConfig(request.getRequestObject());

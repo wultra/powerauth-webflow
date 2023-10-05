@@ -20,7 +20,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.request;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 
 /**
- * Request for initializing the OAuth 2.0 consent form.
+ * Request for initializing the OAuth 2.1 consent form.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

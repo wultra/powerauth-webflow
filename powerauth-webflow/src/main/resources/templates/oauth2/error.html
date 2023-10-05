@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--
+~ PowerAuth Web Flow and related software components
+~ Copyright 2017 Wultra s.r.o.
+~
+~ This program is free software: you can redistribute it and/or modify
+~ it under the terms of the GNU Affero General Public License as published
+~ by the Free Software Foundation, either version 3 of the License, or
+~ (at your option) any later version.
+~
+~ This program is distributed in the hope that it will be useful,
+~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+~ GNU Affero General Public License for more details.
+~
+~ You should have received a copy of the GNU Affero General Public License
+~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head lang="en">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:inline="text">[[${title}]]</title>
+    <link rel="stylesheet" href="../resources/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../ext-resources/css/base.css"/>
+    <link rel="stylesheet" th:if="${stylesheet != null}" th:href="${stylesheet}"/>
+    <link rel="stylesheet" href="../ext-resources/css/customization.css"/>
+</head>
+<body>
+
+<div id="page-wrap">
+    <div id="react">
+        <div class="row">
+            <div id="main-panel" class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
+                <div id="home" className="text-center">
+                    <div id="logo"></div>
+                    <div id="error-page" class="text-center">
+                        <div class="message-error title" th:text="#{error.authPage}"/>
+                        <div class="image-result error"></div>
+                        <div class="message-error" th:text="#{error.sessionTerminated}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

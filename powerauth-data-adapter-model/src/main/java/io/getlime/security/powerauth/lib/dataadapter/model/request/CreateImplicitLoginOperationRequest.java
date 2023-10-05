@@ -19,19 +19,19 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 /**
- * Request object for creating an operation based on OAuth 2.0 context.
+ * Request object for creating an operation based on OAuth 2.1 context.
  *
  * @author Petr Dvorak, petr@wultra.com
  */
 public class CreateImplicitLoginOperationRequest {
 
     /**
-     * OAuth 2.0 client ID.
+     * OAuth 2.1 client ID.
      */
     private String clientId;
 
     /**
-     * OAuth 2.0 scopes.
+     * OAuth 2.1 scopes.
      */
     private String[] scopes;
 
@@ -43,8 +43,8 @@ public class CreateImplicitLoginOperationRequest {
 
     /**
      * Full constructor.
-     * @param clientId OAuth 2.0 Client ID.
-     * @param scopes OAuth 2.0 Scopes.
+     * @param clientId OAuth 2.1 Client ID.
+     * @param scopes OAuth 2.1 Scopes.
      */
     public CreateImplicitLoginOperationRequest(String clientId, String[] scopes) {
         this.clientId = clientId;
@@ -60,24 +60,24 @@ public class CreateImplicitLoginOperationRequest {
     }
 
     /**
-     * Set OAuth 2.0 client ID.
-     * @param clientId OAuth 2.0 client ID.
+     * Set OAuth 2.1 client ID.
+     * @param clientId OAuth 2.1 client ID.
      */
     public void setClientId(String clientId) {
         this.clientId = clientId;
     }
 
     /**
-     * Get OAuth 2.0 scopes.
-     * @return OAuth 2.0 scopes.
+     * Get OAuth 2.1 scopes.
+     * @return OAuth 2.1 scopes.
      */
     public String[] getScopes() {
         return scopes;
     }
 
     /**
-     * Set OAuth 2.0 scopes.
-     * @param scopes OAuth 2.0 scopes.
+     * Set OAuth 2.1 scopes.
+     * @param scopes OAuth 2.1 scopes.
      */
     public void setScopes(String[] scopes) {
         this.scopes = scopes;

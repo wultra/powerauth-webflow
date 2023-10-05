@@ -31,16 +31,15 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.OtpAuthenticati
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
 
 /**
  * REST controller for user authentication.
@@ -88,7 +87,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, USER_IDENTITY_NOT_FOUND, OPERATION_NOT_FOUND, CREDENTIAL_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_CONFIGURATION, OPERATION_ALREADY_FINISHED, OPERATION_ALREADY_CANCELED, OPERATION_ALREADY_FAILED, OPERATION_NOT_VALID, AUTH_METHOD_NOT_FOUND, ENCRYPTION_FAILED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "credential", method = RequestMethod.POST)
+    @PostMapping("credential")
     public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@Valid @RequestBody ObjectRequest<CredentialAuthenticationRequest> request) throws InvalidRequestException, UserNotFoundException, OperationNotFoundException, CredentialNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException, OperationNotValidException, AuthMethodNotFoundException, EncryptionException {
         logger.info("Received authenticateWithCredential request, user ID: {}, operation ID: {}", request.getRequestObject().getUserId(), request.getRequestObject().getOperationId());
         final CredentialAuthenticationResponse response = authenticationService.authenticateWithCredential(request.getRequestObject());
@@ -118,7 +117,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, AUTH_METHOD_NOT_FOUND, OPERATION_ALREADY_FAILED, OPERATION_ALREADY_FINISHED, OPERATION_ALREADY_CANCELED, INVALID_CONFIGURATION, CREDENTIAL_NOT_FOUND, OPERATION_NOT_FOUND, OTP_NOT_FOUND, OPERATION_NOT_VALID, ENCRYPTION_FAILED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "otp", method = RequestMethod.POST)
+    @PostMapping("otp")
     public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(@Valid @RequestBody ObjectRequest<OtpAuthenticationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, InvalidConfigurationException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, OperationNotValidException, EncryptionException {
         logger.info("Received authenticateWithOtp request, OTP ID: {}, operation ID: {}", request.getRequestObject().getOtpId(), request.getRequestObject().getOperationId());
         final OtpAuthenticationResponse response = authenticationService.authenticateWithOtp(request.getRequestObject());
@@ -149,7 +148,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, AUTH_METHOD_NOT_FOUND, INVALID_CONFIGURATION, USER_IDENTITY_NOT_FOUND, OPERATION_ALREADY_FINISHED, OPERATION_ALREADY_CANCELED, OPERATION_ALREADY_FAILED, CREDENTIAL_NOT_FOUND, OPERATION_NOT_FOUND, OTP_NOT_FOUND, OPERATION_NOT_VALID, ENCRYPTION_FAILED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "combined", method = RequestMethod.POST)
+    @PostMapping("combined")
     public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@Valid @RequestBody ObjectRequest<CombinedAuthenticationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, InvalidConfigurationException, UserNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, OperationNotValidException, EncryptionException {
         logger.info("Received authenticateCombined request, user ID: {}, OTP ID: {}, operation ID: {}", request.getRequestObject().getUserId(), request.getRequestObject().getOperationId(), request.getRequestObject().getOtpId());
         final CombinedAuthenticationResponse response = authenticationService.authenticateCombined(request.getRequestObject());

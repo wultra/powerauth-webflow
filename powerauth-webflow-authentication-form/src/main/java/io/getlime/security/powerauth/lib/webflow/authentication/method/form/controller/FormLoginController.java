@@ -60,9 +60,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -166,21 +166,19 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             String cipherTransformation = configuration.getCipherTransformation();
             PasswordProtection passwordProtection;
             switch (passwordProtectionType) {
-                case NO_PROTECTION:
+                case NO_PROTECTION -> {
                     // Password is sent in plain text
                     passwordProtection = new NoPasswordProtection();
                     logger.info("No protection is used for protecting user password");
-                    break;
-
-                case PASSWORD_ENCRYPTION_AES:
+                }
+                case PASSWORD_ENCRYPTION_AES -> {
                     // Encrypt user password in case password encryption is configured in Web Flow
                     passwordProtection = new AesEncryptionPasswordProtection(cipherTransformation, configuration.getPasswordEncryptionKey());
                     logger.info("User password is protected using transformation: {}", cipherTransformation);
-                    break;
-
-                default:
+                }
+                default ->
                     // Unsupported authentication type
-                    throw new AuthStepException("Invalid authentication type", "error.invalidRequest");
+                        throw new AuthStepException("Invalid authentication type", "error.invalidRequest");
             }
 
             String protectedPassword = passwordProtection.protect(request.getPassword());
@@ -235,7 +233,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @return Authentication response.
      * @throws AuthStepException Thrown in case authentication fails.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     public @ResponseBody UsernamePasswordAuthResponse authenticateHandler(@RequestBody UsernamePasswordAuthRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final String username = request.getUsername();
@@ -290,8 +288,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             logger.warn("Error occurred while authenticating user: {}", e.getMessage());
             if (afsAction != null) {
                 final List<AfsAuthInstrument> authInstruments = authInstrumentConverter.fromAuthInstruments(request.getAuthInstruments());
-                if (e instanceof AuthenticationFailedException) {
-                    AuthenticationFailedException authEx = (AuthenticationFailedException) e;
+                if (e instanceof final AuthenticationFailedException authEx) {
                     if (authEx.getAccountStatus() != UserAccountStatus.ACTIVE) {
                         // notify AFS about failed authentication method due to the fact that user account is not active
                         afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_METHOD_FAILED);
@@ -326,7 +323,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @return Object response.
      * @throws AuthStepException Thrown when operation could not be canceled.
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    @PostMapping("/cancel")
     public @ResponseBody
     UsernamePasswordAuthResponse cancelAuthentication() throws AuthStepException {
         try {
@@ -352,7 +349,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @return Prepare login form response.
      * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    @PostMapping("/init")
     public @ResponseBody UsernamePasswordInitResponse initLoginForm(@RequestBody UsernamePasswordInitRequest request) throws AuthStepException {
         if (request == null) {
             throw new AuthStepException("Invalid request", "error.invalidRequest");

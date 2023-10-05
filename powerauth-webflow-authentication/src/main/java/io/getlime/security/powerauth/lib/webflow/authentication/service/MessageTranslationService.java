@@ -119,9 +119,8 @@ public class MessageTranslationService {
         }
         for (OperationFormFieldAttribute attribute : attributes) {
             // Formatting of attributes with specified format
-            if (attribute instanceof OperationFormFieldAttributeFormatted) {
-                OperationFormFieldAttributeFormatted formattedAttribute = (OperationFormFieldAttributeFormatted) attribute;
-                ValueFormatType valueFormatType = formattedAttribute.getValueFormatType();
+            if (attribute instanceof final OperationFormFieldAttributeFormatted formattedAttribute) {
+                final ValueFormatType valueFormatType = formattedAttribute.getValueFormatType();
                 if (valueFormatType == ValueFormatType.LOCALIZED_TEXT) {
                     String formattedValue = localize(valueFormatterService.getValue(attribute));
                     formattedAttribute.addFormattedValue("value", formattedValue);
@@ -168,33 +167,31 @@ public class MessageTranslationService {
         for (OperationFormFieldAttribute attribute: formData.getParameters()) {
             String value = null;
             switch (attribute.getType()) {
-                case AMOUNT:
+                case AMOUNT -> {
                     OperationAmountFieldAttribute amountAttribute = (OperationAmountFieldAttribute) attribute;
                     value = amountAttribute.getAmount().toPlainString();
                     // special handling for translation of currency value
                     idValueMap.put(amountAttribute.getCurrencyId(), amountAttribute.getCurrency());
-                    break;
-                case NOTE:
+                }
+                case NOTE -> {
                     OperationNoteFieldAttribute messageAttribute = (OperationNoteFieldAttribute) attribute;
                     value = messageAttribute.getNote();
-                    break;
-                case BANK_ACCOUNT_CHOICE:
-                    value = formData.getUserInput().get(CHOSEN_BANK_ACCOUNT_NUMBER_INPUT);
-                    break;
-                case KEY_VALUE:
+                }
+                case BANK_ACCOUNT_CHOICE -> value = formData.getUserInput().get(CHOSEN_BANK_ACCOUNT_NUMBER_INPUT);
+                case KEY_VALUE -> {
                     OperationKeyValueFieldAttribute keyValueAttribute = (OperationKeyValueFieldAttribute) attribute;
                     value = keyValueAttribute.getValue();
-                    break;
-                case HEADING:
+                }
+                case HEADING -> {
                     OperationHeadingFieldAttribute headingAttribute = (OperationHeadingFieldAttribute) attribute;
                     value = headingAttribute.getValue();
-                    break;
-                case PARTY_INFO:
+                }
+                case PARTY_INFO -> {
                     OperationPartyInfoFieldAttribute partyInfoAttribute = (OperationPartyInfoFieldAttribute) attribute;
                     if (partyInfoAttribute.getPartyInfo() != null) {
                         value = partyInfoAttribute.getPartyInfo().getName();
                     }
-                    break;
+                }
             }
             idValueMap.put(attribute.getId(), value);
         }

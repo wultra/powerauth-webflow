@@ -7973,7 +7973,9 @@ The list of expected status codes:
     "credentialName": "RETAIL_CREDENTIAL",
     "credentialType": "PERMANENT",
     "username": "username1234",
-    "credentialStatus": "ACTIVE"
+    "credentialValue": "JeM1vr%GyJFh",
+    "credentialStatus": "ACTIVE",
+    "timestampExpires": "2021-07-02T13:07:55+0000"
   }
 }
 ```

@@ -30,16 +30,12 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteStepDefin
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller class related to step definitions.
@@ -76,7 +72,7 @@ public class StepDefinitionController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, STEP_DEFINITION_ALREADY_EXISTS"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public ObjectResponse<CreateStepDefinitionResponse> createStepDefinition(@Valid @RequestBody ObjectRequest<CreateStepDefinitionRequest> request) throws StepDefinitionAlreadyExistsException {
         logger.info("Received createStepDefinition request, step definition ID: {}", request.getRequestObject().getStepDefinitionId());
         final CreateStepDefinitionResponse response = stepDefinitionService.createStepDefinition(request.getRequestObject());
@@ -96,7 +92,7 @@ public class StepDefinitionController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, STEP_DEFINITION_NOT_FOUND"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping("delete")
     public ObjectResponse<DeleteStepDefinitionResponse> deleteStepDefinition(@Valid @RequestBody ObjectRequest<DeleteStepDefinitionRequest> request) throws StepDefinitionNotFoundException {
         logger.info("Received deleteStepDefinition request, step definition ID: {}", request.getRequestObject().getStepDefinitionId());
         final DeleteStepDefinitionResponse response = stepDefinitionService.deleteStepDefinition(request.getRequestObject());

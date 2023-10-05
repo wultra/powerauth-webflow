@@ -19,7 +19,7 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.entity;
 
 /**
- * Result of validation of option in OAuth 2.0 consent form.
+ * Result of validation of option in OAuth 2.1 consent form.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

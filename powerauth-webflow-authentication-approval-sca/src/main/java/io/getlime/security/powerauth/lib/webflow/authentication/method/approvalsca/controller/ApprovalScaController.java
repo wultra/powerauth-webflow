@@ -45,15 +45,14 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.approvals
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpSession;
 
 /**
  * Controller for initialization of SCA approval.
@@ -66,7 +65,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
 
     private static final Logger logger = LoggerFactory.getLogger(ApprovalScaController.class);
 
-    private final String FIELD_BANK_ACCOUNT_CHOICE_DISABLED = "operation.bankAccountChoice.disabled";
+    private static final String FIELD_BANK_ACCOUNT_CHOICE_DISABLED = "operation.bankAccountChoice.disabled";
 
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
@@ -97,7 +96,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
      * @return SCA approval authentication response.
      * @throws AuthStepException In case SCA approval authentication fails.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @PostMapping("/authenticate")
     public ApprovalScaAuthResponse authenticateScaApproval(@RequestBody ApprovalScaAuthRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
@@ -144,7 +143,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
      * @return SCA approval initialization response.
      * @throws AuthStepException In case SCA approval initialization fails.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    @PostMapping("/init")
     public ApprovalScaInitResponse initScaApproval(@RequestBody ApprovalScaInitRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         try {
@@ -194,7 +193,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
      * @return Object response.
      * @throws AuthStepException Thrown when operation could not be canceled.
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    @PostMapping("/cancel")
     public AuthStepResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();

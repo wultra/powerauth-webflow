@@ -1,0 +1,1327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="1" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_operation_afs_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_operation_afs_seq</comment>
+        <createSequence sequenceName="ns_operation_afs_seq" startValue="1" incrementBy="1" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="2" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_application_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_application_seq</comment>
+        <createSequence sequenceName="ns_application_seq" startValue="1" incrementBy="1" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="3" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_credential_policy_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_credential_policy_seq</comment>
+        <createSequence sequenceName="ns_credential_policy_seq" startValue="1" incrementBy="1" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="4" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_otp_policy_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_otp_policy_seq</comment>
+        <createSequence sequenceName="ns_otp_policy_seq" startValue="1" incrementBy="1" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="5" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_user_contact_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_user_contact_seq</comment>
+        <createSequence sequenceName="ns_user_contact_seq" startValue="1" incrementBy="1" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="6" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_user_identity_history_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_user_identity_history_seq</comment>
+        <createSequence sequenceName="ns_user_identity_history_seq" startValue="1" incrementBy="1" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="7" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_role_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_role_seq</comment>
+        <createSequence sequenceName="ns_role_seq" startValue="1" incrementBy="1" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="8" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_user_role_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_user_role_seq</comment>
+        <createSequence sequenceName="ns_user_role_seq" startValue="1" incrementBy="1" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="9" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_user_alias_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_user_alias_seq</comment>
+        <createSequence sequenceName="ns_user_alias_seq" startValue="1" incrementBy="1" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="10" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_hashing_config_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_hashing_config_seq</comment>
+        <createSequence sequenceName="ns_hashing_config_seq" startValue="1" incrementBy="1" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="11" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_credential_definition_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_credential_definition_seq</comment>
+        <createSequence sequenceName="ns_credential_definition_seq" startValue="1" incrementBy="2" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="12" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_otp_definition_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_otp_definition_seq</comment>
+        <createSequence sequenceName="ns_otp_definition_seq" startValue="1" incrementBy="2" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="13" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="ns_credential_history_seq"/>
+            </not>
+        </preConditions>
+        <comment>Create a new sequence ns_credential_history_seq</comment>
+        <createSequence sequenceName="ns_credential_history_seq" startValue="1" incrementBy="1" cacheSize="20" />
+    </changeSet>
+
+    <changeSet id="14" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_auth_method"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_auth_method</comment>
+        <createTable tableName="ns_auth_method" remarks="Table ns_auth_method stores configuration of authentication methods. Data in this table needs to be loaded before Web Flow is started.">
+            <column name="auth_method" type="varchar(32)" remarks="Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH, OTP_CODE.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="order_number" type="integer" remarks="Order of the authentication method, incrementing value, starts with 1.">
+                <constraints nullable="false" />
+            </column>
+            <column name="check_user_prefs" type="boolean" defaultValueBoolean="false" remarks="Indication if the authentication method requires checking the user preference first.">
+                <constraints nullable="false" />
+            </column>
+            <column name="user_prefs_column" type="integer" remarks="In case the previous column is 'true', this is pointer to the user preferences configuration column index." />
+            <column name="user_prefs_default" type="boolean" defaultValueBoolean="false" remarks="Default value of the user preferences, in case the per-user preference is not found." />
+            <column name="check_auth_fails" type="boolean" defaultValueBoolean="false" remarks="Indication if the methods can fail, and hence the fail count must be checked.">
+                <constraints nullable="false" />
+            </column>
+            <column name="max_auth_fails" type="integer" remarks="Maximum allowed number of authentication fails." />
+            <column name="has_user_interface" type="boolean" defaultValueBoolean="false" remarks="Indication of if the given method has any user interface in the web flow." />
+            <column name="has_mobile_token" type="boolean" defaultValueBoolean="false" remarks="Indication of if the given authentication method has mobile token as a part of the flow." />
+            <column name="display_name_key" type="varchar(32)" remarks="Localization key to the display name of the authentication method." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="15" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_operation_config"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_operation_config</comment>
+        <createTable tableName="ns_operation_config" remarks="Each operation type (defined by operation_name) has a related mobile token template and configuration.">
+            <column name="operation_name" type="varchar(32)" remarks="Name of the operation, for example 'login' or 'authorize_payment'.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="template_version" type="varchar(1)" remarks="Version of the template, used for data signing base.">
+                <constraints nullable="false" />
+            </column>
+            <column name="template_id" type="integer" remarks="ID of the template, used for data signing base.">
+                <constraints nullable="false" />
+            </column>
+            <column name="mobile_token_enabled" type="boolean" defaultValueBoolean="false" remarks="Flag indicating if the mobile token is enabled for this operation type.">
+                <constraints nullable="false" />
+            </column>
+            <column name="mobile_token_mode" type="varchar(256)" remarks="Configuration of mobile token for this operation, for example, if 1FA or 2FA is supported, and which 2FA variants. The field contains a serialized JSON with configuration.">
+                <constraints nullable="false" />
+            </column>
+            <column name="afs_enabled" type="boolean" defaultValueBoolean="false" remarks="Flag indicating if AFS system is enabled.">
+                <constraints nullable="false" />
+            </column>
+            <column name="afs_config_id" type="varchar(256)" remarks="Configuration of AFS system." />
+            <column name="expiration_time" type="integer" remarks="Expiration time in seconds, which overrides global Next Step configuration." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="16" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_operation_method_config"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_operation_method_config</comment>
+        <createTable tableName="ns_operation_method_config" remarks="Table ns_operation_method_config stores configuration of authentication methods per operation name.">
+            <column name="operation_name" type="varchar(32)" remarks="Name of the operation, for example 'login' or 'authorize_payment'.">
+                <constraints primaryKey="true" foreignKeyName="ns_operation_method_fk1" referencedTableName="ns_operation_config" referencedColumnNames="operation_name" />
+            </column>
+            <column name="auth_method" type="varchar(32)" remarks="Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH, OTP_CODE.">
+                <constraints primaryKey="true" foreignKeyName="ns_operation_method_fk2" referencedTableName="ns_auth_method" referencedColumnNames="auth_method" />
+            </column>
+            <column name="max_auth_fails" type="integer" remarks="Maximum allowed number of authentication fails.">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="17" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_organization"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_organization</comment>
+        <createTable tableName="ns_organization" remarks="Table ns_organization stores definitions of organizations related to the operations. At least one default organization must be configured. Data in this table needs to be loaded before Web Flow is started.">
+            <column name="organization_id" type="varchar(256)" remarks="ID of organization.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="display_name_key" type="varchar(256)" remarks="Localization key for the organization display name." />
+            <column name="is_default" type="boolean" defaultValueBoolean="false" remarks="Flag indicating if this organization is the default.">
+                <constraints nullable="false" />
+            </column>
+            <column name="order_number" type="integer" remarks="Ordering column for this organization, incrementing value, starts with 1.">
+                <constraints nullable="false" />
+            </column>
+            <column name="default_credential_name" type="varchar(256)" remarks="Default name of credential definition for authentication using Next Step, used by Web Flow." />
+            <column name="default_otp_name" type="varchar(256)" remarks="Default name of OTP definition for authentication using Next Step, used by Web Flow." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="18" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_step_definition"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_step_definition</comment>
+        <createTable tableName="ns_step_definition" remarks="Table ns_step_definition stores definitions of authentication/authorization steps. Data in this table needs to be loaded before Web Flow is started.">
+            <column name="step_definition_id" type="integer">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="operation_name" type="varchar(32)">
+                <constraints nullable="false" />
+            </column>
+            <column name="operation_type" type="varchar(32)">
+                <constraints nullable="false" />
+            </column>
+            <column name="request_auth_method" type="varchar(32)">
+                <constraints foreignKeyName="step_request_auth_method_fk" referencedTableName="ns_auth_method" referencedColumnNames="auth_method" />
+            </column>
+            <column name="request_auth_step_result" type="varchar(32)" />
+            <column name="response_priority" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="response_auth_method" type="varchar(32)">
+                <constraints foreignKeyName="step_response_auth_method_fk" referencedTableName="ns_auth_method" referencedColumnNames="auth_method" />
+            </column>
+            <column name="response_result" type="varchar(32)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="19" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_application"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_application</comment>
+        <createTable tableName="ns_application">
+            <column name="application_id" type="integer" remarks="Next Step application ID (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="varchar(256)" remarks="Application name used for identification.">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(256)" remarks="Description of the application." />
+            <column name="status" type="varchar(32)" remarks="Application status: ACTIVE, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when application was created." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when application was last updated." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_credential_policy"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_credential_policy</comment>
+        <createTable tableName="ns_credential_policy" remarks="Table ns_credential_policy stores credential policies.">
+            <column name="credential_policy_id" type="integer" remarks="Credential policy ID (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="varchar(256)" remarks="Credential policy name used for identification.">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(256)" remarks="Description of the credential policy.">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="varchar(32)" remarks="Credential policy status: ACTIVE, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="username_length_min" type="integer" remarks="Minimum length of username." />
+            <column name="username_length_max" type="integer" remarks="Maximum length of username." />
+            <column name="username_allowed_pattern" type="varchar(256)" remarks="Allowed pattern for username (regular expression)." />
+            <column name="credential_length_min" type="integer" remarks="Minimum length of credential value." />
+            <column name="credential_length_max" type="integer" remarks="Maximum length of credential value." />
+            <column name="limit_soft" type="integer" remarks="Soft limit of failed attempts." />
+            <column name="limit_hard" type="integer" remarks="Hard limit of failed attempts." />
+            <column name="check_history_count" type="integer" defaultValue="0" remarks="Number of historical credential values to check.">
+                <constraints nullable="false" />
+            </column>
+            <column name="rotation_enabled" type="boolean" defaultValueBoolean="false" remarks="Whether credential rotation is enabled.">
+                <constraints nullable="false" />
+            </column>
+            <column name="rotation_days" type="integer" remarks="Number of days for credential rotation." />
+            <column name="credential_temp_expiration" type="integer" remarks="Expiration time of TEMPORARY credentials in seconds." />
+            <column name="username_gen_algorithm" type="varchar(256)" defaultValue="DEFAULT" remarks="Algorithm used for generating the username.">
+                <constraints nullable="false" />
+            </column>
+            <column name="username_gen_param" type="varchar(4000)" remarks="Parameters used when generating the username.">
+                <constraints nullable="false" />
+            </column>
+            <column name="credential_gen_algorithm" type="varchar(256)" defaultValue="DEFAULT" remarks="Algorithm used for generating the credential.">
+                <constraints nullable="false" />
+            </column>
+            <column name="credential_gen_param" type="varchar(4000)" remarks="Parameters used when generating the credential.">
+                <constraints nullable="false" />
+            </column>
+            <column name="credential_val_param" type="varchar(4000)" remarks="Parameters used when validating the credential.">
+                <constraints nullable="false" />
+            </column>
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when policy was created." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when policy was last updated." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="21" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_otp_policy"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_otp_policy</comment>
+        <createTable tableName="ns_otp_policy" remarks="Table ns_otp_policy stores one time password policies.">
+            <column name="otp_policy_id" type="integer" remarks="One time password policy ID (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="varchar(256)" remarks="One time password policy name used for identification.">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(256)" remarks="Description of the one time password policy." />
+            <column name="status" type="varchar(32)" remarks="One time password policy status: ACTIVE, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="length" type="integer" remarks="One time password length.">
+                <constraints nullable="false" />
+            </column>
+            <column name="attempt_limit" type="integer" remarks="Maximum number of authentication attempts." />
+            <column name="expiration_time" type="integer" remarks="One time password expiration time." />
+            <column name="gen_algorithm" type="varchar(256)" defaultValue="DEFAULT" remarks="Algorithm used for generating the one time password.">
+                <constraints nullable="false" />
+            </column>
+            <column name="gen_param" type="varchar(4000)" remarks="Parameters used when generating the OTP.">
+                <constraints nullable="false" />
+            </column>
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when policy was created." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when policy was last updated." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="22" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_user_identity"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_user_identity</comment>
+        <createTable tableName="ns_user_identity" remarks="Table ns_user_identity stores user identities.">
+            <column name="user_id" type="varchar(256)" remarks="User identity identifier (not autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="status" type="varchar(32)" remarks="User identity status: ACTIVE, BLOCKED, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="extras" type="text" remarks="Extra attributes with data related to user identity." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when user identity was created." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when user identity was last updated." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="23" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_user_contact"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_user_contact</comment>
+        <createTable tableName="ns_user_contact" remarks="Table ns_user_contact stores contact information for user identities.">
+            <column name="user_contact_id" type="integer" remarks="User contact identifier (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="user_id" type="varchar(256)" remarks="User identity identifier.">
+                <constraints nullable="false" foreignKeyName="ns_user_contact_fk" referencedTableName="ns_user_identity" referencedColumnNames="user_id" />
+            </column>
+            <column name="name" type="varchar(256)" remarks="User contact name used for identification.">
+                <constraints nullable="false" />
+            </column>
+            <column name="type" type="varchar(32)" remarks="User contact type: PHONE, EMAIL, OTHER.">
+                <constraints nullable="false" />
+            </column>
+            <column name="value" type="varchar(256)" remarks="User contact value.">
+                <constraints nullable="false" />
+            </column>
+            <column name="is_primary" type="boolean" defaultValueBoolean="false" remarks="Whether contact is primary.">
+                <constraints nullable="false" />
+            </column>
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when contact was created." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when contact was last updated." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="24" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_user_identity_history"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_user_identity_history</comment>
+        <createTable tableName="ns_user_identity_history" remarks="Table ns_user_identity stores history for user identities.">
+            <column name="user_identity_history_id" type="integer" remarks="User identity history identifier (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="user_id" type="varchar(256)" remarks="User identity identifier.">
+                <constraints nullable="false" foreignKeyName="ns_user_identity_history_fk" referencedTableName="ns_user_identity" referencedColumnNames="user_id" />
+            </column>
+            <column name="status" type="varchar(32)" remarks="User identity status: ACTIVE, BLOCKED, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="roles" type="varchar(256)" remarks="Assigned user roles." />
+            <column name="extras" type="text" remarks="Extra attributes with data related to user identity." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when user identity snapshot was created." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="25" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_role"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_role</comment>
+        <createTable tableName="ns_role" remarks="Table ns_role stores user role definitions.">
+            <column name="role_id" type="integer" remarks="Role identifier (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="varchar(256)" remarks="Role name used for identification.">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(256)" remarks="Description of role." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when role was created." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when role was last updated." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="26" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_user_role"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_user_role</comment>
+        <createTable tableName="ns_user_role" remarks="Table ns_user_role stores assignment of roles to user identities.">
+            <column name="user_role_id" type="integer" remarks="User role identifier (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="user_id" type="varchar(256)" remarks="User identity identifier.">
+                <constraints nullable="false" foreignKeyName="ns_role_identity_fk" referencedTableName="ns_user_identity" referencedColumnNames="user_id" />
+            </column>
+            <column name="role_id" type="integer" remarks="Role identifier.">
+                <constraints nullable="false" foreignKeyName="ns_user_role_fk" referencedTableName="ns_role" referencedColumnNames="role_id" />
+            </column>
+            <column name="status" type="varchar(32)" remarks="User role status: ACTIVE, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when user role was created." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when user role was last updated." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="27" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_user_alias"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_user_alias</comment>
+        <createTable tableName="ns_user_alias" remarks="Table ns_user_alias stores user aliases.">
+            <column name="user_alias_id" type="integer" remarks="User alias identifier (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="user_id" type="varchar(256)" remarks="User identity identifier.">
+                <constraints nullable="false" foreignKeyName="ns_user_alias_fk" referencedTableName="ns_user_identity" referencedColumnNames="user_id" />
+            </column>
+            <column name="name" type="varchar(256)" remarks="User alias name used for identification.">
+                <constraints nullable="false" />
+            </column>
+            <column name="value" type="varchar(256)" remarks="User alias value.">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="varchar(32)" remarks="User alias status: ACTIVE, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="extras" type="text" remarks="Extra attributes with data related to user alias." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when user alias was created." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when user alias was last updated." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="28" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_hashing_config"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_hashing_config</comment>
+        <createTable tableName="ns_hashing_config" remarks="Table ns_hashing_config stores configuration of hashing algorithms.">
+            <column name="hashing_config_id" type="integer" remarks="Hashing configuration identifier (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="varchar(256)" remarks="Hashing configuration name used for identification.">
+                <constraints nullable="false" />
+            </column>
+            <column name="algorithm" type="varchar(256)" remarks="Hashing algorithm name.">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="varchar(32)" remarks="Hashing configuration status: ACTIVE, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="parameters" type="varchar(256)" remarks="Hashing algorithm parameters." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when hashing configuration was created." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when hashing configuration was last updated." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="29" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_credential_definition"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_credential_definition</comment>
+        <createTable tableName="ns_credential_definition" remarks="Table ns_credential_definition stores definitions of credentials with reference to credential policies and applications.">
+            <column name="credential_definition_id" type="integer" remarks="Credential definition identifier (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="varchar(256)" remarks="Credential definition name used for identification.">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(256)" remarks="Description of the credential definition." />
+            <column name="application_id" type="integer" remarks="Application identifier.">
+                <constraints nullable="false" foreignKeyName="ns_credential_application_fk" referencedTableName="ns_application" referencedColumnNames="application_id" />
+            </column>
+            <column name="organization_id" type="varchar(256)" remarks="Organization this credential belongs to.">
+                <constraints foreignKeyName="ns_application_organization_fk"  referencedTableName="ns_organization" referencedColumnNames="organization_id" />
+            </column>
+            <column name="credential_policy_id" type="integer" remarks="Credential policy identifier.">
+                <constraints nullable="false" foreignKeyName="ns_credential_policy_fk" referencedTableName="ns_credential_policy" referencedColumnNames="credential_policy_id" />
+            </column>
+            <column name="category" type="varchar(32)" remarks="Credential category: PASSWORD, PIN, OTHER.">
+                <constraints nullable="false" />
+            </column>
+            <column name="encryption_enabled" type="boolean" defaultValueBoolean="false" remarks="Whether encryption of stored credentials is enabled.">
+                <constraints nullable="false" />
+            </column>
+            <column name="encryption_algorithm" type="varchar(256)" remarks="Algorithm used for stored credential encryption.">
+                <constraints nullable="false" />
+            </column>
+            <column name="hashing_enabled" type="boolean" defaultValueBoolean="false" remarks="Whether credential hashing is enabled.">
+                <constraints nullable="false" />
+            </column>
+            <column name="hashing_config_id" type="integer" remarks="Algorithm used for credential hashing.">
+                <constraints foreignKeyName="ns_credential_hash_fk" referencedTableName="ns_hashing_config" referencedColumnNames="hashing_config_id" />
+            </column>
+            <column name="e2e_encryption_enabled" type="boolean" defaultValueBoolean="false" remarks="Whether end to end encryption of credential values is enabled.">
+                <constraints nullable="false" />
+            </column>
+            <column name="e2e_encryption_algorithm" type="varchar(256)" remarks="Algorithm used for end to end encryption of credential." />
+            <column name="e2e_encryption_transform" type="varchar(256)" remarks="Cipher transformation used for end to end encryption of credential." />
+            <column name="e2e_encryption_temporary" type="boolean" defaultValueBoolean="false" remarks="Whether end to end encryption of temporary credential values is enabled.">
+                <constraints nullable="false" />
+            </column>
+            <column name="data_adapter_proxy_enabled" type="boolean" defaultValueBoolean="false" remarks="Whether credential API calls should be proxied through Data Adapter.">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="varchar(32)" remarks="Credential definition status: ACTIVE, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="parameters" type="varchar(256)" remarks="Hashing algorithm parameters." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when credential definition was created." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when credential definition was last updated." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="30" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_otp_definition"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_otp_definition</comment>
+        <createTable tableName="ns_otp_definition" remarks="Table ns_otp_definition stores definitions of one time passwords with reference to credential policies and applications.">
+            <column name="otp_definition_id" type="integer" remarks="One time password definition identifier (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="varchar(256)" remarks="One time password definition name used for identification.">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(256)" remarks="Description of the one time password definition." />
+            <column name="application_id" type="integer" remarks="Application identifier.">
+                <constraints nullable="false" foreignKeyName="ns_otp_application_fk" referencedTableName="ns_application" referencedColumnNames="application_id" />
+            </column>
+            <column name="otp_policy_id" type="integer" remarks="One time password policy identifier.">
+                <constraints nullable="false" foreignKeyName="ns_otp_policy_fk" referencedTableName="ns_otp_policy" referencedColumnNames="otp_policy_id" />
+            </column>
+            <column name="encryption_enabled" type="boolean" defaultValueBoolean="false" remarks="Whether encryption of stored one time passwords is enabled.">
+                <constraints nullable="false" />
+            </column>
+            <column name="encryption_algorithm" type="varchar(256)" remarks="Algorithm used for stored one time password encryption." />
+            <column name="data_adapter_proxy_enabled" type="boolean" defaultValueBoolean="false" remarks="Whether one time password API calls should be proxied through Data Adapter.">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="varchar(32)" remarks="One time password definition status: ACTIVE, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when one time password definition was created." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when one time password definition was last updated." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="31" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_credential_storage"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_credential_storage</comment>
+        <createTable tableName="ns_credential_storage" remarks="Table ns_credential_storage stores credential values, counters and other data related to credentials.">
+            <column name="credential_id" type="varchar(256)" remarks="Credential identifier (generated by application as UUID).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="credential_definition_id" type="integer" remarks="Credential definition identifier.">
+                <constraints nullable="false" foreignKeyName="ns_credential_definition_fk" referencedTableName="ns_credential_definition" referencedColumnNames="credential_definition_id" />
+            </column>
+            <column name="user_id" type="varchar(256)" remarks="User identity identifier.">
+                <constraints nullable="false" foreignKeyName="ns_credential_user_fk" referencedTableName="ns_user_identity" referencedColumnNames="user_id" />
+            </column>
+            <column name="type" type="varchar(32)" remarks="Credential type: PERMANENT, TEMPORARY.">
+                <constraints nullable="false" />
+            </column>
+            <column name="user_name" type="varchar(256)" remarks="Username." />
+            <column name="value" type="varchar(256)" remarks="Credential value.">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="varchar(32)" remarks="Credential status: ACTIVE, BLOCKED_TEMPORARY, BLOCKED_PERMANENT, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="attempt_counter" type="integer" defaultValue="0" remarks="Attempt counter for both successful and failed attempts.">
+                <constraints nullable="false" />
+            </column>
+            <column name="failed_attempt_counter_soft" type="integer" defaultValue="0" remarks="Soft failed attempt counter.">
+                <constraints nullable="false" />
+            </column>
+            <column name="failed_attempt_counter_hard" type="integer" defaultValue="0" remarks="Hard failed attempt counter.">
+                <constraints nullable="false" />
+            </column>
+            <column name="encryption_algorithm" type="varchar(256)" remarks="Encryption algorithm used for encrypting credential value." />
+            <column name="hashing_config_id" type="integer" remarks="Hashing configuration used when credential value was hashed." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when credential was created." />
+            <column name="timestamp_expires" type="timestamp" remarks="Timestamp when credential expires." />
+            <column name="timestamp_blocked" type="timestamp" remarks="Timestamp when credential was blocked." />
+            <column name="timestamp_last_updated" type="timestamp" remarks="Timestamp when credential was last updated." />
+            <column name="timestamp_last_credential_change" type="timestamp" remarks="Timestamp when credential value was last changed." />
+            <column name="timestamp_last_username_change" type="timestamp" remarks="Timestamp when username value was last changed." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="32" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_credential_history"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_credential_history</comment>
+        <createTable tableName="ns_credential_history" remarks="Table ns_credential_history stores historical values of credentials.">
+            <column name="credential_history_id" type="integer" remarks="Credential history identifier (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="credential_definition_id" type="integer" remarks="Credential definition identifier.">
+                <constraints nullable="false" foreignKeyName="ns_credential_history_definition_fk" referencedTableName="ns_credential_definition" referencedColumnNames="credential_definition_id" />
+            </column>
+            <column name="user_id" type="varchar(256)" remarks="User identity identifier.">
+                <constraints nullable="false" foreignKeyName="ns_credential_history_user_fk" referencedTableName="ns_user_identity" referencedColumnNames="user_id" />
+            </column>
+            <column name="user_name" type="varchar(256)" remarks="Username." />
+            <column name="value" type="varchar(256)" remarks="Credential value.">
+                <constraints nullable="false" />
+            </column>
+            <column name="encryption_algorithm" type="varchar(256)" remarks="Encryption algorithm used for encrypting credential value." />
+            <column name="hashing_config_id" type="integer" remarks="Hashing configuration used when credential value was hashed." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when credential was created." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="33" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_otp_storage"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_otp_storage</comment>
+        <createTable tableName="ns_otp_storage" remarks="Table ns_otp_storage stores one time password values, counters and other data related to one time passwords.">
+            <column name="otp_id" type="varchar(256)" remarks="One time password identifier (generated by application as UUID).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="otp_definition_id" type="integer" remarks="One time password definition identifier.">
+                <constraints nullable="false" foreignKeyName="ns_otp_definition_fk" referencedTableName="ns_otp_definition" referencedColumnNames="otp_definition_id" />
+            </column>
+            <column name="user_id" type="varchar(256)" remarks="User identifier.">
+                <constraints nullable="false" />
+            </column>
+            <column name="credential_definition_id" type="integer" remarks="Credential definition identifier used when updating failed counter." />
+            <column name="operation_id" type="varchar(256)" remarks="Operation identifier." />
+            <column name="value" type="varchar(256)" remarks="One time password value." />
+            <column name="salt" type="${blob_type}" remarks="Cryptographic salt used when generating one time password." />
+            <column name="status" type="varchar(32)" remarks="One time password status: ACTIVE, USED, BLOCKED, REMOVED.">
+                <constraints nullable="false" />
+            </column>
+            <column name="otp_data" type="text" remarks="Data used for generating one time password." />
+            <column name="attempt_counter" type="integer" defaultValue="0" remarks="One time password attempt counter.">
+                <constraints nullable="false" />
+            </column>
+            <column name="failed_attempt_counter" type="integer" defaultValue="0" remarks="One time password failed attempt counter.">
+                <constraints nullable="false" />
+            </column>
+            <column name="encryption_algorithm" type="varchar(256)" remarks="Encryption algorithm used for encrypting OTP value." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when one time password was created." />
+            <column name="timestamp_verified" type="timestamp" remarks="Timestamp when one time password was verified." />
+            <column name="timestamp_blocked" type="timestamp" remarks="Timestamp when one time password was verified." />
+            <column name="timestamp_expires" type="timestamp" remarks="Timestamp when one time password expires." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="34" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_operation"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_operation</comment>
+        <createTable tableName="ns_operation" remarks="Table ns_operation stores details of Web Flow operations. Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.">
+            <column name="operation_id" type="varchar(256)" remarks="ID of a specific operation instance, random value in the UUID format or any value that external system decides to set as the operation ID when creating the operation.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="operation_name" type="varchar(32)" remarks="Name of the operation, represents a type of the operation, for example, 'login' or 'authorize_payment'.">
+                <constraints nullable="false" foreignKeyName="ns_operation_config_fk" referencedTableName="ns_operation_config" referencedColumnNames="operation_name" />
+            </column>
+            <column name="operation_data" type="text" remarks="Signing data of the operation.">
+                <constraints nullable="false" />
+            </column>
+            <column name="operation_form_data" type="text" remarks="Structured data of the operation that are displayed to the end user." />
+            <column name="application_id" type="varchar(256)" remarks="ID of the application that initiated the operation, usually OAuth 2.0 client ID." />
+            <column name="application_name" type="varchar(256)" remarks="Displayable name of the application that initiated the operation." />
+            <column name="application_description" type="varchar(256)" remarks="Displayable description of the application that initiated the operation." />
+            <column name="application_original_scopes" type="varchar(256)" remarks="Original OAuth 2.0 scopes used by the application that initiated the operation." />
+            <column name="application_extras" type="text" remarks="Any additional information related to the application that initiated the operation." />
+            <column name="user_id" type="varchar(256)" remarks="Associated user ID." />
+            <column name="organization_id" type="varchar(256)" remarks="Associated organization ID.">
+                <constraints foreignKeyName="ns_operation_organization_fk" referencedTableName="ns_organization" referencedColumnNames="organization_id" />
+            </column>
+            <column name="user_account_status" type="varchar(32)" remarks="Status of the user account while initiated the operation - ACTIVE, NOT_ACTIVE." />
+            <column name="external_operation_name" type="varchar(32)" remarks="External operation name, which can further specify the operation purpose." />
+            <column name="external_transaction_id" type="varchar(256)" remarks="External transaction ID, for example ID of a payment in a transaction system." />
+            <column name="result" type="varchar(32)" remarks="Operation result - CONTINUE, FAILED, DONE." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when this operation was created." />
+            <column name="timestamp_expires" type="timestamp" remarks="Timestamp of the expiration of the operation." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="35" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_authentication"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_authentication</comment>
+        <createTable tableName="ns_authentication" remarks="Table ns_authentication stores authentication attempts.">
+            <column name="authentication_id" type="varchar(256)" remarks="Authentication identifier (autogenerated).">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="user_id" type="varchar(256)" remarks="User identity identifier." />
+            <column name="type" type="varchar(32)" remarks="Authentication type: CREDENTIAL, OTP, CREDENTIAL_OTP.">
+                <constraints nullable="false" />
+            </column>
+            <column name="credential_id" type="varchar(256)" remarks="Credential identifier.">
+                <constraints foreignKeyName="ns_auth_credential_fk" referencedTableName="ns_credential_storage" referencedColumnNames="credential_id" />
+            </column>
+            <column name="otp_id" type="varchar(256)" remarks="One time password identifier.">
+                <constraints foreignKeyName="ns_auth_otp_fk" referencedTableName="ns_otp_storage" referencedColumnNames="otp_id" />
+            </column>
+            <column name="operation_id" type="varchar(256)" remarks="Operation identifier.">
+                <constraints foreignKeyName="ns_auth_operation_fk" referencedTableName="ns_operation" referencedColumnNames="operation_id" />
+            </column>
+            <column name="result" type="varchar(32)" remarks="Overall authentication result.">
+                <constraints nullable="false" />
+            </column>
+            <column name="result_credential" type="varchar(32)" remarks="Authentication result for credential authentication." />
+            <column name="result_otp" type="varchar(32)" remarks="Authentication result for one time password authentication." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when authentication record was created." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="36" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_operation_history"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_operation_history</comment>
+        <createTable tableName="ns_operation_history" remarks="Table ns_operation_history stores all changes of operations.">
+            <column name="operation_id" type="varchar(256)" remarks="Operation ID.">
+                <constraints primaryKey="true" foreignKeyName="ns_history_operation_fk" referencedTableName="ns_operation" referencedColumnNames="operation_id" />
+            </column>
+            <column name="result_id" type="integer" remarks="Result ordering index identifier, incrementing value, starts with 1.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="request_auth_method" type="varchar(32)" remarks="Authentication method used for the step.">
+                <constraints nullable="false" foreignKeyName="ns_history_auth_method_fk" referencedTableName="ns_auth_method" referencedColumnNames="auth_method" />
+            </column>
+            <column name="request_auth_instruments" type="varchar(256)" remarks="Which specific instruments were used for the step. Supported values are: PASSWORD, OTP_KEY, POWERAUTH_TOKEN, HW_TOKEN. There can be multiple supported instruments, they are stored encoded in JSON format." />
+            <column name="request_auth_step_result" type="varchar(32)" remarks="Authentication result: CANCELED, AUTH_METHOD_FAILED, AUTH_FAILED, CONFIRMED, AUTH_METHOD_CHOSEN, AUTH_METHOD_DOWNGRADE">
+                <constraints nullable="false" />
+            </column>
+            <column name="request_params" type="varchar(4000)" remarks="Additional request parameters." />
+            <column name="response_result" type="varchar(32)" remarks="Authentication step result: FAILED, CONTINUE, DONE.">
+                <constraints nullable="false" />
+            </column>
+            <column name="response_result_description" type="varchar(256)" remarks="Additional information about the authentication step result." />
+            <column name="response_steps" type="varchar(4000)" remarks="Information about which methods are allowed in the next step." />
+            <column name="response_timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp when the record was created." />
+            <column name="response_timestamp_expires" type="timestamp" remarks="Timestamp when the operation step should expire." />
+            <column name="chosen_auth_method" type="varchar(32)" remarks="Information about which authentication method was chosen, in case user can chose the authentication method.">
+                <constraints foreignKeyName="ns_history_chosen_method_fk" referencedTableName="ns_auth_method" referencedColumnNames="auth_method" />
+            </column>
+            <column name="mobile_token_active" type="boolean" defaultValueBoolean="false" remarks="Information about if mobile token is active during the particular authentication step, in order to show the mobile token operation at the right time.">
+                <constraints nullable="false" />
+            </column>
+            <column name="authentication_id" type="varchar(256)" remarks="Reference to the authentication record.">
+                <constraints foreignKeyName="ns_history_authentication_fk" referencedTableName="ns_authentication" referencedColumnNames="authentication_id" />
+            </column>
+            <column name="pa_operation_id" type="varchar(256)" remarks="PowerAuth operation ID for PowerAuth operations." />
+            <column name="pa_auth_context" type="varchar(256)" remarks="PowerAuth authentication context with additional details related to performed authentication." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="37" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_operation_afs"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_operation_afs</comment>
+        <createTable tableName="ns_operation_afs" remarks="Table ns_operation_afs stores AFS requests and responses.">
+            <column name="afs_action_id" type="integer" remarks="ID of the AFS action.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="operation_id" type="varchar(256)" remarks="Operation ID.">
+                <constraints nullable="false" foreignKeyName="operation_afs_fk" referencedTableName="ns_operation" referencedColumnNames="operation_id" />
+            </column>
+            <column name="request_afs_action" type="varchar(256)" remarks="Information about requested AFS action.">
+                <constraints nullable="false" />
+            </column>
+            <column name="request_step_index" type="integer" remarks="Counter within the specific operation step that is associated with AFS action, e.g. to differentiate multiple authentication attempts. Incrementing value, starts with 1.">
+                <constraints nullable="false" />
+            </column>
+            <column name="request_afs_extras" type="varchar(256)" remarks="Additional information about AFS action, typically a cookie values used in AFS system." />
+            <column name="response_afs_apply" type="boolean" defaultValueBoolean="false" remarks="Response information about if AFS was applied.">
+                <constraints nullable="false" />
+            </column>
+            <column name="response_afs_label" type="varchar(256)" remarks="Response AFS label (information about what should the application do)." />
+            <column name="response_afs_extras" type="varchar(256)" remarks="Additional information sent in AFS response." />
+            <column name="timestamp_created" type="timestamp" defaultValueDate="${now}" remarks="Timestamp this AFS action was created." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="38" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ns_user_prefs"/>
+            </not>
+        </preConditions>
+        <comment>Create a new table ns_user_prefs</comment>
+        <createTable tableName="ns_user_prefs" remarks="Table ns_user_prefs stores user preferences. Status of authentication methods is stored in this table per user (methods can be enabled or disabled).">
+            <column name="user_id" type="varchar(256)" remarks="User ID.">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="auth_method_1" type="boolean" defaultValueBoolean="false" remarks="Flag indicating if 'authentication method 1' is enabled." />
+            <column name="auth_method_2" type="boolean" defaultValueBoolean="false" remarks="Flag indicating if 'authentication method 2' is enabled." />
+            <column name="auth_method_3" type="boolean" defaultValueBoolean="false" remarks="Flag indicating if 'authentication method 3' is enabled." />
+            <column name="auth_method_4" type="boolean" defaultValueBoolean="false" remarks="Flag indicating if 'authentication method 4' is enabled." />
+            <column name="auth_method_5" type="boolean" defaultValueBoolean="false" remarks="Flag indicating if 'authentication method 5' is enabled." />
+            <column name="auth_method_1_config" type="varchar(256)" defaultValueBoolean="false" remarks="Configuration for 'authentication method 1'." />
+            <column name="auth_method_2_config" type="varchar(256)" defaultValueBoolean="false" remarks="Configuration for 'authentication method 2'." />
+            <column name="auth_method_3_config" type="varchar(256)" defaultValueBoolean="false" remarks="Configuration for 'authentication method 3'." />
+            <column name="auth_method_4_config" type="varchar(256)" defaultValueBoolean="false" remarks="Configuration for 'authentication method 4'." />
+            <column name="auth_method_5_config" type="varchar(256)" defaultValueBoolean="false" remarks="Configuration for 'authentication method 5'." />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="39" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_operation" indexName="ns_operation_pending"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_operation(user_id, result)</comment>
+        <createIndex tableName="ns_operation" indexName="ns_operation_pending">
+            <column name="user_id" />
+            <column name="result" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="40" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_operation_afs" indexName="ns_operation_afs_unique"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_operation_afs(operation_id, request_afs_action, request_step_index)</comment>
+        <createIndex tableName="ns_operation_afs" indexName="ns_operation_afs_unique" unique="true">
+            <column name="operation_id" />
+            <column name="request_afs_action" />
+            <column name="request_step_index" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="41" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_application" indexName="ns_application_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_application(name)</comment>
+        <createIndex tableName="ns_application" indexName="ns_application_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="42" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_policy" indexName="ns_credential_policy_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_credential_policy(name)</comment>
+        <createIndex tableName="ns_credential_policy" indexName="ns_credential_policy_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="43" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_otp_policy" indexName="ns_otp_policy_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_otp_policy(name)</comment>
+        <createIndex tableName="ns_otp_policy" indexName="ns_otp_policy_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="44" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_contact" indexName="ns_user_contact_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_contact(user_id)</comment>
+        <createIndex tableName="ns_user_contact" indexName="ns_user_contact_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="45" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_contact" indexName="ns_user_contact_unique"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_user_contact(user_id, name, type)</comment>
+        <createIndex tableName="ns_user_contact" indexName="ns_user_contact_unique" unique="true">
+            <column name="user_id" />
+            <column name="name" />
+            <column name="type" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="46" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_identity" indexName="ns_user_identity_status"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_identity(status)</comment>
+        <createIndex tableName="ns_user_identity" indexName="ns_user_identity_status">
+            <column name="status" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="47" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_identity" indexName="ns_user_identity_created"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_identity(timestamp_created)</comment>
+        <createIndex tableName="ns_user_identity" indexName="ns_user_identity_created">
+            <column name="timestamp_created" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="48" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_identity_history" indexName="ns_user_identity_history_user"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_identity_history(user_id)</comment>
+        <createIndex tableName="ns_user_identity_history" indexName="ns_user_identity_history_user">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="49" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_identity_history" indexName="ns_user_identity_history_created"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_identity_history(timestamp_created)</comment>
+        <createIndex tableName="ns_user_identity_history" indexName="ns_user_identity_history_created">
+            <column name="timestamp_created" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="50" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_role" indexName="ns_role_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_role(name)</comment>
+        <createIndex tableName="ns_role" indexName="ns_role_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="51" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_role" indexName="ns_user_role_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_role(user_id)</comment>
+        <createIndex tableName="ns_user_role" indexName="ns_user_role_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="52" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_role" indexName="ns_user_role_role_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_role(role_id)</comment>
+        <createIndex tableName="ns_user_role" indexName="ns_user_role_role_id">
+            <column name="role_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="53" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_alias" indexName="ns_user_alias_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_user_alias(user_id)</comment>
+        <createIndex tableName="ns_user_alias" indexName="ns_user_alias_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="54" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_definition" indexName="ns_credential_definition_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_credential_definition(name)</comment>
+        <createIndex tableName="ns_credential_definition" indexName="ns_credential_definition_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="55" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_otp_definition" indexName="ns_otp_definition_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_otp_definition(name)</comment>
+        <createIndex tableName="ns_otp_definition" indexName="ns_otp_definition_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="56" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_storage" indexName="ns_credential_storage_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_credential_storage(user_id)</comment>
+        <createIndex tableName="ns_credential_storage" indexName="ns_credential_storage_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="57" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_storage" indexName="ns_credential_storage_status"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_credential_storage(status)</comment>
+        <createIndex tableName="ns_credential_storage" indexName="ns_credential_storage_status">
+            <column name="status" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="58" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_storage" indexName="ns_credential_storage_query1"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_credential_storage(credential_definition_id, user_name)</comment>
+        <createIndex tableName="ns_credential_storage" indexName="ns_credential_storage_query1" unique="true">
+            <column name="credential_definition_id" />
+            <column name="user_name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="59" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_storage" indexName="ns_credential_storage_query2"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_credential_storage(user_id, credential_definition_id)</comment>
+        <createIndex tableName="ns_credential_storage" indexName="ns_credential_storage_query2" unique="true">
+            <column name="user_id" />
+            <column name="credential_definition_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="60" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_storage" indexName="ns_credential_storage_query3"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_credential_storage(credential_definition_id, status)</comment>
+        <createIndex tableName="ns_credential_storage" indexName="ns_credential_storage_query3">
+            <column name="credential_definition_id" />
+            <column name="status" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="61" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_credential_history" indexName="ns_credential_history_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_credential_history(user_id)</comment>
+        <createIndex tableName="ns_credential_history" indexName="ns_credential_history_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="62" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_otp_storage" indexName="ns_otp_storage_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_otp_storage(user_id)</comment>
+        <createIndex tableName="ns_otp_storage" indexName="ns_otp_storage_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="63" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_otp_storage" indexName="ns_otp_storage_user_id_status"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_otp_storage(user_id, status)</comment>
+        <createIndex tableName="ns_otp_storage" indexName="ns_otp_storage_user_id_status">
+            <column name="user_id" />
+            <column name="status" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="64" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_otp_storage" indexName="ns_otp_storage_operation_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_otp_storage(operation_id)</comment>
+        <createIndex tableName="ns_otp_storage" indexName="ns_otp_storage_operation_id">
+            <column name="operation_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="65" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_authentication" indexName="ns_authentication_user_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_authentication(user_id)</comment>
+        <createIndex tableName="ns_authentication" indexName="ns_authentication_user_id">
+            <column name="user_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="66" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_authentication" indexName="ns_authentication_operation_id"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_authentication(operation_id)</comment>
+        <createIndex tableName="ns_authentication" indexName="ns_authentication_operation_id">
+            <column name="operation_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="67" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_authentication" indexName="ns_authentication_timestamp_created"/>
+            </not>
+        </preConditions>
+        <comment>Create a new index ns_authentication(timestamp_created)</comment>
+        <createIndex tableName="ns_authentication" indexName="ns_authentication_timestamp_created">
+            <column name="timestamp_created" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="68" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_hashing_config" indexName="ns_hashing_config_name"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_hashing_config(name)</comment>
+        <createIndex tableName="ns_hashing_config" indexName="ns_hashing_config_name" unique="true">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="69" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_alias" indexName="ns_user_alias_unique"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_user_alias(user_id, name)</comment>
+        <createIndex tableName="ns_user_alias" indexName="ns_user_alias_unique" unique="true">
+            <column name="user_id" />
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="70" logicalFilePath="powerauth-nextstep/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="ns_user_role" indexName="ns_user_role_unique"/>
+            </not>
+        </preConditions>
+        <comment>Create a new unique index ns_user_role(user_id, role_id)</comment>
+        <createIndex tableName="ns_user_role" indexName="ns_user_role_unique" unique="true">
+            <column name="user_id" />
+            <column name="role_id" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

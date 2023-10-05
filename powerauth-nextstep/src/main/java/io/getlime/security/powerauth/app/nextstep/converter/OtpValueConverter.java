@@ -17,7 +17,6 @@
  */
 package io.getlime.security.powerauth.app.nextstep.converter;
 
-import com.google.common.io.BaseEncoding;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpDefinitionEntity;
 import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
@@ -38,6 +37,7 @@ import javax.crypto.SecretKey;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 
 /**
  * Converter for OTP value which handles key encryption and decryption in case it is configured.
@@ -77,11 +77,10 @@ public class OtpValueConverter {
      */
     public String fromDBValue(OtpValue otpValue, String otpId, OtpDefinitionEntity otpDefinition) throws InvalidConfigurationException, EncryptionException {
         switch (otpValue.getEncryptionAlgorithm()) {
-
-            case NO_ENCRYPTION:
+            case NO_ENCRYPTION -> {
                 return otpValue.getValue();
-
-            case AES_HMAC:
+            }
+            case AES_HMAC -> {
                 final String masterDbEncryptionKeyBase64 = configuration.getMasterDbEncryptionKey();
 
                 // In case master DB encryption key does not exist, do not encrypt the server private key
@@ -90,13 +89,13 @@ public class OtpValueConverter {
                 }
 
                 // Convert master DB encryption key
-                final SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(BaseEncoding.base64().decode(masterDbEncryptionKeyBase64));
+                final SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(Base64.getDecoder().decode(masterDbEncryptionKeyBase64));
 
                 // Derive secret key from master DB encryption key, userId and activationId
                 final SecretKey secretKey = deriveSecretKey(masterDbEncryptionKey, otpId, otpDefinition.getName());
 
                 // Base64-decode credential value
-                final byte[] credentialValueBytes = BaseEncoding.base64().decode(otpValue.getValue());
+                final byte[] credentialValueBytes = Base64.getDecoder().decode(otpValue.getValue());
 
                 // IV is present in first 16 bytes
                 final byte[] iv = Arrays.copyOfRange(credentialValueBytes, 0, 16);
@@ -111,9 +110,8 @@ public class OtpValueConverter {
                 } catch (Exception ex) {
                     throw new EncryptionException(ex);
                 }
-
-            default:
-                throw new InvalidConfigurationException("Unsupported encryption algorithm: " + otpValue.getEncryptionAlgorithm());
+            }
+            default -> throw new InvalidConfigurationException("Unsupported encryption algorithm: " + otpValue.getEncryptionAlgorithm());
         }
 
     }
@@ -134,11 +132,10 @@ public class OtpValueConverter {
         }
 
         switch (otpDefinition.getEncryptionAlgorithm()) {
-
-            case NO_ENCRYPTION:
+            case NO_ENCRYPTION -> {
                 return new OtpValue(EncryptionAlgorithm.NO_ENCRYPTION, otpValue);
-
-            case AES_HMAC:
+            }
+            case AES_HMAC -> {
                 final String masterDbEncryptionKeyBase64 = configuration.getMasterDbEncryptionKey();
 
                 // In case master DB encryption key does not exist, do not encrypt the server private key
@@ -147,11 +144,10 @@ public class OtpValueConverter {
                 }
 
                 // Convert master DB encryption key
-                final SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(BaseEncoding.base64().decode(masterDbEncryptionKeyBase64));
+                final SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(Base64.getDecoder().decode(masterDbEncryptionKeyBase64));
 
                 // Derive secret key from master DB encryption key, userId and activationId
                 final SecretKey secretKey = deriveSecretKey(masterDbEncryptionKey, otpId, otpDefinition.getName());
-
                 try {
                     // Generate random IV
                     final byte[] iv = keyGenerator.generateRandomBytes(16);
@@ -166,16 +162,15 @@ public class OtpValueConverter {
                     final byte[] record = baos.toByteArray();
 
                     // Base64-encode output
-                    final String encoded = BaseEncoding.base64().encode(record);
+                    final String encoded = Base64.getEncoder().encodeToString(record);
 
                     // Return encrypted record including encryption algorithm
                     return new OtpValue(EncryptionAlgorithm.AES_HMAC, encoded);
                 } catch (Exception ex) {
                     throw new EncryptionException(ex);
                 }
-
-            default:
-                throw new InvalidConfigurationException("Unsupported encryption algorithm: " + otpDefinition.getEncryptionAlgorithm());
+            }
+            default -> throw new InvalidConfigurationException("Unsupported encryption algorithm: " + otpDefinition.getEncryptionAlgorithm());
         }
 
     }

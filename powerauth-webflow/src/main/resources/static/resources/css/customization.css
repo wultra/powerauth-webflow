@@ -89,14 +89,13 @@ a:hover, a:active, a:focus {
     margin: 30px auto;
 }
 
-#lang a {
+#lang .menu-flags-button {
     color: white;
-    text-decoration: underline;
+    background:transparent;
 }
 
-#lang a:hover {
-    color: white !important;
-    text-decoration: none;
+#lang ul {
+    background:transparent;
 }
 
 #operation .operation-approve h3 {

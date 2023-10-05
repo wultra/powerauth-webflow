@@ -33,13 +33,12 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCredentia
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 /**
  * REST controller for credential definitions.
@@ -80,7 +79,7 @@ public class CredentialDefinitionController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_ALREADY_EXISTS, APPLICATION_NOT_FOUND, HASHING_CONFIG_NOT_FOUND, CREDENTIAL_POLICY_NOT_FOUND, ORGANIZATION_NOT_FOUND"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public ObjectResponse<CreateCredentialDefinitionResponse> createCredentialDefinition(@Valid @RequestBody ObjectRequest<CreateCredentialDefinitionRequest> request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException, OrganizationNotFoundException {
         logger.info("Received createCredentialDefinition request, credential definition name: {}", request.getRequestObject().getCredentialDefinitionName());
         final CreateCredentialDefinitionResponse response = credentialDefinitionService.createCredentialDefinition(request.getRequestObject());
@@ -104,7 +103,7 @@ public class CredentialDefinitionController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND, APPLICATION_NOT_FOUND, HASHING_CONFIG_NOT_FOUND, CREDENTIAL_POLICY_NOT_FOUND, ORGANIZATION_NOT_FOUND"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.PUT)
+    @PutMapping
     public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinition(@Valid @RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException, OrganizationNotFoundException {
         logger.info("Received updateCredentialDefinition request, credential definition name: {}", request.getRequestObject().getCredentialDefinitionName());
         final UpdateCredentialDefinitionResponse response = credentialDefinitionService.updateCredentialDefinition(request.getRequestObject());
@@ -128,7 +127,7 @@ public class CredentialDefinitionController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND, APPLICATION_NOT_FOUND, HASHING_CONFIG_NOT_FOUND, CREDENTIAL_POLICY_NOT_FOUND, ORGANIZATION_NOT_FOUND"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @PostMapping("update")
     public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinitionPost(@Valid @RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException, OrganizationNotFoundException {
         logger.info("Received updateCredentialDefinitionPost request, credential definition name: {}", request.getRequestObject().getCredentialDefinitionName());
         final UpdateCredentialDefinitionResponse response = credentialDefinitionService.updateCredentialDefinition(request.getRequestObject());
@@ -147,7 +146,7 @@ public class CredentialDefinitionController {
             @ApiResponse(responseCode = "400", description = "Invalid request"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ObjectResponse<GetCredentialDefinitionListResponse> getCredentialDefinitionList(@RequestParam boolean includeRemoved) {
         GetCredentialDefinitionListRequest request = new GetCredentialDefinitionListRequest();
         request.setIncludeRemoved(includeRemoved);
@@ -168,7 +167,7 @@ public class CredentialDefinitionController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "list", method = RequestMethod.POST)
+    @PostMapping("list")
     public ObjectResponse<GetCredentialDefinitionListResponse> getCredentialDefinitionListPost(@Valid @RequestBody ObjectRequest<GetCredentialDefinitionListRequest> request) {
         logger.info("Received getCredentialDefinitionListPost request");
         final GetCredentialDefinitionListResponse response = credentialDefinitionService.getCredentialDefinitionList(request.getRequestObject());
@@ -188,7 +187,7 @@ public class CredentialDefinitionController {
             @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping("delete")
     public ObjectResponse<DeleteCredentialDefinitionResponse> deleteCredentialDefinition(@Valid @RequestBody ObjectRequest<DeleteCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException {
         logger.info("Received deleteCredentialDefinition request, credential definition name: {}", request.getRequestObject().getCredentialDefinitionName());
         final DeleteCredentialDefinitionResponse response = credentialDefinitionService.deleteCredentialDefinition(request.getRequestObject());

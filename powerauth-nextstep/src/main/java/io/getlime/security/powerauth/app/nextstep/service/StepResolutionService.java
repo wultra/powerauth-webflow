@@ -328,7 +328,7 @@ public class StepResolutionService {
      * @param stepDefinitions step definitions
      */
     private void sortSteps(List<StepDefinitionEntity> stepDefinitions) {
-        Collections.sort(stepDefinitions, Comparator.comparing(StepDefinitionEntity::getResponsePriority));
+        stepDefinitions.sort(Comparator.comparing(StepDefinitionEntity::getResponsePriority));
     }
 
     /**
@@ -383,11 +383,8 @@ public class StepResolutionService {
             }
         }
         // check whether authMethod supports check of authorization failure count
-        final Optional<AuthMethodEntity> authMethodEntityOptional = authMethodRepository.findByAuthMethod(authMethod);
-        if (!authMethodEntityOptional.isPresent()) {
-            throw new AuthMethodNotFoundException("Authentication method not found: " + authMethod);
-        }
-        final AuthMethodEntity authMethodEntity = authMethodEntityOptional.get();
+        final AuthMethodEntity authMethodEntity = authMethodRepository.findByAuthMethod(authMethod).orElseThrow(() ->
+                new AuthMethodNotFoundException("Authentication method not found: " + authMethod));
         if (authMethodEntity.getCheckAuthFails()) {
             // count failures
             int failureCount = 0;
@@ -420,7 +417,7 @@ public class StepResolutionService {
         final AuthMethod authMethod = currentOperationHistory.getRequestAuthMethod();
         // check whether authMethod supports check of authorization failure count
         final Optional<AuthMethodEntity> authMethodEntityOptional = authMethodRepository.findByAuthMethod(authMethod);
-        if (!authMethodEntityOptional.isPresent()) {
+        if (authMethodEntityOptional.isEmpty()) {
             return null;
         }
         // in case authentication method previously failed, it is already failed

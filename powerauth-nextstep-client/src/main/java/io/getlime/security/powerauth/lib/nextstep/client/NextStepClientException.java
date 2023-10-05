@@ -91,11 +91,10 @@ public class NextStepClientException extends Exception {
      */
     public Error getError() {
         final Throwable cause = getCause();
-        if (!(cause instanceof RestClientException)) {
+        if (!(cause instanceof final RestClientException ex)) {
             final String message = cause != null ? cause.getMessage() : "General error without explicit cause";
             return new Error(Error.Code.ERROR_GENERIC, message);
         }
-        final RestClientException ex = (RestClientException) cause;
         if (ex.getErrorResponse() == null) {
             logger.trace("Wultra Java Core lib did not parse ErrorResponse for {}", ex.getResponse());
             try {
@@ -103,16 +102,19 @@ public class NextStepClientException extends Exception {
                 ErrorResponse errorResponse = objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).readValue(ex.getResponse(), ErrorResponse.class);
                 if (errorResponse != null && errorResponse.getResponseObject() != null) {
                     switch (errorResponse.getResponseObject().getCode()) {
-                        case "CREDENTIAL_VALIDATION_FAILED":
-                            ObjectResponse<CredentialValidationError> validationErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<ObjectResponse<CredentialValidationError>>(){});
+                        case "CREDENTIAL_VALIDATION_FAILED" -> {
+                            ObjectResponse<CredentialValidationError> validationErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<>() {
+                            });
                             return validationErrorResponse.getResponseObject();
-
-                        case "REQUEST_VALIDATION_FAILED":
-                            ObjectResponse<ExtendedError> extendedErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<ObjectResponse<ExtendedError>>(){});
+                        }
+                        case "REQUEST_VALIDATION_FAILED" -> {
+                            ObjectResponse<ExtendedError> extendedErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<>() {
+                            });
                             return extendedErrorResponse.getResponseObject();
-
-                        default:
+                        }
+                        default -> {
                             return null;
+                        }
                     }
                 }
             } catch (JsonProcessingException ex2) {

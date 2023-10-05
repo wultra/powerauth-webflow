@@ -44,12 +44,12 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResult
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.OperationSessionEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -135,9 +135,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
-     * Create a new implicit login operation based on the OAuth 2.0 scopes.
-     * @param clientId OAuth 2.0 Client ID.
-     * @param scopes OAuth 2.0 Scopes
+     * Create a new implicit login operation based on the OAuth 2.1 scopes.
+     * @param clientId OAuth 2.1 Client ID.
+     * @param scopes OAuth 2.1 Scopes
      * @return Information about a new operation.
      * @throws CommunicationFailedException In case the communication with data adapter fails.
      */
@@ -533,16 +533,16 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
             // TODO: Allow passing custom parameters
             switch (authOperationResponse.getAuthResult()) {
-                case DONE: {
+                case DONE -> {
                     return provider.doneAuthentication(userId);
                 }
-                case FAILED: {
+                case FAILED -> {
                     return provider.failedAuthentication(userId, authOperationResponse.getResultDescription());
                 }
-                case CONTINUE: {
+                case CONTINUE -> {
                     return provider.continueAuthentication(authOperationResponse.getOperationId(), userId, authOperationResponse.getSteps());
                 }
-                default: {
+                default -> {
                     return provider.failedAuthentication(userId, "error.unknown");
                 }
             }
@@ -550,15 +550,15 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             Error nextStepError = ex.getError();
             if (nextStepError != null) {
                 switch (nextStepError.getCode()) {
-                    case OperationAlreadyFinishedException.CODE:
-                        // Translate Next Step exception for update of a finished operation
-                        throw new OperationIsAlreadyFinished(ex.getMessage());
-                    case OperationAlreadyCanceledException.CODE:
-                        // Translate Next Step exception for update of a canceled operation
-                        throw new OperationIsAlreadyCanceledException(ex.getMessage());
-                    case OperationAlreadyFailedException.CODE:
-                        // Translate Next Step exception for update of a failed operation
-                        throw new OperationIsAlreadyFailedException(ex.getMessage());
+                    case OperationAlreadyFinishedException.CODE ->
+                            // Translate Next Step exception for update of a finished operation
+                            throw new OperationIsAlreadyFinished(ex.getMessage());
+                    case OperationAlreadyCanceledException.CODE ->
+                            // Translate Next Step exception for update of a canceled operation
+                            throw new OperationIsAlreadyCanceledException(ex.getMessage());
+                    case OperationAlreadyFailedException.CODE ->
+                            // Translate Next Step exception for update of a failed operation
+                            throw new OperationIsAlreadyFailedException(ex.getMessage());
                 }
             }
             // Generic Next Step error

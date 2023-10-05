@@ -73,17 +73,9 @@ Copy "ojdbc-[version].jar" to "/opt/tomcat/lib" folder, so that the Oracle DB co
 
 https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc8
 
-#### MySQL:
-
-Copy "mysql-connector-java-[version].jar" to "/opt/tomcat/lib" folder, so that the MySQL DB connector is on classpath. You can get the required JAR here:
-
-https://mvnrepository.com/artifact/mysql/mysql-connector-java
-
 #### PostgreSQL:
 
-Copy "mysql-connector-java-[version].jar" to "/opt/tomcat/lib" folder, so that the MySQL DB connector is on classpath. You can get the required JAR here:
-
-https://mvnrepository.com/artifact/org.postgresql/postgresql
+PostgreSQL JDBC driver is already included in the WAR files.
 
 #### Other databases
 
@@ -94,14 +86,6 @@ Find the JDBC client driver for the database and install it using similar steps 
 Edit "/opt/tomcat/conf/server.xml" so that the HTTP connector has the correct IP address:
 
 `<Connector port="8080" protocol="HTTP/1.1" address="10.x.x.x" connectionTimeout="20000" redirectPort="8443" />`
-
-### Create database schema - MySQL
-
-* Create a new database or reuse an existing PowerAuth database.
-* Run the [create_schema.sql](./sql/mysql/create_schema.sql) script to create tables.
-* Run the [initial_data.sql](./sql/mysql/initial_data.sql) script to load initial data.
-
-For more details see document [Database Table Structure](./Database-Table-Structure.md).
 
 ### Create database schema - Oracle
 
@@ -281,7 +265,7 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
 
-    <!-- PowerAuth OAuth 2.0 API Config -->
+    <!-- PowerAuth OAuth 2.1 API Config -->
     <Parameter name="powerauth.webflow.service.url" value="http://10.x.x.x:8080/powerauth-webflow"/>
     <Parameter name="powerauth.webflow.service.oauth.authorizeUrl" value="http://10.x.x.x:8080/powerauth-webflow/oauth/authorize"/>
     <Parameter name="powerauth.webflow.service.oauth.tokenUrl" value="http://10.x.x.x:8080/powerauth-webflow/oauth/token"/>

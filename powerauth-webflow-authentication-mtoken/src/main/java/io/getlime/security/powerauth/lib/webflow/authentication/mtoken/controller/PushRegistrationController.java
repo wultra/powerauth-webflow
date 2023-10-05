@@ -35,9 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -56,7 +56,7 @@ public class PushRegistrationController {
 
     /**
      * Controller constructor.
-     * @param pushServerClient PowerAuth 2.0 Push server client.
+     * @param pushServerClient PowerAuth Push server client.
      */
     @Autowired
     public PushRegistrationController(PushServerClient pushServerClient) {
@@ -71,7 +71,7 @@ public class PushRegistrationController {
      * @throws PowerAuthAuthenticationException Thrown when PowerAuth authentication fails.
      * @throws MobileAppApiException Thrown when registration fails.
      */
-    @RequestMapping(value = "/device/register/signature", method = RequestMethod.POST)
+    @PostMapping("/device/register/signature")
     @PowerAuth(resourceId = "/device/register/signature", signatureType = {PowerAuthSignatureTypes.POSSESSION})
     public @ResponseBody Response registerDevice(@RequestBody ObjectRequest<PushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, MobileAppApiException {
         return registerDeviceImpl(request, apiAuthentication);
@@ -85,7 +85,7 @@ public class PushRegistrationController {
      * @throws PowerAuthAuthenticationException Thrown when PowerAuth authentication fails.
      * @throws MobileAppApiException Thrown when registration fails.
      */
-    @RequestMapping(value = "/device/register/token", method = RequestMethod.POST)
+    @PostMapping("/device/register/token")
     @PowerAuthToken(signatureType = {
             PowerAuthSignatureTypes.POSSESSION,
             PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
@@ -104,7 +104,7 @@ public class PushRegistrationController {
      * @throws PowerAuthAuthenticationException Thrown when PowerAuth authentication fails.
      * @throws MobileAppApiException Thrown when registration fails.
      */
-    @RequestMapping(value = "/device/register", method = RequestMethod.POST)
+    @PostMapping("/device/register")
     @PowerAuthToken(signatureType = {
             PowerAuthSignatureTypes.POSSESSION,
             PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
