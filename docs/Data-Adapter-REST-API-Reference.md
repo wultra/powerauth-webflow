@@ -21,10 +21,10 @@ Following topics are covered in this chapter:
 - [Verify authorization SMS code](#verify-authorization-sms-code)
 - [Verify authorization SMS code and password](#verify-authorization-sms-code-and-password)
 - [Verify a client TLS certificate](#verify-a-client-tls-certificate)
-- [Initialize OAuth 2.1 consent form](#initialize-oauth-20-consent-form)
-- [Create OAuth 2.1 consent form](#create-oauth-20-consent-form)
-- [Validate OAuth 2.1 consent form](#validate-oauth-20-consent-form)
-- [Save OAuth 2.1 consent form](#save-oauth-20-consent-form)
+- [Initialize OAuth 2.1 consent form](#initialize-oauth-21-consent-form)
+- [Create OAuth 2.1 consent form](#create-oauth-21-consent-form)
+- [Validate OAuth 2.1 consent form](#validate-oauth-21-consent-form)
+- [Save OAuth 2.1 consent form](#save-oauth-21-consent-form)
 - [Execute an AFS action](#execute-an-afs-action)
 
 You can access the generated REST API documentation in deployed Data Adapter:
