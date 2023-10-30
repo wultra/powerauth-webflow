@@ -6,7 +6,6 @@
 
 ### Standalone Run
 
-- Enable maven profile `standalone`
 - Use IntelliJ Idea run configuration at `../.run/PowerAuthWebFlowApplication.run.xml`
 - Open [http://localhost:9080/powerauth-webflow/actuator/health](http://localhost:9080/powerauth-webflow/actuator/health) and you should get `{"status":"UP"}`
 
@@ -29,7 +28,6 @@ liquibase --changelog-file=./docs/db/changelog/changesets/powerauth-webflow/db.c
 
 ### Standalone Run
 
-- Enable maven profile `standalone`
 - Use IntelliJ Idea run configuration at `../.run/TppEngineApplication.run.xml`
 - Open [http://localhost:9081/tpp-engine/actuator/health](http://localhost:9081/tpp-engine/actuator/health) and you should get `{"status":"UP"}`
 
@@ -52,7 +50,6 @@ liquibase --changelog-file=./docs/db/changelog/changesets/powerauth-tpp-engine/d
 
 ### Standalone Run
 
-- Enable maven profile `standalone`
 - Use IntelliJ Idea run configuration at `../.run/NextStepApplication.run.xml`
 - Open [http://localhost:9082/powerauth-nextstep/actuator/health](http://localhost:9082/powerauth-nextstep/actuator/health) and you should get `{"status":"UP"}`
 
@@ -85,6 +82,5 @@ ALTER TABLE ns_authentication ADD CONSTRAINT ns_auth_user_fk FOREIGN KEY (user_i
 
 ### Standalone Run
 
-- Enable maven profile `standalone`
 - Use IntelliJ Idea run configuration at `../.run/PowerAuthWebFlowClientApplication.run.xml`
 - Open [http://localhost:9083/powerauth-webflow-client/actuator/health](http://localhost:9083/powerauth-webflow-client/actuator/health) and you should get `{"status":"UP"}`
