@@ -31,6 +31,7 @@
     <name>powerauth-webflow</name>
     <description>Federated Authentication and Authorization Server for Web</description>
     <packaging>war</packaging>
+
     <dependencies>
 
         <!-- Spring Dependencies -->
