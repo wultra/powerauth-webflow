@@ -99,7 +99,7 @@
         <moneta.version>1.4.2</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
         <logstash.version>7.4</logstash.version>
-        <tomcat-embeded.version>11.0.0-M13</tomcat-embeded.version>
+        <tomcat-embeded.version>10.1.15</tomcat-embeded.version>
         <spring-boot-starter-tomcat.version>3.1.5</spring-boot-starter-tomcat.version>
 
         <!--  Wultra dependencies  -->

@@ -123,6 +123,10 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                         </exclude>
+                        <exclude>
+                            <groupId>jakarta.servlet</groupId>
+                            <artifactId>jakarta.servlet-api</artifactId>
+                        </exclude>
                     </excludes>
                 </configuration>
             </plugin>
