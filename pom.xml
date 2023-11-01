@@ -99,8 +99,6 @@
         <moneta.version>1.4.2</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
         <logstash.version>7.4</logstash.version>
-        <tomcat-embeded.version>10.1.15</tomcat-embeded.version>
-        <spring-boot-starter-tomcat.version>3.1.5</spring-boot-starter-tomcat.version>
 
         <!--  Wultra dependencies  -->
         <wultra-core.version>1.7.0</wultra-core.version>
@@ -275,13 +273,13 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-tomcat</artifactId>
-                <version>${spring-boot-starter-tomcat.version}</version>
+                <version>${project.parent.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-el</artifactId>
-                <version>${tomcat-embeded.version}</version>
+                <version>${tomcat.version}</version>
                 <scope>provided</scope>
             </dependency>
 
