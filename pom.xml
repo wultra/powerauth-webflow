@@ -91,7 +91,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <bc.version>1.76</bc.version>
+        <bcprov-jdk18on.version>1.76</bcprov-jdk18on.version>
         <zxing.version>3.5.0</zxing.version>
         <passay.version>1.6.4</passay.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.2.0</springdoc-openapi-starter-webmvc-ui.version>
@@ -246,13 +246,13 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bc.version}</version>
+                <version>${bcprov-jdk18on.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
-                <version>${bc.version}</version>
+                <version>${bcprov-jdk18on.version}</version>
             </dependency>
 
             <!-- Library for formatting monetary amounts -->
