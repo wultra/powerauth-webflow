@@ -47,7 +47,6 @@ spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.hikari.auto-commit=false
 spring.datasource.driver-class-name=org.postgresql.Driver
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
 
@@ -183,7 +182,6 @@ spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.hikari.auto-commit=false
 spring.datasource.driver-class-name=org.postgresql.Driver
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
 
@@ -284,7 +282,6 @@ spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.hikari.auto-commit=false
 spring.datasource.driver-class-name=org.postgresql.Driver
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
 
