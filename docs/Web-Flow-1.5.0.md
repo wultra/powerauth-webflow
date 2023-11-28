@@ -173,6 +173,8 @@ CREATE TABLE oauth2_registered_client (
     PRIMARY KEY (id)
 );
 
+CREATE UNIQUE INDEX client_id_unique ON oauth2_registered_client (client_id);
+
 -- Table oauth2_registered_client stores information about OAuth 2.1 consents
 -- Source: https://github.com/spring-projects/spring-authorization-server/blob/main/oauth2-authorization-server/src/main/resources/org/springframework/security/oauth2/server/authorization/oauth2-authorization-consent-schema.sql
 CREATE TABLE oauth2_authorization_consent (
