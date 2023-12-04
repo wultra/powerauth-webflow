@@ -94,7 +94,7 @@
         <bcprov-jdk18on.version>1.77</bcprov-jdk18on.version>
         <zxing.version>3.5.0</zxing.version>
         <passay.version>1.6.4</passay.version>
-        <springdoc-openapi-starter-webmvc-ui.version>2.2.0</springdoc-openapi-starter-webmvc-ui.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
         <guava.version>32.1.2-jre</guava.version>
         <moneta.version>1.4.2</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
