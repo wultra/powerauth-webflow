@@ -1,0 +1,9 @@
+ __        __   _      __ _                  ____ _ _            _
+ \ \      / /__| |__  / _| | _____      __  / ___| (_) ___ _ __ | |_
+  \ \ /\ / / _ \ '_ \| |_| |/ _ \ \ /\ / / | |   | | |/ _ \ '_ \| __|
+   \ V  V /  __/ |_) |  _| | (_) \ V  V /  | |___| | |  __/ | | | |_
+    \_/\_/ \___|_.__/|_| |_|\___/ \_/\_/    \____|_|_|\___|_| |_|\__|
+
+${AnsiColor.GREEN} :: ${banner.application.name} (${banner.application.version}) :: ${AnsiColor.GREEN}
+${AnsiColor.RED} :: Spring Boot${spring-boot.formatted-version} :: ${AnsiColor.RED}
+${AnsiColor.DEFAULT}
