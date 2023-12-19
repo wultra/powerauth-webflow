@@ -45,9 +45,9 @@ addLocaleData([
     ...enLocaleData,
     ...csLocaleData,
     ...ukLocaleData,
-    ...roLocaleData
-    ...deLocaleData
-    ...frLocaleData
+    ...roLocaleData,
+    ...deLocaleData,
+    ...frLocaleData,
     ...esLocaleData
 
 ]);
