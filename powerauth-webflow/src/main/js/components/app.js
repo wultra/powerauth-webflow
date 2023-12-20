@@ -56,7 +56,10 @@ export class App extends React.Component {
                                {"code":"en", "country" :  "US"},
                                {"code":"cs", "country" :  "CZ"},
                                {"code":"ro", "country" :  "RO"},
-                               {"code":"uk", "country" :  "UA"}
+                               {"code":"uk", "country" :  "UA"},
+                               {"code":"de", "country" :  "DE"},
+                               {"code":"fr", "country" :  "FR"},
+                               {"code":"es", "country" :  "ES"}
                              ];
     }
 

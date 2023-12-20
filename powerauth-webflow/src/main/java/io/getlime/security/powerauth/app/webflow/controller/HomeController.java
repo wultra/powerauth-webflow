@@ -192,6 +192,9 @@ public class HomeController {
         model.put("i18n_EN", i18nService.generateMessages(Locale.ENGLISH));
         model.put("i18n_UK", i18nService.generateMessages(new Locale("uk")));
         model.put("i18n_RO", i18nService.generateMessages(new Locale("ro")));
+        model.put("i18n_DE", i18nService.generateMessages(new Locale("de")));
+        model.put("i18n_FR", i18nService.generateMessages(new Locale("fr")));
+        model.put("i18n_ES", i18nService.generateMessages(new Locale("es")));
         model.put("operationHash", operationSessionService.generateOperationHash(operationId));
         model.put("showAndroidSecurityWarning", webFlowConfig.getShowAndroidSecurityWarning());
         model.put("usernameMaxLength", webFlowConfig.getUsernameMaxLength());
