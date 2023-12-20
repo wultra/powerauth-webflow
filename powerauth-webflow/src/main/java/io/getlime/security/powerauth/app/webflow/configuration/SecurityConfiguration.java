@@ -18,7 +18,6 @@
 
 package io.getlime.security.powerauth.app.webflow.configuration;
 
-import com.google.common.collect.ImmutableList;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,6 +50,7 @@ import org.springframework.web.util.UriUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -168,9 +168,9 @@ public class SecurityConfiguration {
         // Configuration of CORS for client TLS certificate validation which can be requested from another host/port
         final CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Collections.singletonList(corsAllowOrigin));
-        configuration.setAllowedMethods(ImmutableList.of("GET", "POST", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(ImmutableList.of("Content-Type", "X-CSRF-Token"));
+        configuration.setAllowedHeaders(List.of("Content-Type", "X-CSRF-Token"));
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/tls/client/login", configuration);
         source.registerCorsConfiguration("/tls/client/approve", configuration);
