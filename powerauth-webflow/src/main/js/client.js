@@ -35,19 +35,31 @@ import enLocaleData from "react-intl/locale-data/en";
 import csLocaleData from "react-intl/locale-data/cs";
 import ukLocaleData from "react-intl/locale-data/uk";
 import roLocaleData from "react-intl/locale-data/ro";
+import deLocaleData from "react-intl/locale-data/de";
+import frLocaleData from "react-intl/locale-data/fr";
+import esLocaleData from "react-intl/locale-data/es";
 
-// currently only EN and CS languages are supported
+
+// currently specific languages are supported
 addLocaleData([
     ...enLocaleData,
     ...csLocaleData,
     ...ukLocaleData,
-    ...roLocaleData
+    ...roLocaleData,
+    ...deLocaleData,
+    ...frLocaleData,
+    ...esLocaleData
+
 ]);
 const languagesMapping = [
                            {"code":"en", "country" :  "US"},
                            {"code":"cs", "country" :  "CZ"},
                            {"code":"ro", "country" :  "RO"},
-                           {"code":"uk", "country" :  "UA"}
+                           {"code":"uk", "country" :  "UA"},
+                           {"code":"de", "country" :  "DE"},
+                           {"code":"fr", "country" :  "FR"},
+                           {"code":"es", "country" :  "ES"}
+
                          ];
 
 //  check if language is supported
@@ -93,6 +105,12 @@ if (msie && msie < 9) {
         window.alert(I18N_UK.messages["browser.unsupported"]);
     } else if (lang === "ro") {
         window.alert(I18N_RO.messages["browser.unsupported"]);
+    } else if (lang === "de") {
+        window.alert(I18N_DE.messages["browser.unsupported"]);
+    } else if (lang === "fr") {
+        window.alert(I18N_FR.messages["browser.unsupported"]);
+    } else if (lang === "es") {
+        window.alert(I18N_ES.messages["browser.unsupported"]);
     }  else {
         window.alert(I18N_EN.messages["browser.unsupported"]);
     }
