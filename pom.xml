@@ -95,7 +95,7 @@
         <zxing.version>3.5.0</zxing.version>
         <passay.version>1.6.4</passay.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
-        <guava.version>32.1.3-jre</guava.version>
+        <guava.version>33.0.0-jre</guava.version>
         <moneta.version>1.4.2</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
         <logstash.version>7.4</logstash.version>
