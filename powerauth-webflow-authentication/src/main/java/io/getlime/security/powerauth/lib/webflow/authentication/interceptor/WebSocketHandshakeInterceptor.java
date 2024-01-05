@@ -17,7 +17,6 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.interceptor;
 
-import com.google.common.net.InetAddresses;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +27,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import java.net.Inet4Address;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Web Socket handshake interceptor resolves the client IP address during Web Socket handshake and stores it into
@@ -64,9 +63,9 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             String ipAddress = servletRequest.getHeader("X-FORWARDED-FOR");
             if (forceIpv4) {
                 // IPv4 logic
-                if (ipAddress == null || !isIpv4Address(ipAddress)) {
+                if (ipAddress == null || !IpAddressValidator.isIpv4Address(ipAddress)) {
                     ipAddress = servletRequest.getRemoteAddr();
-                    if (!isIpv4Address(ipAddress)) {
+                    if (!IpAddressValidator.isIpv4Address(ipAddress)) {
                         // IP address is null in case IPv4 address could not be determined, it should not be sent to AFS
                         logger.warn("IPv4 address could not be detected.");
                         ipAddress = "";
@@ -87,16 +86,38 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
                                @NonNull WebSocketHandler wsHandler, Exception exception) {
     }
 
-    /**
-     * Determine whether IP address is an IPv4 address.
-     * @param address IP address as String.
-     * @return Whether IP address is an IPv4 address.
-     */
-    private boolean isIpv4Address(String address) {
-        try {
-            return InetAddresses.forString(address) instanceof Inet4Address;
-        } catch (Exception e) {
-            return false;
+    protected static final class IpAddressValidator {
+
+        /**
+         * In this regular expression,
+         * {@code ((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b)} is a group that is repeated four times to match the four octets in an IPv4 address.
+         * <p>
+         * The following matches each octet:
+         * <ul>
+         * <li>{@code 25[0-5]} – This matches a number between 250 and 255.</li>
+         * <li>{@code (2[0-4]|1\\d|[1-9])} – This matches a number between 200 – 249, 100 – 199, and 1 – 9.</li>
+         * <li>{@code \\d} – This matches any digit (0-9).</li>
+         * <li>{@code \\.?} – This matches an optional dot(.) character.</li>
+         * <li>{@code \\b} – This is a word boundary.</li>
+         * </ul>
+         * @link <a href="https://www.baeldung.com/java-validate-ipv4-address">Validating IPv4 Address in Java</a>
+         * @implNote We avoid Guava dependency. Another dependency commons-validator is not yet introduced.
+         * More over it could be needed just only for one method.
+         */
+        private static final Pattern IPV4_PATTERN = Pattern.compile("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
+
+        private IpAddressValidator() {
+            throw new IllegalStateException("Utility class");
+        }
+
+        /**
+         * Determine whether IP address is an IPv4 address.
+         *
+         * @param address IP address as String.
+         * @return Whether IP address is an IPv4 address.
+         */
+        public static boolean isIpv4Address(final String address) {
+            return IPV4_PATTERN.matcher(address).matches();
         }
     }
 }
