@@ -104,7 +104,7 @@
 
         <!--  Wultra dependencies  -->
         <wultra-core.version>1.8.0-SNAPSHOT</wultra-core.version>
-        <powerauth.version>1.6.0-SNAPSHOT</powerauth.version>
+        <powerauth.version>1.6.0</powerauth.version>
         <powerauth-crypto.version>1.6.0-SNAPSHOT</powerauth-crypto.version>
         <powerauth-push.version>1.6.0-SNAPSHOT</powerauth-push.version>
     </properties>
