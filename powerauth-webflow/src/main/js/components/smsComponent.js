@@ -72,7 +72,7 @@ export default class SmsComponent extends React.Component {
 
     handleToggle(event) {
         if (this.state.pwdType=='password'){
-          this.setState ({pwdType: 'text'});
+            this.setState ({pwdType: 'text'});
         } else {
             this.setState ({pwdType: 'password'});
         }
