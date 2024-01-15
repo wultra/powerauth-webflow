@@ -213,7 +213,6 @@ export default class SmsComponent extends React.Component {
         this.setState({signerError: errorMessage, signedMessage: null, certificates: null, chosenCertificate: null});
     }
 
-
     render() {
        const formatMessage = this.props.intl.formatMessage;
         return (
