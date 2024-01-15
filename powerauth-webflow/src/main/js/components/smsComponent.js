@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {Button, FormControl, FormGroup} from "react-bootstrap";
+import {Button, FormControl, FormGroup, InputGroup } from "react-bootstrap";
+import { Eye, EyeSlashFill } from "react-bootstrap-icons";
 import {FormattedMessage} from "react-intl";
 import React from "react";
 import {authenticate, initializeICAClientSign} from "../actions/smsAuthActions";
@@ -36,6 +37,7 @@ export default class SmsComponent extends React.Component {
         super();
         this.handleAuthCodeChange = this.handleAuthCodeChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
+        this.handleToggle = this.handleToggle.bind(this);
         this.handleCertificateChoice = this.handleCertificateChoice.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.updateButtonState = this.updateButtonState.bind(this);
@@ -48,7 +50,7 @@ export default class SmsComponent extends React.Component {
         this.onCertificatesLoaded = this.onCertificatesLoaded.bind(this);
         this.onSignerSucceeded = this.onSignerSucceeded.bind(this);
         this.onSignerFailed = this.onSignerFailed.bind(this);
-        this.state = {authCode: '', password: '', confirmDisabled: true, signerReady: false, signerInitFailed: false, signerError: null, certificates: null, chosenCertificate: null, signedMessage: null};
+        this.state = {authCode: '', password: '', confirmDisabled: true, signerReady: false, signerInitFailed: false, signerError: null, certificates: null, chosenCertificate: null, signedMessage: null, pwdType:'password'};
     }
 
     componentDidMount() {
@@ -66,6 +68,14 @@ export default class SmsComponent extends React.Component {
 
     handlePasswordChange(event) {
         this.setState({password: event.target.value}, this.updateButtonState);
+    }
+
+    handleToggle(event) {
+        if (this.state.pwdType=='password'){
+            this.setState ({pwdType: 'text'});
+        } else {
+            this.setState ({pwdType: 'password'});
+        }
     }
 
     handleCertificateChoice(certificate) {
@@ -320,10 +330,15 @@ export default class SmsComponent extends React.Component {
                                 <FormGroup>
                                     <div className="attribute row">
                                         <div className="col-xs-12">
-                                            <FormControl id="password" autoComplete="new-password" type="password"
-                                                         value={this.state.password} onChange={this.handlePasswordChange}
-                                                         placeholder={formatMessage({id: 'loginSca.password.placeholder',defaultMessage: ' '})}
-                                                         maxLength={passwordMaxLength}/>
+                                            <InputGroup >
+                                                <FormControl id="password" autoComplete="new-password" type={this.state.pwdType}
+                                                             value={this.state.password} onChange={this.handlePasswordChange}
+                                                             placeholder={formatMessage({id: 'loginSca.password.placeholder',defaultMessage: ' '})}
+                                                             maxLength={passwordMaxLength}/>
+                                                <InputGroup.Addon onClick={this.handleToggle} class={(this.state.pwdType=='password') ? 'input-group-addon password-icon-holder password-icon-holder-close' : 'input-group-addon password-icon-holder password-icon-holder-open'} >
+                                                    {(this.state.pwdType=='password') ?  <EyeSlashFill class="password-icon-close" size="2em"/>  : <Eye class="password-icon-open" size="2em" />  }
+                                                </InputGroup.Addon>
+                                             </InputGroup>
                                         </div>
                                     </div>
                                 </FormGroup>
