@@ -119,13 +119,6 @@
             <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
         </dependency>
 
-        <!-- Upgrade Swagger Guava dependency due to CVE-2018-10237 -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

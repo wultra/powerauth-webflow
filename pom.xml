@@ -255,6 +255,19 @@
                 <version>${bcprov-jdk18on.version}</version>
             </dependency>
 
+            <!-- TODO (racansky, 2024-01-05) overriding vulnerable transitive dependency of owasp-java-html-sanitizer, https://github.com/OWASP/java-html-sanitizer/pull/295 -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+                <artifactId>owasp-java-html-sanitizer</artifactId>
+                <version>${owasp-java-html-sanitizer.version}</version>
+            </dependency>
+
             <!-- Library for formatting monetary amounts -->
             <dependency>
                 <groupId>org.javamoney.moneta</groupId>
