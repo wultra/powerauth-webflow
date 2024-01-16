@@ -8,13 +8,13 @@
 
     <groupId>io.getlime.security</groupId>
     <artifactId>powerauth-webflow-parent</artifactId>
-    <version>1.5.0</version>
+    <version>1.6.0</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.3</version>
+        <version>3.1.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -91,20 +91,22 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <bc.version>1.76</bc.version>
-        <zxing.version>3.5.0</zxing.version>
+        <bcprov-jdk18on.version>1.77</bcprov-jdk18on.version>
+        <zxing.version>3.5.2</zxing.version>
         <passay.version>1.6.4</passay.version>
-        <springdoc-openapi-starter-webmvc-ui.version>2.2.0</springdoc-openapi-starter-webmvc-ui.version>
-        <guava.version>32.1.2-jre</guava.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
+        <guava.version>33.0.0-jre</guava.version>
         <moneta.version>1.4.2</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
         <logstash.version>7.4</logstash.version>
+        <!--  TODO (racansky, 2023-12-08) temporarily override the version 1.4.11 from spring boot version because of CVE  -->
+        <logback.version>1.4.14</logback.version>
 
         <!--  Wultra dependencies  -->
-        <wultra-core.version>1.7.0</wultra-core.version>
-        <powerauth.version>1.5.0</powerauth.version>
-        <powerauth-crypto.version>1.5.1</powerauth-crypto.version>
-        <powerauth-push.version>1.5.0</powerauth-push.version>
+        <wultra-core.version>1.8.0</wultra-core.version>
+        <powerauth.version>1.6.0</powerauth.version>
+        <powerauth-crypto.version>1.6.0</powerauth-crypto.version>
+        <powerauth-push.version>1.6.0</powerauth-push.version>
     </properties>
 
     <dependencyManagement>
@@ -246,13 +248,13 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bc.version}</version>
+                <version>${bcprov-jdk18on.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
-                <version>${bc.version}</version>
+                <version>${bcprov-jdk18on.version}</version>
             </dependency>
 
             <!-- Library for formatting monetary amounts -->
@@ -268,6 +270,18 @@
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <scope>provided</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

@@ -42,7 +42,7 @@ A recent version of the Bouncy Castle library is bundled with Web Flow and Next 
 
 Unzip Tomcat to "/opt/tomcat" folder. You can download Tomcat here:
 
-[https://tomcat.apache.org/download-90.cgi](https://tomcat.apache.org/download-90.cgi)
+[https://tomcat.apache.org/download-10.cgi](https://tomcat.apache.org/download-10.cgi)
 
 Change owner of the files to "tomcat" user:
 
