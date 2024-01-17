@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="1" logicalFilePath="powerauth-nextstep/1.6.x/20240116-correct-userid-nullable.xml" author="Zdenek Cerny">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="ns_otp_storage"/>
+            <columnExists tableName="ns_otp_storage" columnName="user_id"/>
+        </preConditions>
+        <comment>Make user_id column in table ns_otp_storage nullable</comment>
+        <dropNotNullConstraint tableName="ns_otp_storage" columnName="user_id" columnDataType="varchar(255)" />
+    </changeSet>
+
+</databaseChangeLog>
