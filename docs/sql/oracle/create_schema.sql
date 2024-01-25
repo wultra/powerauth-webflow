@@ -76,6 +76,8 @@ CREATE TABLE oauth2_registered_client (
     PRIMARY KEY (id)
 );
 
+CREATE UNIQUE INDEX oauth2_client_unique ON oauth2_registered_client (client_id);
+
 -- Table oauth2_registered_client stores information about OAuth 2.1 consents
 -- Source: https://github.com/spring-projects/spring-authorization-server/blob/main/oauth2-authorization-server/src/main/resources/org/springframework/security/oauth2/server/authorization/oauth2-authorization-consent-schema.sql
 CREATE TABLE oauth2_authorization_consent (
@@ -628,7 +630,6 @@ CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id)
 CREATE INDEX ns_operation_pending ON ns_operation (user_id, result);
 CREATE UNIQUE INDEX ns_operation_afs_unique on ns_operation_afs (operation_id, request_afs_action, request_step_index);
 CREATE INDEX wf_certificate_operation ON wf_certificate_verification (operation_id);
-CREATE UNIQUE INDEX oauth2_client_unique ON oauth2_registered_client (client_id);
 CREATE UNIQUE INDEX ns_application_name ON ns_application (name);
 CREATE UNIQUE INDEX ns_credential_policy_name ON ns_credential_policy (name);
 CREATE UNIQUE INDEX ns_otp_policy_name ON ns_otp_policy (name);
