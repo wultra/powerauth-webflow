@@ -94,7 +94,11 @@
         <bcprov-jdk18on.version>1.77</bcprov-jdk18on.version>
         <zxing.version>3.5.2</zxing.version>
         <passay.version>1.6.4</passay.version>
+
+        <!-- Documentation Dependencies -->
         <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
+        <swagger-annotations-jakarta.version>2.2.20</swagger-annotations-jakarta.version>
+
         <guava.version>33.0.0-jre</guava.version>
         <moneta.version>1.4.2</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
@@ -293,6 +297,12 @@
                 <scope>provided</scope>
             </dependency>
 
+            <!-- Documentation -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger-annotations-jakarta.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
