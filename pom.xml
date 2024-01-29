@@ -100,7 +100,7 @@
         <swagger-annotations-jakarta.version>2.2.20</swagger-annotations-jakarta.version>
 
         <guava.version>33.0.0-jre</guava.version>
-        <moneta.version>1.4.2</moneta.version>
+        <moneta.version>1.4.4</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
         <logstash.version>7.4</logstash.version>
 
