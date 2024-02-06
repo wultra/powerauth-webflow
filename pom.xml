@@ -8,13 +8,13 @@
 
     <groupId>io.getlime.security</groupId>
     <artifactId>powerauth-webflow-parent</artifactId>
-    <version>1.6.0-SNAPSHOT</version>
+    <version>1.7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.5</version>
+        <version>3.2.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -91,20 +91,24 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <bc.version>1.76</bc.version>
-        <zxing.version>3.5.0</zxing.version>
+        <bcprov-jdk18on.version>1.77</bcprov-jdk18on.version>
+        <zxing.version>3.5.3</zxing.version>
         <passay.version>1.6.4</passay.version>
-        <springdoc-openapi-starter-webmvc-ui.version>2.2.0</springdoc-openapi-starter-webmvc-ui.version>
-        <guava.version>32.1.2-jre</guava.version>
-        <moneta.version>1.4.2</moneta.version>
+
+        <!-- Documentation Dependencies -->
+        <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
+        <swagger-annotations-jakarta.version>2.2.20</swagger-annotations-jakarta.version>
+
+        <guava.version>33.0.0-jre</guava.version>
+        <moneta.version>1.4.4</moneta.version>
         <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
         <logstash.version>7.4</logstash.version>
 
         <!--  Wultra dependencies  -->
-        <wultra-core.version>1.7.0</wultra-core.version>
-        <powerauth.version>1.5.0</powerauth.version>
-        <powerauth-crypto.version>1.5.1</powerauth-crypto.version>
-        <powerauth-push.version>1.5.0</powerauth-push.version>
+        <wultra-core.version>1.9.0-SNAPSHOT</wultra-core.version>
+        <powerauth.version>1.7.0-SNAPSHOT</powerauth.version>
+        <powerauth-crypto.version>1.7.0-SNAPSHOT</powerauth-crypto.version>
+        <powerauth-push.version>1.7.0-SNAPSHOT</powerauth-push.version>
     </properties>
 
     <dependencyManagement>
@@ -246,13 +250,26 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bc.version}</version>
+                <version>${bcprov-jdk18on.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
-                <version>${bc.version}</version>
+                <version>${bcprov-jdk18on.version}</version>
+            </dependency>
+
+            <!-- TODO (racansky, 2024-01-05) overriding vulnerable transitive dependency of owasp-java-html-sanitizer, https://github.com/OWASP/java-html-sanitizer/pull/295 -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+                <artifactId>owasp-java-html-sanitizer</artifactId>
+                <version>${owasp-java-html-sanitizer.version}</version>
             </dependency>
 
             <!-- Library for formatting monetary amounts -->
@@ -267,6 +284,24 @@
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Documentation -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger-annotations-jakarta.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
