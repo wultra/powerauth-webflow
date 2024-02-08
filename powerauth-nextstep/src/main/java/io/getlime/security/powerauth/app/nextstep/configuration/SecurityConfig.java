@@ -59,8 +59,6 @@ public class SecurityConfig {
                             .requestMatchers(
                                     new AntPathRequestMatcher("/login/oauth2/**"),
                                     new AntPathRequestMatcher("/api/service/status"),
-                                    new AntPathRequestMatcher("/swagger-ui*/**"),
-                                    new AntPathRequestMatcher("/v3/api-docs*/**"),
                                     new AntPathRequestMatcher("/actuator/**"))
                             .permitAll()
                             .anyRequest()
