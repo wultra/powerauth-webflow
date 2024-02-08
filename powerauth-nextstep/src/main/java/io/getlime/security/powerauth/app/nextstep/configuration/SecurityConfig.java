@@ -19,8 +19,11 @@ package io.getlime.security.powerauth.app.nextstep.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -71,6 +74,13 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
+    }
+
+    @Configuration
+    @ConditionalOnProperty(name = "powerauth.nextstep.security.auth.type", havingValue = "OIDC")
+    @Import(OAuth2ClientAutoConfiguration.class)
+    public static class OAuth2ClientConfiguration {
+        // no code on purpose, only config class
     }
 
     enum AuthType {

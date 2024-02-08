@@ -74,15 +74,15 @@ The Next Step Server functionality is described in details in [Next Step Server 
 
 You may configure OpenID Connect (OIDC) authentication.
 
-| Property                                                                                   | Description                                                                                                                   |
-|--------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| `powerauth.nextstep.security.auth.type`                                                    | `OIDC` for OpenID Connect. If OIDC enabled, the properties bellow must be configured.                                         |
-| `spring.security.oauth2.client.registration.nextstep-oidc-client.provider`                 | Should be `nextstep-oidc-provider`, defines the key for the `issuer-uri` property, see below.                                 |
-| `spring.security.oauth2.client.registration.nextstep-oidc-client.client-id`                | Client ID for authentication to the provider.                                                                                 |
-| `spring.security.oauth2.client.registration.nextstep-oidc-client.client-secret`            | Client secret for authentication to the provider.                                                                             |
-| `spring.security.oauth2.client.registration.nextstep-oidc-client.authorization-grant-type` | Authorization grant type. Should be `authorization_code`.                                                                     |
-| `spring.security.oauth2.client.registration.nextstep-oidc-client.scope`                    | Authorization scopes. Should be `openid`.                                                                                     |
-| `spring.security.oauth2.client.registration.nextstep-oidc-client.redirectUri`              | Redirect URI from the provider back to the NextStep, e.g. `http://localhost:8080//powerauth-nextstep/login/oauth2/code/azure` |
-| `spring.security.oauth2.client.provider.nextstep-oidc-provider.issuer-uri`                 | URL of the provider, e.g. `https://sts.windows.net/example/`                                                                  |
+| Property                                                                                   | Default value            | Description                                                                                                                   |
+|--------------------------------------------------------------------------------------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| `powerauth.nextstep.security.auth.type`                                                    |                          | `OIDC` for OpenID Connect. If OIDC enabled, the properties bellow must be configured.                                         |
+| `spring.security.oauth2.client.registration.nextstep-oidc-client.provider`                 | `nextstep-oidc-provider` | Should be `nextstep-oidc-provider`, defines the key for the `issuer-uri` property, see below.                                 |
+| `spring.security.oauth2.client.registration.nextstep-oidc-client.client-id`                |                          | Client ID for authentication to the provider.                                                                                 |
+| `spring.security.oauth2.client.registration.nextstep-oidc-client.client-secret`            |                          | Client secret for authentication to the provider.                                                                             |
+| `spring.security.oauth2.client.registration.nextstep-oidc-client.authorization-grant-type` | `authorization_code`     | Authorization grant type. Should be `authorization_code`.                                                                     |
+| `spring.security.oauth2.client.registration.nextstep-oidc-client.scope`                    | `openid`                 | Authorization scopes. Should be `openid`.                                                                                     |
+| `spring.security.oauth2.client.registration.nextstep-oidc-client.redirectUri`              |                          | Redirect URI from the provider back to the NextStep, e.g. `http://localhost:8080//powerauth-nextstep/login/oauth2/code/azure` |
+| `spring.security.oauth2.client.provider.nextstep-oidc-provider.issuer-uri`                 |                          | URL of the provider, e.g. `https://sts.windows.net/example/`                                                                  |
 
 See the [Spring Security documentation](https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html#oauth2-client-log-users-in) and [OpenID Connect UserInfo endpoint](https://connect2id.com/products/server/docs/api/userinfo) for details. 
