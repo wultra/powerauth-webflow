@@ -17,6 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -52,6 +54,8 @@ public class CreateOperationRequest {
     private String organizationId;
     @Size(min = 1, max = 256)
     private String externalTransactionId;
+
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<KeyValueParameter> params = new ArrayList<>();
     private OperationFormData formData;
     private ApplicationContext applicationContext;
