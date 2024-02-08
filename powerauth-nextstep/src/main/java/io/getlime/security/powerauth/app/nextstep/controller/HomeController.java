@@ -27,7 +27,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- *  Home controller to display welcome page.
+ * Home controller to display welcome page.
  *
  * @author Jan Pesek, jan.pesek@wultra.com
  */
