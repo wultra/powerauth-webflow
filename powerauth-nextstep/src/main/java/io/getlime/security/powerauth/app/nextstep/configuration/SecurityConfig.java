@@ -17,12 +17,20 @@
  */
 package io.getlime.security.powerauth.app.nextstep.configuration;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * Default Spring Security configuration.
@@ -31,19 +39,55 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfig {
+
+    @Value("${powerauth.nextstep.security.auth.type:NONE}")
+    private AuthType authType;
 
     /**
      * Configures HTTP security.
+     *
      * @param http HTTP security.
      * @throws Exception Thrown when configuration fails.
      */
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
+        if (authType == AuthType.OIDC) {
+            logger.info("Initializing OIDC authentication.");
+            http.authorizeHttpRequests(authorize -> authorize
+                            .requestMatchers(
+                                    new AntPathRequestMatcher("/login/oauth2/**"),
+                                    new AntPathRequestMatcher("/api/service/status"),
+                                    new AntPathRequestMatcher("/actuator/**"))
+                            .permitAll()
+                            .anyRequest()
+                            .fullyAuthenticated())
+                    .oauth2Login(withDefaults());
+        } else {
+            logger.info("No authentication configured");
+            http.httpBasic(AbstractHttpConfigurer::disable);
+        }
+
         return http
-                .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
+    }
+
+    @Configuration
+    @ConditionalOnProperty(name = "powerauth.nextstep.security.auth.type", havingValue = "OIDC")
+    @Import(OAuth2ClientAutoConfiguration.class)
+    public static class OAuth2ClientConfiguration {
+        // no code on purpose, only config class
+    }
+
+    enum AuthType {
+        NONE,
+
+        /**
+         * OpenID Connect.
+         */
+        OIDC
     }
 
 }
