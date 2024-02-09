@@ -17,6 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.ConsentOption;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 
@@ -48,6 +50,7 @@ public class SaveConsentFormRequest {
     /**
      * Consent options with values set by the user.
      */
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<ConsentOption> options;
 
     /**
