@@ -24,7 +24,6 @@
     <artifactId>powerauth-webflow-i18n</artifactId>
     <groupId>io.getlime.security</groupId>
     <description>PowerAuth Next Step Server</description>
-    <packaging>jar</packaging>
 
     <parent>
         <groupId>io.getlime.security</groupId>

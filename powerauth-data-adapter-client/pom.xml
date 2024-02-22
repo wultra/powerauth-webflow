@@ -24,7 +24,6 @@
 
     <name>powerauth-data-adapter-client</name>
     <artifactId>powerauth-data-adapter-client</artifactId>
-    <packaging>jar</packaging>
 
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
