@@ -31,7 +31,6 @@
     <groupId>io.getlime.security</groupId>
     <artifactId>powerauth-webflow-resources</artifactId>
     <name>powerauth-webflow-resources</name>
-    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

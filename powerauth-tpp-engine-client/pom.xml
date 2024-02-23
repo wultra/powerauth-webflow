@@ -30,7 +30,6 @@
 
     <name>powerauth-tpp-engine-client</name>
     <artifactId>powerauth-tpp-engine-client</artifactId>
-    <packaging>jar</packaging>
 
     <dependencies>
 

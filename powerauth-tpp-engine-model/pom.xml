@@ -29,7 +29,6 @@
 
     <name>powerauth-tpp-engine-model</name>
     <artifactId>powerauth-tpp-engine-model</artifactId>
-    <packaging>jar</packaging>
 
     <dependencies>
         <!-- PowerAuth Dependencies -->

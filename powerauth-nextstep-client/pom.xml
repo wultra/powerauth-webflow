@@ -31,7 +31,6 @@
     <artifactId>powerauth-nextstep-client</artifactId>
     <name>powerauth-nextstep-client</name>
     <groupId>io.getlime.security</groupId>
-    <packaging>jar</packaging>
 
     <dependencies>
         <!-- PowerAuth Web Flow Dependencies -->
