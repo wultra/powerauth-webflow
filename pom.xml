@@ -96,7 +96,7 @@
         <passay.version>1.6.4</passay.version>
 
         <!-- Documentation Dependencies -->
-        <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.4.0</springdoc-openapi-starter-webmvc-ui.version>
         <swagger-annotations-jakarta.version>2.2.20</swagger-annotations-jakarta.version>
 
         <guava.version>33.0.0-jre</guava.version>
