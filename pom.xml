@@ -97,7 +97,7 @@
 
         <!-- Documentation Dependencies -->
         <springdoc-openapi-starter-webmvc-ui.version>2.4.0</springdoc-openapi-starter-webmvc-ui.version>
-        <swagger-annotations-jakarta.version>2.2.20</swagger-annotations-jakarta.version>
+        <swagger-annotations-jakarta.version>2.2.21</swagger-annotations-jakarta.version>
 
         <guava.version>33.1.0-jre</guava.version>
         <moneta.version>1.4.4</moneta.version>
