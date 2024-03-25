@@ -37,7 +37,7 @@
     "redux": "^3.7.2",
     "redux-promise-middleware": "^4.4.2",
     "redux-thunk": "^2.3.0",
-    "sanitize-html": "^2.11.0",
+    "sanitize-html": "^2.13.0",
     "snyk": "^1.1266.0",
     "sockjs-client": "^1.6.1",
     "spin.js": "^2.3.2",
