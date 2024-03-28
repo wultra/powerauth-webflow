@@ -73,7 +73,8 @@ CREATE TABLE oauth2_registered_client (
     scopes VARCHAR(1000) NOT NULL,
     client_settings VARCHAR(2000) NOT NULL,
     token_settings VARCHAR(2000) NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    CONSTRAINT client_id_unique UNIQUE (client_id)
 );
 
 -- Table oauth2_registered_client stores information about OAuth 2.1 consents
@@ -628,7 +629,6 @@ CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id)
 CREATE INDEX ns_operation_pending ON ns_operation (user_id, result);
 CREATE UNIQUE INDEX ns_operation_afs_unique on ns_operation_afs (operation_id, request_afs_action, request_step_index);
 CREATE INDEX wf_certificate_operation ON wf_certificate_verification (operation_id);
-CREATE UNIQUE INDEX oauth2_client_unique ON oauth2_registered_client (client_id);
 CREATE UNIQUE INDEX ns_application_name ON ns_application (name);
 CREATE UNIQUE INDEX ns_credential_policy_name ON ns_credential_policy (name);
 CREATE UNIQUE INDEX ns_otp_policy_name ON ns_otp_policy (name);

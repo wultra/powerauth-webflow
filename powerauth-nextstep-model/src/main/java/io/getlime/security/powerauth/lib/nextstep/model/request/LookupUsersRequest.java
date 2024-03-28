@@ -17,6 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import jakarta.validation.constraints.Size;
@@ -42,6 +44,7 @@ public class LookupUsersRequest {
     private UserIdentityStatus userIdentityStatus;
 
     // Filter by roles
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<String> roles = new ArrayList<>();
 
     // Filter by username and credentialName to allow username -> user ID mapping

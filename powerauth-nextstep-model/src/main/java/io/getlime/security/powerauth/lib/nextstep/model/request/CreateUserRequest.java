@@ -17,6 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ContactType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
@@ -40,14 +42,18 @@ public class CreateUserRequest {
     @Size(min = 1, max = 256)
     private String userId;
 
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, Object> extras = new LinkedHashMap<>();
 
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<String> roles = new ArrayList<>();
 
     @Valid
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<NewContact> contacts = new ArrayList<>();
 
     @Valid
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<NewCredential> credentials = new ArrayList<>();
 
     /**
@@ -87,6 +93,7 @@ public class CreateUserRequest {
         // Null value allowed, defaults to CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL
         private CredentialValidationMode validationMode;
         @Valid
+        @JsonSetter(nulls = Nulls.SKIP)
         private final List<CredentialHistory> credentialHistory = new ArrayList<>();
 
     }

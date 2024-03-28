@@ -17,6 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -41,6 +43,8 @@ public class CreateUserAliasRequest {
     @NotBlank
     @Size(min = 2, max = 256)
     private String aliasValue;
+
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, Object> extras = new LinkedHashMap<>();
 
 }

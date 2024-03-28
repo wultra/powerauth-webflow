@@ -17,44 +17,41 @@
  */
 package io.getlime.security.powerauth.lib.mtoken.model.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Request to register for sending push messages.
  * @author Petr Dvorak, petr@wultra.com
  */
+@Getter
+@Setter
 public class PushRegisterRequest {
 
-    private String platform;
+    /**
+     * Platform
+     */
+    @NotNull
+    @Schema(description = "Platform.")
+    private Platform platform;
+
+    /**
+     *
+     */
+    @NotBlank
+    @Schema(description = "Push registration token.")
     private String token;
 
-    /**
-     * Get mobile platform - "ios" / "android".
-     * @return Mobile platform.
-     */
-    public String getPlatform() {
-        return platform;
+    public enum Platform {
+        @JsonProperty("ios")
+        IOS,
+
+        @JsonProperty("android")
+        ANDROID
     }
 
-    /**
-     * Set mobile platform - "ios" / "android".
-     * @param platform Mobile platform.
-     */
-    public void setPlatform(String platform) {
-        this.platform = platform;
-    }
-
-    /**
-     * Get push registration token.
-     * @return Push registration token.
-     */
-    public String getToken() {
-        return token;
-    }
-
-    /**
-     * Set push registration token.
-     * @param token Push registration token.
-     */
-    public void setToken(String token) {
-        this.token = token;
-    }
 }

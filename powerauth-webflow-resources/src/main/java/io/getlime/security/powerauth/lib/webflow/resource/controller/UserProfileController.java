@@ -26,16 +26,15 @@ import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailRe
 import io.getlime.security.powerauth.lib.webflow.resource.configuration.WebFlowResourcesServerConfiguration;
 import io.getlime.security.powerauth.lib.webflow.resource.model.UserInfoResponse;
 import io.getlime.security.powerauth.lib.webflow.resource.model.UserResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 import java.util.Map;
@@ -45,8 +44,9 @@ import java.util.Map;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
-@Controller
+@RestController
 @RequestMapping("/api/secure/profile")
+@Slf4j
 public class UserProfileController {
 
     private final DataAdapterClient client;
@@ -57,8 +57,6 @@ public class UserProfileController {
     private static final String ORGANIZATION_ID = "organization_id";
 
     private static final String ANONYMOUS_USER = "anonymousUser";
-
-    private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
 
     @Autowired
     public UserProfileController(DataAdapterClient client, WebFlowResourcesServerConfiguration webFlowResourcesServerConfiguration) {
@@ -76,7 +74,11 @@ public class UserProfileController {
      * @return User profile.
      */
     @GetMapping("me")
-    public @ResponseBody UserResponse me(@AuthenticationPrincipal OAuth2AuthenticatedPrincipal principal) {
+    public UserResponse me(@AuthenticationPrincipal OAuth2AuthenticatedPrincipal principal) {
+        if (principal == null) {
+            throw new InsufficientAuthenticationException("Missing principal");
+        }
+
         final UserResponse userResponse = new UserResponse();
 
         // Try to fetch user details from the service
@@ -132,7 +134,11 @@ public class UserProfileController {
      * @return User profile.
      */
     @RequestMapping(value = "me/info", method = { RequestMethod.GET, RequestMethod.POST })
-    public @ResponseBody UserInfoResponse userInfo(@AuthenticationPrincipal OAuth2AuthenticatedPrincipal principal) {
+    public UserInfoResponse userInfo(@AuthenticationPrincipal OAuth2AuthenticatedPrincipal principal) {
+        if (principal == null) {
+            throw new InsufficientAuthenticationException("Missing principal");
+        }
+
         // Try to fetch user details from the service
         try {
             final String usedId = principal.getName();

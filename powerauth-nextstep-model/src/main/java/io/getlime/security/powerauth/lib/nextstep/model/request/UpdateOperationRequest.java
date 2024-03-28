@@ -17,6 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.PAAuthenticationContext;
@@ -46,11 +48,15 @@ public class UpdateOperationRequest {
     @Size(min = 2, max = 256)
     private String organizationId;
     private AuthMethod authMethod;
+
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<AuthInstrument> authInstruments = new ArrayList<>();
     private AuthStepResult authStepResult;
     private AuthMethod targetAuthMethod;
     @Size(min = 2, max = 256)
     private String authStepResultDescription;
+
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<KeyValueParameter> params = new ArrayList<>();
     private ApplicationContext applicationContext;
     @Size(min = 36, max = 36)

@@ -17,6 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -33,6 +35,7 @@ import java.util.List;
 public class UpdateUsersRequest {
 
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<String> userIds = new ArrayList<>();
     @NotNull
     private UserIdentityStatus userIdentityStatus;

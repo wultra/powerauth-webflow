@@ -1,9 +1,11 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="NextStepApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="dev" />
+    <option name="DEBUG_MODE" value="true" />
     <module name="powerauth-nextstep" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.getlime.security.powerauth.app.nextstep.NextStepApplication" />
     <option name="VM_PARAMETERS" value="-Dserver.servlet.context-path=/powerauth-nextstep -Dserver.port=9082" />
+    <option name="WORKING_DIRECTORY" value="file://$MODULE_WORKING_DIR$" />
     <method v="2">
       <option name="Make" enabled="true" />
       <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/powerauth-nextstep/pom.xml" goal="process-resources" />

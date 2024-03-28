@@ -17,6 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 
 import java.util.LinkedHashMap;
@@ -52,6 +54,7 @@ public class AfsRequest {
     /**
      * Extra parameters sent with the request depending on AFS type, e.g. cookies for Threat Mark.
      */
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, Object> extras = new LinkedHashMap<>();
 
     /**
