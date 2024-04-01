@@ -101,7 +101,7 @@
 
         <guava.version>33.1.0-jre</guava.version>
         <moneta.version>1.4.4</moneta.version>
-        <owasp-java-html-sanitizer.version>20220608.1</owasp-java-html-sanitizer.version>
+        <owasp-java-html-sanitizer.version>20240325.1</owasp-java-html-sanitizer.version>
         <logstash.version>7.4</logstash.version>
 
         <!--  Wultra dependencies  -->
