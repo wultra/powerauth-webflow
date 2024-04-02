@@ -99,7 +99,6 @@
         <springdoc-openapi-starter-webmvc-ui.version>2.4.0</springdoc-openapi-starter-webmvc-ui.version>
         <swagger-annotations-jakarta.version>2.2.21</swagger-annotations-jakarta.version>
 
-        <guava.version>33.1.0-jre</guava.version>
         <moneta.version>1.4.4</moneta.version>
         <owasp-java-html-sanitizer.version>20240325.1</owasp-java-html-sanitizer.version>
         <logstash.version>7.4</logstash.version>
@@ -259,13 +258,6 @@
                 <version>${bcprov-jdk18on.version}</version>
             </dependency>
 
-            <!-- TODO (racansky, 2024-01-05) overriding vulnerable transitive dependency of owasp-java-html-sanitizer, https://github.com/OWASP/java-html-sanitizer/pull/295 -->
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
                 <artifactId>owasp-java-html-sanitizer</artifactId>
@@ -369,6 +361,7 @@
                                         <exclude>org.apache.tomcat.embed:*:*:*:compile</exclude>
                                         <exclude>org.bouncycastle:bcpkix-jdk15on:*:*:compile</exclude>
                                         <exclude>org.bouncycastle:bcprov-jdk15on:*:*:compile</exclude>
+                                        <exclude>com.google.guava:guava*:*:*:compile</exclude>
                                     </excludes>
                                 </bannedDependencies>
                             </rules>
@@ -382,8 +375,7 @@
                         <configuration>
                             <rules>
                                 <RestrictImports>
-                                    <!--  https://github.com/google/guava/issues/2960  -->
-                                    <reason>Guava depends on jsr305 but we prefer jakarta in our code</reason>
+                                    <reason>com.google.code.findbugs:annotations depends on jsr305 but we prefer jakarta in our code</reason>
                                     <bannedImport>javax.annotation.**</bannedImport>
                                 </RestrictImports>
                             </rules>
