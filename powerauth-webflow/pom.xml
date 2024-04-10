@@ -24,7 +24,7 @@
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.0</version>
     </parent>
 
     <artifactId>powerauth-webflow</artifactId>
@@ -68,12 +68,6 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Other Dependencies -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
@@ -154,6 +148,25 @@
             <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
         </dependency>
 
+        <!-- Monitoring -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core-micrometer</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-otel</artifactId>
+        </dependency>
+
+        <!-- For run at Apple M1 architecture -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <scope>runtime</scope>
+            <classifier>osx-aarch_64</classifier>
+        </dependency>
+
         <!-- TEST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -193,7 +206,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.11.2</version>
+                <version>1.15.0</version>
                 <configuration>
                     <installDirectory>target</installDirectory>
                 </configuration>

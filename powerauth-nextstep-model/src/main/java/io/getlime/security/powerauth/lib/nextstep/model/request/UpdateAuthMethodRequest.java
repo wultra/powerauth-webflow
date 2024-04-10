@@ -17,6 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,6 +42,7 @@ public class UpdateAuthMethodRequest {
     @NotNull
     private AuthMethod authMethod;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, String> config = new LinkedHashMap<>();
 
 }

@@ -17,6 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -39,6 +41,8 @@ public class CreateHashConfigRequest {
     private String hashConfigName;
     @NotNull
     private HashAlgorithm algorithm;
+
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, String> parameters = new LinkedHashMap<>();
 
 }

@@ -145,7 +145,6 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
     <Parameter name="spring.datasource.url" value="jdbc:oracle:thin:@//hostname:1523/SID"/>
     <Parameter name="spring.datasource.username" value="powerauth"/>
     <Parameter name="spring.datasource.password" value="********"/>
-    <Parameter name="spring.datasource.driver-class-name" value="oracle.jdbc.OracleDriver"/>
     <Parameter name="spring.jpa.hibernate.ddl-auto" value="none"/>
     <Parameter name="spring.jpa.properties.hibernate.default_schema" value="powerauth"/>
 
@@ -162,7 +161,6 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
     <Parameter name="spring.datasource.url" value="jdbc:oracle:thin:@//hostname:1523/SID"/>
     <Parameter name="spring.datasource.username" value="powerauth"/>
     <Parameter name="spring.datasource.password" value="********"/>
-    <Parameter name="spring.datasource.driver-class-name" value="oracle.jdbc.OracleDriver"/>
     <Parameter name="spring.jpa.hibernate.ddl-auto" value="none"/>
     <Parameter name="spring.jpa.properties.hibernate.default_schema" value="powerauth"/>
 
@@ -207,7 +205,6 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
     <Parameter name="spring.datasource.url" value="jdbc:oracle:thin:@//hostname:1523/SID"/>
     <Parameter name="spring.datasource.username" value="powerauth"/>
     <Parameter name="spring.datasource.password" value="********"/>
-    <Parameter name="spring.datasource.driver-class-name" value="oracle.jdbc.OracleDriver"/>
     <Parameter name="spring.jpa.hibernate.ddl-auto" value="none"/>
     <Parameter name="spring.jpa.properties.hibernate.default_schema" value="powerauth"/>
 
@@ -232,7 +229,6 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
     <Parameter name="spring.datasource.url" value="jdbc:oracle:thin:@//hostname:1523/SID"/>
     <Parameter name="spring.datasource.username" value="powerauth"/>
     <Parameter name="spring.datasource.password" value="********"/>
-    <Parameter name="spring.datasource.driver-class-name" value="oracle.jdbc.OracleDriver"/>
     <Parameter name="spring.jpa.hibernate.ddl-auto" value="none"/>
     <Parameter name="spring.jpa.properties.hibernate.default_schema" value="powerauth"/>
 
@@ -252,7 +248,6 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
     <Parameter name="spring.datasource.url" value="jdbc:oracle:thin:@//hostname:1523/SID"/>
     <Parameter name="spring.datasource.username" value="powerauth"/>
     <Parameter name="spring.datasource.password" value="********"/>
-    <Parameter name="spring.datasource.driver-class-name" value="oracle.jdbc.OracleDriver"/>
     <Parameter name="spring.jpa.hibernate.ddl-auto" value="none"/>
     <Parameter name="spring.jpa.properties.hibernate.default_schema" value="powerauth"/>
 ​
@@ -279,7 +274,6 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
     <Parameter name="spring.datasource.url" value="jdbc:oracle:thin:@//hostname:1523/SID"/>
     <Parameter name="spring.datasource.username" value="powerauth"/>
     <Parameter name="spring.datasource.password" value="********"/>
-    <Parameter name="spring.datasource.driver-class-name" value="oracle.jdbc.OracleDriver"/>
     <Parameter name="spring.jpa.hibernate.ddl-auto" value="none"/>
     <Parameter name="spring.jpa.properties.hibernate.default_schema" value="powerauth"/>
 

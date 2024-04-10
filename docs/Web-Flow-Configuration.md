@@ -46,7 +46,6 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.hikari.auto-commit=false
-spring.datasource.driver-class-name=org.postgresql.Driver
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
 
@@ -54,7 +53,6 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/powerauth
 #spring.datasource.username=powerauth
 #spring.datasource.password=
-#spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
 
 # Application Service Configuration
 powerauth.webflow.service.applicationName=powerauth-webflow
@@ -181,7 +179,6 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.hikari.auto-commit=false
-spring.datasource.driver-class-name=org.postgresql.Driver
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
 
@@ -189,7 +186,6 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/powerauth
 #spring.datasource.username=powerauth
 #spring.datasource.password=
-#spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
 
 # Data Adapter Server Service URL
 powerauth.dataAdapter.service.url=http://localhost:8080/powerauth-data-adapter
@@ -281,7 +277,6 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.hikari.auto-commit=false
-spring.datasource.driver-class-name=org.postgresql.Driver
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
 
@@ -289,7 +284,6 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/powerauth
 #spring.datasource.username=powerauth
 #spring.datasource.password=
-#spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
 
 # SMS OTP expiration time in seconds
 powerauth.authorization.sms-otp.expiration-time-in-seconds=300

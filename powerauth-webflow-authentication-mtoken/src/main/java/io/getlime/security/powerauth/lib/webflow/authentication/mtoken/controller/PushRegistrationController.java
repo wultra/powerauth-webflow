@@ -140,7 +140,6 @@ public class PushRegistrationController {
         }
 
         // Get the values from the request
-        String platform = requestObject.getPlatform();
         String token = requestObject.getToken();
 
         // Check if the context is authenticated - if it is, add activation ID.
@@ -154,13 +153,9 @@ public class PushRegistrationController {
             throw new PushRegistrationFailedException();
         }
 
-        // Register the device and return response
-        MobilePlatform p = MobilePlatform.Android;
-        if ("ios".equalsIgnoreCase(platform)) {
-            p = MobilePlatform.iOS;
-        }
+        final MobilePlatform platform = convert(requestObject.getPlatform());
         try {
-            boolean result = pushServerClient.createDevice(applicationId, token, p, activationId);
+            boolean result = pushServerClient.createDevice(applicationId, token, platform, activationId);
             if (result) {
                 logger.info("Push registration succeeded, user ID: {}", apiAuthentication.getUserId());
                 return new Response();
@@ -172,6 +167,13 @@ public class PushRegistrationController {
             logger.error("Push registration failed", ex);
             throw new PushRegistrationFailedException();
         }
+    }
+
+    private static MobilePlatform convert(final PushRegisterRequest.Platform source) {
+        return switch (source) {
+            case IOS -> MobilePlatform.IOS;
+            case ANDROID -> MobilePlatform.ANDROID;
+        };
     }
 
 }

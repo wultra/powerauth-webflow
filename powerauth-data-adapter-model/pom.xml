@@ -24,12 +24,11 @@
 
     <name>powerauth-data-adapter-model</name>
     <artifactId>powerauth-data-adapter-model</artifactId>
-    <packaging>jar</packaging>
 
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.6.0</version>
+        <version>1.7.0</version>
     </parent>
 
     <dependencies>

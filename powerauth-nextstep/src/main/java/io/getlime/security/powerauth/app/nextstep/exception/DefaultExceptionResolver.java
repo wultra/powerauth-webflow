@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * Controller advice responsible for default exception resolving.
@@ -862,4 +863,17 @@ public class DefaultExceptionResolver {
         return new ErrorResponse(error);
     }
 
+    /**
+     * Exception handler for no resource found.
+     *
+     * @param e Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public @ResponseBody ErrorResponse handleNoResourceFoundException(final NoResourceFoundException e) {
+        logger.warn("Error occurred when calling an API: {}", e.getMessage());
+        logger.debug("Exception detail: ", e);
+        return new ErrorResponse("ERROR_NOT_FOUND", "Resource not found.");
+    }
 }

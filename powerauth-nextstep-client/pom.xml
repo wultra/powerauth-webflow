@@ -25,13 +25,12 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.6.0</version>
+        <version>1.7.0</version>
     </parent>
 
     <artifactId>powerauth-nextstep-client</artifactId>
     <name>powerauth-nextstep-client</name>
     <groupId>io.getlime.security</groupId>
-    <packaging>jar</packaging>
 
     <dependencies>
         <!-- PowerAuth Web Flow Dependencies -->

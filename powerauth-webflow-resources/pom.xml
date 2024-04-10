@@ -25,13 +25,12 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.6.0</version>
+        <version>1.7.0</version>
     </parent>
 
     <groupId>io.getlime.security</groupId>
     <artifactId>powerauth-webflow-resources</artifactId>
     <name>powerauth-webflow-resources</name>
-    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

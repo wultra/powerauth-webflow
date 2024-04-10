@@ -27,7 +27,7 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.6.0</version>
+        <version>1.7.0</version>
     </parent>
 
     <dependencies>
@@ -38,6 +38,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
         </dependency>
     </dependencies>
 

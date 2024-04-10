@@ -28,7 +28,7 @@
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.0</version>
     </parent>
 
     <dependencies>
@@ -52,6 +52,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
         <!-- PowerAuth Dependencies -->
@@ -96,11 +100,23 @@
             <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
         </dependency>
 
-        <!-- Upgrade Swagger Guava dependency due to CVE-2018-10237 -->
+        <!-- Monitoring -->
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core-micrometer</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-otel</artifactId>
+        </dependency>
+
+        <!-- For run at Apple M1 architecture -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <scope>runtime</scope>
+            <classifier>osx-aarch_64</classifier>
         </dependency>
 
         <!-- Testing -->
