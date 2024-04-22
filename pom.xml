@@ -91,7 +91,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <bcprov-jdk18on.version>1.78</bcprov-jdk18on.version>
+        <bcprov-jdk18on.version>1.78.1</bcprov-jdk18on.version>
         <zxing.version>3.5.3</zxing.version>
         <passay.version>1.6.4</passay.version>
 
