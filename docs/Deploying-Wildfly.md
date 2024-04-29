@@ -12,7 +12,7 @@ Web Flow contains the following configuration in `jboss-deployment-structure.xml
 
 ```
 <?xml version="1.0"?>
-<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.3">
 	<deployment>
 		<exclude-subsystems>
 			<!-- disable the logging subsystem because the application manages its own logging independently -->
@@ -23,11 +23,6 @@ Web Flow contains the following configuration in `jboss-deployment-structure.xml
 			<module name="com.wultra.powerauth.webflow.conf" />
 		</dependencies>
 		
-		<resources>
-			<!-- use WAR provided Bouncy Castle -->
-			<resource-root path="WEB-INF/lib/bcprov-jdk18on-${BC_VERSION}.jar" use-physical-code-source="true"/>
-		</resources>
-
 		<local-last value="true" />
 	</deployment>
 </jboss-deployment-structure>
@@ -36,7 +31,7 @@ Web Flow contains the following configuration in `jboss-deployment-structure.xml
 Similarly, Next Step contains the following configuration in `jboss-deployment-structure.xml` file for JBoss / Wildfly:
 ```
 <?xml version="1.0"?>
-<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.3">
 	<deployment>
 		<exclude-subsystems>
 			<!-- disable the logging subsystem because the application manages its own logging independently -->
@@ -47,11 +42,6 @@ Similarly, Next Step contains the following configuration in `jboss-deployment-s
 			<module name="com.wultra.powerauth.nextstep.conf" />
 		</dependencies>
 		
-		<resources>
-			<!-- use WAR provided Bouncy Castle -->
-			<resource-root path="WEB-INF/lib/bcprov-jdk18on-${BC_VERSION}.jar" use-physical-code-source="true"/>
-		</resources>
-
 		<local-last value="true" />
 	</deployment>
 </jboss-deployment-structure>
@@ -60,7 +50,7 @@ Similarly, Next Step contains the following configuration in `jboss-deployment-s
 Optionally, TPP engine contains the following configuration in `jboss-deployment-structure.xml` file for JBoss / Wildfly:
 ```
 <?xml version="1.0"?>
-<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.3">
 	<deployment>
 		<exclude-subsystems>
 			<!-- disable the logging subsystem because the application manages its own logging independently -->
@@ -79,7 +69,7 @@ Optionally, Web Flow Client contains the following configuration in `jboss-deplo
 
 ```
 <?xml version="1.0"?>
-<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.3">
 	<deployment>
 		<exclude-subsystems>
 			<!-- disable the resource-adapters subsystem to prevent the application's HSQLDB driver
@@ -180,15 +170,17 @@ For Next Step you can use the same configuration, just change the variable `LOG_
 
 The `application-ext.properties` file is used to override default configuration properties, for example:
 ```
+# Database Configuration
+spring.datasource.jndi-name=java:/jdbc/powerauth
+
 # PowerAuth Client configuration
 powerauth.service.url=http://[host]:[port]/powerauth-java-server/rest
 ```
 
+Mind that you should specify `spring.datasource.jndi-name` to use the application server datasource (its declaration is out of the scope of this guideline).
+When configure `spring.datasource.url`, the hikari connection pool is used.
+Spring Boot running on WildFly or JBoos initializes [JtaTransactionManager](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/transaction/jta/JtaTransactionManager.html).
+
 Web Flow Spring application uses the `ext` Spring profile which activates overriding of default properties by `application-ext.properties`.
 
 You need to configure separate `application-ext.properties` files for Web Flow and Next Step in each module. 
-
-### Bouncy Castle Installation
-
-The Bouncy Castle library for JBoss / Wildfly is included in the Web Flow and Next Step war files. The library is configured 
-using the `jboss-deployment-structure.xml` descriptor. Global module configuration of Bouncy Castle is no longer required.
