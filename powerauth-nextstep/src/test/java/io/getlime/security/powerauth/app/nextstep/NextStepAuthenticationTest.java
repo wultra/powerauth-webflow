@@ -416,7 +416,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
 
     @Test
     public void testOtpAndCredentialVerifyBlockedUser() throws NextStepClientException {
-        CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", null, "TEST_DATA").getResponseObject();
+        CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA").getResponseObject();
         nextStepClient.blockUser("test_user_1");
         CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("TEST_CREDENTIAL", "test_user_1", "s3cret", r1.getOtpId(), r1.getOtpValue()).getResponseObject();
         assertEquals(UserIdentityStatus.BLOCKED, r2.getUserIdentityStatus());
@@ -705,6 +705,26 @@ public class NextStepAuthenticationTest extends NextStepTest {
         assertEquals(UserIdentityStatus.ACTIVE, r5.getUserIdentityStatus());
         GetOperationDetailResponse r6 = nextStepClient.getOperationDetail("test_operation_check_2").getResponseObject();
         assertEquals(AuthResult.FAILED, r6.getResult());
+    }
+
+    @Test
+    void testAuthCombinedCredentialNameMismatch() throws NextStepClientException {
+        final String otpCredentialName = "TEST_CREDENTIAL";
+        final String authCredentialName = "TEST_CREDENTIAL_MISMATCH";
+        final CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", otpCredentialName, "TEST_DATA").getResponseObject();
+        final NextStepClientException thrownException = assertThrows(NextStepClientException.class, () -> {
+            nextStepClient.authenticateCombined(authCredentialName, "test_user_1", "s3cret", r1.getOtpId(), r1.getOtpValue());
+        });
+        assertEquals("com.wultra.core.rest.client.base.RestClientException: HTTP error occurred: 400 BAD_REQUEST", thrownException.getMessage());
+    }
+
+    @Test
+    void testAuthCombinedCredentialNameMissing() throws NextStepClientException {
+        final String otpCredentialName = "TEST_CREDENTIAL";
+        final CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", otpCredentialName, "TEST_DATA").getResponseObject();
+        assertDoesNotThrow(() -> {
+            nextStepClient.authenticateCombined(null, "test_user_1", "s3cret", r1.getOtpId(), r1.getOtpValue());
+        });
     }
 
 }
