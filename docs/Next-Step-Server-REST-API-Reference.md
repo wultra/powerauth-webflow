@@ -8837,6 +8837,8 @@ The list of expected status codes:
 }
 ```
 
+**The `credentialName` parameter is optional and should not be used or it has to be the same as used for OTP generation.**
+
 #### Response 200
 
 - Headers:

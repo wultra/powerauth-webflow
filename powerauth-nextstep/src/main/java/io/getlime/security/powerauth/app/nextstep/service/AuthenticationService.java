@@ -551,6 +551,10 @@ public class AuthenticationService {
         final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
 
         final OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
+        if (!request.getCredentialName().equals(otp.getCredentialDefinition().getName())) {
+            throw new InvalidRequestException("Mismatched credentialName for OTP: " + otp.getOtpId() + "'. The credentialName must match the one used for OTP generation.");
+        }
+
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
             logger.info("Combined authentication proxied through Data Adapter, OTP ID: {}", request.getOtpId());
             return authenticateCombinedCustom(otp.getCredentialDefinition(), otp.getOtpId(), request.getOtpValue(), request.getCredentialValue(), otp.getOperation().getOperationId(), otp.getUserId(), request.getAuthMethod());
