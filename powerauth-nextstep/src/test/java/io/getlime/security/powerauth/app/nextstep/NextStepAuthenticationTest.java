@@ -283,7 +283,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
     @Test
     public void testCredentialAndOtpSuccessNoOperation() throws NextStepClientException {
         CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA").getResponseObject();
-        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("TEST_CREDENTIAL", "test_user_1", "s3cret", r1.getOtpId(), r1.getOtpValue()).getResponseObject();
+        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("test_user_1", "s3cret", r1.getOtpId(), r1.getOtpValue()).getResponseObject();
         assertEquals(AuthenticationResult.SUCCEEDED, r2.getAuthenticationResult());
     }
 
@@ -291,7 +291,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
     public void testCredentialAndOtpSuccessWithOperation() throws NextStepClientException {
         nextStepClient.createOperation("auth_otp", "test_operation_8", "A1", null, null);
         CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA", "test_operation_8").getResponseObject();
-        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("TEST_CREDENTIAL", "test_user_1", "s3cret", r1.getOtpId(), "test_operation_8", r1.getOtpValue(), true, null).getResponseObject();
+        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("test_user_1", "s3cret", r1.getOtpId(), "test_operation_8", r1.getOtpValue(), true, null).getResponseObject();
         assertEquals(AuthenticationResult.SUCCEEDED, r2.getAuthenticationResult());
         GetOperationDetailResponse r3 = nextStepClient.getOperationDetail("test_operation_8").getResponseObject();
         assertEquals(AuthResult.DONE, r3.getResult());
@@ -300,7 +300,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
     @Test
     public void testCredentialAndOtpFailNoOperation1() throws NextStepClientException {
         CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA").getResponseObject();
-        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("TEST_CREDENTIAL", "test_user_1", "secret", r1.getOtpId(), r1.getOtpValue()).getResponseObject();
+        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("test_user_1", "secret", r1.getOtpId(), r1.getOtpValue()).getResponseObject();
         assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
         assertEquals(AuthenticationResult.FAILED, r2.getCredentialAuthenticationResult());
         assertEquals(AuthenticationResult.SUCCEEDED, r2.getOtpAuthenticationResult());
@@ -309,7 +309,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
     @Test
     public void testCredentialAndOtpFailNoOperation2() throws NextStepClientException {
         CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA").getResponseObject();
-        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("TEST_CREDENTIAL", "test_user_1", "s3cret", r1.getOtpId(), "0000000000").getResponseObject();
+        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("test_user_1", "s3cret", r1.getOtpId(), "0000000000").getResponseObject();
         assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
         assertEquals(AuthenticationResult.SUCCEEDED, r2.getCredentialAuthenticationResult());
         assertEquals(AuthenticationResult.FAILED, r2.getOtpAuthenticationResult());
@@ -319,7 +319,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
     public void testCredentialAndOtpFailWithOperation1() throws NextStepClientException {
         nextStepClient.createOperation("auth_otp", "test_operation_9a", "A1", null, null);
         CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA", "test_operation_9a").getResponseObject();
-        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("TEST_CREDENTIAL", "test_user_1", "secret", r1.getOtpId(), "test_operation_9a", r1.getOtpValue(), true, null).getResponseObject();
+        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("test_user_1", "secret", r1.getOtpId(), "test_operation_9a", r1.getOtpValue(), true, null).getResponseObject();
         assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
         assertEquals(AuthenticationResult.FAILED, r2.getCredentialAuthenticationResult());
         assertEquals(AuthenticationResult.SUCCEEDED, r2.getOtpAuthenticationResult());
@@ -331,7 +331,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
     public void testCredentialAndOtpFailWithOperation2() throws NextStepClientException {
         nextStepClient.createOperation("auth_otp", "test_operation_9b", "A1", null, null);
         CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA", "test_operation_9b").getResponseObject();
-        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("TEST_CREDENTIAL", "test_user_1", "s3cret", r1.getOtpId(), "test_operation_9b", "0000000000", true, null).getResponseObject();
+        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("test_user_1", "s3cret", r1.getOtpId(), "test_operation_9b", "0000000000", true, null).getResponseObject();
         assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
         assertEquals(AuthenticationResult.SUCCEEDED, r2.getCredentialAuthenticationResult());
         assertEquals(AuthenticationResult.FAILED, r2.getOtpAuthenticationResult());
@@ -418,7 +418,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
     public void testOtpAndCredentialVerifyBlockedUser() throws NextStepClientException {
         CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA").getResponseObject();
         nextStepClient.blockUser("test_user_1");
-        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("TEST_CREDENTIAL", "test_user_1", "s3cret", r1.getOtpId(), r1.getOtpValue()).getResponseObject();
+        CombinedAuthenticationResponse r2 = nextStepClient.authenticateCombined("test_user_1", "s3cret", r1.getOtpId(), r1.getOtpValue()).getResponseObject();
         assertEquals(UserIdentityStatus.BLOCKED, r2.getUserIdentityStatus());
         assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
         assertEquals(AuthenticationResult.FAILED, r2.getOtpAuthenticationResult());
@@ -534,7 +534,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         nextStepClient.createOperation("auth_otp", "test_operation_11", "A1", null, null);
         for (int i = 0; i < 4; i++) {
             nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA", "test_operation_11");
-            CombinedAuthenticationResponse r1 = nextStepClient.authenticateCombined("TEST_CREDENTIAL", "test_user_1", "secret", null, "test_operation_11", "0000000000", true, null).getResponseObject();
+            CombinedAuthenticationResponse r1 = nextStepClient.authenticateCombined("test_user_1", "secret", null, "test_operation_11", "0000000000", true, null).getResponseObject();
             assertEquals(AuthenticationResult.FAILED, r1.getAuthenticationResult());
             if (i < 3) {
                 // 2 attempts for OTP, 2 attempts for credential
@@ -549,7 +549,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
             nextStepClient.updateCredentialCounter("test_user_1", "TEST_CREDENTIAL", AuthenticationResult.SUCCEEDED);
         }
         // Operation status changes to FAILED due to 5th failed attempt
-        CombinedAuthenticationResponse r1 = nextStepClient.authenticateCombined("TEST_CREDENTIAL", "test_user_1", "secret", null, "test_operation_11", "0000000000", true, null).getResponseObject();
+        CombinedAuthenticationResponse r1 = nextStepClient.authenticateCombined("test_user_1", "secret", null, "test_operation_11", "0000000000", true, null).getResponseObject();
         assertEquals(0, (int) r1.getRemainingAttempts());
         assertTrue(r1.isOperationFailed());
         assertEquals(AuthenticationResult.FAILED, r1.getAuthenticationResult());
@@ -705,26 +705,6 @@ public class NextStepAuthenticationTest extends NextStepTest {
         assertEquals(UserIdentityStatus.ACTIVE, r5.getUserIdentityStatus());
         GetOperationDetailResponse r6 = nextStepClient.getOperationDetail("test_operation_check_2").getResponseObject();
         assertEquals(AuthResult.FAILED, r6.getResult());
-    }
-
-    @Test
-    void testAuthCombinedCredentialNameMismatch() throws NextStepClientException {
-        final String otpCredentialName = "TEST_CREDENTIAL";
-        final String authCredentialName = "TEST_CREDENTIAL_MISMATCH";
-        final CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", otpCredentialName, "TEST_DATA").getResponseObject();
-        final NextStepClientException thrownException = assertThrows(NextStepClientException.class, () -> {
-            nextStepClient.authenticateCombined(authCredentialName, "test_user_1", "s3cret", r1.getOtpId(), r1.getOtpValue());
-        });
-        assertEquals("com.wultra.core.rest.client.base.RestClientException: HTTP error occurred: 400 BAD_REQUEST", thrownException.getMessage());
-    }
-
-    @Test
-    void testAuthCombinedCredentialNameMissing() throws NextStepClientException {
-        final String otpCredentialName = "TEST_CREDENTIAL";
-        final CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", otpCredentialName, "TEST_DATA").getResponseObject();
-        assertDoesNotThrow(() -> {
-            nextStepClient.authenticateCombined(null, "test_user_1", "s3cret", r1.getOtpId(), r1.getOtpValue());
-        });
     }
 
 }

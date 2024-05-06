@@ -2424,10 +2424,9 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String userId, @NotNull String credentialValue,
                                                                                  String otpId, @NotNull String otpValue) throws NextStepClientException {
         final CombinedAuthenticationRequest request = new CombinedAuthenticationRequest();
-        request.setCredentialName(credentialName);
         request.setUserId(userId);
         request.setCredentialValue(credentialValue);
         request.setOtpId(otpId);
@@ -2448,11 +2447,10 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String userId, @NotNull String credentialValue,
                                                                                  CredentialAuthenticationMode authenticationMode, List<Integer> credentialPositionsToVerify,
                                                                                  String otpId, @NotNull String otpValue) throws NextStepClientException {
         final CombinedAuthenticationRequest request = new CombinedAuthenticationRequest();
-        request.setCredentialName(credentialName);
         request.setUserId(userId);
         request.setCredentialValue(credentialValue);
         request.setAuthenticationMode(authenticationMode);
@@ -2476,11 +2474,10 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String userId, @NotNull String credentialValue,
                                                                                  String otpId, String operationId, @NotNull String otpValue,
                                                                                  boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
         final CombinedAuthenticationRequest request = new CombinedAuthenticationRequest();
-        request.setCredentialName(credentialName);
         request.setUserId(userId);
         request.setCredentialValue(credentialValue);
         request.setOtpId(otpId);
@@ -2507,12 +2504,11 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String userId, @NotNull String credentialValue,
                                                                                  CredentialAuthenticationMode authenticationMode, List<Integer> credentialPositionsToVerify,
                                                                                  String otpId, String operationId, @NotNull String otpValue,
                                                                                  boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
         final CombinedAuthenticationRequest request = new CombinedAuthenticationRequest();
-        request.setCredentialName(credentialName);
         request.setUserId(userId);
         request.setCredentialValue(credentialValue);
         request.setAuthenticationMode(authenticationMode);

@@ -551,9 +551,6 @@ public class AuthenticationService {
         final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
 
         final OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
-        if (request.getCredentialName() != null && !request.getCredentialName().equals(otp.getCredentialDefinition().getName())) {
-            throw new InvalidRequestException("Mismatched credentialName for OTP: " + otp.getOtpId() + "'. The credentialName must match the one used for OTP generation.");
-        }
 
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
             logger.info("Combined authentication proxied through Data Adapter, OTP ID: {}", request.getOtpId());
@@ -581,11 +578,9 @@ public class AuthenticationService {
             operation = operationPersistenceService.getOperation(request.getOperationId());
         }
         if (request.isUpdateOperation() && operation == null) {
-            throw new InvalidRequestException("Operation not found, however operation update requested for credential and OTP: " + request.getCredentialName() + ", " + otp.getOtpDefinition().getName());
+            throw new InvalidRequestException("Operation not found, however operation update requested OTP: " + otp.getOtpDefinition().getName());
         }
-        if (request.getOperationId() != null && !request.getOperationId().equals(otp.getOperation().getOperationId())) {
-            throw new InvalidRequestException("Operation ID mismatch for credential and OTP: " + request.getCredentialName() + ", " + otp.getOtpDefinition().getName());
-        }
+
         final CredentialEntity credential = credentialService.findCredential(otp.getCredentialDefinition(), user);
         final CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
         String credentialValue = request.getCredentialValue();

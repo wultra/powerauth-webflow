@@ -8823,7 +8823,6 @@ The list of expected status codes:
 ```json
 {
   "requestObject": {
-    "credentialName": "RETAIL_CREDENTIAL",
     "userId": "test1234",
     "credentialValue": ")wOI6ijUkwYI",
     "authenticationMode": "MATCH_EXACT",
@@ -8836,8 +8835,6 @@ The list of expected status codes:
   }
 }
 ```
-
-**The `credentialName` parameter is optional and should not be used or it has to be the same as used for OTP generation.**
 
 #### Response 200
 
