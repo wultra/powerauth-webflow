@@ -551,7 +551,6 @@ public class AuthenticationService {
         final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
 
         final OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
-
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
             logger.info("Combined authentication proxied through Data Adapter, OTP ID: {}", request.getOtpId());
             return authenticateCombinedCustom(otp.getCredentialDefinition(), otp.getOtpId(), request.getOtpValue(), request.getCredentialValue(), otp.getOperation().getOperationId(), otp.getUserId(), request.getAuthMethod());

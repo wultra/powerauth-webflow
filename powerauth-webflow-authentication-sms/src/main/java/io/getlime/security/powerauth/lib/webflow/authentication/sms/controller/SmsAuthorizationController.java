@@ -137,7 +137,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             final String otpId = getOtpIdFromHttpSession();
             GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(operation.getOrganizationId()).getResponseObject();
             String otpName = organization.getDefaultOtpName();
-
             if (otpName == null) {
                 logger.warn("Default OTP name is not configured for organization: " + operation.getOrganizationId());
                 throw new AuthStepException("SMS delivery failed", "error.communication");
