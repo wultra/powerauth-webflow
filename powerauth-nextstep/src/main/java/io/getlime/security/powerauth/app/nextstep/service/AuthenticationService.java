@@ -551,6 +551,9 @@ public class AuthenticationService {
         final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
 
         final OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
+        if (otp.getCredentialDefinition() == null || otp.getCredentialDefinition().getName() == null) {
+            throw new InvalidRequestException("Credential definition is not set for operation with OTP Id and Operation Id: " + request.getOtpId() + ", " + request.getOperationId());
+        }
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
             logger.info("Combined authentication proxied through Data Adapter, OTP ID: {}", request.getOtpId());
             return authenticateCombinedCustom(otp.getCredentialDefinition(), otp.getOtpId(), request.getOtpValue(), request.getCredentialValue(), otp.getOperation().getOperationId(), otp.getUserId(), request.getAuthMethod());
@@ -577,10 +580,10 @@ public class AuthenticationService {
             operation = operationPersistenceService.getOperation(request.getOperationId());
         }
         if (request.isUpdateOperation() && operation == null) {
-            throw new InvalidRequestException("Operation not found, however operation update requested for credential and OTP: " + request.getCredentialName() + ", " + otp.getOtpDefinition().getName());
+            throw new InvalidRequestException("Operation not found, however operation update requested for credential and OTP: " + otp.getCredentialDefinition().getName() + ", " + otp.getOtpDefinition().getName());
         }
         if (request.getOperationId() != null && !request.getOperationId().equals(otp.getOperation().getOperationId())) {
-            throw new InvalidRequestException("Operation ID mismatch for credential and OTP: " + request.getCredentialName() + ", " + otp.getOtpDefinition().getName());
+            throw new InvalidRequestException("Operation ID mismatch for credential and OTP: " + otp.getCredentialDefinition().getName() + ", " + otp.getOtpDefinition().getName());
         }
         final CredentialEntity credential = credentialService.findCredential(otp.getCredentialDefinition(), user);
         final CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();

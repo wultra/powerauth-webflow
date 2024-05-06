@@ -35,9 +35,6 @@ import java.util.List;
 public class CombinedAuthenticationRequest {
 
     @NotBlank
-    @Size(min = 2, max = 256)
-    private String credentialName;
-    @NotBlank
     @Size(min = 1, max = 256)
     private String userId;
     @NotBlank

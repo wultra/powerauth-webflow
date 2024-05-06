@@ -8823,7 +8823,6 @@ The list of expected status codes:
 ```json
 {
   "requestObject": {
-    "credentialName": "RETAIL_CREDENTIAL",
     "userId": "test1234",
     "credentialValue": ")wOI6ijUkwYI",
     "authenticationMode": "MATCH_EXACT",
