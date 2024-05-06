@@ -552,7 +552,7 @@ public class AuthenticationService {
 
         final OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
         if (otp.getCredentialDefinition() == null || otp.getCredentialDefinition().getName() == null) {
-            throw new InvalidRequestException("Credential definition is not defined for operation with OTP Id and Operation Id:" + request.getOtpId() + ", " + request.getOperationId());
+            throw new InvalidRequestException("Credential definition is not set for operation with OTP Id and Operation Id: " + request.getOtpId() + ", " + request.getOperationId());
         }
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
             logger.info("Combined authentication proxied through Data Adapter, OTP ID: {}", request.getOtpId());
