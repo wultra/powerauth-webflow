@@ -2416,7 +2416,6 @@ public class NextStepClient {
     /**
      * Authenticate using credential and OTP without operation.
      *
-     * @param credentialName Credential name.
      * @param userId User ID.
      * @param credentialValue Credential value.
      * @param otpId OTP ID.
@@ -2437,7 +2436,6 @@ public class NextStepClient {
     /**
      * Authenticate using credential and OTP without operation and with additional details.
      *
-     * @param credentialName Credential name.
      * @param userId User ID.
      * @param credentialValue Credential value.
      * @param authenticationMode Authentication mode.
@@ -2463,7 +2461,6 @@ public class NextStepClient {
     /**
      * Authenticate using credential and OTP with operation.
      *
-     * @param credentialName Credential name.
      * @param userId User ID.
      * @param credentialValue Credential value.
      * @param otpId OTP ID.
@@ -2491,7 +2488,6 @@ public class NextStepClient {
     /**
      * Authenticate using credential and OTP with operation and with additional details.
      *
-     * @param credentialName Credential name.
      * @param userId User ID.
      * @param credentialValue Credential value.
      * @param authenticationMode Authentication mode.
