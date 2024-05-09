@@ -42,6 +42,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -421,19 +422,12 @@ public class AuthenticationService {
             }
         }
 
-        final Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
-        if (Integer.valueOf(0).equals(remainingAttempts) && otp.getStatus() == OtpStatus.ACTIVE) {
-            logger.debug("OTP was blocked because there are no remaining attempts left, OTP ID: {}", otp.getOtpId());
-            otp.setStatus(OtpStatus.BLOCKED);
-            otp.setTimestampBlocked(new Date());
-            // OTP was updated, save authentication with OTP
-            authenticationRepository.save(authentication);
-        }
+        final Integer remainingAttempts = resolveRemainingAttemptsAndBlockOtpIfNeeded(credential, otp, operation, authentication);
 
         final String mode = checkOnly ? "check" : "authentication";
 
-        logger.info("OTP " + mode + " result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
-                authenticationResult, remainingAttempts, user == null ? null : user.getUserId(), user == null ? null : user.getStatus(), otp.getStatus(), credential == null ? null : credential.getStatus(), operationFailed);
+        logger.info("OTP {} result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
+                mode, authenticationResult, remainingAttempts, user == null ? null : user.getUserId(), user == null ? null : user.getStatus(), otp.getStatus(), credential == null ? null : credential.getStatus(), operationFailed);
         audit.info("OTP authentication result", AuditDetail.builder()
                 .type(AUDIT_TYPE_AUTHENTICATION)
                 .param("userId", user != null ? user.getUserId() : null)
@@ -669,14 +663,7 @@ public class AuthenticationService {
             }
         }
 
-        final Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
-        if (Integer.valueOf(0).equals(remainingAttempts) && otp.getStatus() == OtpStatus.ACTIVE) {
-            logger.debug("OTP was blocked because there are no remaining attempts left, OTP ID: {}", otp.getOtpId());
-            otp.setStatus(OtpStatus.BLOCKED);
-            otp.setTimestampBlocked(new Date());
-            // OTP was updated, save authentication with OTP
-            authenticationRepository.save(authentication);
-        }
+        final Integer remainingAttempts = resolveRemainingAttemptsAndBlockOtpIfNeeded(credential, otp, operation, authentication);
 
         logger.info("Combined authentication result: {}, credential authentication result: {}, OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
                 authenticationResult, credentialAuthenticationResult, otpAuthenticationResult, remainingAttempts, user.getUserId(), user.getStatus(), otp.getStatus(), credential.getStatus(), operationFailed);
@@ -979,6 +966,18 @@ public class AuthenticationService {
             // Cannot occur, organization is not changed by the request
             return null;
         }
+    }
+
+    private Integer resolveRemainingAttemptsAndBlockOtpIfNeeded(final CredentialEntity credential, final @NotNull OtpEntity otp, final OperationEntity operation, final AuthenticationEntity authentication) {
+        final Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
+        if (Integer.valueOf(0).equals(remainingAttempts) && otp.getStatus() == OtpStatus.ACTIVE) {
+            logger.debug("OTP was blocked because there are no remaining attempts left, OTP ID: {}", otp.getOtpId());
+            otp.setStatus(OtpStatus.BLOCKED);
+            otp.setTimestampBlocked(new Date());
+            // OTP was updated, save authentication with OTP
+            authenticationRepository.save(authentication);
+        }
+        return remainingAttempts;
     }
 
     /**
