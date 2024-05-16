@@ -97,7 +97,7 @@
 
         <!-- Documentation Dependencies -->
         <springdoc-openapi-starter-webmvc-ui.version>2.5.0</springdoc-openapi-starter-webmvc-ui.version>
-        <swagger-annotations-jakarta.version>2.2.21</swagger-annotations-jakarta.version>
+        <swagger-annotations-jakarta.version>2.2.22</swagger-annotations-jakarta.version>
 
         <moneta.version>1.4.4</moneta.version>
         <owasp-java-html-sanitizer.version>20240325.1</owasp-java-html-sanitizer.version>
