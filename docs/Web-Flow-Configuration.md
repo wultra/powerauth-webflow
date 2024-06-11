@@ -27,6 +27,8 @@ powerauth.nextstep.service.url=http://localhost:8080/powerauth-nextstep
 
 # PowerAuth Server URL
 powerauth.service.url=http://localhost:8080/powerauth-java-server/rest
+powerauth.service.restClientConfig.responseTimeout=60s
+powerauth.service.restClientConfig.maxIdleTime=200s
 powerauth.service.security.clientToken=
 powerauth.service.security.clientSecret=
 # Whether invalid SSL certificates should be accepted
@@ -34,6 +36,8 @@ powerauth.service.ssl.acceptInvalidSslCertificate=false
 
 # PowerAuth Push Server URL
 powerauth.push.service.url=http://localhost:8080/powerauth-push-server
+powerauth.push.service.restClientConfig.responseTimeout=60s
+powerauth.push.service.restClientConfig.maxIdleTime=200s
 
 # Dynamic CSS stylesheet URL
 powerauth.webflow.page.title=PowerAuth Web Flow
@@ -192,6 +196,8 @@ powerauth.dataAdapter.service.url=http://localhost:8080/powerauth-data-adapter
 
 # PowerAuth Server URL
 powerauth.service.url=http://localhost:8080/powerauth-java-server/rest
+powerauth.service.restClientConfig.responseTimeout=60s
+powerauth.service.restClientConfig.maxIdleTime=200s
 powerauth.service.security.clientToken=
 powerauth.service.security.clientSecret=
 # Whether invalid SSL certificates should be accepted

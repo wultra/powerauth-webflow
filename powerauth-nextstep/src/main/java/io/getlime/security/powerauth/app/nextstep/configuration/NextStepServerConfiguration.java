@@ -29,14 +29,15 @@ import com.wultra.security.powerauth.rest.client.PowerAuthRestClient;
 import com.wultra.security.powerauth.rest.client.PowerAuthRestClientConfiguration;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.Duration;
 
 /**
  * Configuration of Next Step server.
@@ -46,9 +47,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties("ext")
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
+@Slf4j
 public class NextStepServerConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(NextStepServerConfiguration.class);
     private final AuditFactory auditFactory;
 
     /**
@@ -59,6 +60,12 @@ public class NextStepServerConfiguration {
 
     @Value("${powerauth.service.url}")
     private String powerAuthRestUrl;
+
+    @Value("${powerauth.service.restClientConfig.responseTimeout}")
+    private Duration powerAuthServiceTimeout;
+
+    @Value("${powerauth.service.restClientConfig.maxIdleTime}")
+    private Duration powerAuthServiceMaxIdleTime;
 
     @Value("${powerauth.service.security.clientToken}")
     private String powerAuthClientToken;
@@ -211,18 +218,14 @@ public class NextStepServerConfiguration {
      * @return PowerAuth REST client.
      */
     @Bean
-    public PowerAuthClient powerAuthClient() {
+    public PowerAuthClient powerAuthClient() throws PowerAuthClientException {
         final PowerAuthRestClientConfiguration config = new PowerAuthRestClientConfiguration();
         config.setPowerAuthClientToken(powerAuthClientToken);
         config.setPowerAuthClientSecret(powerAuthClientSecret);
         config.setAcceptInvalidSslCertificate(powerAuthAcceptInvalidSslCertificate);
-        try {
-            return new PowerAuthRestClient(powerAuthRestUrl, config);
-        } catch (PowerAuthClientException ex) {
-            logger.error(ex.getMessage(), ex);
-            audit().error(ex.getMessage(), ex);
-            return null;
-        }
+        config.setResponseTimeout(powerAuthServiceTimeout);
+        config.setMaxIdleTime(powerAuthServiceMaxIdleTime);
+        return new PowerAuthRestClient(powerAuthRestUrl, config);
     }
 
     /**
