@@ -17,18 +17,20 @@
  */
 package io.getlime.security.powerauth.app.webflow.configuration;
 
+import com.wultra.core.rest.client.base.RestClientConfiguration;
 import com.wultra.security.powerauth.client.PowerAuthClient;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.rest.client.PowerAuthRestClient;
 import com.wultra.security.powerauth.rest.client.PowerAuthRestClientConfiguration;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.Duration;
 
 /**
  * Configuration for the PowerAuth Server connector.
@@ -37,15 +39,17 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
+@Slf4j
 public class PowerAuthWebServiceConfiguration {
-
-    private static final Logger logger = LoggerFactory.getLogger(PowerAuthWebServiceConfiguration.class);
 
     @Value("${powerauth.service.url}")
     private String powerAuthRestUrl;
 
-    @Value("${powerauth.push.service.url}")
-    private String powerAuthPushServiceUrl;
+    @Value("${powerauth.service.restClientConfig.responseTimeout}")
+    private Duration powerAuthServiceTimeout;
+
+    @Value("${powerauth.service.restClientConfig.maxIdleTime}")
+    private Duration powerAuthServiceMaxIdleTime;
 
     @Value("${powerauth.service.security.clientToken}")
     private String clientToken;
@@ -61,17 +65,14 @@ public class PowerAuthWebServiceConfiguration {
      * @return PowerAuth REST client.
      */
     @Bean
-    public PowerAuthClient powerAuthClient() {
-        PowerAuthRestClientConfiguration config = new PowerAuthRestClientConfiguration();
+    public PowerAuthClient powerAuthClient() throws PowerAuthClientException {
+        final PowerAuthRestClientConfiguration config = new PowerAuthRestClientConfiguration();
         config.setPowerAuthClientToken(clientToken);
         config.setPowerAuthClientSecret(clientSecret);
         config.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
-        try {
-            return new PowerAuthRestClient(powerAuthRestUrl, config);
-        } catch (PowerAuthClientException ex) {
-            logger.error(ex.getMessage(), ex);
-            return null;
-        }
+        config.setResponseTimeout(powerAuthServiceTimeout);
+        config.setMaxIdleTime(powerAuthServiceMaxIdleTime);
+        return new PowerAuthRestClient(powerAuthRestUrl, config);
     }
 
     /**
@@ -79,13 +80,12 @@ public class PowerAuthWebServiceConfiguration {
      * @return Push server client.
      */
     @Bean
-    public PushServerClient pushServerClient() {
-        try {
-            return new PushServerClient(powerAuthPushServiceUrl);
-        } catch (PushServerClientException ex) {
-            logger.error(ex.getMessage(), ex);
-            return null;
-        }
+    public PushServerClient pushServerClient(final PushServiceConfigProperties pushServiceProperties) throws PushServerClientException {
+        final String url = pushServiceProperties.getUrl();
+        logger.info("Configuring PushServerClient for URL: {}", url);
+        final RestClientConfiguration restClientConfig = pushServiceProperties.getRestClientConfig();
+        restClientConfig.setBaseUrl(url);
+        return new PushServerClient(restClientConfig);
     }
 
 }
