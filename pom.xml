@@ -96,7 +96,7 @@
         <passay.version>1.6.4</passay.version>
 
         <!-- Documentation Dependencies -->
-        <springdoc-openapi-starter-webmvc-ui.version>2.5.0</springdoc-openapi-starter-webmvc-ui.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
         <swagger-annotations-jakarta.version>2.2.22</swagger-annotations-jakarta.version>
 
         <moneta.version>1.4.4</moneta.version>
