@@ -100,6 +100,7 @@ public class NextStepClient {
      * @param params List of generic parameters.
      * @return A Response with CreateOperationResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createOperation(CreateOperationRequest)
      */
     public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, @NotNull String operationData, List<KeyValueParameter> params) throws NextStepClientException {
         return createOperation(operationName, null, operationData, null, null, null, params, null);
@@ -115,7 +116,8 @@ public class NextStepClient {
      * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with CreateOperationResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
-    */
+     * @see #createOperation(CreateOperationRequest)
+     */
     public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, String operationId, @NotNull String operationData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
         return createOperation(operationName, operationId, operationData, null, null, null, params, applicationContext);
     }
@@ -130,6 +132,7 @@ public class NextStepClient {
      * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with CreateOperationResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createOperation(CreateOperationRequest)
      */
     public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, @NotNull String operationData, OperationFormData formData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
         return createOperation(operationName, null, operationData, null, null, formData, params, applicationContext);
@@ -148,6 +151,7 @@ public class NextStepClient {
      * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with CreateOperationResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createOperation(CreateOperationRequest)
      */
     public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, String operationId, @NotNull String operationData, String organizationId, String externalTransactionId, OperationFormData formData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
         final CreateOperationRequest request = new CreateOperationRequest();
@@ -161,7 +165,7 @@ public class NextStepClient {
             request.getParams().addAll(params);
         }
         request.setApplicationContext(applicationContext);
-        return postObjectImpl("/operation", new ObjectRequest<>(request), CreateOperationResponse.class);
+        return createOperation(request);
     }
 
     /**
@@ -175,9 +179,21 @@ public class NextStepClient {
      * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with CreateOperationResponse object.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createOperation(CreateOperationRequest)
      */
     public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, @NotNull String operationData, OperationFormData formData, String organizationId, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
         return createOperation(operationName, null, operationData, organizationId, null, formData, params, applicationContext);
+    }
+
+    /**
+     * Calls the create operation endpoint via POST method to create a new operation.
+     *
+     * @param request Create operation request.
+     * @return A Response with CreateOperationResponse object.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateOperationResponse> createOperation(@NotNull final CreateOperationRequest request) throws NextStepClientException {
+        return postObjectImpl("/operation", new ObjectRequest<>(request), CreateOperationResponse.class);
     }
 
     /**
@@ -194,6 +210,7 @@ public class NextStepClient {
      * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with UpdateOperationResponse object.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateOperation(UpdateOperationRequest)
      */
     public ObjectResponse<UpdateOperationResponse> updateOperation(@NotNull String operationId, String userId, String organizationId, @NotNull AuthMethod authMethod, List<AuthInstrument> authInstruments, @NotNull AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext, PAAuthenticationContext authenticationContext) throws NextStepClientException {
         final UpdateOperationRequest request = new UpdateOperationRequest();
@@ -209,6 +226,17 @@ public class NextStepClient {
         }
         request.setApplicationContext(applicationContext);
         request.setAuthenticationContext(authenticationContext);
+        return updateOperation(request);
+    }
+
+    /**
+     * Calls the update operation endpoint via PUT method to update an existing operation.
+     *
+     * @param request Update operation request.
+     * @return A Response with UpdateOperationResponse object.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateOperationResponse> updateOperation(@NotNull final UpdateOperationRequest request) throws NextStepClientException {
         return putObjectImpl("/operation", new ObjectRequest<>(request), UpdateOperationResponse.class);
     }
   
@@ -226,6 +254,7 @@ public class NextStepClient {
      * @param applicationContext Context of application requesting the OAuth 2.1 consent.
      * @return A Response with UpdateOperationResponse object.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateOperationPost(UpdateOperationRequest)
      */
     public ObjectResponse<UpdateOperationResponse> updateOperationPost(@NotNull String operationId, String userId, String organizationId, @NotNull AuthMethod authMethod, List<AuthInstrument> authInstruments, @NotNull AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext, PAAuthenticationContext authenticationContext) throws NextStepClientException {
         final UpdateOperationRequest request = new UpdateOperationRequest();
@@ -241,6 +270,17 @@ public class NextStepClient {
         }
         request.setApplicationContext(applicationContext);
         request.setAuthenticationContext(authenticationContext);
+        return updateOperationPost(request);
+    }
+
+    /**
+     * Calls the update operation endpoint via POST method to update an existing operation.
+     *
+     * @param request Update operation request.
+     * @return A Response with UpdateOperationResponse object.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateOperationResponse> updateOperationPost(@NotNull final UpdateOperationRequest request) throws NextStepClientException {
         return postObjectImpl("/operation/update", new ObjectRequest<>(request), UpdateOperationResponse.class);
     }
 
@@ -253,6 +293,7 @@ public class NextStepClient {
      * @param accountStatus User account status.
      * @return Response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateOperationUser(UpdateOperationUserRequest)
      */
     public Response updateOperationUser(@NotNull String operationId, @NotNull String userId, String organizationId, UserAccountStatus accountStatus) throws NextStepClientException {
         final UpdateOperationUserRequest request = new UpdateOperationUserRequest();
@@ -260,11 +301,22 @@ public class NextStepClient {
         request.setUserId(userId);
         request.setOrganizationId(organizationId);
         request.setAccountStatus(accountStatus);
+        return updateOperationUser(request);
+    }
+
+    /**
+     * Update user, organization and account status for an operation via PUT method.
+     *
+     * @param request Update operation user request.
+     * @return Response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public Response updateOperationUser(@NotNull final UpdateOperationUserRequest request) throws NextStepClientException {
         return putObjectImpl("/operation/user", new ObjectRequest<>(request));
     }
 
     /**
-     * UUpdate user, organization and account status for an operation via POST method.
+     * Update user, organization and account status for an operation via POST method.
      *
      * @param operationId Operation ID.
      * @param userId User ID.
@@ -272,6 +324,7 @@ public class NextStepClient {
      * @param accountStatus User account status.
      * @return Response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateOperationUserPost(UpdateOperationUserRequest)
      */
     public Response updateOperationUserPost(@NotNull String operationId, @NotNull String userId, String organizationId, UserAccountStatus accountStatus) throws NextStepClientException {
         final UpdateOperationUserRequest request = new UpdateOperationUserRequest();
@@ -279,6 +332,17 @@ public class NextStepClient {
         request.setUserId(userId);
         request.setOrganizationId(organizationId);
         request.setAccountStatus(accountStatus);
+        return updateOperationUserPost(request);
+    }
+
+    /**
+     * Update user, organization and account status for an operation via POST method.
+     *
+     * @param request Update operation user request.
+     * @return Response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public Response updateOperationUserPost(@NotNull final UpdateOperationUserRequest request) throws NextStepClientException {
         return postObjectImpl("/operation/user/update", new ObjectRequest<>(request));
     }
 
@@ -289,11 +353,23 @@ public class NextStepClient {
      * @param formData Form data.
      * @return Object response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateOperationFormData(UpdateFormDataRequest)
      */
     public Response updateOperationFormData(@NotNull String operationId, @NotNull OperationFormData formData) throws NextStepClientException {
         final UpdateFormDataRequest request = new UpdateFormDataRequest();
         request.setOperationId(operationId);
         request.setFormData(formData);
+        return updateOperationFormData(request);
+    }
+
+    /**
+     * Update operation form data via PUT method.
+     *
+     * @param request Update form data request.
+     * @return Object response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public Response updateOperationFormData(@NotNull final UpdateFormDataRequest request) throws NextStepClientException {
         return putObjectImpl("/operation/formData", new ObjectRequest<>(request));
     }
 
@@ -304,11 +380,23 @@ public class NextStepClient {
      * @param formData Form data.
      * @return Object response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateOperationFormDataPost(UpdateFormDataRequest)
      */
     public Response updateOperationFormDataPost(@NotNull String operationId, @NotNull OperationFormData formData) throws NextStepClientException {
         final UpdateFormDataRequest request = new UpdateFormDataRequest();
         request.setOperationId(operationId);
         request.setFormData(formData);
+        return updateOperationFormDataPost(request);
+    }
+    
+    /**
+     * Update operation form data via POST method.
+     *
+     * @param request Update form data request.
+     * @return Object response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public Response updateOperationFormDataPost(@NotNull final UpdateFormDataRequest request) throws NextStepClientException {
         return postObjectImpl("/operation/formData/update", new ObjectRequest<>(request));
     }
 
@@ -319,11 +407,23 @@ public class NextStepClient {
      * @param chosenAuthMethod Chosen authentication method.
      * @return Object response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateChosenAuthMethod(UpdateChosenAuthMethodRequest)
      */
     public Response updateChosenAuthMethod(@NotNull String operationId, @NotNull AuthMethod chosenAuthMethod) throws NextStepClientException {
         final UpdateChosenAuthMethodRequest request = new UpdateChosenAuthMethodRequest();
         request.setOperationId(operationId);
         request.setChosenAuthMethod(chosenAuthMethod);
+        return updateChosenAuthMethod(request);
+    }
+
+    /**
+     * Update chosen authentication method for current operation step via PUT method.
+     *
+     * @param request Update chosen auth method request.
+     * @return Object response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public Response updateChosenAuthMethod(@NotNull final UpdateChosenAuthMethodRequest request) throws NextStepClientException {
         return putObjectImpl("/operation/chosenAuthMethod", new ObjectRequest<>(request));
     }
 
@@ -334,11 +434,23 @@ public class NextStepClient {
      * @param chosenAuthMethod Chosen authentication method.
      * @return Object response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateChosenAuthMethodPost(UpdateChosenAuthMethodRequest)
      */
     public Response updateChosenAuthMethodPost(@NotNull String operationId, @NotNull AuthMethod chosenAuthMethod) throws NextStepClientException {
         final UpdateChosenAuthMethodRequest request = new UpdateChosenAuthMethodRequest();
         request.setOperationId(operationId);
         request.setChosenAuthMethod(chosenAuthMethod);
+        return updateChosenAuthMethodPost(request);
+    }
+
+    /**
+     * Update chosen authentication method for current operation step via POST method.
+     *
+     * @param request Update chosen auth method request.
+     * @return Object response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public Response updateChosenAuthMethodPost(@NotNull final UpdateChosenAuthMethodRequest request) throws NextStepClientException {
         return postObjectImpl("/operation/chosenAuthMethod/update", new ObjectRequest<>(request));
     }
 
@@ -349,11 +461,23 @@ public class NextStepClient {
      * @param applicationContext Application context.
      * @return Object response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateApplicationContext(UpdateApplicationContextRequest)
      */
     public Response updateApplicationContext(@NotNull String operationId, @NotNull ApplicationContext applicationContext) throws NextStepClientException {
         final UpdateApplicationContextRequest request = new UpdateApplicationContextRequest();
         request.setOperationId(operationId);
         request.setApplicationContext(applicationContext);
+        return updateApplicationContext(request);
+    }
+
+    /**
+     * Update application context for current operation step via PUT method.
+     *
+     * @param request Update application context request.
+     * @return Object response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public Response updateApplicationContext(@NotNull final UpdateApplicationContextRequest request) throws NextStepClientException {
         return putObjectImpl("/operation/application", new ObjectRequest<>(request));
     }
 
@@ -364,11 +488,23 @@ public class NextStepClient {
      * @param applicationContext Application context.
      * @return Object response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateApplicationContextPost(UpdateApplicationContextRequest)
      */
     public Response updateApplicationContextPost(@NotNull String operationId, @NotNull ApplicationContext applicationContext) throws NextStepClientException {
         final UpdateApplicationContextRequest request = new UpdateApplicationContextRequest();
         request.setOperationId(operationId);
         request.setApplicationContext(applicationContext);
+        return updateApplicationContextPost(request);
+    }
+
+    /**
+     * Update application context for current operation step via POST method.
+     *
+     * @param request Update application context request.
+     * @return Object response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public Response updateApplicationContextPost(@NotNull final UpdateApplicationContextRequest request) throws NextStepClientException {
         return postObjectImpl("/operation/application/update", new ObjectRequest<>(request));
     }
 
@@ -379,11 +515,23 @@ public class NextStepClient {
      * @param mobileTokenActive Whether mobile token is active.
      * @return Object response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateMobileToken(UpdateMobileTokenRequest)
      */
     public Response updateMobileToken(@NotNull String operationId, boolean mobileTokenActive) throws NextStepClientException {
         final UpdateMobileTokenRequest request = new UpdateMobileTokenRequest();
         request.setOperationId(operationId);
         request.setMobileTokenActive(mobileTokenActive);
+        return updateMobileToken(request);
+    }
+
+    /**
+     * Update mobile token status for current operation step via PUT method.
+     *
+     * @param request Update mobile token request.
+     * @return Object response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public Response updateMobileToken(@NotNull final UpdateMobileTokenRequest request) throws NextStepClientException {
         return putObjectImpl("/operation/mobileToken/status", new ObjectRequest<>(request));
     }
 
@@ -394,16 +542,28 @@ public class NextStepClient {
      * @param mobileTokenActive Whether mobile token is active.
      * @return Object response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateMobileTokenPost(UpdateMobileTokenRequest)
      */
     public Response updateMobileTokenPost(@NotNull String operationId, boolean mobileTokenActive) throws NextStepClientException {
         final UpdateMobileTokenRequest request = new UpdateMobileTokenRequest();
         request.setOperationId(operationId);
         request.setMobileTokenActive(mobileTokenActive);
+        return updateMobileTokenPost(request);
+    }
+
+    /**
+     * Update mobile token status for current operation step via POST method.
+     *
+     * @param request Update mobile token request.
+     * @return Object response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public Response updateMobileTokenPost(@NotNull final UpdateMobileTokenRequest request) throws NextStepClientException {
         return postObjectImpl("/operation/mobileToken/status/update", new ObjectRequest<>(request));
     }
 
     /**
-     * Get mobile token configuration configuration.
+     * Get mobile token configuration using GET method.
      *
      * @param userId User ID.
      * @param operationName Operation name.
@@ -422,24 +582,36 @@ public class NextStepClient {
     }
 
     /**
-     * Get mobile token configuration configuration using POST method.
+     * Get mobile token configuration using POST method.
      *
      * @param userId User ID.
      * @param operationName Operation name.
      * @param authMethod Authentication method.
      * @return Mobile token configuration.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #getMobileTokenConfigPost(GetMobileTokenConfigRequest)
      */
     public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfigPost(@NotNull String userId, @NotNull String operationName, @NotNull AuthMethod authMethod) throws NextStepClientException {
         final GetMobileTokenConfigRequest request = new GetMobileTokenConfigRequest();
         request.setUserId(userId);
         request.setOperationName(operationName);
         request.setAuthMethod(authMethod);
+        return getMobileTokenConfigPost(request);
+    }
+
+    /**
+     * Get mobile token configuration using POST method.
+     *
+     * @param request Get mobile token config request.
+     * @return Mobile token configuration.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfigPost(@NotNull final GetMobileTokenConfigRequest request) throws NextStepClientException {
         return postObjectImpl("/operation/mobileToken/config/detail", new ObjectRequest<>(request), GetMobileTokenConfigResponse.class);
     }
 
     /**
-     * Calls the operation details endpoint via POST method to get operation details.
+     * Calls the operation details endpoint via GET method to get operation details.
      *
      * @param operationId Operation ID.
      * @return A Response with {@link GetOperationDetailResponse} object.
@@ -489,6 +661,7 @@ public class NextStepClient {
      * @param responseAfsExtras AFS response extras.
      * @return Response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createAfsAction(CreateAfsActionRequest)
      */
     public Response createAfsAction(@NotNull String operationId, @NotNull String afsAction, int stepIndex, String requestAfsExtras, String afsLabel,
                                     boolean afsResponseApplied, String responseAfsExtras) throws NextStepClientException {
@@ -501,6 +674,17 @@ public class NextStepClient {
         request.setAfsResponseApplied(afsResponseApplied);
         request.setResponseAfsExtras(responseAfsExtras);
         request.setTimestampCreated(new Date());
+        return createAfsAction(request);
+    }
+
+    /**
+     * Create an AFS action in Next Step and log its request and response parameters.
+     *
+     * @param request Create AFS action request.
+     * @return Response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public Response createAfsAction(@NotNull final CreateAfsActionRequest request) throws NextStepClientException {
         return postObjectImpl("/operation/afs/action", new ObjectRequest<>(request));
     }
 
@@ -627,6 +811,7 @@ public class NextStepClient {
      * @param orderNumber Order number.
      * @return Create organization response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createOrganization(CreateOrganizationRequest)
      */
     public ObjectResponse<CreateOrganizationResponse> createOrganization(@NotNull String organizationId, String displayNameKey,
                                                                          boolean isDefault, @NotNull Integer orderNumber) throws NextStepClientException {
@@ -635,6 +820,17 @@ public class NextStepClient {
         request.setDisplayNameKey(displayNameKey);
         request.setDefault(isDefault);
         request.setOrderNumber(orderNumber);
+        return createOrganization(request);
+    }
+
+    /**
+     * Create an organization.
+     *
+     * @param request Create organization request.
+     * @return Create organization response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateOrganizationResponse> createOrganization(@NotNull final CreateOrganizationRequest request) throws NextStepClientException {
         return postObjectImpl("/organization", new ObjectRequest<>(request), CreateOrganizationResponse.class);
     }
 
@@ -844,6 +1040,7 @@ public class NextStepClient {
      * @param config Authentication method configuration.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #enableAuthMethodForUser(UpdateAuthMethodRequest)
      */
     public ObjectResponse<GetAuthMethodsResponse> enableAuthMethodForUser(@NotNull String userId, @NotNull AuthMethod authMethod, Map<String, String> config) throws NextStepClientException {
         final UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
@@ -852,6 +1049,17 @@ public class NextStepClient {
         if (config != null) {
             request.getConfig().putAll(config);
         }
+        return enableAuthMethodForUser(request);
+    }
+
+    /**
+     * Enable an authentication method for given user.
+     *
+     * @param request Update auth method request.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetAuthMethodsResponse> enableAuthMethodForUser(@NotNull final UpdateAuthMethodRequest request) throws NextStepClientException {
         return postObjectImpl("/user/auth-method", new ObjectRequest<>(request), GetAuthMethodsResponse.class);
     }
 
@@ -863,6 +1071,7 @@ public class NextStepClient {
      * @param config Authentication method configuration.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #disableAuthMethodForUser(UpdateAuthMethodRequest)
      */
     public ObjectResponse<GetAuthMethodsResponse> disableAuthMethodForUser(@NotNull String userId, @NotNull AuthMethod authMethod, Map<String, String> config) throws NextStepClientException {
         final UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
@@ -871,6 +1080,17 @@ public class NextStepClient {
         if (config != null) {
             request.getConfig().putAll(config);
         }
+        return disableAuthMethodForUser(request);
+    }
+
+    /**
+     * Disable an authentication method for given user.
+     *
+     * @param request Update auth method request.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetAuthMethodsResponse> disableAuthMethodForUser(@NotNull final UpdateAuthMethodRequest request) throws NextStepClientException {
         return postObjectImpl("/user/auth-method/delete", new ObjectRequest<>(request), GetAuthMethodsResponse.class);
     }
 
@@ -883,11 +1103,23 @@ public class NextStepClient {
      * @param description Application description.
      * @return Create application response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createApplication(CreateApplicationRequest)
      */
     public ObjectResponse<CreateApplicationResponse> createApplication(@NotNull String applicationName, String description) throws NextStepClientException {
         final CreateApplicationRequest request = new CreateApplicationRequest();
         request.setApplicationName(applicationName);
         request.setDescription(description);
+        return createApplication(request);
+    }
+
+    /**
+     * Create a Next Step application.
+     *
+     * @param request Createa application request.
+     * @return Create application response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateApplicationResponse> createApplication(@NotNull final CreateApplicationRequest request) throws NextStepClientException {
         return postObjectImpl("/application", new ObjectRequest<>(request), CreateApplicationResponse.class);
     }
 
@@ -899,12 +1131,24 @@ public class NextStepClient {
      * @param status Application status.
      * @return Update application response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateApplication(UpdateApplicationRequest)
      */
     public ObjectResponse<UpdateApplicationResponse> updateApplication(@NotNull String applicationName, String description, ApplicationStatus status) throws NextStepClientException {
         final UpdateApplicationRequest request = new UpdateApplicationRequest();
         request.setApplicationName(applicationName);
         request.setDescription(description);
         request.setApplicationStatus(status);
+        return updateApplication(request);
+    }
+
+    /**
+     * Update a Next Step application via PUT method.
+     *
+     * @param request Update application request.
+     * @return Update application response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateApplicationResponse> updateApplication(@NotNull final UpdateApplicationRequest request) throws NextStepClientException {
         return putObjectImpl("/application", new ObjectRequest<>(request), UpdateApplicationResponse.class);
     }
 
@@ -916,12 +1160,24 @@ public class NextStepClient {
      * @param status Application status.
      * @return Update application response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateApplicationPost(UpdateApplicationRequest)
      */
     public ObjectResponse<UpdateApplicationResponse> updateApplicationPost(@NotNull String applicationName, String description, ApplicationStatus status) throws NextStepClientException {
         final UpdateApplicationRequest request = new UpdateApplicationRequest();
         request.setApplicationName(applicationName);
         request.setDescription(description);
         request.setApplicationStatus(status);
+        return updateApplicationPost(request);
+    }
+
+    /**
+     * Update a Next Step application via POST method.
+     *
+     * @param request Update application request.
+     * @return Update application response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateApplicationResponse> updateApplicationPost(@NotNull final UpdateApplicationRequest request) throws NextStepClientException {
         return postObjectImpl("/application/update", new ObjectRequest<>(request), UpdateApplicationResponse.class);
     }
 
@@ -973,11 +1229,23 @@ public class NextStepClient {
      * @param description Role description.
      * @return Create user role response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createRole(CreateRoleRequest)
      */
     public ObjectResponse<CreateRoleResponse> createRole(@NotNull String roleName, String description) throws NextStepClientException {
         final CreateRoleRequest request = new CreateRoleRequest();
         request.setRoleName(roleName);
         request.setDescription(description);
+        return createRole(request);
+    }
+
+    /**
+     * Create a user role.
+     *
+     * @param request Create role request.
+     * @return Create user role response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateRoleResponse> createRole(@NotNull final CreateRoleRequest request) throws NextStepClientException {
         return postObjectImpl("/role", new ObjectRequest<>(request), CreateRoleResponse.class);
     }
 
@@ -1025,6 +1293,7 @@ public class NextStepClient {
      * @param parameters Hashing algorithm parameters.
      * @return Create hashing configuration response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createHashConfig(CreateHashConfigRequest)
      */
     public ObjectResponse<CreateHashConfigResponse> createHashConfig(@NotNull String hashConfigName, @NotNull HashAlgorithm algorithm, Map<String, String> parameters) throws NextStepClientException {
         final CreateHashConfigRequest request = new CreateHashConfigRequest();
@@ -1033,6 +1302,17 @@ public class NextStepClient {
         if (parameters != null) {
             request.getParameters().putAll(parameters);
         }
+        return createHashConfig(request);
+    }
+
+    /**
+     * Create a hashing configuration.
+     *
+     * @param request Create hash config request.
+     * @return Create hashing configuration response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateHashConfigResponse> createHashConfig(@NotNull final CreateHashConfigRequest request) throws NextStepClientException {
         return postObjectImpl("/hashconfig", new ObjectRequest<>(request), CreateHashConfigResponse.class);
     }
 
@@ -1045,6 +1325,7 @@ public class NextStepClient {
      * @param status Hashing configuration status.
      * @return Update hashing configuration response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateHashConfig(UpdateHashConfigRequest)
      */
     public ObjectResponse<UpdateHashConfigResponse> updateHashConfig(@NotNull String hashConfigName, @NotNull HashAlgorithm algorithm, Map<String, String> parameters, HashConfigStatus status) throws NextStepClientException {
         final UpdateHashConfigRequest request = new UpdateHashConfigRequest();
@@ -1054,6 +1335,17 @@ public class NextStepClient {
             request.getParameters().putAll(parameters);
         }
         request.setHashConfigStatus(status);
+        return updateHashConfig(request);
+    }
+
+    /**
+     * Update a hashing configuration via PUT method.
+     *
+     * @param request Update hash config request.
+     * @return Update hashing configuration response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateHashConfigResponse> updateHashConfig(@NotNull final UpdateHashConfigRequest request) throws NextStepClientException {
         return putObjectImpl("/hashconfig", new ObjectRequest<>(request), UpdateHashConfigResponse.class);
     }
 
@@ -1066,6 +1358,7 @@ public class NextStepClient {
      * @param status Hashing configuration status.
      * @return Update hashing configuration response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateHashConfigPost(UpdateHashConfigRequest)
      */
     public ObjectResponse<UpdateHashConfigResponse> updateHashConfigPost(@NotNull String hashConfigName, @NotNull HashAlgorithm algorithm, Map<String, String> parameters, HashConfigStatus status) throws NextStepClientException {
         final UpdateHashConfigRequest request = new UpdateHashConfigRequest();
@@ -1075,6 +1368,17 @@ public class NextStepClient {
             request.getParameters().putAll(parameters);
         }
         request.setHashConfigStatus(status);
+        return updateHashConfigPost(request);
+    }
+
+    /**
+     * Update a hashing configuration via POST method.
+     *
+     * @param request Update hash config request.
+     * @return Update hashing configuration response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateHashConfigResponse> updateHashConfigPost(@NotNull final UpdateHashConfigRequest request) throws NextStepClientException {
         return postObjectImpl("/hashconfig/update", new ObjectRequest<>(request), UpdateHashConfigResponse.class);
     }
 
@@ -1455,11 +1759,23 @@ public class NextStepClient {
      * @param status Status to use.
      * @return Update users response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateUsers(UpdateUsersRequest)
      */
     public ObjectResponse<UpdateUsersResponse> updateUsers(@NotNull List<String> userIds, @NotNull UserIdentityStatus status) throws NextStepClientException {
         final UpdateUsersRequest request = new UpdateUsersRequest();
         request.getUserIds().addAll(userIds);
         request.setUserIdentityStatus(status);
+        return updateUsers(request);
+    }
+
+    /**
+     * Update statuses of multiple user identities.
+     *
+     * @param request Update users request.
+     * @return Update users response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateUsersResponse> updateUsers(@NotNull final UpdateUsersRequest request) throws NextStepClientException {
         return postObjectImpl("/user/update/multi", new ObjectRequest<>(request), UpdateUsersResponse.class);
     }
 
@@ -1511,12 +1827,13 @@ public class NextStepClient {
      * @param credentialName Credential name.
      * @return Lookup user response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #lookupUser(LookupUserRequest)
      */
     public ObjectResponse<LookupUserResponse> lookupUser(@NotNull String username, @NotNull String credentialName) throws NextStepClientException {
         final LookupUserRequest request = new LookupUserRequest();
         request.setUsername(username);
         request.setCredentialName(credentialName);
-        return postObjectImpl("/user/lookup/single", new ObjectRequest<>(request), LookupUserResponse.class);
+        return lookupUser(request);
     }
 
     /**
@@ -1527,12 +1844,24 @@ public class NextStepClient {
      * @param operationId Operation ID.
      * @return Lookup user response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #lookupUser(LookupUserRequest)
      */
     public ObjectResponse<LookupUserResponse> lookupUser(@NotNull String username, @NotNull String credentialName, String operationId) throws NextStepClientException {
         final LookupUserRequest request = new LookupUserRequest();
         request.setUsername(username);
         request.setCredentialName(credentialName);
         request.setOperationId(operationId);
+        return lookupUser(request);
+    }
+
+    /**
+     * Lookup a single user identity.
+     *
+     * @param request Lookup user request.
+     * @return Lookup user response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<LookupUserResponse> lookupUser(@NotNull final LookupUserRequest request) throws NextStepClientException {
         return postObjectImpl("/user/lookup/single", new ObjectRequest<>(request), LookupUserResponse.class);
     }
 
@@ -1582,11 +1911,23 @@ public class NextStepClient {
      * @param roleName Role name.
      * @return Add user role response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #addUserRole(AddUserRoleRequest)
      */
     public ObjectResponse<AddUserRoleResponse> addUserRole(@NotNull String userId, @NotNull String roleName) throws NextStepClientException {
         final AddUserRoleRequest request = new AddUserRoleRequest();
         request.setUserId(userId);
         request.setRoleName(roleName);
+        return addUserRole(request);
+    }
+
+    /**
+     * Add a role to a user.
+     *
+     * @param request Add user role request.
+     * @return Add user role response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<AddUserRoleResponse> addUserRole(@NotNull final AddUserRoleRequest request) throws NextStepClientException {
         return postObjectImpl("/user/role", new ObjectRequest<>(request), AddUserRoleResponse.class);
     }
 
@@ -1597,11 +1938,23 @@ public class NextStepClient {
      * @param roleName Role name.
      * @return Remove user role response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #removeUserRole(RemoveUserRoleRequest)
      */
     public ObjectResponse<RemoveUserRoleResponse> removeUserRole(@NotNull String userId, @NotNull String roleName) throws NextStepClientException {
         final RemoveUserRoleRequest request = new RemoveUserRoleRequest();
         request.setUserId(userId);
         request.setRoleName(roleName);
+        return removeUserRole(request);
+    }
+
+    /**
+     * Remove a role to a user.
+     *
+     * @param request Remove user role request.
+     * @return Remove user role response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<RemoveUserRoleResponse> removeUserRole(@NotNull final RemoveUserRoleRequest request) throws NextStepClientException {
         return postObjectImpl("/user/role/remove", new ObjectRequest<>(request), RemoveUserRoleResponse.class);
     }
 
@@ -1615,6 +1968,7 @@ public class NextStepClient {
      * @param primary Whether contact is primary.
      * @return Create user contact response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createUserContact(CreateUserContactRequest)
      */
     public ObjectResponse<CreateUserContactResponse> createUserContact(@NotNull String userId, @NotNull String contactName, @NotNull ContactType contactType,
                                                                        @NotNull String contactValue, boolean primary) throws NextStepClientException {
@@ -1624,6 +1978,17 @@ public class NextStepClient {
         request.setContactType(contactType);
         request.setContactValue(contactValue);
         request.setPrimary(primary);
+        return createUserContact(request);
+    }
+
+    /**
+     * Create a user contact.
+     *
+     * @param request Create user contact request.
+     * @return Create user contact response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateUserContactResponse> createUserContact(@NotNull final CreateUserContactRequest request) throws NextStepClientException {
         return postObjectImpl("/user/contact", new ObjectRequest<>(request), CreateUserContactResponse.class);
     }
 
@@ -1637,6 +2002,7 @@ public class NextStepClient {
      * @param primary Whether contact is primary.
      * @return Update user contact response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateUserContact(UpdateUserContactRequest)
      */
     public ObjectResponse<UpdateUserContactResponse> updateUserContact(@NotNull String userId, @NotNull String contactName, @NotNull ContactType contactType,
                                                                        @NotNull String contactValue, boolean primary) throws NextStepClientException {
@@ -1646,6 +2012,17 @@ public class NextStepClient {
         request.setContactType(contactType);
         request.setContactValue(contactValue);
         request.setPrimary(primary);
+        return updateUserContact(request);
+    }
+
+    /**
+     * Update a user contact via PUT method.
+     *
+     * @param request Update user contact request.
+     * @return Update user contact response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateUserContactResponse> updateUserContact(@NotNull final UpdateUserContactRequest request) throws NextStepClientException {
         return putObjectImpl("/user/contact", new ObjectRequest<>(request), UpdateUserContactResponse.class);
     }
 
@@ -1659,6 +2036,7 @@ public class NextStepClient {
      * @param primary Whether contact is primary.
      * @return Update user contact response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateUserContactPost(UpdateUserContactRequest)
      */
     public ObjectResponse<UpdateUserContactResponse> updateUserContactPost(@NotNull String userId, @NotNull String contactName, @NotNull ContactType contactType,
                                                                            @NotNull String contactValue, boolean primary) throws NextStepClientException {
@@ -1668,6 +2046,17 @@ public class NextStepClient {
         request.setContactType(contactType);
         request.setContactValue(contactValue);
         request.setPrimary(primary);
+        return updateUserContactPost(request);
+    }
+
+    /**
+     * Update a user contact via POST method.
+     *
+     * @param request Update user contact request.
+     * @return Update user contact response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateUserContactResponse> updateUserContactPost(@NotNull final UpdateUserContactRequest request) throws NextStepClientException {
         return postObjectImpl("/user/contact/update", new ObjectRequest<>(request), UpdateUserContactResponse.class);
     }
 
@@ -1705,12 +2094,24 @@ public class NextStepClient {
      * @param contactType Contact type.
      * @return Delete user contact response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #deleteUserContact(DeleteUserContactRequest)
      */
     public ObjectResponse<DeleteUserContactResponse> deleteUserContact(@NotNull String userId, @NotNull String contactName, @NotNull ContactType contactType) throws NextStepClientException {
         final DeleteUserContactRequest request = new DeleteUserContactRequest();
         request.setUserId(userId);
         request.setContactName(contactName);
         request.setContactType(contactType);
+        return deleteUserContact(request);
+    }
+
+    /**
+     * Delete a user contact.
+     *
+     * @param request Delete user contact request.
+     * @return Delete user contact response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<DeleteUserContactResponse> deleteUserContact(@NotNull final DeleteUserContactRequest request) throws NextStepClientException {
         return postObjectImpl("/user/contact/delete", new ObjectRequest<>(request), DeleteUserContactResponse.class);
     }
 
@@ -1723,6 +2124,7 @@ public class NextStepClient {
      * @param extras Extra information related to the alias.
      * @return Create user alias response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createUserAlias(CreateUserAliasRequest)
      */
     public ObjectResponse<CreateUserAliasResponse> createUserAlias(@NotNull String userId, @NotNull String aliasName, @NotNull String aliasValue,
                                                                    Map<String, Object> extras) throws NextStepClientException {
@@ -1733,6 +2135,17 @@ public class NextStepClient {
         if (extras != null) {
             request.getExtras().putAll(extras);
         }
+        return createUserAlias(request);
+    }
+
+    /**
+     * Create a user alias.
+     *
+     * @param request Create user alias request.
+     * @return Create user alias response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateUserAliasResponse> createUserAlias(@NotNull final CreateUserAliasRequest request) throws NextStepClientException {
         return postObjectImpl("/user/alias", new ObjectRequest<>(request), CreateUserAliasResponse.class);
     }
 
@@ -1745,6 +2158,7 @@ public class NextStepClient {
      * @param extras Extra information related to the alias.
      * @return Update user alias response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateUserAlias(UpdateUserAliasRequest)
      */
     public ObjectResponse<UpdateUserAliasResponse> updateUserAlias(@NotNull String userId, @NotNull String aliasName, @NotNull String aliasValue,
                                                                    Map<String, Object> extras) throws NextStepClientException {
@@ -1755,6 +2169,17 @@ public class NextStepClient {
         if (extras != null) {
             request.getExtras().putAll(extras);
         }
+        return updateUserAlias(request);
+    }
+
+    /**
+     * Update a user alias via PUT method.
+     *
+     * @param request Update user alias request.
+     * @return Update user alias response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateUserAliasResponse> updateUserAlias(@NotNull final UpdateUserAliasRequest request) throws NextStepClientException {
         return putObjectImpl("/user/alias", new ObjectRequest<>(request), UpdateUserAliasResponse.class);
     }
 
@@ -1767,6 +2192,7 @@ public class NextStepClient {
      * @param extras Extra information related to the alias.
      * @return Update user alias response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateUserAliasPost(UpdateUserAliasRequest)
      */
     public ObjectResponse<UpdateUserAliasResponse> updateUserAliasPost(@NotNull String userId, @NotNull String aliasName, @NotNull String aliasValue,
                                                                        Map<String, Object> extras) throws NextStepClientException {
@@ -1777,6 +2203,17 @@ public class NextStepClient {
         if (extras != null) {
             request.getExtras().putAll(extras);
         }
+        return updateUserAliasPost(request);
+    }
+
+    /**
+     * Update a user alias via POST method.
+     *
+     * @param request Update user alias request.
+     * @return Update user alias response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateUserAliasResponse> updateUserAliasPost(@NotNull final UpdateUserAliasRequest request) throws NextStepClientException {
         return postObjectImpl("/user/alias/update", new ObjectRequest<>(request), UpdateUserAliasResponse.class);
     }
 
@@ -1817,11 +2254,23 @@ public class NextStepClient {
      * @param aliasName Alias name.
      * @return Delete user alias response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #deleteUserAlias(DeleteUserAliasRequest)
      */
     public ObjectResponse<DeleteUserAliasResponse> deleteUserAlias(@NotNull String userId, @NotNull String aliasName) throws NextStepClientException {
         final DeleteUserAliasRequest request = new DeleteUserAliasRequest();
         request.setUserId(userId);
         request.setAliasName(aliasName);
+        return deleteUserAlias(request);
+    }
+
+    /**
+     * Delete a user alias.
+     *
+     * @param request Delete user alias request.
+     * @return Delete user alias response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<DeleteUserAliasResponse> deleteUserAlias(@NotNull final DeleteUserAliasRequest request) throws NextStepClientException {
         return postObjectImpl("/user/alias/delete", new ObjectRequest<>(request), DeleteUserAliasResponse.class);
     }
 
@@ -1905,6 +2354,7 @@ public class NextStepClient {
      * @param credentialValue Credential value.
      * @return Create credential response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createCredential(CreateCredentialRequest)
      */
     public ObjectResponse<CreateCredentialResponse> createCredential(@NotNull String userId, @NotNull String credentialName, @NotNull CredentialType credentialType,
                                                                      String username, String credentialValue) throws NextStepClientException {
@@ -1914,7 +2364,7 @@ public class NextStepClient {
         request.setCredentialType(credentialType);
         request.setUsername(username);
         request.setCredentialValue(credentialValue);
-        return postObjectImpl("/credential", new ObjectRequest<>(request), CreateCredentialResponse.class);
+        return createCredential(request);
     }
 
     /**
@@ -1929,6 +2379,7 @@ public class NextStepClient {
      * @param credentialHistory List with pairs of username : credentialValue for credential history.
      * @return Create credential response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createCredential(CreateCredentialRequest)
      */
     public ObjectResponse<CreateCredentialResponse> createCredential(@NotNull String userId, @NotNull String credentialName, @NotNull CredentialType credentialType,
                                                                      String username, String credentialValue, CredentialValidationMode validationMode,
@@ -1948,6 +2399,17 @@ public class NextStepClient {
                 request.getCredentialHistory().add(h);
             });
         }
+        return createCredential(request);
+    }
+
+    /**
+     * Create a credential.
+     *
+     * @param request Create credential request.
+     * @return Create credential response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateCredentialResponse> createCredential(@NotNull final CreateCredentialRequest request) throws NextStepClientException {
         return postObjectImpl("/credential", new ObjectRequest<>(request), CreateCredentialResponse.class);
     }
 
@@ -1962,6 +2424,7 @@ public class NextStepClient {
      * @param credentialStatus Credential status.
      * @return Update credential response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateCredential(UpdateCredentialRequest)
      */
     public ObjectResponse<UpdateCredentialResponse> updateCredential(@NotNull String userId, @NotNull String credentialName, CredentialType credentialType,
                                                                      String username, String credentialValue, CredentialStatus credentialStatus) throws NextStepClientException {
@@ -1972,6 +2435,17 @@ public class NextStepClient {
         request.setUsername(username);
         request.setCredentialValue(credentialValue);
         request.setCredentialStatus(credentialStatus);
+        return updateCredential(request);
+    }
+
+    /**
+     * Update a credential via PUT method.
+     *
+     * @param request Update credential request.
+     * @return Update credential response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateCredentialResponse> updateCredential(@NotNull final UpdateCredentialRequest request) throws NextStepClientException {
         return putObjectImpl("/credential", new ObjectRequest<>(request), UpdateCredentialResponse.class);
     }
 
@@ -1986,6 +2460,7 @@ public class NextStepClient {
      * @param credentialStatus Credential status.
      * @return Update credential response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateCredentialPost(UpdateCredentialRequest)
      */
     public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@NotNull String userId, @NotNull String credentialName, CredentialType credentialType,
                                                                          String username, String credentialValue, CredentialStatus credentialStatus) throws NextStepClientException {
@@ -1996,6 +2471,17 @@ public class NextStepClient {
         request.setUsername(username);
         request.setCredentialValue(credentialValue);
         request.setCredentialStatus(credentialStatus);
+        return updateCredentialPost(request);
+    }
+
+    /**
+     * Update a credential via POST method.
+     *
+     * @param request Update credential request.
+     * @return Update credential response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@NotNull final UpdateCredentialRequest request) throws NextStepClientException {
         return postObjectImpl("/credential/update", new ObjectRequest<>(request), UpdateCredentialResponse.class);
     }
 
@@ -2009,6 +2495,7 @@ public class NextStepClient {
      * @param validationMode Credential validation mode.
      * @return Validate credential response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #validateCredential(ValidateCredentialRequest)
      */
     public ObjectResponse<ValidateCredentialResponse> validateCredential(@NotNull String userId, @NotNull String credentialName, String username,
                                                                          String credentialValue, @NotNull CredentialValidationMode validationMode) throws NextStepClientException {
@@ -2018,6 +2505,17 @@ public class NextStepClient {
         request.setUsername(username);
         request.setCredentialValue(credentialValue);
         request.setValidationMode(validationMode);
+        return validateCredential(request);
+    }
+
+    /**
+     * Validate a credential.
+     *
+     * @param request Validate credential request.
+     * @return Validate credential response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<ValidateCredentialResponse> validateCredential(@NotNull final ValidateCredentialRequest request) throws NextStepClientException {
         return postObjectImpl("/credential/validate", new ObjectRequest<>(request), ValidateCredentialResponse.class);
     }
 
@@ -2029,12 +2527,24 @@ public class NextStepClient {
      * @param credentialType Credential type.
      * @return Reset credential response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #resetCredential(ResetCredentialRequest)
      */
     public ObjectResponse<ResetCredentialResponse> resetCredential(@NotNull String userId, @NotNull String credentialName, CredentialType credentialType) throws NextStepClientException {
         final ResetCredentialRequest request = new ResetCredentialRequest();
         request.setUserId(userId);
         request.setCredentialName(credentialName);
         request.setCredentialType(credentialType);
+        return resetCredential(request);
+    }
+
+    /**
+     * Reset a credential.
+     *
+     * @param request Reset credential request.
+     * @return Reset credential response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<ResetCredentialResponse> resetCredential(@NotNull final ResetCredentialRequest request) throws NextStepClientException {
         return postObjectImpl("/credential/reset", new ObjectRequest<>(request), ResetCredentialResponse.class);
     }
 
@@ -2045,11 +2555,23 @@ public class NextStepClient {
      * @param credentialName Credential name.
      * @return Block credential response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #blockCredential(BlockCredentialRequest)
      */
     public ObjectResponse<BlockCredentialResponse> blockCredential(@NotNull String userId, @NotNull String credentialName) throws NextStepClientException {
         final BlockCredentialRequest request = new BlockCredentialRequest();
         request.setUserId(userId);
         request.setCredentialName(credentialName);
+        return blockCredential(request);
+    }
+
+    /**
+     * Block a credential.
+     *
+     * @param request Block credential request.
+     * @return Block credential response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<BlockCredentialResponse> blockCredential(@NotNull final BlockCredentialRequest request) throws NextStepClientException {
         return postObjectImpl("/credential/block", new ObjectRequest<>(request), BlockCredentialResponse.class);
     }
 
@@ -2060,11 +2582,23 @@ public class NextStepClient {
      * @param credentialName Credential name.
      * @return Unblock credential response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #unblockCredential(UnblockCredentialRequest)
      */
     public ObjectResponse<UnblockCredentialResponse> unblockCredential(@NotNull String userId, @NotNull String credentialName) throws NextStepClientException {
         final UnblockCredentialRequest request = new UnblockCredentialRequest();
         request.setUserId(userId);
         request.setCredentialName(credentialName);
+        return unblockCredential(request);
+    }
+
+    /**
+     * Unblock a credential.
+     *
+     * @param request Unblock credential request.
+     * @return Unblock credential response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UnblockCredentialResponse> unblockCredential(@NotNull final UnblockCredentialRequest request) throws NextStepClientException {
         return postObjectImpl("/credential/unblock", new ObjectRequest<>(request), UnblockCredentialResponse.class);
     }
 
@@ -2075,11 +2609,23 @@ public class NextStepClient {
      * @param credentialName Credential name.
      * @return Delete credential response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #deleteCredential(DeleteCredentialRequest)
      */
     public ObjectResponse<DeleteCredentialResponse> deleteCredential(@NotNull String userId, @NotNull String credentialName) throws NextStepClientException {
         final DeleteCredentialRequest request = new DeleteCredentialRequest();
         request.setUserId(userId);
         request.setCredentialName(credentialName);
+        return deleteCredential(request);
+    }
+
+    /**
+     * Delete a credential.
+     *
+     * @param request Delete credential request.
+     * @return Delete credential response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<DeleteCredentialResponse> deleteCredential(@NotNull final DeleteCredentialRequest request) throws NextStepClientException {
         return postObjectImpl("/credential/delete", new ObjectRequest<>(request), DeleteCredentialResponse.class);
     }
 
@@ -2093,12 +2639,24 @@ public class NextStepClient {
      * @param authenticationResult Authentication result.
      * @return Update credential counter response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #updateCredentialCounter(UpdateCounterRequest)
      */
     public ObjectResponse<UpdateCounterResponse> updateCredentialCounter(@NotNull String userId, @NotNull String credentialName, @NotNull AuthenticationResult authenticationResult) throws NextStepClientException {
         final UpdateCounterRequest request = new UpdateCounterRequest();
         request.setUserId(userId);
         request.setCredentialName(credentialName);
         request.setAuthenticationResult(authenticationResult);
+        return updateCredentialCounter(request);
+    }
+
+    /**
+     * Update a credential counter.
+     *
+     * @param request Update counter request.
+     * @return Update credential counter response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<UpdateCounterResponse> updateCredentialCounter(@NotNull final UpdateCounterRequest request) throws NextStepClientException {
         return postObjectImpl("/credential/counter/update", new ObjectRequest<>(request), UpdateCounterResponse.class);
     }
 
@@ -2125,6 +2683,7 @@ public class NextStepClient {
      * @param operationId Operation ID.
      * @return Create OTP response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createOtp(CreateOtpRequest)
      */
     public ObjectResponse<CreateOtpResponse> createOtp(String userId, @NotNull String otpName, String credentialName, String otpData, String operationId) throws NextStepClientException {
         final CreateOtpRequest request = new CreateOtpRequest();
@@ -2133,7 +2692,7 @@ public class NextStepClient {
         request.setCredentialName(credentialName);
         request.setOtpData(otpData);
         request.setOperationId(operationId);
-        return postObjectImpl("/otp", new ObjectRequest<>(request), CreateOtpResponse.class);
+        return createOtp(request);
     }
 
     /**
@@ -2145,6 +2704,7 @@ public class NextStepClient {
      * @param otpData OTP data.
      * @return Create OTP response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createOtp(CreateOtpRequest)
      */
     public ObjectResponse<CreateOtpResponse> createOtp(String userId, @NotNull String otpName, String credentialName, String otpData) throws NextStepClientException {
         final CreateOtpRequest request = new CreateOtpRequest();
@@ -2152,6 +2712,17 @@ public class NextStepClient {
         request.setOtpName(otpName);
         request.setCredentialName(credentialName);
         request.setOtpData(otpData);
+        return createOtp(request);
+    }
+
+    /**
+     * Create an OTP.
+     *
+     * @param request Create OTP request.
+     * @return Create OTP response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateOtpResponse> createOtp(final CreateOtpRequest request) throws NextStepClientException {
         return postObjectImpl("/otp", new ObjectRequest<>(request), CreateOtpResponse.class);
     }
 
@@ -2166,6 +2737,7 @@ public class NextStepClient {
      * @param language Language as defined in ISO-639 with 2 characters.
      * @return Create and send OTP response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createAndSendOtp(CreateAndSendOtpRequest)
      */
     public ObjectResponse<CreateAndSendOtpResponse> createAndSendOtp(String userId, @NotNull String otpName, String credentialName, String otpData, String operationId, String language) throws NextStepClientException {
         final CreateAndSendOtpRequest request = new CreateAndSendOtpRequest();
@@ -2175,6 +2747,17 @@ public class NextStepClient {
         request.setOtpData(otpData);
         request.setOperationId(operationId);
         request.setLanguage(language);
+        return createAndSendOtp(request);
+    }
+
+    /**
+     * Create an OTP with operation and send it.
+     *
+     * @param request Create and send OTP request.
+     * @return Create and send OTP response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateAndSendOtpResponse> createAndSendOtp(final CreateAndSendOtpRequest request) throws NextStepClientException {
         return postObjectImpl("/otp/send", new ObjectRequest<>(request), CreateAndSendOtpResponse.class);
     }
 
@@ -2249,11 +2832,23 @@ public class NextStepClient {
      * @param operationId Operation ID.
      * @return Delete OTP response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #deleteOtp(DeleteOtpRequest)
      */
     public ObjectResponse<DeleteOtpResponse> deleteOtp(String otpId, String operationId) throws NextStepClientException {
         final DeleteOtpRequest request = new DeleteOtpRequest();
         request.setOtpId(otpId);
         request.setOperationId(operationId);
+        return deleteOtp(request);
+    }
+
+    /**
+     * Delete an OTP.
+     *
+     * @param request Delete OTP request.
+     * @return Delete OTP response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<DeleteOtpResponse> deleteOtp(@NotNull final DeleteOtpRequest request) throws NextStepClientException {
         return postObjectImpl("/otp/delete", new ObjectRequest<>(request), DeleteOtpResponse.class);
     }
 
@@ -2266,12 +2861,13 @@ public class NextStepClient {
      * @param otpValue OTP value.
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #authenticateWithOtp(OtpAuthenticationRequest)
      */
     public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(String otpId, @NotNull String otpValue) throws NextStepClientException {
         final OtpAuthenticationRequest request = new OtpAuthenticationRequest();
         request.setOtpId(otpId);
         request.setOtpValue(otpValue);
-        return postObjectImpl("/auth/otp", new ObjectRequest<>(request), OtpAuthenticationResponse.class);
+        return authenticateWithOtp(request);
     }
 
     /**
@@ -2284,6 +2880,7 @@ public class NextStepClient {
      * @param authMethod Authentication method used for operation update.
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #authenticateWithOtp(OtpAuthenticationRequest)
      */
     public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(String otpId, String operationId, @NotNull String otpValue,
                                                                          boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
@@ -2293,7 +2890,7 @@ public class NextStepClient {
         request.setOtpValue(otpValue);
         request.setUpdateOperation(updateOperation);
         request.setAuthMethod(authMethod);
-        return postObjectImpl("/auth/otp", new ObjectRequest<>(request), OtpAuthenticationResponse.class);
+        return authenticateWithOtp(request);
     }
 
     /**
@@ -2307,6 +2904,7 @@ public class NextStepClient {
      * @param authMethod Authentication method used for operation update.
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #authenticateWithOtp(OtpAuthenticationRequest)
      */
     public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(String otpId, String operationId, @NotNull String otpValue, boolean checkOnly,
                                                                          boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
@@ -2317,6 +2915,17 @@ public class NextStepClient {
         request.setCheckOnly(checkOnly);
         request.setUpdateOperation(updateOperation);
         request.setAuthMethod(authMethod);
+        return authenticateWithOtp(request);
+    }
+
+    /**
+     * Authenticate using OTP with operation.
+     *
+     * @param request OTP authentication request.
+     * @return OTP authentication response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(@NotNull final OtpAuthenticationRequest request) throws NextStepClientException {
         return postObjectImpl("/auth/otp", new ObjectRequest<>(request), OtpAuthenticationResponse.class);
     }
 
@@ -2328,13 +2937,14 @@ public class NextStepClient {
      * @param credentialValue Credential value.
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #authenticateWithCredential(CredentialAuthenticationRequest)
      */
     public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue) throws NextStepClientException {
         final CredentialAuthenticationRequest request = new CredentialAuthenticationRequest();
         request.setCredentialName(credentialName);
         request.setUserId(userId);
         request.setCredentialValue(credentialValue);
-        return postObjectImpl("/auth/credential", new ObjectRequest<>(request), CredentialAuthenticationResponse.class);
+        return authenticateWithCredential(request);
     }
 
     /**
@@ -2347,6 +2957,7 @@ public class NextStepClient {
      * @param credentialPositionsToVerify Credential positions to verify.
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #authenticateWithCredential(CredentialAuthenticationRequest)
      */
     public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
                                                                                          CredentialAuthenticationMode authenticationMode, List<Integer> credentialPositionsToVerify) throws NextStepClientException {
@@ -2356,7 +2967,7 @@ public class NextStepClient {
         request.setCredentialValue(credentialValue);
         request.setAuthenticationMode(authenticationMode);
         request.setCredentialPositionsToVerify(credentialPositionsToVerify);
-        return postObjectImpl("/auth/credential", new ObjectRequest<>(request), CredentialAuthenticationResponse.class);
+        return authenticateWithCredential(request);
     }
 
     /**
@@ -2370,6 +2981,7 @@ public class NextStepClient {
      * @param authMethod Authentication method used for operation update.
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #authenticateWithCredential(CredentialAuthenticationRequest)
      */
     public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
                                                                                          String operationId, boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
@@ -2380,7 +2992,7 @@ public class NextStepClient {
         request.setOperationId(operationId);
         request.setUpdateOperation(updateOperation);
         request.setAuthMethod(authMethod);
-        return postObjectImpl("/auth/credential", new ObjectRequest<>(request), CredentialAuthenticationResponse.class);
+        return authenticateWithCredential(request);
     }
 
     /**
@@ -2396,6 +3008,7 @@ public class NextStepClient {
      * @param authMethod Authentication method used for operation update.
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #authenticateWithCredential(CredentialAuthenticationRequest)
      */
     public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
                                                                                          CredentialAuthenticationMode authenticationMode, List<Integer> credentialPositionsToVerify,
@@ -2409,36 +3022,44 @@ public class NextStepClient {
         request.setOperationId(operationId);
         request.setUpdateOperation(updateOperation);
         request.setAuthMethod(authMethod);
-        return postObjectImpl("/auth/credential", new ObjectRequest<>(request), CredentialAuthenticationResponse.class);
+        return authenticateWithCredential(request);
     }
 
+    /**
+     * Authenticate using credential.
+     *
+     * @param request Credential authentication request.
+     * @return OTP authentication response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@NotNull final CredentialAuthenticationRequest request) throws NextStepClientException {
+        return postObjectImpl("/auth/credential", new ObjectRequest<>(request), CredentialAuthenticationResponse.class);
+    }
 
     /**
      * Authenticate using credential and OTP without operation.
      *
-     * @param credentialName Credential name.
      * @param userId User ID.
      * @param credentialValue Credential value.
      * @param otpId OTP ID.
      * @param otpValue OTP value.
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #authenticateCombined(CombinedAuthenticationRequest)
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String userId, @NotNull String credentialValue,
                                                                                  String otpId, @NotNull String otpValue) throws NextStepClientException {
         final CombinedAuthenticationRequest request = new CombinedAuthenticationRequest();
-        request.setCredentialName(credentialName);
         request.setUserId(userId);
         request.setCredentialValue(credentialValue);
         request.setOtpId(otpId);
         request.setOtpValue(otpValue);
-        return postObjectImpl("/auth/combined", new ObjectRequest<>(request), CombinedAuthenticationResponse.class);
+        return authenticateCombined(request);
     }
 
     /**
      * Authenticate using credential and OTP without operation and with additional details.
      *
-     * @param credentialName Credential name.
      * @param userId User ID.
      * @param credentialValue Credential value.
      * @param authenticationMode Authentication mode.
@@ -2447,25 +3068,24 @@ public class NextStepClient {
      * @param otpValue OTP value.
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #authenticateCombined(CombinedAuthenticationRequest)
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String userId, @NotNull String credentialValue,
                                                                                  CredentialAuthenticationMode authenticationMode, List<Integer> credentialPositionsToVerify,
                                                                                  String otpId, @NotNull String otpValue) throws NextStepClientException {
         final CombinedAuthenticationRequest request = new CombinedAuthenticationRequest();
-        request.setCredentialName(credentialName);
         request.setUserId(userId);
         request.setCredentialValue(credentialValue);
         request.setAuthenticationMode(authenticationMode);
         request.setCredentialPositionsToVerify(credentialPositionsToVerify);
         request.setOtpId(otpId);
         request.setOtpValue(otpValue);
-        return postObjectImpl("/auth/combined", new ObjectRequest<>(request), CombinedAuthenticationResponse.class);
+        return authenticateCombined(request);
     }
 
     /**
      * Authenticate using credential and OTP with operation.
      *
-     * @param credentialName Credential name.
      * @param userId User ID.
      * @param credentialValue Credential value.
      * @param otpId OTP ID.
@@ -2475,12 +3095,12 @@ public class NextStepClient {
      * @param authMethod Authentication method used for operation update.
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #authenticateCombined(CombinedAuthenticationRequest)
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String userId, @NotNull String credentialValue,
                                                                                  String otpId, String operationId, @NotNull String otpValue,
                                                                                  boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
         final CombinedAuthenticationRequest request = new CombinedAuthenticationRequest();
-        request.setCredentialName(credentialName);
         request.setUserId(userId);
         request.setCredentialValue(credentialValue);
         request.setOtpId(otpId);
@@ -2488,13 +3108,12 @@ public class NextStepClient {
         request.setOtpValue(otpValue);
         request.setUpdateOperation(updateOperation);
         request.setAuthMethod(authMethod);
-        return postObjectImpl("/auth/combined", new ObjectRequest<>(request), CombinedAuthenticationResponse.class);
+        return authenticateCombined(request);
     }
 
     /**
      * Authenticate using credential and OTP with operation and with additional details.
      *
-     * @param credentialName Credential name.
      * @param userId User ID.
      * @param credentialValue Credential value.
      * @param authenticationMode Authentication mode.
@@ -2506,13 +3125,13 @@ public class NextStepClient {
      * @param authMethod Authentication method used for operation update.
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #authenticateCombined(CombinedAuthenticationRequest)
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String userId, @NotNull String credentialValue,
                                                                                  CredentialAuthenticationMode authenticationMode, List<Integer> credentialPositionsToVerify,
                                                                                  String otpId, String operationId, @NotNull String otpValue,
                                                                                  boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
         final CombinedAuthenticationRequest request = new CombinedAuthenticationRequest();
-        request.setCredentialName(credentialName);
         request.setUserId(userId);
         request.setCredentialValue(credentialValue);
         request.setAuthenticationMode(authenticationMode);
@@ -2522,6 +3141,17 @@ public class NextStepClient {
         request.setOtpValue(otpValue);
         request.setUpdateOperation(updateOperation);
         request.setAuthMethod(authMethod);
+        return authenticateCombined(request);
+    }
+
+    /**
+     * Authenticate using credential and OTP.
+     *
+     * @param request Combined authentication request.
+     * @return OTP authentication response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull final CombinedAuthenticationRequest request) throws NextStepClientException {
         return postObjectImpl("/auth/combined", new ObjectRequest<>(request), CombinedAuthenticationResponse.class);
     }
 
@@ -2534,11 +3164,23 @@ public class NextStepClient {
      * @param data Audit log data.
      * @return Create audit log response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     * @see #createAudit(CreateAuditRequest)
      */
     public ObjectResponse<CreateAuditResponse> createAudit(@NotNull String action, String data) throws NextStepClientException {
         final CreateAuditRequest request = new CreateAuditRequest();
         request.setAction(action);
         request.setData(data);
+        return createAudit(request);
+    }
+
+    /**
+     * Create an audit log.
+     *
+     * @param request Create audit request.
+     * @return Create audit log response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateAuditResponse> createAudit(@NotNull final CreateAuditRequest request) throws NextStepClientException {
         return postObjectImpl("/audit", new ObjectRequest<>(request), CreateAuditResponse.class);
     }
 

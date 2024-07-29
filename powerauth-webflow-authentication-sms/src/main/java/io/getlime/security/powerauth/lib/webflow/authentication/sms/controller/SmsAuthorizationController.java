@@ -137,7 +137,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             final String otpId = getOtpIdFromHttpSession();
             GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(operation.getOrganizationId()).getResponseObject();
             String otpName = organization.getDefaultOtpName();
-            String credentialName = organization.getDefaultCredentialName();
             if (otpName == null) {
                 logger.warn("Default OTP name is not configured for organization: " + operation.getOrganizationId());
                 throw new AuthStepException("SMS delivery failed", "error.communication");
@@ -217,7 +216,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 }
 
                 String protectedPassword = passwordProtection.protect(request.getPassword());
-                CombinedAuthenticationResponse authResponse = nextStepClient.authenticateCombined(credentialName, userId, protectedPassword, otpId, operationId, authCode, true, authMethod).getResponseObject();
+                CombinedAuthenticationResponse authResponse = nextStepClient.authenticateCombined(userId, protectedPassword, otpId, operationId, authCode, true, authMethod).getResponseObject();
                 if (authResponse.isOperationFailed()) {
                     logger.info("Step authentication maximum attempts reached for credential and OTP verification (2FA) due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
                     throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
