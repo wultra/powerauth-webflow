@@ -101,7 +101,7 @@
 
         <moneta.version>1.4.4</moneta.version>
         <owasp-java-html-sanitizer.version>20240325.1</owasp-java-html-sanitizer.version>
-        <logstash.version>7.4</logstash.version>
+        <logstash.version>8.0</logstash.version>
 
         <!--  Wultra dependencies  -->
         <wultra-core.version>1.10.0-SNAPSHOT</wultra-core.version>
