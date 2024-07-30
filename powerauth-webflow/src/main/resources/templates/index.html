@@ -70,6 +70,8 @@
     const extensionIDFirefox = [[${icaExtensionIDFirefox}]];
     const extensionInstallURLFirefox = [[${icaExtensionInstallURLFirefox}]];
 
+    const webSocketSupportEnabled = [[${webSocketSupportEnabled}]];
+    
     window.onbeforeunload = function() {
         // Modern browsers do not allow custom messages, so text will be only shown in old browsers.
         // Note that the onbeforeunload dialog does not appear in case user does no action, see:

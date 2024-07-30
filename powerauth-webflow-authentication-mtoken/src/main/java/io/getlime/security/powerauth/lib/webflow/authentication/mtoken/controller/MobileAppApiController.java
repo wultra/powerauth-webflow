@@ -55,7 +55,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.req
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.PowerAuthOperationService;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.WebSocketMessageService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.websocket.WebSocketMessageService;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthToken;
 import io.getlime.security.powerauth.rest.api.spring.authentication.PowerAuthActivation;
@@ -65,6 +65,7 @@ import io.getlime.security.powerauth.rest.api.spring.model.ActivationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -94,6 +95,12 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     private final PowerAuthOperationService powerAuthOperationService;
 
     private final FormDataConverter formDataConverter = new FormDataConverter();
+
+    /**
+     * WebSocket support configuration.
+     */
+    @Value("${powerauth.webflow.websocket.enabled:true}")
+    private boolean webSocketSupportEnabled;
 
     /**
      * Controller constructor.
@@ -305,7 +312,9 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                         throw new OperationIsAlreadyFailedException("Operation approval has failed");
                     }
                     final AuthOperationResponse updateOperationResponse = authorize(operationId, userId, operation.getOrganizationId(), authInstruments, authenticationContext, null);
-                    webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getAuthResult());
+                    if (webSocketSupportEnabled) {
+                        webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getAuthResult());
+                    }
                     return new Response();
                 } else {
                     boolean approvalFailSucceeded = powerAuthOperationService.failApprovalForOperation(operation);
@@ -349,7 +358,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             final GetOperationDetailResponse operation = getOperation(operationId);
             boolean rejectSucceeded = powerAuthOperationService.rejectOperation(operation, activationId);
             final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.fromString(request.getRequestObject().getReason()), null, false);
-            if (updateOperationResponse != null) {
+            if (webSocketSupportEnabled && updateOperationResponse != null) {
                 webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
             }
             if (!rejectSucceeded) {

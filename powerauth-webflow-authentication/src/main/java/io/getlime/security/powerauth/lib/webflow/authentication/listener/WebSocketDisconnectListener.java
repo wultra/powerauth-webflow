@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.Commun
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationCancellationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -34,6 +35,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Component
+@ConditionalOnProperty(name = "powerauth.webflow.websocket.enabled", havingValue = "true")
 public class WebSocketDisconnectListener implements ApplicationListener<SessionDisconnectEvent> {
 
     private final OperationSessionService operationSessionService;

@@ -14,12 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.service;
+package io.getlime.security.powerauth.lib.webflow.authentication.service.websocket;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.response.WebSocketAuthorizationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.response.WebSocketRegistrationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
@@ -33,7 +35,8 @@ import org.springframework.stereotype.Service;
  * @author Petr Dvorak, petr@wultra.com
  */
 @Service
-public class WebSocketMessageService {
+@ConditionalOnProperty(name = "powerauth.webflow.websocket.enabled", havingValue = "true")
+public class WebSocketMessageServiceImpl implements WebSocketMessageService {
 
     private final SimpMessagingTemplate websocket;
     private final OperationSessionService operationSessionService;
@@ -44,7 +47,7 @@ public class WebSocketMessageService {
      * @param operationSessionService Operation to session mapping service.
      */
     @Autowired
-    public WebSocketMessageService(SimpMessagingTemplate websocket, OperationSessionService operationSessionService) {
+    public WebSocketMessageServiceImpl(SimpMessagingTemplate websocket, OperationSessionService operationSessionService) {
         this.websocket = websocket;
         this.operationSessionService = operationSessionService;
     }
