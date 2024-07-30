@@ -65,12 +65,7 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         return headerAccessor.getMessageHeaders();
     }
 
-    /**
-     * Notification of clients about completed authorization.
-     *
-     * @param operationId Operation ID.
-     * @param authResult Authorization result.
-     */
+    @Override
     public void notifyAuthorizationComplete(String operationId, AuthResult authResult) {
         final String webSocketId = operationSessionService.generateOperationHash(operationId);
         final String sessionId = lookupWebSocketSessionId(webSocketId);
@@ -82,13 +77,7 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         }
     }
 
-    /**
-     * Sends a message about successful websocket registration to the user.
-     *
-     * @param operationHash Operation hash.
-     * @param sessionId Session ID.
-     * @param registrationSucceeded Whether Web Socket registration was successful.
-     */
+    @Override
     public void sendRegistrationMessage(String operationHash, String sessionId, boolean registrationSucceeded) {
         WebSocketRegistrationResponse registrationResponse = new WebSocketRegistrationResponse();
         registrationResponse.setWebSocketId(operationHash);
@@ -96,24 +85,12 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         websocket.convertAndSendToUser(sessionId, "/topic/registration", registrationResponse, createHeaders(sessionId));
     }
 
-    /**
-     * Get Web Socket session ID for given operation hash.
-     *
-     * @param operationHash Operation hash.
-     * @return Web Socket session ID.
-     */
+    @Override
     public String lookupWebSocketSessionId(String operationHash) {
         return operationSessionService.lookupWebSocketSessionIdByOperationHash(operationHash);
     }
 
-    /**
-     * Store a mapping for new web socket identifier to the Web Socket session with given ID.
-     *
-     * @param operationHash Operation hash.
-     * @param webSocketSessionId Web Socket Session ID.
-     * @param clientIpAddress Remote client IP address.
-     * @return Whether Web Socket registration was successful.
-     */
+    @Override
     public boolean registerWebSocketSession(String operationHash, String webSocketSessionId, String clientIpAddress) {
         return operationSessionService.registerWebSocketSession(operationHash, webSocketSessionId, clientIpAddress);
     }

@@ -25,12 +25,39 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
  */
 public interface WebSocketMessageService {
 
+    /**
+     * Notification of clients about completed authorization.
+     *
+     * @param operationId Operation ID.
+     * @param authResult Authorization result.
+     */
     void notifyAuthorizationComplete(String operationId, AuthResult authResult);
 
+    /**
+     * Sends a message about successful websocket registration to the user.
+     *
+     * @param operationHash Operation hash.
+     * @param sessionId Session ID.
+     * @param registrationSucceeded Whether Web Socket registration was successful.
+     */
     void sendRegistrationMessage(String operationHash, String sessionId, boolean registrationSucceeded);
 
+    /**
+     * Get Web Socket session ID for given operation hash.
+     *
+     * @param operationHash Operation hash.
+     * @return Web Socket session ID.
+     */
     String lookupWebSocketSessionId(String operationHash);
 
+    /**
+     * Store a mapping for new web socket identifier to the Web Socket session with given ID.
+     *
+     * @param operationHash Operation hash.
+     * @param webSocketSessionId Web Socket Session ID.
+     * @param clientIpAddress Remote client IP address.
+     * @return Whether Web Socket registration was successful.
+     */
     boolean registerWebSocketSession(String operationHash, String webSocketSessionId, String clientIpAddress);
 
 }
