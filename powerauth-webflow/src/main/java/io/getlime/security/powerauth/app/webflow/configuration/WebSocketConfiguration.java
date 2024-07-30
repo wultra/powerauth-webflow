@@ -34,7 +34,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  */
 @Configuration
 @EnableWebSocketMessageBroker
-@ConditionalOnProperty(name = "powerauth.webflow.websocket.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "powerauth.webflow.websockets.enabled", havingValue = "true")
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
 
     public static final String MESSAGE_PREFIX = "/topic";

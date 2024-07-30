@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Service
-@ConditionalOnProperty(name = "powerauth.webflow.websocket.enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(name = "powerauth.webflow.websockets.enabled", havingValue = "false", matchIfMissing = true)
 public class WebSocketMessageServiceDummy implements WebSocketMessageService {
 
 

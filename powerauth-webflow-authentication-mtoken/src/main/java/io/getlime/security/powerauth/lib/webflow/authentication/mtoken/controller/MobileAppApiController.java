@@ -99,7 +99,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     /**
      * WebSocket support configuration.
      */
-    @Value("${powerauth.webflow.websocket.enabled:true}")
+    @Value("${powerauth.webflow.websockets.enabled:true}")
     private boolean webSocketSupportEnabled;
 
     /**

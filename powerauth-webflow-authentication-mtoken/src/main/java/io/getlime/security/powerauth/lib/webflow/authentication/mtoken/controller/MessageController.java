@@ -31,7 +31,7 @@ import org.springframework.stereotype.Controller;
  * @author Roman Strobl
  */
 @Controller
-@ConditionalOnProperty(name = "powerauth.webflow.websocket.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "powerauth.webflow.websockets.enabled", havingValue = "true")
 public class MessageController {
 
     private final WebSocketMessageService webSocketMessageService;

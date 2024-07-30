@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty(name = "powerauth.webflow.websocket.enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(name = "powerauth.webflow.websockets.enabled", havingValue = "false", matchIfMissing = true)
 @EnableAutoConfiguration(exclude = {
         org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration.class,
         org.springframework.boot.autoconfigure.websocket.servlet.WebSocketMessagingAutoConfiguration.class,

@@ -35,7 +35,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Component
-@ConditionalOnProperty(name = "powerauth.webflow.websocket.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "powerauth.webflow.websockets.enabled", havingValue = "true")
 public class WebSocketDisconnectListener implements ApplicationListener<SessionDisconnectEvent> {
 
     private final OperationSessionService operationSessionService;
