@@ -20,6 +20,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.response.WebSocketAuthorizationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.response.WebSocketRegistrationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.MessageHeaders;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
  * @author Petr Dvorak, petr@wultra.com
  */
 @Service
+@Slf4j
 @ConditionalOnProperty(name = "powerauth.webflow.websockets.enabled", havingValue = "true")
 public class WebSocketMessageServiceImpl implements WebSocketMessageService {
 
@@ -50,6 +52,7 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     public WebSocketMessageServiceImpl(SimpMessagingTemplate websocket, OperationSessionService operationSessionService) {
         this.websocket = websocket;
         this.operationSessionService = operationSessionService;
+        logger.info("WebSocketMessageServiceImpl was initialized.");
     }
 
     /**

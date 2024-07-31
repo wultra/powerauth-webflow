@@ -17,6 +17,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.service.websocket;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -26,9 +27,13 @@ import org.springframework.stereotype.Service;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Service
+@Slf4j
 @ConditionalOnProperty(name = "powerauth.webflow.websockets.enabled", havingValue = "false", matchIfMissing = true)
 public class WebSocketMessageServiceDummy implements WebSocketMessageService {
 
+    {
+        logger.info("WebSocketMessageServiceDummy was initialized.");
+    }
 
     @Override
     public void notifyAuthorizationComplete(String operationId, AuthResult authResult) {
