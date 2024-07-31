@@ -188,6 +188,12 @@ public class WebFlowServerConfiguration {
     private String icaExtensionInstallURLFirefox;
 
     /**
+     * WebSocket support configuration.
+     */
+    @Value("${powerauth.webflow.websockets.enabled:true}")
+    private boolean webSocketSupportEnabled;
+
+    /**
      * Configuration constructor.
      * @param auditFactory Audit factory.
      */
@@ -390,6 +396,14 @@ public class WebFlowServerConfiguration {
      */
     public String getIcaExtensionInstallURLFirefox() {
         return icaExtensionInstallURLFirefox;
+    }
+
+    /**
+     * Get whether WebSocket support is enabled.
+     * @return Whether WebSocket support is enabled.
+     */
+    public boolean isWebSocketSupportEnabled() {
+        return webSocketSupportEnabled;
     }
 
     /**
