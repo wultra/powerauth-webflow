@@ -209,6 +209,7 @@ public class HomeController {
         model.put("icaExtensionIDEdge", webFlowConfig.getIcaExtensionIDEdge());
         model.put("icaExtensionIDFirefox", webFlowConfig.getIcaExtensionIDFirefox());
         model.put("icaExtensionInstallURLFirefox", webFlowConfig.getIcaExtensionInstallURLFirefox());
+        model.put("webSocketSupportEnabled", webFlowConfig.isWebSocketSupportEnabled());
         logger.info("The /authenticate request succeeded");
         return "index";
     }
