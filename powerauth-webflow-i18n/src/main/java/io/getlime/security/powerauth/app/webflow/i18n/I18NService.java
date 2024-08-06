@@ -19,16 +19,16 @@ package io.getlime.security.powerauth.app.webflow.i18n;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Service which converts resource bundle messages for given locale to JSON and provides access to the MessageSource.
@@ -86,7 +86,8 @@ public class I18NService {
     public String readLanguageSetting() {
         try {
             // language setting is possible only via extension and external resources
-            return new String(Files.readAllBytes(languageSettingSource.getFile().toPath()));
+            byte[] languageData = FileCopyUtils.copyToByteArray(languageSettingSource.getInputStream());
+            return new String(languageData, StandardCharsets.UTF_8);
         } catch (IOException ex) {
             // language setting is not configured return null
             logger.warn("Error occurred while retrieving the language setting ", ex);
