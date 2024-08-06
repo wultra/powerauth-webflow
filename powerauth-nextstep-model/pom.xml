@@ -30,7 +30,7 @@
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>1.4.2</version>
+        <version>1.4.3</version>
     </parent>
 
     <dependencies>
