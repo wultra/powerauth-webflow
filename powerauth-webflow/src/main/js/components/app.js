@@ -142,6 +142,8 @@ export class App extends React.Component {
             <div>
                 <div id="lang">
                     <ReactFlagsSelect
+                      className="menu-flags"
+                      selectButtonClassName="menu-flags-button"
                       countries={languageList}
                       customLabels={languageLabels}
                       selected={selectedLanguage}
