@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -140,7 +141,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public Resource languageSettingSource() throws MalformedURLException {
-        return resourceLoader.getResource(configuration.getResourcesLocation() + "lang.json");
+        Resource resource = resourceLoader.getResource(configuration.getResourcesLocation() + "lang.json");
+        if (!resource.exists()) {
+            resource = new UrlResource("classpath:/static/resources/lang.json");
+        }
+        return resource;
     }
 
     @Override
