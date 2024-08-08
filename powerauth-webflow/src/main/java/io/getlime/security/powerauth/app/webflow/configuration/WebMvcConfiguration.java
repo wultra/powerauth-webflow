@@ -33,7 +33,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -146,7 +145,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         Resource resource = resourceLoader.getResource(configuration.getResourcesLocation() + "lang.json");
         if (!resource.exists()) {
             logger.info("The lang.json file was not found in {}, using default location", configuration.getResourcesLocation());
-            resource = new UrlResource("classpath:/static/resources/lang.json");
+            resource = resourceLoader.getResource("classpath:/static/resources/lang.json");
         }
         return resource;
     }
