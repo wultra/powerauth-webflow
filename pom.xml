@@ -93,7 +93,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <bcprov-jdk18on.version>1.78.1</bcprov-jdk18on.version>
         <zxing.version>3.5.3</zxing.version>
-        <passay.version>1.6.4</passay.version>
+        <passay.version>1.6.5</passay.version>
 
         <!-- Documentation Dependencies -->
         <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
