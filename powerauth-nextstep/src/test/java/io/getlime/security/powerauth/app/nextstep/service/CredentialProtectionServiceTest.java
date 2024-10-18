@@ -18,6 +18,7 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getlime.security.powerauth.app.nextstep.NextStepTest;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashConfigEntity;
@@ -26,10 +27,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Map;
 
@@ -40,9 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class CredentialProtectionServiceTest {
+class CredentialProtectionServiceTest extends NextStepTest {
 
     @Autowired
     private CredentialProtectionService credentialProtectionService;
