@@ -17,11 +17,14 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
 
+import lombok.Getter;
+
 /**
  * Enumeration representing hashing algorithms.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Getter
 public enum HashAlgorithm {
 
     /**
@@ -37,35 +40,30 @@ public enum HashAlgorithm {
     /**
      * Algorithm argon2id.
      */
-    ARGON_2ID("argon2id", 2);
+    ARGON_2ID("argon2id", 2),
+
+    BCRYPT("bcrypt");
 
     private final String name;
-    private final int id;
+    private final Integer id;
 
     /**
      * Hash algorithm constructor.
+     * @param name Algorithm name.
+     */
+    HashAlgorithm(String name) {
+        this.name = name;
+        this.id = null;
+    }
+
+    /**
+     * Hash algorithm constructor for Argon family of algorithms.
      * @param name Algorithm name for Modular Crypt Format.
-     * @param id Algorithm ID in Bouncy Castle library.
+     * @param id Algorithm ID in Bouncy Castle library (Argon algorithms only).
      */
     HashAlgorithm(String name, int id) {
         this.name = name;
         this.id = id;
-    }
-
-    /**
-     * Get algorithm name for Modular Crypt Format.
-     * @return Algorithm name.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Get algorithm ID in Bouncy Castle library.
-     * @return Algorithm ID.
-     */
-    public int getId() {
-        return id;
     }
 
 }
