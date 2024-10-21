@@ -20,8 +20,9 @@ package io.getlime.security.powerauth.app.webflow.configuration;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.interceptor.WebSocketHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.stereotype.Component;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -31,8 +32,9 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Component
+@Configuration
 @EnableWebSocketMessageBroker
+@ConditionalOnProperty(name = "powerauth.webflow.websockets.enabled", havingValue = "true")
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
 
     public static final String MESSAGE_PREFIX = "/topic";

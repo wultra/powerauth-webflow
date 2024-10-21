@@ -37,6 +37,7 @@ import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -100,6 +101,10 @@ public class CredentialProtectionService {
                 final String hashedValue = argon2Hash.toString();
                 return credentialValueConverter.toDBValue(hashedValue, userId, credentialDefinition);
             }
+            case BCRYPT -> {
+                String hashedValue = BCrypt.hashpw(credentialValue, BCrypt.gensalt());
+                return credentialValueConverter.toDBValue(hashedValue, userId, credentialDefinition);
+            }
             default -> throw new InvalidConfigurationException("Unsupported hashing algorithm: " + algorithm);
         }
     }
@@ -132,6 +137,13 @@ public class CredentialProtectionService {
                 }
                 return succeeded;
             }
+            case BCRYPT -> {
+                boolean succeeded = BCrypt.checkpw(credentialValue, decryptedCredentialValue);
+                if (succeeded) {
+                    updateStoredCredentialValueIfRequired(credentialValue, credential);
+                }
+                return succeeded;
+            }
             default -> throw new InvalidConfigurationException("Unsupported hashing algorithm: " + algorithm);
         }
     }
@@ -154,6 +166,7 @@ public class CredentialProtectionService {
         final HashAlgorithm algorithm = hashingConfig.getAlgorithm();
         return switch (algorithm) {
             case ARGON_2I, ARGON_2D, ARGON_2ID -> verifyCredentialUsingArgon2(credentialValue, algorithm, decryptedCredentialValue);
+            case BCRYPT -> BCrypt.checkpw(credentialValue, decryptedCredentialValue);
         };
     }
 
@@ -335,7 +348,7 @@ public class CredentialProtectionService {
                 updateRequired = true;
             } else {
                 // Check actual argon2 parameters from the hash in the database and compare them with credential definition
-                updateRequired = updateRequired || !argon2ParamMatch(extractCredentialValue(credential), credentialDefinition.getHashingConfig().getAlgorithm(), credential.getHashingConfig().getParameters());
+                updateRequired = updateRequired || (credentialDefinition.getHashingConfig().getAlgorithm() != HashAlgorithm.BCRYPT && !argon2ParamMatch(extractCredentialValue(credential), credentialDefinition.getHashingConfig().getAlgorithm(), credential.getHashingConfig().getParameters()));
             }
         }
 

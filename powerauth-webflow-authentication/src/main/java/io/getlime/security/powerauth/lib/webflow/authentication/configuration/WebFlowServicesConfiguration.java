@@ -78,6 +78,12 @@ public class WebFlowServicesConfiguration {
     private boolean powerAuthOperationSupportEnabled;
 
     /**
+     * WebSocket support configuration.
+     */
+    @Value("${powerauth.webflow.websockets.enabled:true}")
+    private boolean webSocketSupportEnabled;
+
+    /**
      * Authentication type which configures how username and password is transferred for verification.
      */
     @Value("${powerauth.webflow.password.protection.type:NO_PROTECTION}")
@@ -217,6 +223,14 @@ public class WebFlowServicesConfiguration {
      */
     public boolean isPowerAuthOperationSupportEnabled() {
         return powerAuthOperationSupportEnabled;
+    }
+
+    /**
+     * Get whether WebSocket support is enabled.
+     * @return Whether WebSocket support is enabled.
+     */
+    public boolean isWebSocketSupportEnabled() {
+        return webSocketSupportEnabled;
     }
 
     /**

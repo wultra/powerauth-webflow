@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.rest.api.spring.annotation.support.PowerAut
 import io.getlime.security.powerauth.rest.api.spring.annotation.support.PowerAuthEncryptionArgumentResolver;
 import io.getlime.security.powerauth.rest.api.spring.annotation.support.PowerAuthWebArgumentResolver;
 import io.getlime.security.powerauth.rest.api.spring.filter.PowerAuthRequestFilter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -52,6 +53,7 @@ import java.util.List;
  * @author Petr Dvorak, petr@wultra.com
  */
 @Configuration
+@Slf4j
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Autowired
@@ -140,7 +142,12 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public Resource languageSettingSource() throws MalformedURLException {
-        return resourceLoader.getResource(configuration.getResourcesLocation() + "lang.json");
+        Resource resource = resourceLoader.getResource(configuration.getResourcesLocation() + "lang.json");
+        if (!resource.exists()) {
+            logger.info("The lang.json file was not found in {}, using default location", configuration.getResourcesLocation());
+            resource = resourceLoader.getResource("classpath:/static/resources/lang.json");
+        }
+        return resource;
     }
 
     @Override

@@ -27,6 +27,9 @@ require('stompjs');
  * @param webSocketId Web Socket ID.
  */
 function register(registrations, webSocketId) {
+    if (!webSocketSupportEnabled) {
+        return;
+    }
     try {
         var msie = document.documentMode;
         if (msie && msie < 11) {
@@ -60,6 +63,9 @@ function register(registrations, webSocketId) {
  * @param callback Callback function to call on an event.
  */
 function subscribe(route, callback) {
+    if (!webSocketSupportEnabled) {
+        return;
+    }
     try {
         if (client !== undefined) {
             client.subscribe(route, callback);
@@ -75,6 +81,9 @@ function subscribe(route, callback) {
  * @param route Web Socket route.
  */
 function unsubscribe(route) {
+    if (!webSocketSupportEnabled) {
+        return;
+    }
     try {
         if (client !== undefined) {
             client.unsubscribe(route);
@@ -92,6 +101,9 @@ function unsubscribe(route) {
  * @param message Text of the message as JSON.
  */
 function send(destination, params, message) {
+    if (!webSocketSupportEnabled) {
+        return;
+    }
     try {
         if (client !== undefined) {
             client.send(destination, params, message);
@@ -106,6 +118,9 @@ function send(destination, params, message) {
  * Disconnect the WebSocket.
  */
 function disconnect() {
+    if (!webSocketSupportEnabled) {
+        return;
+    }
     try {
         if (client !== undefined) {
             client.disconnect();
