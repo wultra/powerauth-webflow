@@ -40,7 +40,7 @@ jobs:
       - name: Deploy powerauth-webflow-client.war
         shell: bash
         run: |
-          scp -i ~/.ssh/id_rsa powerauth-webflow-client/target/webflow-client-*.war ${{ secrets.SCP_USERNAME }}@${{ secrets.SCP_HOST }}:/opt/apache-tomcat/webapps/webflow-client.war
+          scp -i ~/.ssh/id_rsa powerauth-webflow-client/target/powerauth-webflow-client-*.war ${{ secrets.SCP_USERNAME }}@${{ secrets.SCP_HOST }}:/opt/apache-tomcat/webapps/powerauth-webflow-client.war
       - name: Deploy powerauth-tpp-engine.war
         shell: bash
         run: |
