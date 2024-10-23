@@ -221,7 +221,7 @@ When the user identity is managed by the Next Step application, Next Step provid
 
 ### Next Step -- credential hashing
 
-Next Step application hashes the user credentials using the Argon2 hashing algorithm. The credential verification is performed by comparing the hash of the credential with the stored hash. The hashing algorithm parameters can be changed and in this case the credential hash is recreated with new parameters during the next user authentication and stored in the database.
+Next Step application hashes the user credentials using the Argon2 or Bcrypt hashing algorithms. The credential verification is performed by comparing the hash of the credential with the stored hash. For Argon2, the hashing algorithm parameters can be changed to provide strong hashing. In this case the credential hash is recreated with new parameters during the next user authentication and stored in the database. We recommend to use Argon2 instead of Bcrypt, which was added mainly for compatibility reasons and does not support hashing strength configuration.
 
 ### Next Step -- database record encryption
 

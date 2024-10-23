@@ -5701,6 +5701,8 @@ The list of expected status codes:
 }
 ```
 
+Possible algorithm names: `ARGON_2D`, `ARGON_2I`, `ARGON_2ID`, `BCRYPT`. For `BCRYPT` empty parameters should be used as this algorithm does not support hashing algorithm parameterization.
+
 #### Response 200
 
 - Headers:
