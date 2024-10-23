@@ -32,16 +32,16 @@ jobs:
       - name: Deploy powerauth-webflow.war
         shell: bash
         run: |
-          scp -T -i ~/.ssh/id_rsa **/target/powerauth-webflow-*.war ${{ secrets.SCP_USERNAME }}@${{ secrets.SCP_HOST }}:/opt/apache-tomcat/webapps/powerauth-webflow.war
+          scp -i ~/.ssh/id_rsa powerauth-webflow/powerauth-webflow/target/powerauth-webflow-*.war ${{ secrets.SCP_USERNAME }}@${{ secrets.SCP_HOST }}:/opt/apache-tomcat/webapps/powerauth-webflow.war
       - name: Deploy powerauth-nextstep.war
         shell: bash
         run: |
-          scp -T -i ~/.ssh/id_rsa **/target/powerauth-nextstep-*.war ${{ secrets.SCP_USERNAME }}@${{ secrets.SCP_HOST }}:/opt/apache-tomcat/webapps/powerauth-nextstep.war
+          scp -i ~/.ssh/id_rsa powerauth-webflow/powerauth-nextstep/target/powerauth-nextstep-*.war ${{ secrets.SCP_USERNAME }}@${{ secrets.SCP_HOST }}:/opt/apache-tomcat/webapps/powerauth-nextstep.war
       - name: Deploy powerauth-webflow-client.war
         shell: bash
         run: |
-          scp -T -i ~/.ssh/id_rsa **/target/webflow-client-*.war ${{ secrets.SCP_USERNAME }}@${{ secrets.SCP_HOST }}:/opt/apache-tomcat/webapps/webflow-client.war
+          scp -i ~/.ssh/id_rsa powerauth-webflow/powerauth-webflow-client/target/webflow-client-*.war ${{ secrets.SCP_USERNAME }}@${{ secrets.SCP_HOST }}:/opt/apache-tomcat/webapps/webflow-client.war
       - name: Deploy powerauth-tpp-engine.war
         shell: bash
         run: |
-          scp -T -i ~/.ssh/id_rsa **/target/powerauth-tpp-engine-*.war ${{ secrets.SCP_USERNAME }}@${{ secrets.SCP_HOST }}:/opt/apache-tomcat/webapps/powerauth-tpp-engine.war
+          scp -i ~/.ssh/id_rsa powerauth-webflow/powerauth-tpp-engine/target/powerauth-tpp-engine-*.war ${{ secrets.SCP_USERNAME }}@${{ secrets.SCP_HOST }}:/opt/apache-tomcat/webapps/powerauth-tpp-engine.war
