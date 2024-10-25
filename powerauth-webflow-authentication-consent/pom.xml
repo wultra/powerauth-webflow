@@ -25,7 +25,7 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.9.0</version>
+        <version>1.10.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>powerauth-webflow-authentication-consent</artifactId>
