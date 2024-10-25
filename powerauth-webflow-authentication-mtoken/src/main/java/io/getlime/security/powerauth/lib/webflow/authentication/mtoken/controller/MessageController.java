@@ -18,8 +18,9 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
 import io.getlime.security.powerauth.lib.webflow.authentication.model.request.WebSocketRegistrationRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.WebSocketMessageService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.websocket.WebSocketMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Controller;
  * @author Roman Strobl
  */
 @Controller
+@ConditionalOnProperty(name = "powerauth.webflow.websockets.enabled", havingValue = "true")
 public class MessageController {
 
     private final WebSocketMessageService webSocketMessageService;
