@@ -19,7 +19,7 @@ Important and fixed parameter is `changelog-file`.
 Others (like URL, username, password) depend on your environment.
 
 ```shell
-liquibase --changelog-file=./docs/db/changelog/changesets/powerauth-webflow/db.changelog-module.xml --url=jdbc:postgresql://localhost:5432/powerauth --username=powerauth --hub-mode=off status
+liquibase --changelog-file=./docs/db/changelog/changesets/powerauth-webflow/db.changelog-module.xml --url=jdbc:postgresql://localhost:5432/powerauth --username=powerauth status
 ```
 
 
@@ -41,7 +41,7 @@ Important and fixed parameter is `changelog-file`.
 Others (like URL, username, password) depend on your environment.
 
 ```shell
-liquibase --changelog-file=./docs/db/changelog/changesets/powerauth-tpp-engine/db.changelog-module.xml --url=jdbc:postgresql://localhost:5432/powerauth --username=powerauth --hub-mode=off status
+liquibase --changelog-file=./docs/db/changelog/changesets/powerauth-tpp-engine/db.changelog-module.xml --url=jdbc:postgresql://localhost:5432/powerauth --username=powerauth status
 ```
 
 
@@ -63,7 +63,7 @@ Important and fixed parameter is `changelog-file`.
 Others (like URL, username, password) depend on your environment.
 
 ```shell
-liquibase --changelog-file=./docs/db/changelog/changesets/powerauth-nextstep/db.changelog-module.xml --url=jdbc:postgresql://localhost:5432/powerauth --username=powerauth --hub-mode=off status
+liquibase --changelog-file=./docs/db/changelog/changesets/powerauth-nextstep/db.changelog-module.xml --url=jdbc:postgresql://localhost:5432/powerauth --username=powerauth status
 ```
 
 When all user identities are stored in Next Step, add foreign keys for user identity manually (they are not part of liquibase changesets).

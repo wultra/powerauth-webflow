@@ -624,7 +624,6 @@ CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
 CREATE INDEX ns_operation_pending ON ns_operation (user_id, result);
 CREATE UNIQUE INDEX ns_operation_afs_unique ON ns_operation_afs (operation_id, request_afs_action, request_step_index);
-CREATE INDEX wf_certificate_operation ON wf_certificate_verification (operation_id);
 CREATE UNIQUE INDEX ns_application_name ON ns_application (name);
 CREATE UNIQUE INDEX ns_credential_policy_name ON ns_credential_policy (name);
 CREATE UNIQUE INDEX ns_otp_policy_name ON ns_otp_policy (name);

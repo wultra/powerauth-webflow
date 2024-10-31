@@ -101,17 +101,7 @@
         </createIndex>
     </changeSet>
 
-    <changeSet id="6" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists tableName="wf_certificate_verification" indexName="wf_certificate_operation"/>
-            </not>
-        </preConditions>
-        <comment>Create a new index wf_certificate_verification(operation_id)</comment>
-        <createIndex tableName="wf_operation_session" indexName="wf_certificate_operation">
-            <column name="operation_id" />
-        </createIndex>
-    </changeSet>
+    <!--  changeSet id="6" omitted on purpose, because it has been creating an index on primary key  -->
 
     <!--  See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/JdbcClientDetailsService.java  -->
     <changeSet id="7" logicalFilePath="powerauth-webflow/1.4.x/20230324-init-db.xml" author="Lubos Racansky">
