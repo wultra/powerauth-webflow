@@ -243,7 +243,16 @@ springdoc.default-produces-media-type=application/json
 
 # Set the Spring application name
 spring.application.name=powerauth-nextstep
+
+# OIDC configuration
+powerauth.nextstep.security.auth.type=OIDC
+# URL of the provider, e.g. `https://sts.windows.net/example/`
+spring.security.oauth2.resource-server.jwt.issuer-uri=
+# A comma-separated list of allowed `aud` JWT claim values to be validated.
+spring.security.oauth2.resource-server.jwt.audiences=
 ```
+See the [Spring Security documentation](https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html#oauth2-client-log-users-in) and [OpenID Connect UserInfo endpoint](https://connect2id.com/products/server/docs/api/userinfo) for details.
+
 
 Encryption of user passwords during transport (end-to-end encryption) can be configured using following property:
 ```properties
@@ -266,6 +275,18 @@ String encryptionKey = Base64.getEncoder().encodeToString(randomBytes);
 <!-- begin box warning -->
 Do not use the same key for end-to-encryption and database record encryption. Store the keys securely, ideally using a vault mechanism._
 <!-- end -->
+
+### Docker Environment Setup
+For docker image configuration, the following environment variables can be used :
+
+| Environment Variable                     | Default value | Description                                                                                  |
+|------------------------------------------|---------------|----------------------------------------------------------------------------------------------|
+| `NEXTSTEP_MASTER_DB_ENCRYPTION_KEY`      |               | [16 random bytes Base64 encoded, for example 'MTIzNDU2Nzg5MDEyMzQ1Ng==']                     |
+| `NEXTSTEP_E2E_ENCRYPTION_KEY`            |               | [32 random bytes Base64 encoded, for example 'SkJNSkp5eTZMRHk5N0RDSGRacEhhZlp0NnpValdOVksK'] |
+| `NEXTSTEP_AUTH_TYPE`                     | NONE          | `OIDC` for OpenID Connect. If OIDC enabled, the properties bellow must be configured.        |
+| `NEXTSTEP_SECURITY_AUTH_OIDC_ISSUER_URI` |               | URL of the provider, e.g. `https://sts.windows.net/example/`                                 |
+| `NEXTSTEP_SECURITY_AUTH_OIDC_AUDIENCES`  |               | A comma-separated list of allowed `aud` JWT claim values to be validated.                    |
+
 
 ## Data Adapter
 At minimum the following configuration properties should be updated based on deployment:
