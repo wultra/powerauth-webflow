@@ -276,7 +276,8 @@ String encryptionKey = Base64.getEncoder().encodeToString(randomBytes);
 Do not use the same key for end-to-encryption and database record encryption. Store the keys securely, ideally using a vault mechanism._
 <!-- end -->
 
-### In case of using docker image, following environment variables can be used 
+### Docker Environment Setup
+For docker image configuration, the following environment variables can be used :
 
 | Environment Variable                     | Default value | Description                                                                                  |
 |------------------------------------------|---------------|----------------------------------------------------------------------------------------------|
