@@ -18,7 +18,7 @@ Next Step Server implements following functionality:
   - create an authentication method
   - listing available authentication methods both general and user-specific
   - enabling/disabling authentication methods per user including their configuration (configuration is required for the [Mobile Token](./Mobile-Token-Configuration.md))
-  - get a list of authentication methods currently enabled for the user  
+  - get a list of authentication methods currently enabled for the user
   - delete an authentication method
 - management of operations
   - create a new operation
@@ -34,8 +34,8 @@ Next Step Server implements following functionality:
   - retrieve mobile token configuration
   - get and update detailed authentication method and operation configuration
   - authentication method downgrade for the next step
-  - enable PowerAuth token for the next step   
-  - integration with PowerAuth operations   
+  - enable PowerAuth token for the next step
+  - integration with PowerAuth operations
   - store result of an AFS action
 - management of organizations
   - create an organization
@@ -52,7 +52,7 @@ Next Step Server implements following functionality:
   - obtaining user authentication history
   - update status of multiple user identities
   - lookup of user identities
-- management of Next Step applications  
+- management of Next Step applications
 - management of credential policies
 - management of OTP policies
 - management of credential definitions
@@ -68,16 +68,3 @@ Next Step Server implements following functionality:
 REST services are available for all Next Step functionality listed above.
 
 The Next Step Server functionality is described in details in [Next Step Server REST API Reference](./Next-Step-Server-REST-API-Reference.md).
-
-
-## OpenID Connect (OIDC)
-
-You may configure OpenID Connect (OIDC) authentication.
-
-| Property                                                | Default value | Description                                                                           |
-|---------------------------------------------------------|---------------|---------------------------------------------------------------------------------------|
-| `powerauth.nextstep.security.auth.type`                 |               | `OIDC` for OpenID Connect. If OIDC enabled, the properties bellow must be configured. |
-| `spring.security.oauth2.resource-server.jwt.issuer-uri` |               | URL of the provider, e.g. `https://sts.windows.net/example/`                          |
-| `spring.security.oauth2.resource-server.jwt.audiences`  |               | A comma-separated list of allowed `aud` JWT claim values to be validated.             |
-
-See the [Spring Security documentation](https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html#oauth2-client-log-users-in) and [OpenID Connect UserInfo endpoint](https://connect2id.com/products/server/docs/api/userinfo) for details. 
