@@ -22,9 +22,16 @@ import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import jakarta.servlet.ServletContext;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 /**
  * Configuration class used for setting up Open API documentation.
@@ -58,6 +65,29 @@ public class OpenApiConfiguration {
                 .group("nextstep")
                 .packagesToScan(packages)
                 .build();
+    }
+
+    @Bean
+    public OpenAPI openAPI(final ServletContext servletContext, final SecurityConfig securityConfig) {
+        final io.swagger.v3.oas.models.servers.Server server = new io.swagger.v3.oas.models.servers.Server()
+                .url(servletContext.getContextPath())
+                .description("Default Server URL");
+
+        final OpenAPI openAPI = new OpenAPI()
+                .servers(List.of(server));
+
+        if (SecurityConfig.AuthType.OIDC == securityConfig.getAuthType()) {
+            final Components components = new Components()
+                    .addSecuritySchemes("bearerAuth", new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT"));
+
+            openAPI.components(components);
+            openAPI.addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
+        }
+
+        return openAPI;
     }
 
 }
