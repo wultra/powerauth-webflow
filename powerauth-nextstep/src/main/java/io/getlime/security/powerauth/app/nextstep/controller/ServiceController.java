@@ -24,6 +24,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.ServiceStatusRe
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,7 @@ public class ServiceController {
      * Controller resource with system information.
      * @return System status info.
      */
+    @SecurityRequirements
     @Operation(summary = "Get service status")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Service status sent in response"),
