@@ -18,7 +18,7 @@
 
 package io.getlime.security.powerauth.app.webflow.demo.controller;
 
-import io.getlime.core.rest.model.base.response.ObjectResponse;
+import com.wultra.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.configuration.WebFlowServiceConfiguration;
 import io.getlime.security.powerauth.app.webflow.demo.model.ServiceStatusResponse;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -17,7 +17,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity.error;
 
-import io.getlime.core.rest.model.base.entity.Error;
+import com.wultra.core.rest.model.base.entity.Error;
 
 import java.io.Serial;
 import java.io.Serializable;

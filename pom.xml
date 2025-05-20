@@ -105,10 +105,10 @@
         <logstash.version>8.1</logstash.version>
 
         <!--  Wultra dependencies  -->
-        <wultra-core.version>1.12.0</wultra-core.version>
-        <powerauth.version>1.10.0</powerauth.version>
-        <powerauth-crypto.version>1.10.0</powerauth-crypto.version>
-        <powerauth-push.version>1.10.0</powerauth-push.version>
+        <wultra-core.version>2.0.0</wultra-core.version>
+        <powerauth.version>2.0.0</powerauth.version>
+        <powerauth-crypto.version>2.0.0</powerauth-crypto.version>
+        <powerauth-push.version>2.0.0</powerauth-push.version>
     </properties>
 
     <dependencyManagement>
@@ -217,31 +217,31 @@
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.core</groupId>
+                <groupId>com.wultra.core</groupId>
                 <artifactId>rest-client-base</artifactId>
                 <version>${wultra-core.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.core</groupId>
+                <groupId>com.wultra.core</groupId>
                 <artifactId>rest-model-base</artifactId>
                 <version>${wultra-core.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-java-crypto</artifactId>
                 <version>${powerauth-crypto.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-rest-client-spring</artifactId>
                 <version>${powerauth.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.core</groupId>
+                <groupId>com.wultra.core</groupId>
                 <artifactId>audit-base</artifactId>
                 <version>${wultra-core.version}</version>
             </dependency>
