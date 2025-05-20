@@ -20,7 +20,7 @@ package io.getlime.security.powerauth.lib.mtoken.model.enumeration;
 /**
  * This class contains a list of all possible error codes the mobile token API may return.
  * Return some of these messages as error codes in the context of our standard
- * {@link io.getlime.core.rest.model.base.response.ErrorResponse} responses.
+ * {@link com.wultra.core.rest.model.base.response.ErrorResponse} responses.
  *
  * @author Petr Dvorak, petr@wultra.com
  */

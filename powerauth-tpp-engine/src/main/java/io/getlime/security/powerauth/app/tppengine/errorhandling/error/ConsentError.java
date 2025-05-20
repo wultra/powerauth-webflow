@@ -18,7 +18,7 @@
 
 package io.getlime.security.powerauth.app.tppengine.errorhandling.error;
 
-import io.getlime.core.rest.model.base.entity.Error;
+import com.wultra.core.rest.model.base.entity.Error;
 
 /**
  * Error related to consent.
