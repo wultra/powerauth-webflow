@@ -20,8 +20,8 @@ package io.getlime.security.powerauth.app.nextstep.exception;
 
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
-import io.getlime.core.rest.model.base.entity.Error;
-import io.getlime.core.rest.model.base.response.ErrorResponse;
+import com.wultra.core.rest.model.base.entity.Error;
+import com.wultra.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialValidationError;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.ExtendedError;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.Violation;

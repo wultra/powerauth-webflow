@@ -94,6 +94,7 @@
         <bcprov-jdk18on.version>1.80</bcprov-jdk18on.version>
         <zxing.version>3.5.3</zxing.version>
         <passay.version>1.6.6</passay.version>
+        <shedlock.version>6.6.1</shedlock.version>
 
         <!-- Documentation Dependencies -->
         <springdoc-openapi-starter-webmvc-ui.version>2.8.8</springdoc-openapi-starter-webmvc-ui.version>
@@ -104,10 +105,10 @@
         <logstash.version>8.1</logstash.version>
 
         <!--  Wultra dependencies  -->
-        <wultra-core.version>1.12.0-SNAPSHOT</wultra-core.version>
-        <powerauth.version>1.10.0-SNAPSHOT</powerauth.version>
-        <powerauth-crypto.version>1.10.0-SNAPSHOT</powerauth-crypto.version>
-        <powerauth-push.version>1.10.0-SNAPSHOT</powerauth-push.version>
+        <wultra-core.version>2.0.0-SNAPSHOT</wultra-core.version>
+        <powerauth.version>2.0.0-SNAPSHOT</powerauth.version>
+        <powerauth-crypto.version>2.0.0-SNAPSHOT</powerauth-crypto.version>
+        <powerauth-push.version>2.0.0-SNAPSHOT</powerauth-push.version>
     </properties>
 
     <dependencyManagement>
@@ -216,13 +217,13 @@
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.core</groupId>
+                <groupId>com.wultra.core</groupId>
                 <artifactId>rest-client-base</artifactId>
                 <version>${wultra-core.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.core</groupId>
+                <groupId>com.wultra.core</groupId>
                 <artifactId>rest-model-base</artifactId>
                 <version>${wultra-core.version}</version>
             </dependency>
@@ -240,7 +241,7 @@
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.core</groupId>
+                <groupId>com.wultra.core</groupId>
                 <artifactId>audit-base</artifactId>
                 <version>${wultra-core.version}</version>
             </dependency>
@@ -287,6 +288,15 @@
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-el</artifactId>
                 <scope>provided</scope>
+            </dependency>
+
+            <!-- Job Scheduling -->
+            <dependency>
+                <groupId>net.javacrumbs.shedlock</groupId>
+                <artifactId>shedlock-bom</artifactId>
+                <version>${shedlock.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- Documentation -->

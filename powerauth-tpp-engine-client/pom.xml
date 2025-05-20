@@ -41,7 +41,7 @@
 
         <!-- Other Dependencies -->
         <dependency>
-            <groupId>io.getlime.core</groupId>
+            <groupId>com.wultra.core</groupId>
             <artifactId>rest-client-base</artifactId>
         </dependency>
 
