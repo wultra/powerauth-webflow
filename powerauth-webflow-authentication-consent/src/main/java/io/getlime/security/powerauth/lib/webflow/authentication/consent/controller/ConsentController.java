@@ -17,7 +17,7 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.consent.controller;
 
-import com.wultra.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;

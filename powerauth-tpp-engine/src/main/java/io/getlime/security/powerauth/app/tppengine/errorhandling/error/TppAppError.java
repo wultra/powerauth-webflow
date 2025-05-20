@@ -18,7 +18,7 @@
 
 package io.getlime.security.powerauth.app.tppengine.errorhandling.error;
 
-import com.wultra.core.rest.model.base.entity.Error;
+import io.getlime.core.rest.model.base.entity.Error;
 
 import java.util.ArrayList;
 import java.util.List;

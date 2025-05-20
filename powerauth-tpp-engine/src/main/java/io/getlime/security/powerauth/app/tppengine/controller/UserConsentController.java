@@ -18,9 +18,9 @@
 
 package io.getlime.security.powerauth.app.tppengine.controller;
 
-import com.wultra.core.rest.model.base.request.ObjectRequest;
-import com.wultra.core.rest.model.base.response.ObjectResponse;
-import com.wultra.core.rest.model.base.response.Response;
+import io.getlime.core.rest.model.base.request.ObjectRequest;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.ConsentNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.model.request.GiveConsentRequest;
 import io.getlime.security.powerauth.app.tppengine.model.request.RemoveConsentRequest;

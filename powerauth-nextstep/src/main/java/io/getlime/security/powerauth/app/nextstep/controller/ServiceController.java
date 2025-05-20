@@ -18,7 +18,7 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
-import com.wultra.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.lib.nextstep.model.response.ServiceStatusResponse;
 import io.swagger.v3.oas.annotations.Operation;

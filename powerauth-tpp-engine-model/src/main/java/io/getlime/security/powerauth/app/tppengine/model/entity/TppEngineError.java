@@ -18,7 +18,7 @@
 
 package io.getlime.security.powerauth.app.tppengine.model.entity;
 
-import com.wultra.core.rest.model.base.entity.Error;
+import io.getlime.core.rest.model.base.entity.Error;
 
 /**
  *

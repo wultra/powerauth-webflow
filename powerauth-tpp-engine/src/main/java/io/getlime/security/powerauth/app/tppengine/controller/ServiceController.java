@@ -18,7 +18,7 @@
 
 package io.getlime.security.powerauth.app.tppengine.controller;
 
-import com.wultra.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.tppengine.configuration.TppEngineConfiguration;
 import io.getlime.security.powerauth.app.tppengine.model.response.ServiceStatusResponse;
 import org.slf4j.Logger;

@@ -17,8 +17,8 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
-import com.wultra.core.rest.model.base.request.ObjectRequest;
-import com.wultra.core.rest.model.base.response.Response;
+import io.getlime.core.rest.model.base.request.ObjectRequest;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
 import io.getlime.push.model.enumeration.MobilePlatform;

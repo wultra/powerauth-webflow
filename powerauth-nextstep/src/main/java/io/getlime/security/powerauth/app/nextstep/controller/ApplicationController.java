@@ -17,8 +17,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.controller;
 
-import com.wultra.core.rest.model.base.request.ObjectRequest;
-import com.wultra.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.request.ObjectRequest;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.service.ApplicationService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.ApplicationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.ApplicationNotFoundException;

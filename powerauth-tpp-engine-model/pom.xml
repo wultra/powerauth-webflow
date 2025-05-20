@@ -33,7 +33,7 @@
     <dependencies>
         <!-- PowerAuth Dependencies -->
         <dependency>
-            <groupId>com.wultra.core</groupId>
+            <groupId>io.getlime.core</groupId>
             <artifactId>rest-model-base</artifactId>
         </dependency>
         <dependency>

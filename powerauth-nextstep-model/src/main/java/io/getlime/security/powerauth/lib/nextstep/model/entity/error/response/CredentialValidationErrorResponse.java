@@ -18,7 +18,7 @@
 
 package io.getlime.security.powerauth.lib.nextstep.model.entity.error.response;
 
-import com.wultra.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialValidationError;
 import jakarta.validation.constraints.NotNull;
 

@@ -17,7 +17,7 @@
 
 package io.getlime.security.powerauth.lib.nextstep.model.entity.error;
 
-import com.wultra.core.rest.model.base.entity.Error;
+import io.getlime.core.rest.model.base.entity.Error;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

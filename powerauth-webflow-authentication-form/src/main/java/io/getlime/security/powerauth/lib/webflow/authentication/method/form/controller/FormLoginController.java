@@ -18,7 +18,7 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.method.form.controller;
 
-import com.wultra.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.converter.UserAccountStatusConverter;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAuthInstrument;

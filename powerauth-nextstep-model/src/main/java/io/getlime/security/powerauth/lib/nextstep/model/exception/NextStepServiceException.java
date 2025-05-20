@@ -18,7 +18,7 @@
 
 package io.getlime.security.powerauth.lib.nextstep.model.exception;
 
-import com.wultra.core.rest.model.base.entity.Error;
+import io.getlime.core.rest.model.base.entity.Error;
 
 /**
  * Exception for failures in Next Step service processing.

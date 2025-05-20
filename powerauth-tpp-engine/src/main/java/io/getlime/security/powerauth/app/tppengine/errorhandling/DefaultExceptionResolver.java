@@ -20,8 +20,8 @@ package io.getlime.security.powerauth.app.tppengine.errorhandling;
 
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
-import com.wultra.core.rest.model.base.entity.Error;
-import com.wultra.core.rest.model.base.response.ErrorResponse;
+import io.getlime.core.rest.model.base.entity.Error;
+import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.error.ConsentError;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.error.TppAppError;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.ConsentNotFoundException;

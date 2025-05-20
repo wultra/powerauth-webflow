@@ -17,7 +17,7 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.entity;
 
-import com.wultra.core.rest.model.base.entity.Error;
+import io.getlime.core.rest.model.base.entity.Error;
 
 import java.util.List;
 
