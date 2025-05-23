@@ -27,10 +27,8 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,8 +42,6 @@ import org.springframework.context.annotation.Configuration;
 public class WebFlowServicesConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(WebFlowServicesConfiguration.class);
-
-    private final SSLConfigurationService sslConfigurationService;
 
     /**
      * Data Adapter service URL.
@@ -154,11 +150,6 @@ public class WebFlowServicesConfiguration {
      */
     @Value("${powerauth.webflow.afs.tm.cookies.sessionSid}")
     private String tmSessionSidCookie;
-
-    @Autowired
-    public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
-        this.sslConfigurationService = sslConfigurationService;
-    }
 
     /**
      * Construct jackson configuration which allows sending empty objects and allows unknown properties.
