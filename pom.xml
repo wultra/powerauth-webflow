@@ -94,7 +94,7 @@
         <bcprov-jdk18on.version>1.80</bcprov-jdk18on.version>
         <zxing.version>3.5.3</zxing.version>
         <passay.version>1.6.6</passay.version>
-        <shedlock.version>6.7.0</shedlock.version>
+        <shedlock.version>6.8.0</shedlock.version>
 
         <!-- Documentation Dependencies -->
         <springdoc-openapi-starter-webmvc-ui.version>2.8.8</springdoc-openapi-starter-webmvc-ui.version>
