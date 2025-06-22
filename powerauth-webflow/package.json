@@ -20,7 +20,7 @@
   "homepage": "https://github.com/wultra/powerauth-webflow",
   "dependencies": {
     "@snyk/protect": "^1.1288.0",
-    "axios": "^1.6.8",
+    "axios": "^1.8.2",
     "bluebird": "^3.7.2",
     "intl": "^1.2.5",
     "lodash": "^4.17.21",
