@@ -221,7 +221,7 @@ public class CredentialService {
             credential.setUsername(username);
             credential.setTimestampLastUsernameChange(changeTimestamp);
         }
-        if (request.getCredentialValue() != null) {
+        if (credentialValue != null) {
             final CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
             credential.setValue(protectedValue.getValue());
             credential.setEncryptionAlgorithm(protectedValue.getEncryptionAlgorithm());

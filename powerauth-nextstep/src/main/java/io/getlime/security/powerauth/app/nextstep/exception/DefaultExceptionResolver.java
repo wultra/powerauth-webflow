@@ -25,6 +25,8 @@ import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialValidationError;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.ExtendedError;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.Violation;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.error.response.CredentialValidationErrorResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.error.response.ExtendedErrorResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -798,12 +800,12 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(CredentialValidationFailedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleCredentialValidationFailedException(CredentialValidationFailedException ex) {
+    public @ResponseBody CredentialValidationErrorResponse handleCredentialValidationFailedException(CredentialValidationFailedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
         logger.warn("Validation errors: {}", ex.getError().getValidationFailures());
         audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Credential validation failed.", ex.getError().getValidationFailures());
-        return new ErrorResponse(error);
+        return new CredentialValidationErrorResponse(error);
     }
 
     /**
@@ -813,14 +815,14 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+    public @ResponseBody ExtendedErrorResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
         audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final ExtendedError error = new ExtendedError(RequestValidationFailedException.CODE, "Request validation failed.");
         error.getViolations().add(
                 new Violation(ex.getParameterName(), null, ex.getMessage())
         );
-        return new ErrorResponse(error);
+        return new ExtendedErrorResponse(error);
     }
 
     /**
@@ -831,7 +833,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleConstraintViolationException(ConstraintViolationException ex) {
+    public @ResponseBody ExtendedErrorResponse handleConstraintViolationException(ConstraintViolationException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
         audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final ExtendedError error = new ExtendedError(RequestValidationFailedException.CODE, "Request validation failed.");
@@ -840,7 +842,7 @@ public class DefaultExceptionResolver {
                     new Violation(violation.getPropertyPath().toString(), violation.getInvalidValue(), violation.getMessage())
             );
         }
-        return new ErrorResponse(error);
+        return new ExtendedErrorResponse(error);
     }
 
     /**
@@ -851,7 +853,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public @ResponseBody ExtendedErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
         audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final ExtendedError error = new ExtendedError(RequestValidationFailedException.CODE, "Request validation failed.");
@@ -860,7 +862,7 @@ public class DefaultExceptionResolver {
                     new Violation(fieldError.getField(), fieldError.getRejectedValue(), fieldError.getDefaultMessage())
             );
         }
-        return new ErrorResponse(error);
+        return new ExtendedErrorResponse(error);
     }
 
     /**

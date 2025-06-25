@@ -68,13 +68,17 @@ public class SecurityConfig {
                 .build();
     }
 
-    enum AuthType {
+    public enum AuthType {
         NONE,
 
         /**
          * OpenID Connect.
          */
         OIDC
+    }
+
+    public AuthType getAuthType() {
+        return this.authType;
     }
 
 }

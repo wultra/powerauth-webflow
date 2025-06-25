@@ -150,9 +150,10 @@ public class AuthenticationController {
     })
     @PostMapping("combined")
     public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@Valid @RequestBody ObjectRequest<CombinedAuthenticationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, InvalidConfigurationException, UserNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, OperationNotValidException, EncryptionException {
-        logger.info("Received authenticateCombined request, user ID: {}, OTP ID: {}, operation ID: {}", request.getRequestObject().getUserId(), request.getRequestObject().getOperationId(), request.getRequestObject().getOtpId());
-        final CombinedAuthenticationResponse response = authenticationService.authenticateCombined(request.getRequestObject());
-        logger.info("The authenticateCombined request succeeded, user ID: {}, OTP ID: {}, operation ID: {}, result: {}", request.getRequestObject().getUserId(), request.getRequestObject().getOperationId(), request.getRequestObject().getOtpId(), response.getAuthenticationResult());
+        final CombinedAuthenticationRequest requestObject = request.getRequestObject();
+        logger.info("Received authenticateCombined request, user ID: {}, OTP ID: {}, operation ID: {}", requestObject.getUserId(), requestObject.getOtpId(), requestObject.getOperationId());
+        final CombinedAuthenticationResponse response = authenticationService.authenticateCombined(requestObject);
+        logger.info("The authenticateCombined request succeeded, user ID: {}, OTP ID: {}, operation ID: {}, result: {}", requestObject.getUserId(), requestObject.getOtpId(), requestObject.getOperationId(), response.getAuthenticationResult());
         return new ObjectResponse<>(response);
     }
 

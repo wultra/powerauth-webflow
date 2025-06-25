@@ -628,7 +628,6 @@ CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
 CREATE INDEX ns_operation_pending ON ns_operation (user_id, result);
 CREATE UNIQUE INDEX ns_operation_afs_unique on ns_operation_afs (operation_id, request_afs_action, request_step_index);
-CREATE INDEX wf_certificate_operation ON wf_certificate_verification (operation_id);
 CREATE UNIQUE INDEX ns_application_name ON ns_application (name);
 CREATE UNIQUE INDEX ns_credential_policy_name ON ns_credential_policy (name);
 CREATE UNIQUE INDEX ns_otp_policy_name ON ns_otp_policy (name);
@@ -698,3 +697,6 @@ EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
 -- ALTER TABLE ns_user_prefs ADD CONSTRAINT ns_user_prefs_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);
 -- ALTER TABLE ns_otp_storage ADD CONSTRAINT ns_otp_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);
 -- ALTER TABLE ns_authentication ADD CONSTRAINT ns_auth_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);
+
+-- Create a new table shedlock
+CREATE TABLE shedlock (name VARCHAR2(64) NOT NULL, lock_until TIMESTAMP NOT NULL, locked_at TIMESTAMP NOT NULL, locked_by VARCHAR2(255) NOT NULL, CONSTRAINT PK_SHEDLOCK PRIMARY KEY (name));
