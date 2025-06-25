@@ -39,7 +39,7 @@
             <artifactId>powerauth-nextstep-model</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.getlime.core</groupId>
+            <groupId>com.wultra.core</groupId>
             <artifactId>rest-client-base</artifactId>
         </dependency>
 

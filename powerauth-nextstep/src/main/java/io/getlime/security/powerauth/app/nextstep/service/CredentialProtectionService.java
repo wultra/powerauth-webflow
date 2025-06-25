@@ -26,8 +26,8 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Creden
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashConfigEntity;
-import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
-import io.getlime.security.powerauth.crypto.lib.model.Argon2Hash;
+import com.wultra.security.powerauth.crypto.lib.generator.KeyGenerator;
+import com.wultra.security.powerauth.crypto.lib.model.Argon2Hash;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.EncryptionException;

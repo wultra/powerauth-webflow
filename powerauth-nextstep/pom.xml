@@ -74,7 +74,7 @@
             <artifactId>powerauth-nextstep-model</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.getlime.security</groupId>
+            <groupId>com.wultra.security</groupId>
             <artifactId>powerauth-java-crypto</artifactId>
         </dependency>
         <dependency>
@@ -82,11 +82,11 @@
             <artifactId>powerauth-data-adapter-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.getlime.security</groupId>
+            <groupId>com.wultra.security</groupId>
             <artifactId>powerauth-rest-client-spring</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.getlime.core</groupId>
+            <groupId>com.wultra.core</groupId>
             <artifactId>audit-base</artifactId>
         </dependency>
 

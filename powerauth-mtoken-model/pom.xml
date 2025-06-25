@@ -32,7 +32,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.getlime.core</groupId>
+            <groupId>com.wultra.core</groupId>
             <artifactId>rest-model-base</artifactId>
         </dependency>
         <dependency>
