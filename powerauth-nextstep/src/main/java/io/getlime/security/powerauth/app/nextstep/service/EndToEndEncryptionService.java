@@ -19,11 +19,11 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
-import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
-import io.getlime.security.powerauth.crypto.lib.model.exception.CryptoProviderException;
-import io.getlime.security.powerauth.crypto.lib.model.exception.GenericCryptoException;
-import io.getlime.security.powerauth.crypto.lib.util.AESEncryptionUtils;
-import io.getlime.security.powerauth.crypto.lib.util.KeyConvertor;
+import com.wultra.security.powerauth.crypto.lib.generator.KeyGenerator;
+import com.wultra.security.powerauth.crypto.lib.model.exception.CryptoProviderException;
+import com.wultra.security.powerauth.crypto.lib.model.exception.GenericCryptoException;
+import com.wultra.security.powerauth.crypto.lib.util.AESEncryptionUtils;
+import com.wultra.security.powerauth.crypto.lib.util.KeyConvertor;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EndToEndEncryptionAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.EncryptionException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;

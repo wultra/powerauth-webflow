@@ -18,8 +18,8 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
-import io.getlime.core.rest.model.base.request.ObjectRequest;
-import io.getlime.core.rest.model.base.response.ObjectResponse;
+import com.wultra.core.rest.model.base.request.ObjectRequest;
+import com.wultra.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.service.OtpPolicyService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;

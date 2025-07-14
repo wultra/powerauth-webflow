@@ -50,12 +50,12 @@
             <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.getlime.security</groupId>
+            <groupId>com.wultra.security</groupId>
             <artifactId>powerauth-restful-security-spring</artifactId>
             <version>${powerauth.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.getlime.security</groupId>
+            <groupId>com.wultra.security</groupId>
             <artifactId>powerauth-push-client</artifactId>
             <version>${powerauth-push.version}</version>
         </dependency>
@@ -64,7 +64,7 @@
             <artifactId>powerauth-mtoken-model</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.getlime.core</groupId>
+            <groupId>com.wultra.core</groupId>
             <artifactId>audit-base</artifactId>
         </dependency>
 

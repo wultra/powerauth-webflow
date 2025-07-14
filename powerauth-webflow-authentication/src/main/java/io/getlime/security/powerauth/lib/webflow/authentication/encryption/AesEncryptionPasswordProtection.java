@@ -17,9 +17,9 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.encryption;
 
-import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
-import io.getlime.security.powerauth.crypto.lib.util.AESEncryptionUtils;
-import io.getlime.security.powerauth.crypto.lib.util.KeyConvertor;
+import com.wultra.security.powerauth.crypto.lib.generator.KeyGenerator;
+import com.wultra.security.powerauth.crypto.lib.util.AESEncryptionUtils;
+import com.wultra.security.powerauth.crypto.lib.util.KeyConvertor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

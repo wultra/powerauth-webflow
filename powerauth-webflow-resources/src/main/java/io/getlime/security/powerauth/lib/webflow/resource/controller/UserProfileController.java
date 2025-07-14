@@ -18,7 +18,7 @@
 
 package io.getlime.security.powerauth.lib.webflow.resource.controller;
 
-import io.getlime.core.rest.model.base.response.ObjectResponse;
+import com.wultra.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;

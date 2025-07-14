@@ -24,7 +24,6 @@
 
     <artifactId>powerauth-nextstep-model</artifactId>
     <name>powerauth-nextstep-model</name>
-    <groupId>io.getlime.security</groupId>
 
     <parent>
         <groupId>io.getlime.security</groupId>
@@ -34,7 +33,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.getlime.core</groupId>
+            <groupId>com.wultra.core</groupId>
             <artifactId>rest-model-base</artifactId>
         </dependency>
         <dependency>
