@@ -12,7 +12,7 @@
             </not>
         </preConditions>
         <comment>Create a new table shedlock</comment>
-        <createTable tableName="shedlock">
+        <createTable tableName="shedlock" ifNotExists="true">
             <column name="name" type="varchar(64)">
                 <constraints primaryKey="true"/>
             </column>
