@@ -20,6 +20,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ContactType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialLocation;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
 import jakarta.validation.Valid;
@@ -85,6 +86,8 @@ public class CreateUserRequest {
         private String credentialName;
         @NotNull
         private CredentialType credentialType;
+        private CredentialLocation credentialSource;
+        private CredentialLocation credentialTarget;
         @Size(min = 1, max = 256)
         private String username;
         @Size(min = 1, max = 256)
