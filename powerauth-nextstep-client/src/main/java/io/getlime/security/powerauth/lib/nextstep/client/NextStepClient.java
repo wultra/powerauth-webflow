@@ -2357,11 +2357,13 @@ public class NextStepClient {
      * @see #createCredential(CreateCredentialRequest)
      */
     public ObjectResponse<CreateCredentialResponse> createCredential(@NotNull String userId, @NotNull String credentialName, @NotNull CredentialType credentialType,
-                                                                     String username, String credentialValue) throws NextStepClientException {
+                                                                     String username, String credentialValue, CredentialLocation credentialSource, CredentialLocation credentialTarget) throws NextStepClientException {
         final CreateCredentialRequest request = new CreateCredentialRequest();
         request.setUserId(userId);
         request.setCredentialName(credentialName);
         request.setCredentialType(credentialType);
+        request.setCredentialSource(credentialSource);
+        request.setCredentialTarget(credentialTarget);
         request.setUsername(username);
         request.setCredentialValue(credentialValue);
         return createCredential(request);
@@ -2383,11 +2385,13 @@ public class NextStepClient {
      */
     public ObjectResponse<CreateCredentialResponse> createCredential(@NotNull String userId, @NotNull String credentialName, @NotNull CredentialType credentialType,
                                                                      String username, String credentialValue, CredentialValidationMode validationMode,
-                                                                     List<KeyValueParameter> credentialHistory) throws NextStepClientException {
+                                                                     List<KeyValueParameter> credentialHistory, CredentialLocation credentialSource, CredentialLocation credentialTarget) throws NextStepClientException {
         final CreateCredentialRequest request = new CreateCredentialRequest();
         request.setUserId(userId);
         request.setCredentialName(credentialName);
         request.setCredentialType(credentialType);
+        request.setCredentialSource(credentialSource);
+        request.setCredentialTarget(credentialTarget);
         request.setUsername(username);
         request.setCredentialValue(credentialValue);
         request.setValidationMode(validationMode);
@@ -2427,11 +2431,13 @@ public class NextStepClient {
      * @see #updateCredential(UpdateCredentialRequest)
      */
     public ObjectResponse<UpdateCredentialResponse> updateCredential(@NotNull String userId, @NotNull String credentialName, CredentialType credentialType,
-                                                                     String username, String credentialValue, CredentialStatus credentialStatus) throws NextStepClientException {
+                                                                     String username, String credentialValue, CredentialStatus credentialStatus, CredentialLocation credentialSource, CredentialLocation credentialTarget) throws NextStepClientException {
         final UpdateCredentialRequest request = new UpdateCredentialRequest();
         request.setUserId(userId);
         request.setCredentialName(credentialName);
         request.setCredentialType(credentialType);
+        request.setCredentialSource(credentialSource);
+        request.setCredentialTarget(credentialTarget);
         request.setUsername(username);
         request.setCredentialValue(credentialValue);
         request.setCredentialStatus(credentialStatus);
@@ -2463,11 +2469,13 @@ public class NextStepClient {
      * @see #updateCredentialPost(UpdateCredentialRequest)
      */
     public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@NotNull String userId, @NotNull String credentialName, CredentialType credentialType,
-                                                                         String username, String credentialValue, CredentialStatus credentialStatus) throws NextStepClientException {
+                                                                         String username, String credentialValue, CredentialStatus credentialStatus, CredentialLocation credentialSource, CredentialLocation credentialTarget) throws NextStepClientException {
         final UpdateCredentialRequest request = new UpdateCredentialRequest();
         request.setUserId(userId);
         request.setCredentialName(credentialName);
         request.setCredentialType(credentialType);
+        request.setCredentialSource(credentialSource);
+        request.setCredentialTarget(credentialTarget);
         request.setUsername(username);
         request.setCredentialValue(credentialValue);
         request.setCredentialStatus(credentialStatus);

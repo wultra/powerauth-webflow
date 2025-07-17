@@ -17,6 +17,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialLocation;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
@@ -57,6 +58,14 @@ public class CredentialEntity implements Serializable {
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private CredentialType type;
+
+    @Column(name = "source", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CredentialLocation source;
+
+    @Column(name = "target", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CredentialLocation target;
 
     @Column(name = "user_name")
     private String username;
