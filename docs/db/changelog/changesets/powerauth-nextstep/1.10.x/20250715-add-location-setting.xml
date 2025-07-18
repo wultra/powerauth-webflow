@@ -6,7 +6,9 @@
     <changeSet id="1" logicalFilePath="powerauth-nextstep/1.10.x/20250715-add-location-setting" author="Zdenek Cerny">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="ns_credential_storage"/>
-            <columnExists tableName="ns_credential_storage" columnName="source"/>
+            <not>
+                <columnExists tableName="ns_credential_storage" columnName="source"/>
+            </not>
         </preConditions>
         <comment>Add column source to ns_credential_storage</comment>
         <addColumn tableName="ns_credential_storage">
@@ -17,7 +19,9 @@
     <changeSet id="2" logicalFilePath="powerauth-nextstep/1.10.x/20250715-add-location-setting" author="Zdenek Cerny">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="ns_credential_storage"/>
-            <columnExists tableName="ns_credential_storage" columnName="target"/>
+            <not>
+                <columnExists tableName="ns_credential_storage" columnName="target"/>
+            </not>
         </preConditions>
         <comment>Add column target to ns_credential_storage</comment>
         <addColumn tableName="ns_credential_storage">
