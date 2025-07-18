@@ -730,7 +730,7 @@ public class CredentialService {
             // Credential expiration needs to be derived
             updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
         }
-        credential.setSource((source == null)?CredentialLocation.LOCAL:source);
+        credential.setSource(Objects.requireNonNullElse(source, CredentialLocation.LOCAL));
         credential.setTarget((target == null)?CredentialLocation.LOCAL:target);
         credential.setUsername(username);
         final String credentialValueRequest = credentialValue;
