@@ -243,7 +243,7 @@ public class CredentialService {
                 credential.setTimestampLastCredentialChange(changeTimestamp);
                 updateCredentialExpiration = true;
             } else {
-                logger.warn("invalid attempt to set credentials value for external password, userId: {}",user.getUserId());
+                logger.warn("invalid attempt to set credentials value for external password, userId: {}", user.getUserId());
             }
         }
         if (request.getTimestampExpires() != null) {
