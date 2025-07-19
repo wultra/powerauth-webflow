@@ -149,7 +149,7 @@ public class AuthenticationService {
         // Verify credential value
         final AuthenticationResult authenticationResult;
         if (credential.getStatus() == CredentialStatus.ACTIVE) {
-            if (CredentialLocation.PROXY.equals(credential.getSource())) {
+            if (CredentialLocation.PROXY == credential.getSource()) {
                 final AuthenticationContext authenticationContext = new AuthenticationContext();
                 if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
                     authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
@@ -614,7 +614,7 @@ public class AuthenticationService {
         } else {
             // Verify OTP value
             if (otp.getStatus() == OtpStatus.ACTIVE) {
-                if (CredentialLocation.PROXY.equals(credential.getSource())) {
+                if (CredentialLocation.PROXY == credential.getSource()) {
                     final AuthenticationContext authenticationContext = new AuthenticationContext();
                     if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
                         authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);

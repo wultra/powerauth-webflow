@@ -231,9 +231,9 @@ public class CredentialService {
         }
         if (credentialValue != null) {
             // change value only if the target is local
-            if (CredentialLocation.LOCAL.equals(credential.getTarget())) {
+            if (CredentialLocation.LOCAL == credential.getTarget()) {
                 // if source was proxy change the information about the source
-                if (CredentialLocation.PROXY.equals(credential.getSource())) {
+                if (CredentialLocation.PROXY == credential.getSource()) {
                     credential.setSource(CredentialLocation.LOCAL);
                 }
                 final CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
@@ -731,7 +731,7 @@ public class CredentialService {
             updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
         }
         credential.setSource(Objects.requireNonNullElse(source, CredentialLocation.LOCAL));
-        credential.setTarget((target == null)?CredentialLocation.LOCAL:target);
+        credential.setTarget(Objects.requireNonNullElse(target, CredentialLocation.LOCAL) );
         credential.setUsername(username);
         final String credentialValueRequest = credentialValue;
         if (credentialValue == null) {
@@ -779,7 +779,7 @@ public class CredentialService {
         credentialDetail.setUsername(credential.getUsername());
         final boolean credentialChangeRequired;
         // the proxied passwords are maintained by external system, i.e. nor created neither generated.
-        if (CredentialLocation.PROXY.equals(source)) {
+        if (CredentialLocation.PROXY == source) {
             credentialChangeRequired = false;
         } else if (credentialValueRequest == null) {
             // Generated credential value is returned in unprotected form, with possible e2e-encryption
