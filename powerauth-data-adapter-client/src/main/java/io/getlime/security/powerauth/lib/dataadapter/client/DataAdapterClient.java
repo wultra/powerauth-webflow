@@ -112,6 +112,17 @@ public class DataAdapterClient {
     }
 
     /**
+     * Perform authentication with provided username and password.
+     *
+     * @param request Request object for a user authentication.
+     * @return Authentication response is returned in case of successful authentication.
+     * @throws DataAdapterClientErrorException Thrown when client request fails or authentication fails.
+     */
+    public ObjectResponse<UserAuthenticationResponse> authenticateUser(UserAuthenticationRequest request) throws DataAdapterClientErrorException {
+        return postObjectImpl("/api/auth/user/authenticate", new ObjectRequest<>(request), UserAuthenticationResponse.class);
+    }
+
+    /**
      * Obtain user details for given user ID.
      *
      * @param userId User ID for the user to be obtained.
