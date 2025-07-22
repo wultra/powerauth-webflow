@@ -30,7 +30,9 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.AuthenticationCustomizationService;
 import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
+import io.getlime.security.powerauth.lib.dataadapter.model.request.UserAuthenticationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthenticationDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValue;
@@ -158,8 +160,15 @@ public class AuthenticationService {
                     authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
                 }
                 final AuthenticationCustomizationService authenticationCustomizationService = serviceCatalogue.getAuthenticationCustomizationService();
-                final String organizationId = operation.getOrganization() != null ? operation.getOrganization().getOrganizationId() : null;
-                final CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(request.getUserId(), organizationId, credentialValue, operation, authenticationContext);
+                final UserAuthenticationRequest authRequest = new UserAuthenticationRequest();
+                authRequest.setUserId(request.getUserId());
+                authRequest.setUsername(credential.getUsername());
+                authRequest.setOrganizationId(null);
+                authRequest.setPassword(request.getCredentialValue());
+                authRequest.setAuthenticationContext(authenticationContext);
+                authRequest.setOperationContext(null);
+                // neither operation nor organizationId is used in this branch
+                final CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(authRequest);
                 authenticationResult = response.getAuthenticationResult();
             } else {
                 authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
@@ -623,8 +632,15 @@ public class AuthenticationService {
                         authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
                     }
                     final AuthenticationCustomizationService authenticationCustomizationService = serviceCatalogue.getAuthenticationCustomizationService();
-                    final String organizationId = operation.getOrganization() != null ? operation.getOrganization().getOrganizationId() : null;
-                    final CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(request.getUserId(), organizationId, credentialValue, operation, authenticationContext);
+                    final UserAuthenticationRequest authRequest = new UserAuthenticationRequest();
+                    authRequest.setUserId(request.getUserId());
+                    authRequest.setUsername(credential.getUsername());
+                    authRequest.setOrganizationId(null);
+                    authRequest.setPassword(request.getCredentialValue());
+                    authRequest.setAuthenticationContext(authenticationContext);
+                    authRequest.setOperationContext(null);
+                    // neither operation nor organizationId is used in this branch
+                    final CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(authRequest);
                     credentialAuthenticationResult = response.getAuthenticationResult();
                 } else {
                     credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
