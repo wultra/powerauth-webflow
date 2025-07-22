@@ -30,7 +30,9 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.AuthenticationCustomizationService;
 import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
+import io.getlime.security.powerauth.lib.dataadapter.model.request.UserAuthenticationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthenticationDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValue;
@@ -149,7 +151,28 @@ public class AuthenticationService {
         // Verify credential value
         final AuthenticationResult authenticationResult;
         if (credential.getStatus() == CredentialStatus.ACTIVE) {
-            authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
+            if (CredentialLocation.PROXY == credential.getSource()) {
+                final AuthenticationContext authenticationContext = new AuthenticationContext();
+                if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
+                    authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
+                    authenticationContext.setCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
+                } else {
+                    authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
+                }
+                final AuthenticationCustomizationService authenticationCustomizationService = serviceCatalogue.getAuthenticationCustomizationService();
+                final UserAuthenticationRequest authRequest = new UserAuthenticationRequest();
+                authRequest.setUserId(request.getUserId());
+                authRequest.setUsername(credential.getUsername());
+                authRequest.setOrganizationId(null);
+                authRequest.setPassword(request.getCredentialValue());
+                authRequest.setAuthenticationContext(authenticationContext);
+                authRequest.setOperationContext(null);
+                // neither operation nor organizationId is used in this branch
+                final CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(authRequest);
+                authenticationResult = response.getAuthenticationResult();
+            } else {
+                authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
+            }
             logger.debug("User authentication result: {}, authentication mode: {}", authenticationResult, request.getAuthenticationMode());
         } else {
             logger.debug("User authentication failed because user credential status is: {}", credential.getStatus());
@@ -600,7 +623,28 @@ public class AuthenticationService {
         } else {
             // Verify OTP value
             if (otp.getStatus() == OtpStatus.ACTIVE) {
-                credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
+                if (CredentialLocation.PROXY == credential.getSource()) {
+                    final AuthenticationContext authenticationContext = new AuthenticationContext();
+                    if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
+                        authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
+                        authenticationContext.setCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
+                    } else {
+                        authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
+                    }
+                    final AuthenticationCustomizationService authenticationCustomizationService = serviceCatalogue.getAuthenticationCustomizationService();
+                    final UserAuthenticationRequest authRequest = new UserAuthenticationRequest();
+                    authRequest.setUserId(request.getUserId());
+                    authRequest.setUsername(credential.getUsername());
+                    authRequest.setOrganizationId(null);
+                    authRequest.setPassword(request.getCredentialValue());
+                    authRequest.setAuthenticationContext(authenticationContext);
+                    authRequest.setOperationContext(null);
+                    // neither operation nor organizationId is used in this branch
+                    final CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(authRequest);
+                    credentialAuthenticationResult = response.getAuthenticationResult();
+                } else {
+                    credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
+                }
                 logger.debug("User authentication result: {}, authentication mode: {}", credentialAuthenticationResult, request.getAuthenticationMode());
                 otpAuthenticationResult = verifyOtp(otp, request.getOtpValue());
                 logger.debug("OTP verification result: {}, OTP ID: {}", otpAuthenticationResult, otp.getOtpId());
