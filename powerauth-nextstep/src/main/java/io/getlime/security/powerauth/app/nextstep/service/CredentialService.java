@@ -243,7 +243,7 @@ public class CredentialService {
                 credential.setTimestampLastCredentialChange(changeTimestamp);
                 updateCredentialExpiration = true;
             } else {
-                logger.warn("invalid attempt to set credentials value for external password, userId: {}", user.getUserId());
+                logger.warn("invalid attempt to set credential value for external password, userId: {}", user.getUserId());
             }
         }
         if (request.getTimestampExpires() != null) {
@@ -731,7 +731,7 @@ public class CredentialService {
             updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
         }
         credential.setSource(Objects.requireNonNullElse(source, CredentialLocation.LOCAL));
-        credential.setTarget(Objects.requireNonNullElse(target, CredentialLocation.LOCAL) );
+        credential.setTarget(Objects.requireNonNullElse(target, CredentialLocation.LOCAL));
         credential.setUsername(username);
         final String credentialValueRequest = credentialValue;
         if (credentialValue == null) {
