@@ -30,7 +30,6 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.AuthenticationCustomizationService;
 import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.UserAuthenticationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -152,13 +151,7 @@ public class AuthenticationService {
         final AuthenticationResult authenticationResult;
         if (credential.getStatus() == CredentialStatus.ACTIVE) {
             if (CredentialLocation.PROXY == credential.getSource()) {
-                final AuthenticationContext authenticationContext = new AuthenticationContext();
-                if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
-                    authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
-                    authenticationContext.setCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
-                } else {
-                    authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
-                }
+                final AuthenticationContext authenticationContext = createAuthenticationContext(credentialDefinition);
                 final AuthenticationCustomizationService authenticationCustomizationService = serviceCatalogue.getAuthenticationCustomizationService();
                 final UserAuthenticationRequest authRequest = new UserAuthenticationRequest();
                 authRequest.setUserId(request.getUserId());
@@ -273,13 +266,7 @@ public class AuthenticationService {
         }
         final OperationEntity operation = operationPersistenceService.getOperation(operationId);
         final String organizationId = operation.getOrganization() != null ? operation.getOrganization().getOrganizationId() : null;
-        final AuthenticationContext authenticationContext = new AuthenticationContext();
-        if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
-            authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
-            authenticationContext.setCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
-        } else {
-            authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
-        }
+        final AuthenticationContext authenticationContext = createAuthenticationContext(credentialDefinition);
         final CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(userId, organizationId, credentialValue, operation, authenticationContext);
         final boolean lastAttempt = response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
                 (response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0);
@@ -624,13 +611,7 @@ public class AuthenticationService {
             // Verify OTP value
             if (otp.getStatus() == OtpStatus.ACTIVE) {
                 if (CredentialLocation.PROXY == credential.getSource()) {
-                    final AuthenticationContext authenticationContext = new AuthenticationContext();
-                    if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
-                        authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
-                        authenticationContext.setCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
-                    } else {
-                        authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
-                    }
+                    final AuthenticationContext authenticationContext = createAuthenticationContext(credentialDefinition);
                     final AuthenticationCustomizationService authenticationCustomizationService = serviceCatalogue.getAuthenticationCustomizationService();
                     final UserAuthenticationRequest authRequest = new UserAuthenticationRequest();
                     authRequest.setUserId(request.getUserId());
@@ -1072,5 +1053,22 @@ public class AuthenticationService {
         logger.debug("Remaining attempts: {}", remainingAttempts);
         return remainingAttempts;
     }
+
+    /**
+     * Create an AuthenticationContext based on provided credentialDefinition.
+     * @param credentialDefinition Credential definition object.
+     * @return Authentication Context see {@link AuthenticationContext}.
+     */
+    private AuthenticationContext createAuthenticationContext (CredentialDefinitionEntity credentialDefinition) {
+        final AuthenticationContext authenticationContext = new AuthenticationContext();
+        if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
+            authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
+            authenticationContext.setCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
+        } else {
+            authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
+        }
+        return authenticationContext;
+    }
+
 
 }
