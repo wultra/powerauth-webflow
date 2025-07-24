@@ -2347,6 +2347,8 @@ public class NextStepClient {
     /**
      * Create a credential.
      *
+     * @deprecated use {@link #createCredential(CreateCredentialRequest)}
+     *
      * @param userId User ID.
      * @param credentialName Credential name.
      * @param credentialType Credential type.
@@ -2370,6 +2372,8 @@ public class NextStepClient {
 
     /**
      * Create a credential with credential history import.
+     *
+     * @deprecated use {@link #createCredential(CreateCredentialRequest)}
      *
      * @param userId User ID.
      * @param credentialName Credential name.
@@ -2418,6 +2422,8 @@ public class NextStepClient {
     /**
      * Update a credential via PUT method.
      *
+     * @deprecated use {@link #updateCredential(UpdateCredentialRequest)}
+     *
      * @param userId User ID.
      * @param credentialName Credential name.
      * @param credentialType Credential type.
@@ -2454,6 +2460,8 @@ public class NextStepClient {
 
     /**
      * Update a credential via POST method.
+     *
+     * @deprecated use {@link #updateCredentialPost(UpdateCredentialRequest
      *
      * @param userId User ID.
      * @param credentialName Credential name.
