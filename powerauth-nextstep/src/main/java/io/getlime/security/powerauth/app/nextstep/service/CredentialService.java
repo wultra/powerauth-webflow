@@ -778,7 +778,7 @@ public class CredentialService {
         credentialDetail.setCredentialTarget(credential.getTarget());
         credentialDetail.setUsername(credential.getUsername());
         final boolean credentialChangeRequired;
-        // the proxied passwords are maintained by external system, i.e. nor created neither generated.
+        // the proxied passwords are maintained by external system, i.e. neither created nor generated.
         if (CredentialLocation.PROXY == source) {
             credentialChangeRequired = false;
         } else if (credentialValueRequest == null) {
