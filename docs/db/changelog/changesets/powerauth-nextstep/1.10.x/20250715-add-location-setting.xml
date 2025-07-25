@@ -12,7 +12,7 @@
         </preConditions>
         <comment>Add column source to ns_credential_storage</comment>
         <addColumn tableName="ns_credential_storage">
-            <column name="source" type="varchar(32)" defaultValue="local"/>
+            <column name="source" type="varchar(32)" defaultValue="LOCAL"/>
         </addColumn>
     </changeSet>
 
@@ -25,7 +25,7 @@
         </preConditions>
         <comment>Add column target to ns_credential_storage</comment>
         <addColumn tableName="ns_credential_storage">
-            <column name="target" type="varchar(32)" defaultValue="local"/>
+            <column name="target" type="varchar(32)" defaultValue="LOCAL"/>
         </addColumn>
     </changeSet>
 
