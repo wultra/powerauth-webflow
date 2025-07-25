@@ -1059,7 +1059,7 @@ public class AuthenticationService {
      * @param credentialDefinition Credential definition object.
      * @return Authentication Context see {@link AuthenticationContext}.
      */
-    private AuthenticationContext createAuthenticationContext (CredentialDefinitionEntity credentialDefinition) {
+    private AuthenticationContext createAuthenticationContext(CredentialDefinitionEntity credentialDefinition) {
         final AuthenticationContext authenticationContext = new AuthenticationContext();
         if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
             authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
