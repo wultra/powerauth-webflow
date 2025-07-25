@@ -2347,6 +2347,8 @@ public class NextStepClient {
     /**
      * Create a credential.
      *
+     * @deprecated use {@link #createCredential(CreateCredentialRequest)}
+     *
      * @param userId User ID.
      * @param credentialName Credential name.
      * @param credentialType Credential type.
@@ -2356,6 +2358,7 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      * @see #createCredential(CreateCredentialRequest)
      */
+    @Deprecated
     public ObjectResponse<CreateCredentialResponse> createCredential(@NotNull String userId, @NotNull String credentialName, @NotNull CredentialType credentialType,
                                                                      String username, String credentialValue) throws NextStepClientException {
         final CreateCredentialRequest request = new CreateCredentialRequest();
@@ -2370,6 +2373,8 @@ public class NextStepClient {
     /**
      * Create a credential with credential history import.
      *
+     * @deprecated use {@link #createCredential(CreateCredentialRequest)}
+     *
      * @param userId User ID.
      * @param credentialName Credential name.
      * @param credentialType Credential type.
@@ -2381,6 +2386,7 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      * @see #createCredential(CreateCredentialRequest)
      */
+    @Deprecated
     public ObjectResponse<CreateCredentialResponse> createCredential(@NotNull String userId, @NotNull String credentialName, @NotNull CredentialType credentialType,
                                                                      String username, String credentialValue, CredentialValidationMode validationMode,
                                                                      List<KeyValueParameter> credentialHistory) throws NextStepClientException {
@@ -2416,6 +2422,8 @@ public class NextStepClient {
     /**
      * Update a credential via PUT method.
      *
+     * @deprecated use {@link #updateCredential(UpdateCredentialRequest)}
+     *
      * @param userId User ID.
      * @param credentialName Credential name.
      * @param credentialType Credential type.
@@ -2426,6 +2434,7 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      * @see #updateCredential(UpdateCredentialRequest)
      */
+    @Deprecated
     public ObjectResponse<UpdateCredentialResponse> updateCredential(@NotNull String userId, @NotNull String credentialName, CredentialType credentialType,
                                                                      String username, String credentialValue, CredentialStatus credentialStatus) throws NextStepClientException {
         final UpdateCredentialRequest request = new UpdateCredentialRequest();
@@ -2452,6 +2461,8 @@ public class NextStepClient {
     /**
      * Update a credential via POST method.
      *
+     * @deprecated use {@link #updateCredentialPost(UpdateCredentialRequest)}
+     *
      * @param userId User ID.
      * @param credentialName Credential name.
      * @param credentialType Credential type.
@@ -2462,6 +2473,7 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      * @see #updateCredentialPost(UpdateCredentialRequest)
      */
+    @Deprecated
     public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@NotNull String userId, @NotNull String credentialName, CredentialType credentialType,
                                                                          String username, String credentialValue, CredentialStatus credentialStatus) throws NextStepClientException {
         final UpdateCredentialRequest request = new UpdateCredentialRequest();
