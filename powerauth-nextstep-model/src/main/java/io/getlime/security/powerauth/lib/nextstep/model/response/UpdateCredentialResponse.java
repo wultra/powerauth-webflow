@@ -17,6 +17,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialLocation;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import jakarta.validation.constraints.NotBlank;
@@ -40,6 +41,10 @@ public class UpdateCredentialResponse {
     private String credentialName;
     @NotNull
     private CredentialType credentialType;
+    @NotNull
+    private CredentialLocation credentialSource;
+    @NotNull
+    private CredentialLocation credentialTarget;
     @NotNull
     private CredentialStatus credentialStatus;
     @Size(min = 1, max = 256)

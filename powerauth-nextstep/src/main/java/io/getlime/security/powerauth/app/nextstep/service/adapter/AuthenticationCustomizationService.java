@@ -27,6 +27,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationConte
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsAuthorizationResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.UserAuthenticationResult;
+import io.getlime.security.powerauth.lib.dataadapter.model.request.UserAuthenticationRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserAuthenticationResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifySmsAndPasswordResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifySmsAuthorizationResponse;
@@ -77,10 +78,26 @@ public class AuthenticationCustomizationService {
     public CredentialAuthenticationResponse authenticateWithCredential(String userId, String organizationId, String credentialValue, OperationEntity operation,
                                                                        AuthenticationContext authenticationContext) {
         final OperationContext operationContext = operationConverter.toOperationContext(operation);
+            final UserAuthenticationRequest authRequest = new UserAuthenticationRequest();
+            authRequest.setUserId(userId);
+            authRequest.setOrganizationId(organizationId);
+            authRequest.setPassword(credentialValue);
+            authRequest.setAuthenticationContext(authenticationContext);
+            authRequest.setOperationContext(operationContext);
+            return authenticateWithCredential(authRequest);
+    }
+
+    /**
+     * Authenticate with a credential using Data Adapter.
+     * @param authRequest Authentication request.
+     * @return Credential authentication response.
+     */
+    public CredentialAuthenticationResponse authenticateWithCredential(UserAuthenticationRequest authRequest) {
         try {
-            final UserAuthenticationResponse authResponse = dataAdapterClient.authenticateUser(userId, organizationId, credentialValue, authenticationContext, operationContext).getResponseObject();
+
+            final UserAuthenticationResponse authResponse = dataAdapterClient.authenticateUser(authRequest).getResponseObject();
             final CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
-            response.setUserId(userId);
+            response.setUserId(authRequest.getUserId());
             response.setUserIdentityStatus(UserIdentityStatus.ACTIVE);
             if (authResponse.getAuthenticationResult() == UserAuthenticationResult.SUCCEEDED) {
                 response.setAuthenticationResult(AuthenticationResult.SUCCEEDED);
@@ -97,7 +114,7 @@ public class AuthenticationCustomizationService {
         } catch (DataAdapterClientErrorException ex) {
             logger.warn(ex.getMessage(), ex);
             final CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
-            response.setUserId(userId);
+            response.setUserId(authRequest.getUserId());
             response.setAuthenticationResult(AuthenticationResult.FAILED);
             return response;
         }

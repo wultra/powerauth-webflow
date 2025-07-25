@@ -18,6 +18,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ContactType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialLocation;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import jakarta.validation.Valid;
@@ -83,6 +84,8 @@ public class UpdateUserRequest {
         private String credentialName;
         @NotNull
         private CredentialType credentialType;
+        private CredentialLocation credentialSource;
+        private CredentialLocation credentialTarget;
         @Size(min = 1, max = 256)
         private String username;
         @Size(min = 1, max = 256)
