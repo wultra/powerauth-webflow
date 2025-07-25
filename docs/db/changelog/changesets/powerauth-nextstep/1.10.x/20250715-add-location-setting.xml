@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="1" logicalFilePath="powerauth-nextstep/1.10.x/20250715-add-location-setting" author="Zdenek Cerny">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="ns_credential_storage"/>
+            <not>
+                <columnExists tableName="ns_credential_storage" columnName="source"/>
+            </not>
+        </preConditions>
+        <comment>Add column source to ns_credential_storage</comment>
+        <addColumn tableName="ns_credential_storage">
+            <column name="source" type="varchar(32)" defaultValue="local"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2" logicalFilePath="powerauth-nextstep/1.10.x/20250715-add-location-setting" author="Zdenek Cerny">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="ns_credential_storage"/>
+            <not>
+                <columnExists tableName="ns_credential_storage" columnName="target"/>
+            </not>
+        </preConditions>
+        <comment>Add column target to ns_credential_storage</comment>
+        <addColumn tableName="ns_credential_storage">
+            <column name="target" type="varchar(32)" defaultValue="local"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

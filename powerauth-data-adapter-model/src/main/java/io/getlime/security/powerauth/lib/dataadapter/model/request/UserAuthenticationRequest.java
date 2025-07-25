@@ -28,6 +28,11 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationConte
 public class UserAuthenticationRequest {
 
     /**
+     * Username for this authentication request.
+     */
+    private String username;
+
+    /**
      * User ID for this authentication request.
      */
     private String userId;
@@ -72,6 +77,40 @@ public class UserAuthenticationRequest {
         this.password = password;
         this.authenticationContext = authenticationContext;
         this.operationContext = operationContext;
+    }
+
+    /**
+     * Constructor with all parameters for convenience.
+     * @param username Username for this authentication request.
+     * @param userId User ID for this authentication request.
+     * @param organizationId Organization ID for this authentication request.
+     * @param password Password for this authentication request, optionally encrypted.
+     * @param authenticationContext Authentication context.
+     * @param operationContext Operation context.
+     */
+    public UserAuthenticationRequest(String username, String userId, String organizationId, String password, AuthenticationContext authenticationContext, OperationContext operationContext) {
+        this.username = username;
+        this.userId = userId;
+        this.organizationId = organizationId;
+        this.password = password;
+        this.authenticationContext = authenticationContext;
+        this.operationContext = operationContext;
+    }
+
+    /**
+     * Set the username.
+     * @param username Username.
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * Get the username.
+     * @return Username.
+     */
+    public String getUsername() {
+        return this.username;
     }
 
     /**
