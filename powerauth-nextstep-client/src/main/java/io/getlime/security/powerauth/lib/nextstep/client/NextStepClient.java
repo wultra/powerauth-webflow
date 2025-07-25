@@ -2461,7 +2461,7 @@ public class NextStepClient {
     /**
      * Update a credential via POST method.
      *
-     * @deprecated use {@link #updateCredentialPost(UpdateCredentialRequest
+     * @deprecated use {@link #updateCredentialPost(UpdateCredentialRequest)}
      *
      * @param userId User ID.
      * @param credentialName Credential name.
