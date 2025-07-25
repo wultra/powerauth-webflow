@@ -745,13 +745,7 @@ public class AuthenticationService {
         }
         final OperationEntity operation = operationPersistenceService.getOperation(operationId);
         final String organizationId = operation.getOrganization() != null ? operation.getOrganization().getOrganizationId() : null;
-        final AuthenticationContext authenticationContext = new AuthenticationContext();
-        if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
-            authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
-            authenticationContext.setCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
-        } else {
-            authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
-        }
+        final AuthenticationContext authenticationContext = createAuthenticationContext(credentialDefinition);
         final CombinedAuthenticationResponse response = authenticationCustomizationService.authenticateCombined(otpId, otpValue, userId, organizationId, credentialValue, operation, authenticationContext);
         final boolean lastAttempt = response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
                 (response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0);
