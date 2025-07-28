@@ -25,7 +25,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -54,8 +53,8 @@ public class SecurityConfig {
             logger.info("Initializing OIDC authentication.");
             http.authorizeHttpRequests(authorize -> authorize
                             .requestMatchers(
-                                    new AntPathRequestMatcher("/api/service/status"),
-                                    new AntPathRequestMatcher("/actuator/**")).permitAll()
+                                    "/api/service/status",
+                                    "/actuator/**").permitAll()
                             .anyRequest().fullyAuthenticated())
                     .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
         } else {
