@@ -30,7 +30,7 @@
 
     <artifactId>powerauth-webflow-authentication-mtoken</artifactId>
     <name>powerauth-webflow-authentication-mtoken</name>
-    <groupId>io.getlime.security</groupId>
+    <description>PowerAuth WebFlow Authentication with Mobile Token</description>
 
     <dependencies>
 

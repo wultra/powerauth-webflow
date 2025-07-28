@@ -28,9 +28,9 @@
         <version>1.10.1-SNAPSHOT</version>
     </parent>
 
-    <name>powerauth-webflow-authentication-init</name>
     <artifactId>powerauth-webflow-authentication-init</artifactId>
-    <groupId>io.getlime.security</groupId>
+    <name>powerauth-webflow-authentication-init</name>
+    <description>PowerAuth WebFlow Authentication Init</description>
 
     <dependencies>
         <dependency>
