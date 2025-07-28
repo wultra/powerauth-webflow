@@ -24,6 +24,7 @@
 
     <artifactId>powerauth-nextstep-model</artifactId>
     <name>powerauth-nextstep-model</name>
+    <description>PowerAuth NextStep Model</description>
 
     <parent>
         <groupId>io.getlime.security</groupId>

@@ -20,9 +20,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>powerauth-webflow-i18n</name>
     <artifactId>powerauth-webflow-i18n</artifactId>
-    <groupId>io.getlime.security</groupId>
+    <name>powerauth-webflow-i18n</name>
     <description>PowerAuth Next Step Server</description>
 
     <parent>

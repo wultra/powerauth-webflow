@@ -30,7 +30,7 @@
 
     <artifactId>powerauth-webflow-authentication-consent</artifactId>
     <name>powerauth-webflow-authentication-consent</name>
-    <groupId>io.getlime.security</groupId>
+    <description>PowerAuth WebFlow Authentication Consent</description>
 
     <dependencies>
         <dependency>
