@@ -22,7 +22,8 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>powerauth-mtoken-model</artifactId>
-    <groupId>io.getlime.security</groupId>
+    <name>powerauth-mtoken-model</name>
+    <description>PowerAuth MToken Model</description>
 
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>

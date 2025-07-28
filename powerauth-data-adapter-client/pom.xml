@@ -22,8 +22,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>powerauth-data-adapter-client</name>
     <artifactId>powerauth-data-adapter-client</artifactId>
+    <name>powerauth-data-adapter-client</name>
+    <description>PowerAuth Data Adapter Client</description>
 
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>

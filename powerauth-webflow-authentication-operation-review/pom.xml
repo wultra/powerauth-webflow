@@ -30,7 +30,7 @@
 
     <artifactId>powerauth-webflow-authentication-operation-review</artifactId>
     <name>powerauth-webflow-authentication-operation-review</name>
-    <groupId>io.getlime.security</groupId>
+    <description>PowerAuth WebFlow Authentication Operation Review</description>
 
     <dependencies>
         <dependency>

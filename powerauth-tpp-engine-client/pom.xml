@@ -28,8 +28,9 @@
         <version>1.10.1-SNAPSHOT</version>
     </parent>
 
-    <name>powerauth-tpp-engine-client</name>
     <artifactId>powerauth-tpp-engine-client</artifactId>
+    <name>powerauth-tpp-engine-client</name>
+    <description>PowerAuth TPP Engine Client</description>
 
     <dependencies>
 
