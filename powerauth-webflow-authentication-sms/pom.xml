@@ -30,7 +30,7 @@
 
     <artifactId>powerauth-webflow-authentication-sms</artifactId>
     <name>powerauth-webflow-authentication-sms</name>
-    <groupId>io.getlime.security</groupId>
+    <description>PowerAuth WebFlow Authentication SMS</description>
 
     <dependencies>
         <dependency>

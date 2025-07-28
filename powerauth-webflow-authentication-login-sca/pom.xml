@@ -28,9 +28,9 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
 
-    <name>powerauth-webflow-authentication-login-sca</name>
     <artifactId>powerauth-webflow-authentication-login-sca</artifactId>
-    <groupId>io.getlime.security</groupId>
+    <name>powerauth-webflow-authentication-login-sca</name>
+    <description>PowerAuth WebFlow Authentication Login SCA</description>
 
     <dependencies>
         <dependency>

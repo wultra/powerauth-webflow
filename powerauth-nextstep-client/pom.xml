@@ -30,7 +30,7 @@
 
     <artifactId>powerauth-nextstep-client</artifactId>
     <name>powerauth-nextstep-client</name>
-    <groupId>io.getlime.security</groupId>
+    <description>PowerAuth NextStep Client</description>
 
     <dependencies>
         <!-- PowerAuth Web Flow Dependencies -->
