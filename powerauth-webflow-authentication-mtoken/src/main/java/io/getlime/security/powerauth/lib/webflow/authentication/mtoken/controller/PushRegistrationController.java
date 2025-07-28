@@ -22,15 +22,15 @@ import com.wultra.core.rest.model.base.response.Response;
 import com.wultra.push.client.PushServerClient;
 import com.wultra.push.client.PushServerClientException;
 import com.wultra.push.model.enumeration.MobilePlatform;
-import com.wultra.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
-import io.getlime.security.powerauth.lib.mtoken.model.request.PushRegisterRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.MobileAppApiException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
+import com.wultra.security.powerauth.crypto.lib.enums.PowerAuthCodeType;
 import com.wultra.security.powerauth.rest.api.spring.annotation.PowerAuth;
 import com.wultra.security.powerauth.rest.api.spring.annotation.PowerAuthToken;
 import com.wultra.security.powerauth.rest.api.spring.authentication.PowerAuthApiAuthentication;
 import com.wultra.security.powerauth.rest.api.spring.exception.PowerAuthAuthenticationException;
+import io.getlime.security.powerauth.lib.mtoken.model.request.PushRegisterRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.MobileAppApiException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class PushRegistrationController {
      * @throws MobileAppApiException Thrown when registration fails.
      */
     @PostMapping("/device/register/signature")
-    @PowerAuth(resourceId = "/device/register/signature", signatureType = {PowerAuthSignatureTypes.POSSESSION})
+    @PowerAuth(resourceId = "/device/register/signature", authenticationCodeType = PowerAuthCodeType.POSSESSION)
     public @ResponseBody Response registerDevice(@RequestBody ObjectRequest<PushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, MobileAppApiException {
         return registerDeviceImpl(request, apiAuthentication);
     }
@@ -86,11 +86,11 @@ public class PushRegistrationController {
      * @throws MobileAppApiException Thrown when registration fails.
      */
     @PostMapping("/device/register/token")
-    @PowerAuthToken(signatureType = {
-            PowerAuthSignatureTypes.POSSESSION,
-            PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
-            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
-            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE_BIOMETRY
+    @PowerAuthToken(authenticationCodeType = {
+            PowerAuthCodeType.POSSESSION,
+            PowerAuthCodeType.POSSESSION_BIOMETRY,
+            PowerAuthCodeType.POSSESSION_KNOWLEDGE,
+            PowerAuthCodeType.POSSESSION_KNOWLEDGE_BIOMETRY
     })
     public @ResponseBody Response registerDeviceToken(@RequestBody ObjectRequest<PushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, MobileAppApiException {
         return registerDeviceImpl(request, apiAuthentication);
@@ -105,11 +105,11 @@ public class PushRegistrationController {
      * @throws MobileAppApiException Thrown when registration fails.
      */
     @PostMapping("/device/register")
-    @PowerAuthToken(signatureType = {
-            PowerAuthSignatureTypes.POSSESSION,
-            PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
-            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
-            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE_BIOMETRY
+    @PowerAuthToken(authenticationCodeType = {
+            PowerAuthCodeType.POSSESSION,
+            PowerAuthCodeType.POSSESSION_BIOMETRY,
+            PowerAuthCodeType.POSSESSION_KNOWLEDGE,
+            PowerAuthCodeType.POSSESSION_KNOWLEDGE_BIOMETRY
     })
     public @ResponseBody Response registerDeviceDefault(@RequestBody ObjectRequest<PushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, MobileAppApiException {
         return registerDeviceImpl(request, apiAuthentication);
