@@ -17,11 +17,11 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
-import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.core.rest.model.base.response.ObjectResponse;
 import com.wultra.security.powerauth.client.model.entity.Activation;
 import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
-import com.wultra.core.rest.model.base.response.ObjectResponse;
+import com.wultra.security.powerauth.client.v3.PowerAuthClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;

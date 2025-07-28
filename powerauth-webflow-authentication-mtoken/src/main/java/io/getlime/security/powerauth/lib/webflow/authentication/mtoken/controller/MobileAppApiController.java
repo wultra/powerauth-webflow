@@ -17,11 +17,17 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
-import com.wultra.security.powerauth.client.model.enumeration.SignatureType;
 import com.wultra.core.rest.model.base.request.ObjectRequest;
 import com.wultra.core.rest.model.base.response.ObjectResponse;
 import com.wultra.core.rest.model.base.response.Response;
-import com.wultra.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
+import com.wultra.security.powerauth.client.model.enumeration.v3.SignatureType;
+import com.wultra.security.powerauth.crypto.lib.enums.PowerAuthCodeType;
+import com.wultra.security.powerauth.rest.api.spring.annotation.PowerAuth;
+import com.wultra.security.powerauth.rest.api.spring.annotation.PowerAuthToken;
+import com.wultra.security.powerauth.rest.api.spring.authentication.PowerAuthActivation;
+import com.wultra.security.powerauth.rest.api.spring.authentication.PowerAuthApiAuthentication;
+import com.wultra.security.powerauth.rest.api.spring.exception.PowerAuthAuthenticationException;
+import com.wultra.security.powerauth.rest.api.spring.model.ActivationStatus;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
@@ -56,12 +62,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.res
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.PowerAuthOperationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.websocket.WebSocketMessageService;
-import com.wultra.security.powerauth.rest.api.spring.annotation.PowerAuth;
-import com.wultra.security.powerauth.rest.api.spring.annotation.PowerAuthToken;
-import com.wultra.security.powerauth.rest.api.spring.authentication.PowerAuthActivation;
-import com.wultra.security.powerauth.rest.api.spring.authentication.PowerAuthApiAuthentication;
-import com.wultra.security.powerauth.rest.api.spring.exception.PowerAuthAuthenticationException;
-import com.wultra.security.powerauth.rest.api.spring.model.ActivationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,7 +134,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      */
     @PostMapping("/operation/list/signature")
-    @PowerAuth(resourceId = "/operation/list/signature", signatureType = {PowerAuthSignatureTypes.POSSESSION})
+    @PowerAuth(resourceId = "/operation/list/signature", authenticationCodeType = PowerAuthCodeType.POSSESSION)
     public @ResponseBody ObjectResponse<OperationListResponse> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
         return getOperationListImpl(apiAuthentication);
     }
@@ -147,11 +147,11 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      */
     @PostMapping("/operation/list")
-    @PowerAuthToken(signatureType = {
-            PowerAuthSignatureTypes.POSSESSION,
-            PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
-            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
-            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE_BIOMETRY
+    @PowerAuthToken(authenticationCodeType = {
+            PowerAuthCodeType.POSSESSION,
+            PowerAuthCodeType.POSSESSION_BIOMETRY,
+            PowerAuthCodeType.POSSESSION_KNOWLEDGE,
+            PowerAuthCodeType.POSSESSION_KNOWLEDGE_BIOMETRY
     })
     public @ResponseBody ObjectResponse<OperationListResponse> getOperationListTokens(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
         return getOperationListImpl(apiAuthentication);
@@ -242,10 +242,10 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws AuthStepException Thrown when operation is invalid.
      */
     @PostMapping("/operation/authorize")
-    @PowerAuth(resourceId = "/operation/authorize", signatureType = {
-            PowerAuthSignatureTypes.POSSESSION,
-            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
-            PowerAuthSignatureTypes.POSSESSION_BIOMETRY
+    @PowerAuth(resourceId = "/operation/authorize", authenticationCodeType = {
+            PowerAuthCodeType.POSSESSION,
+            PowerAuthCodeType.POSSESSION_KNOWLEDGE,
+            PowerAuthCodeType.POSSESSION_BIOMETRY
     })
     public @ResponseBody Response verifySignature(@RequestBody ObjectRequest<OperationApproveRequest> request, PowerAuthActivation activationContext) throws MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
 
@@ -262,7 +262,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             final List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.POWERAUTH_TOKEN);
             final PAAuthenticationContext authenticationContext = new PAAuthenticationContext();
-            authenticationContext.setSignatureType(activationContext.getAuthenticationContext().getSignatureType().toString());
+            authenticationContext.setSignatureType(activationContext.getAuthenticationContext().getAuthenticationCodeType().toString());
             authenticationContext.setRemainingAttempts(activationContext.getAuthenticationContext().getRemainingAttempts());
             authenticationContext.setBlocked(false);
 
@@ -299,14 +299,14 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 operation.setFormData(formDataConverter.fromFormData(response.getFormData()));
 
                 // Check if signature type is allowed
-                if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), activationContext.getAuthenticationContext().getSignatureType())) {
+                if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), activationContext.getAuthenticationContext().getAuthenticationCodeType())) {
                     throw new PowerAuthAuthenticationException();
                 }
 
                 if (operation.getOperationData().equals(request.getRequestObject().getData())
                         && operation.getUserId() != null
                         && operation.getUserId().equals(activationContext.getUserId())) {
-                    SignatureType signatureType = SignatureType.enumFromString(activationContext.getAuthenticationContext().getSignatureType().toString());
+                    final SignatureType signatureType = SignatureType.enumFromString(activationContext.getAuthenticationContext().getAuthenticationCodeType().toString());
                     boolean approvalSucceeded = powerAuthOperationService.approveOperation(operation, activationId, signatureType);
                     if (!approvalSucceeded) {
                         throw new OperationIsAlreadyFailedException("Operation approval has failed");
@@ -342,7 +342,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws AuthStepException Thrown when operation is invalid.
      */
     @PostMapping("/operation/cancel")
-    @PowerAuth(resourceId = "/operation/cancel", signatureType = {PowerAuthSignatureTypes.POSSESSION})
+    @PowerAuth(resourceId = "/operation/cancel", authenticationCodeType = PowerAuthCodeType.POSSESSION)
     public @ResponseBody Response cancelOperation(@RequestBody ObjectRequest<OperationRejectRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
 
         if (apiAuthentication != null && apiAuthentication.getUserId() != null && apiAuthentication.getActivationContext().getActivationId() != null) {
@@ -397,7 +397,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @param signatureTypes Signature type that was returned from signature verification.
      * @return True if the signature type is allowed, false otherwise.
      */
-    private boolean isSignatureTypeAllowedForOperation(String operationName, PowerAuthSignatureTypes signatureTypes)  {
+    private boolean isSignatureTypeAllowedForOperation(String operationName, PowerAuthCodeType signatureTypes)  {
 
         // Get configuration for operation with given name
         GetOperationConfigDetailResponse operationConfig;
@@ -419,18 +419,18 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 case MULTIFACTOR_1FA -> {
                     // Is the signature correct 1FA type - "possession"?
                     // Also, allow any 2FA signature as they are more strict than 1FA signature, as a fallback
-                    return PowerAuthSignatureTypes.POSSESSION.equals(signatureTypes)
-                            || PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)
-                            || PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes);
+                    return PowerAuthCodeType.POSSESSION.equals(signatureTypes)
+                            || PowerAuthCodeType.POSSESSION_KNOWLEDGE.equals(signatureTypes)
+                            || PowerAuthCodeType.POSSESSION_BIOMETRY.equals(signatureTypes);
                 }
                 case MULTIFACTOR_2FA -> {
                     // Is the signature correct 2FA type - "possession_knowledge" or "possession_biometry"?
                     // Check for "possession_knowledge" first
-                    if (PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)) {
+                    if (PowerAuthCodeType.POSSESSION_KNOWLEDGE.equals(signatureTypes)) {
                         return true;
                     }
                     // Is "possession_biometry" allowed for this 2FA request?
-                    if (PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes)) {
+                    if (PowerAuthCodeType.POSSESSION_BIOMETRY.equals(signatureTypes)) {
                         return allowedSignatureType.getVariants() != null && allowedSignatureType.getVariants().contains("possession_biometry");
                     }
                 }

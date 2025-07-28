@@ -18,12 +18,12 @@
 package io.getlime.security.powerauth.app.webflow.configuration;
 
 import com.wultra.core.rest.client.base.RestClientConfiguration;
-import com.wultra.security.powerauth.client.PowerAuthClient;
-import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
-import com.wultra.security.powerauth.rest.client.PowerAuthRestClient;
-import com.wultra.security.powerauth.rest.client.PowerAuthRestClientConfiguration;
 import com.wultra.push.client.PushServerClient;
 import com.wultra.push.client.PushServerClientException;
+import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
+import com.wultra.security.powerauth.client.v3.PowerAuthClient;
+import com.wultra.security.powerauth.rest.client.PowerAuthRestClientConfiguration;
+import com.wultra.security.powerauth.rest.client.v3.PowerAuthRestClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

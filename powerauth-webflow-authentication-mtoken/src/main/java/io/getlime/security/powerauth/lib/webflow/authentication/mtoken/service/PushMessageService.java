@@ -17,10 +17,6 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service;
 
-import com.wultra.security.powerauth.client.PowerAuthClient;
-import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
-import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
-import com.wultra.security.powerauth.client.model.response.GetActivationStatusResponse;
 import com.wultra.core.rest.model.base.response.ObjectResponse;
 import com.wultra.core.rest.model.base.response.Response;
 import com.wultra.push.client.PushServerClient;
@@ -28,6 +24,10 @@ import com.wultra.push.client.PushServerClientException;
 import com.wultra.push.model.entity.PushMessage;
 import com.wultra.push.model.entity.PushMessageBody;
 import com.wultra.push.model.entity.PushMessageSendResult;
+import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
+import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
+import com.wultra.security.powerauth.client.model.response.v3.GetActivationStatusResponse;
+import com.wultra.security.powerauth.client.v3.PowerAuthClient;
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
