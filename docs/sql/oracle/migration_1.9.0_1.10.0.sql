@@ -3,8 +3,8 @@ CREATE TABLE shedlock (name VARCHAR2(64) NOT NULL, lock_until TIMESTAMP NOT NULL
 
 -- Changeset powerauth-nextstep/1.10.x/20250715-add-location-setting::1::Zdenek Cerny
 -- Add column source to ns_credential_storage
-ALTER TABLE ns_credential_storage ADD source VARCHAR2(32) DEFAULT 'local';
+ALTER TABLE ns_credential_storage ADD source VARCHAR2(32) DEFAULT 'LOCAL';
 
 -- Changeset powerauth-nextstep/1.10.x/20250715-add-location-setting::2::Zdenek Cerny
 -- Add column target to ns_credential_storage
-ALTER TABLE ns_credential_storage ADD target VARCHAR2(32) DEFAULT 'local';
+ALTER TABLE ns_credential_storage ADD target VARCHAR2(32) DEFAULT 'LOCAL';
