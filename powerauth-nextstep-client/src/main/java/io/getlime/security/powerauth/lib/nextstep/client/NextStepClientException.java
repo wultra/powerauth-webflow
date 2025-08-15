@@ -99,6 +99,10 @@ public class NextStepClientException extends Exception {
             logger.trace("Wultra Java Core lib did not parse ErrorResponse for {}", ex.getResponse());
             try {
                 // TODO (racansky, 2022-12-06) workaround until https://github.com/wultra/lime-java-core/issues/32
+                if (ex.getResponse() == null) {
+                    logger.warn("No response received during REST client call");
+                    return null;
+                }
                 ErrorResponse errorResponse = objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).readValue(ex.getResponse(), ErrorResponse.class);
                 if (errorResponse != null && errorResponse.getResponseObject() != null) {
                     switch (errorResponse.getResponseObject().getCode()) {
