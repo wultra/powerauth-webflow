@@ -67,13 +67,14 @@ public class NextStepTest implements ApplicationContextAware {
     }
 
     @AfterAll
-    public static void cleanup() {
+    static void cleanup() {
         // Flush audit data to database before the test application and H2 database are terminated
-        applicationContext.getBean(DatabaseAudit.class).flush();
+        // name "audit" forcing usage of NextStepServerConfiguration#audit instead of DatabaseAudit annotated by @Service
+        applicationContext.getBean("audit", DatabaseAudit.class).flush();
     }
 
     @Test
-    public void testContextLoads() {
+    void testContextLoads() {
         assertTrue(port > 1024);
     }
 
