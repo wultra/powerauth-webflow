@@ -1,0 +1,81 @@
+/*
+ * PowerAuth Web Flow and related software components
+ * Copyright (C) 2017 Wultra s.r.o.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.wultra.security.powerauth.lib.webflow.authentication.mtoken.model.response;
+
+import com.wultra.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
+
+/**
+ * Response to the init step of mobile token authentication.
+ *
+ * @author Roman Strobl, roman.strobl@wultra.com
+ */
+public class MobileTokenInitResponse extends AuthStepResponse {
+
+    private boolean offlineModeAvailable;
+    private boolean smsFallbackAvailable;
+    private String username;
+
+
+    /**
+     * Whether offline mode is available.
+     * @return True if offline mode is available.
+     */
+    public boolean isOfflineModeAvailable() {
+        return offlineModeAvailable;
+    }
+
+    /**
+     * Set whether offline mode is available.
+     * @param offlineModeAvailable True if offline mode is available.
+     */
+    public void setOfflineModeAvailable(boolean offlineModeAvailable) {
+        this.offlineModeAvailable = offlineModeAvailable;
+    }
+
+    /**
+     * Get whether fallback to SMS authorization is enabled from mobile token.
+     * @return Whether fallback to SMS authorization is enabled from mobile token.
+     */
+    public boolean isSmsFallbackAvailable() {
+        return smsFallbackAvailable;
+    }
+
+    /**
+     * Set whether fallback to SMS authorization is enabled from mobile token.
+     * @param smsFallbackAvailable Whether fallback to SMS authorization is enabled from mobile token.
+     */
+    public void setSmsFallbackAvailable(boolean smsFallbackAvailable) {
+        this.smsFallbackAvailable = smsFallbackAvailable;
+    }
+
+    /**
+     * Get username for LOGIN_SCA authentication method.
+     * @return Username for LOGIN_SCA authentication method.
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Set username for LOGIN_SCA authentication method.
+     * @param username Username for LOGIN_SCA authentication method.
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+}
