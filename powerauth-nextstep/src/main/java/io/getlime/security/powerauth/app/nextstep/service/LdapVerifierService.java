@@ -168,7 +168,7 @@ public class LdapVerifierService {
 
             final Boolean blocked = getBoolAttrSafe(attrs, ACCOUNT_LOCK_ATTRIBUTE);
             if (blocked != null) {
-                externalCredentialDetail.setCredentialStatus((blocked)?CredentialStatus.BLOCKED_TEMPORARY:CredentialStatus.ACTIVE);
+                externalCredentialDetail.setCredentialStatus((blocked) ? CredentialStatus.BLOCKED_TEMPORARY : CredentialStatus.ACTIVE);
             }
 
             final Integer attemptCounter = getIntAttrSafe(attrs, PASSWORD_RETRY_COUNT_ATTRIBUTE);
