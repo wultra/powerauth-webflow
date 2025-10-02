@@ -15,28 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
+package io.getlime.security.powerauth.lib.nextstep.model.entity;
+
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
+import lombok.Data;
+import java.util.Date;
+import java.util.Optional;
 
 /**
- * Enumeration representing credential location storage.
+ * Class represents details of a credential in external system.
  *
  * @author Zdenek Cerny, zdenek.cerny@wultra.com
  */
-public enum CredentialLocation {
+@Data
+public class ExternalCredentialDetail {
 
-    /**
-     * Credential location is local.
-     */
-    LOCAL,
+    private CredentialStatus credentialStatus;
+    private Integer failedAttempts;
 
-    /**
-     * Credential are provided by a proxy.
-     */
-    PROXY,
+    public Optional<CredentialStatus> getCredentialStatusOpt() {
+        return Optional.ofNullable(credentialStatus);
+    }
 
-    /**
-     * Credential are stored in LDAP.
-     */
-    LDAP
-
+    public Optional<Integer> getFailedAttemptsOpt() {
+        return Optional.ofNullable(failedAttempts);
+    }
 }

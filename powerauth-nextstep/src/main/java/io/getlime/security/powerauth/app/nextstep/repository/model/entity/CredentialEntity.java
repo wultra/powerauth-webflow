@@ -67,6 +67,9 @@ public class CredentialEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private CredentialLocation target;
 
+    @Column(name= "external_reference")
+    private String externalReference;
+
     @Column(name = "user_name")
     private String username;
 

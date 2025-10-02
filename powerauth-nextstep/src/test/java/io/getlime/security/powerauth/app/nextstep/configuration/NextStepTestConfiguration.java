@@ -22,10 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialCategory;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetApplicationListResponse;
@@ -240,6 +237,7 @@ public class NextStepTestConfiguration {
         credential.setCredentialValue("s3cret");
         createUserRequest.getCredentials().add(credential);
         nextStepClient.createUser(createUserRequest);
+
     }
 
 }

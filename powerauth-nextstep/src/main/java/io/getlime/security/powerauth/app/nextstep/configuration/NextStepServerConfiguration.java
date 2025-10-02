@@ -32,12 +32,16 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErr
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
 
 import java.time.Duration;
+import java.util.Hashtable;
 
 /**
  * Configuration of Next Step server.
@@ -96,6 +100,39 @@ public class NextStepServerConfiguration {
 
     @Value("${powerauth.nextstep.db.master.encryption.key}")
     private String masterDbEncryptionKey;
+
+    /**
+     * Connection to LDAP setting.
+     */
+    @Value("${powerauth.nextstep.ldap.url}")
+    private String ldapUrl;
+
+    @Value("${powerauth.nextstep.ldap.base}")
+    private String ldapBase;
+
+    @Value("${powerauth.nextstep.ldap.managerDn}")
+    private String managerDn;
+
+    @Value("${powerauth.nextstep.ldap.managerPassword}")
+    private String managerPassword;
+
+    @Value("${powerauth.nextstep.ldap.pooled:false}")
+    private boolean ldapPooled;
+
+    @Value("${powerauth.nextstep.ldap.anonymousReadOnly:false}")
+    private boolean ldapAnonymousReadOnly;
+
+    @Value("${powerauth.nextstep.ldap.userSearchBase}")
+    private String userSearchBase;
+
+    @Value("${powerauth.nextstep.ldap.userSearchFilter}")
+    private String userSearchFilter;
+
+    @Value("${powerauth.nextstep.ldap.connectTimeout:5000}")
+    private int ldapConnectTimeoutMs;
+
+    @Value("${powerauth.nextstep.ldap.readTimeout:5000}")
+    private int ldapReadTimeoutMs;
 
     /**
      * Application name.
@@ -198,6 +235,22 @@ public class NextStepServerConfiguration {
     }
 
     /**
+     * Get configured base filter for findig user in LDAP..
+     * @return userSearchBase .
+     */
+    public String getUserSearchBase() {
+        return userSearchBase;
+    }
+
+    /**
+     * Get configured filter for finding user in LDAP.
+     * @return userSearchFilter
+     */
+    public String getUserSearchFilter() {
+        return userSearchFilter;
+    }
+
+    /**
      * Default data adapter client.
      *
      * @return Data adapter client.
@@ -250,6 +303,35 @@ public class NextStepServerConfiguration {
     @Bean
     public Audit audit() {
         return auditFactory.getAudit();
+    }
+
+    /**
+     * Configure LDAP context source
+     * @return LDAP context source.
+     */
+    @ConditionalOnProperty(prefix = "powerauth.nextstep.ldap", name = "enabled", havingValue = "true")
+    @Bean
+    public LdapContextSource contextSource() {
+        LdapContextSource cs = new LdapContextSource();
+        cs.setUrl(ldapUrl);
+        cs.setBase(ldapBase);
+        if (!managerDn.isBlank()) cs.setUserDn(managerDn);
+        if (!managerPassword.isBlank()) cs.setPassword(managerPassword);
+        cs.setPooled(ldapPooled);
+        cs.setAnonymousReadOnly(ldapAnonymousReadOnly);
+
+        Hashtable<String, Object> env = new Hashtable<>();
+        env.put("com.sun.jndi.ldap.connect.timeout", String.valueOf(ldapConnectTimeoutMs));
+        env.put("com.sun.jndi.ldap.read.timeout", String.valueOf(ldapReadTimeoutMs));
+        cs.setBaseEnvironmentProperties(env);
+
+        cs.afterPropertiesSet();
+        return cs;
+    }
+
+    @Bean
+    public LdapTemplate ldapTemplate(LdapContextSource cs) {
+        return new LdapTemplate(cs);
     }
 
 }

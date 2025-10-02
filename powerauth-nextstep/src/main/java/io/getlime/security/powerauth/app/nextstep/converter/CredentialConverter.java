@@ -39,6 +39,7 @@ public class CredentialConverter {
         credentialDetail.setCredentialSource(credential.getSource());
         credentialDetail.setCredentialTarget(credential.getTarget());
         credentialDetail.setCredentialStatus(credential.getStatus());
+        credentialDetail.setExternalReference(credential.getExternalReference());
         credentialDetail.setUsername(credential.getUsername());
         credentialDetail.setTimestampCreated(credential.getTimestampCreated());
         credentialDetail.setTimestampLastUpdated(credential.getTimestampLastUpdated());
