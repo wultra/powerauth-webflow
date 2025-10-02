@@ -8,6 +8,16 @@ objectClass: top
 objectClass: organizationalUnit
 ou: people
 
+dn: c=cs,dc=example,dc=com
+objectClass: top
+objectClass: country
+c: cs
+
+dn: o=exampleorg,c=cs,dc=example,dc=com
+objectClass: top
+objectClass: organization
+o: exampleorg
+
 # service account for the search step
 dn: cn=svc_ldap_search,dc=example,dc=com
 objectClass: simpleSecurityObject
@@ -24,7 +34,7 @@ cn: Alice
 userPassword: correct-password
 
 
-# user for incorrect password (attribute-only check; embedded DS won't enforce it)
+# user for incorrect password
 dn: uid=test_user_ldap_2,ou=people,dc=example,dc=com
 objectClass: inetOrgPerson
 uid: test_user_ldap_2
@@ -32,7 +42,7 @@ sn: Carol
 cn: Carol
 userPassword: whatever
 
-# user for incorrect password with metadata (attribute-only check; embedded DS won't enforce it)
+# user for incorrect password with metadata
 dn: uid=test_user_ldap_3,ou=people,dc=example,dc=com
 objectClass: inetOrgPerson
 uid: test_user_ldap_3
@@ -42,7 +52,7 @@ userPassword: whatever
 passwordRetryCount: 2
 nsAccountLock: true
 
-# user for incorrect password with unexpected metadata (attribute-only check; embedded DS won't enforce it)
+# user for incorrect password with unexpected metadata
 dn: uid=test_user_ldap_4,ou=people,dc=example,dc=com
 objectClass: inetOrgPerson
 uid: test_user_ldap_4
@@ -51,3 +61,11 @@ cn: Carol
 userPassword: whatever
 passwordRetryCount: x
 nsAccountLock: NO
+
+# user with different base search
+dn: uid=test_user_ldap_6,o=exampleorg,c=cs,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: test_user_ldap_6
+sn: Carol
+cn: Carol
+userPassword: correct-password

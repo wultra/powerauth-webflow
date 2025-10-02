@@ -28,6 +28,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateUserRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.response.CreateUserResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CredentialAuthenticationResponse;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -57,7 +58,7 @@ public class NextStepExternalCredentialTest extends NextStepTest {
         nextStepTestConfiguration.configure(nextStepClient);
     }
 
-    private void prepareUser(String userIdentification) throws NextStepClientException {
+    private CreateUserResponse prepareUser(String userIdentification) throws NextStepClientException {
         // Create user identity with LDAP credentials
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userIdentification);
@@ -67,12 +68,16 @@ public class NextStepExternalCredentialTest extends NextStepTest {
         credential.setUsername(userIdentification);
         credential.setCredentialSource(CredentialLocation.LDAP);
         createUserRequest.getCredentials().add(credential);
-        nextStepClient.createUser(createUserRequest);
+        return nextStepClient.createUser(createUserRequest).getResponseObject();
     }
 
     @Test
     public void testCreateUserWithExternalCredentials() throws NextStepClientException {
-        prepareUser("test_user_ldap_1");
+        CreateUserResponse user = prepareUser("test_user_external_cred_1");
+        //user.getCredentials().stream().findFirst().get().
+        nextStepClient.getUserDetail("test_user_external_cred_1", false);
+        //assertEquals(AuthenticationResult.SUCCEEDED, r1.getAuthenticationResult());
+
     }
 
     // create user

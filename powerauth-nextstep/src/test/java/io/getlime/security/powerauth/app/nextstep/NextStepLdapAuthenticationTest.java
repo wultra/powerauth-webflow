@@ -82,6 +82,10 @@ public class NextStepLdapAuthenticationTest extends NextStepTest {
     }
 
     private void prepareUser(String userIdentification) throws NextStepClientException {
+        prepareUser(userIdentification, null);
+    }
+
+    private void prepareUser(String userIdentification, String externalReference) throws NextStepClientException {
         // Create user identity with LDAP credentials
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userIdentification);
@@ -90,6 +94,9 @@ public class NextStepLdapAuthenticationTest extends NextStepTest {
         credential.setCredentialType(CredentialType.PERMANENT);
         credential.setUsername(userIdentification);
         credential.setCredentialSource(CredentialLocation.LDAP);
+        if (externalReference != null) {
+            credential.setExternalReference(externalReference);
+        }
         createUserRequest.getCredentials().add(credential);
         nextStepClient.createUser(createUserRequest);
     }
@@ -136,6 +143,15 @@ public class NextStepLdapAuthenticationTest extends NextStepTest {
         assertEquals(AuthenticationResult.FAILED, r1.getAuthenticationResult());
         assertEquals(3, r1.getRemainingAttempts());
         assertEquals(CredentialStatus.ACTIVE, r1.getCredentialStatus());
+    }
+
+    @Test
+    public void testCredentialLdapVerifyUserCustomReference() throws NextStepClientException {
+        prepareUser("test_user_ldap_6", "o=exampleorg,c=cs");
+        CredentialAuthenticationResponse r1 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", "test_user_ldap_6", "correct-password").getResponseObject();
+        assertEquals(AuthenticationResult.SUCCEEDED, r1.getAuthenticationResult());
+        assertEquals(CredentialStatus.ACTIVE, r1.getCredentialStatus());
+        assertEquals(3, r1.getRemainingAttempts());
     }
 }
 
