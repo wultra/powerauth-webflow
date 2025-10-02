@@ -167,7 +167,7 @@ public class CredentialCounterService {
      * @throws InvalidRequestException Thrown when request is invalid.
      */
     public void updateCredentialCounter(CredentialEntity credential, AuthenticationResult authenticationResult) throws InvalidRequestException {
-        logger.info("action: {}, state: {}  userId: {}, getCredentialDefinition: {}, authenticationResult: {}",
+        logger.info("action: {}, state: {} userId: {}, getCredentialDefinition: {}, authenticationResult: {}",
                 "updateCredentialCounter", "initiated",
                 credential.getUser().getUserId(), credential.getCredentialDefinition().getName(), authenticationResult);
         switch (credential.getSource()) {
