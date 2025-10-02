@@ -235,7 +235,7 @@ public class NextStepServerConfiguration {
     }
 
     /**
-     * Get configured base filter for findig user in LDAP..
+     * Get configured base filter for finding user in LDAP.
      * @return userSearchBase .
      */
     public String getUserSearchBase() {
@@ -329,6 +329,7 @@ public class NextStepServerConfiguration {
         return cs;
     }
 
+    @ConditionalOnProperty(prefix = "powerauth.nextstep.ldap", name = "enabled", havingValue = "true")
     @Bean
     public LdapTemplate ldapTemplate(LdapContextSource cs) {
         return new LdapTemplate(cs);

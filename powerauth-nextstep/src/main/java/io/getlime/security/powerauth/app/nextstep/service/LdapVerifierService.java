@@ -23,7 +23,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.ExternalCredentia
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
-import io.getlime.security.powerauth.lib.nextstep.model.response.CredentialAuthenticationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +38,10 @@ import org.springframework.stereotype.Service;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
-import java.util.Optional;
-
 import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
 /**
- * Default Web Application Configuration.
+ * Service for verifying credentials and reading external credential status using LDAP.
  *
  * @author Zdenek Cerny, zdenek.cerny@wultra.com
  */
@@ -106,7 +103,7 @@ public class LdapVerifierService {
             // Spring LDAP will do: search -> resolve DN -> attempt bind with that DN+password
             ldapTemplate.authenticate(query, credentialValue);
             return AuthenticationResult.SUCCEEDED;
-        }catch (EmptyResultDataAccessException | NamingException e) {
+        } catch (EmptyResultDataAccessException | NamingException e) {
             logger.warn("action: verifyCredential, state: failed, reason: {}", e.getMessage(), e);
             return AuthenticationResult.FAILED;
         }
@@ -131,7 +128,7 @@ public class LdapVerifierService {
                 return null;
             }
             return Integer.valueOf(a.get().toString());
-        }catch (javax.naming.NamingException | NumberFormatException e) {
+        } catch (javax.naming.NamingException | NumberFormatException e) {
             return null;
         }
     }
@@ -143,7 +140,7 @@ public class LdapVerifierService {
                 return null;
             }
             return a.get().toString();
-        }catch (javax.naming.NamingException e) {
+        } catch (javax.naming.NamingException e) {
             return null;
         }
     }
