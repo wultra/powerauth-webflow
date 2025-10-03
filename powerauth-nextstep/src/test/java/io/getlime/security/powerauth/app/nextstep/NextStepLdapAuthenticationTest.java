@@ -43,9 +43,6 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class NextStepLdapAuthenticationTest extends NextStepTest {
 
-    @Autowired
-    private NextStepServerConfiguration nextStepServerConfiguration;
-
     private static InMemoryDirectoryServer ds;
 
     @BeforeAll

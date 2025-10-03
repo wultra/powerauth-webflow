@@ -39,6 +39,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.util.Hashtable;
@@ -315,8 +316,8 @@ public class NextStepServerConfiguration {
         LdapContextSource cs = new LdapContextSource();
         cs.setUrl(ldapUrl);
         cs.setBase(ldapBase);
-        if (!managerDn.isBlank()) cs.setUserDn(managerDn);
-        if (!managerPassword.isBlank()) cs.setPassword(managerPassword);
+        if (StringUtils.hasText(managerDn)) cs.setUserDn(managerDn);
+        if (StringUtils.hasText(managerPassword)) cs.setPassword(managerPassword);
         cs.setPooled(ldapPooled);
         cs.setAnonymousReadOnly(ldapAnonymousReadOnly);
 

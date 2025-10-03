@@ -129,7 +129,6 @@
         <dependency>
             <groupId>org.springframework.ldap</groupId>
             <artifactId>spring-ldap-core</artifactId>
-            <version>${spring.ldap.version}</version>
         </dependency>
 
         <!-- Logging -->

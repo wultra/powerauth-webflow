@@ -237,7 +237,6 @@ public class NextStepTestConfiguration {
         credential.setCredentialValue("s3cret");
         createUserRequest.getCredentials().add(credential);
         nextStepClient.createUser(createUserRequest);
-
     }
 
 }
