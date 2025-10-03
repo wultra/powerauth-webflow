@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Zdenek Cerny, zdenek.cerny@wultra.com
  */
-public class NextStepLdapAuthenticationTest extends NextStepTest {
+class NextStepLdapAuthenticationTest extends NextStepTest {
 
     @Autowired
     private NextStepServerConfiguration nextStepServerConfiguration;
