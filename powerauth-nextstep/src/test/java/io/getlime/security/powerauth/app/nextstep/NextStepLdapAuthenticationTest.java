@@ -102,7 +102,7 @@ public class NextStepLdapAuthenticationTest extends NextStepTest {
     }
 
     @Test
-    public void testCredentialLdapVerify() throws NextStepClientException {
+   void testCredentialLdapVerify() throws NextStepClientException {
         prepareUser("test_user_ldap_1");
         CredentialAuthenticationResponse r1 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", "test_user_ldap_1", "correct-password").getResponseObject();
         assertEquals(AuthenticationResult.SUCCEEDED, r1.getAuthenticationResult());
