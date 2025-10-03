@@ -27,7 +27,7 @@
     <description>PowerAuth NextStep Model</description>
 
     <parent>
-        <groupId>io.getlime.security</groupId>
+        <groupId>com.wultra.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>

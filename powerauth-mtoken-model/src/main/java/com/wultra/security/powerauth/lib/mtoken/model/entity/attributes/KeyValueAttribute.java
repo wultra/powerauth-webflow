@@ -1,0 +1,66 @@
+/*
+ * PowerAuth Web Flow and related software components
+ * Copyright (C) 2017 Wultra s.r.o.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.wultra.security.powerauth.lib.mtoken.model.entity.attributes;
+
+/**
+ * Attribute representing a key-value item, where key and value are displayed
+ * next to each other.
+ *
+ * @author Petr Dvorak, petr@wultra.com
+ */
+public class KeyValueAttribute extends Attribute {
+
+    protected String value;
+
+    /**
+     * Default constructor.
+     */
+    public KeyValueAttribute() {
+        super();
+        this.setType(Type.KEY_VALUE);
+    }
+
+    /**
+     * Constructor with all details.
+     * @param id Attribute ID.
+     * @param label Attribute label.
+     * @param value Value.
+     */
+    public KeyValueAttribute(String id, String label, String value) {
+        this();
+        this.id = id;
+        this.label = label;
+        this.value = value;
+    }
+
+    /**
+     * Get value.
+     * @return Value.
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * Set value.
+     * @param value Value.
+     */
+    public void setValue(String value) {
+        this.value = value;
+    }
+}

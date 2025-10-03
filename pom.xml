@@ -6,7 +6,7 @@
     <name>powerauth-webflow-parent</name>
     <description>Federated Authentication and Authorization Server for Web</description>
 
-    <groupId>io.getlime.security</groupId>
+    <groupId>com.wultra.security</groupId>
     <artifactId>powerauth-webflow-parent</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -115,103 +115,103 @@
         <dependencies>
             <!-- PowerAuth Web Flow Dependencies -->
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-data-adapter-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-data-adapter-model</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-mtoken-model</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-nextstep-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-nextstep-model</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-tpp-engine-model</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-webflow-authentication</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-webflow-authentication-approval-sca</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-webflow-authentication-consent</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-webflow-authentication-form</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-webflow-authentication-init</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-webflow-authentication-login-sca</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-webflow-authentication-mtoken</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-webflow-authentication-operation-review</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-webflow-authentication-sms</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-webflow-i18n</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.getlime.security</groupId>
+                <groupId>com.wultra.security</groupId>
                 <artifactId>powerauth-webflow-resources</artifactId>
                 <version>${project.version}</version>
             </dependency>
