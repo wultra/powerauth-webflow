@@ -176,11 +176,11 @@ public class CredentialCounterService {
             }
             case LDAP -> {
                 // for LDAP mode the credentials are managed in LDAP, but we can try to query remaining attempts
-                credential = updateCounterLdap(credential,authenticationResult);
+                credential = updateCounterLdap(credential, authenticationResult);
             }
             case PROXY -> {
                 // for proxy mode the credentials are managed by PROXY
-                credential = updateCounterProxy(credential,authenticationResult);
+                credential = updateCounterProxy(credential, authenticationResult);
             }
             default -> throw new InvalidRequestException("Invalid credential source location: " + credential.getSource());
         }
