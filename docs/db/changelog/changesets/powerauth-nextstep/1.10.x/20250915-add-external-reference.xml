@@ -5,7 +5,6 @@
 
     <changeSet id="1" logicalFilePath="powerauth-nextstep/1.10.x/20250915-add-external-reference" author="Zdenek Cerny">
         <preConditions onFail="MARK_RAN">
-            <tableExists tableName="ns_credential_storage"/>
             <not>
                 <columnExists tableName="ns_credential_storage" columnName="external_reference"/>
             </not>
