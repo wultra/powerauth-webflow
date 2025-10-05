@@ -1,6 +1,6 @@
 /*
  * PowerAuth Web Flow and related software components
- * Copyright (C) 2021 Wultra s.r.o.
+ * Copyright (C) 2025 Wultra s.r.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -17,29 +17,18 @@
  */
 package io.getlime.security.powerauth.app.nextstep;
 
-import com.unboundid.ldap.listener.InMemoryDirectoryServer;
-import com.unboundid.ldap.listener.InMemoryDirectoryServerConfig;
-import com.unboundid.ldap.listener.InMemoryListenerConfig;
-import com.unboundid.ldif.LDIFReader;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialLocation;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.InputStream;
-import java.net.InetAddress;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,14 +38,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Zdenek Cerny, zdenek.cerny@wultra.com
  */
-public class NextStepExternalCredentialTest extends NextStepTest {
+class NextStepExternalCredentialTest extends NextStepTest {
 
     public static final String TEST_CREDENTIAL_NAME = "TEST_CREDENTIAL";
-    @Autowired
-    private NextStepServerConfiguration nextStepServerConfiguration;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         nextStepClient = nextStepClientFactory.createNextStepClient("http://localhost:" + port);
         nextStepTestConfiguration.configure(nextStepClient);
     }
@@ -76,10 +63,10 @@ public class NextStepExternalCredentialTest extends NextStepTest {
     }
 
     @Test
-    public void testCreateUpdateExternalCredentials() throws NextStepClientException {
+    void testCreateUpdateExternalCredentials() throws NextStepClientException {
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId("test_user_external_cred_1");
-        CreateUserResponse user =  nextStepClient.createUser(createUserRequest).getResponseObject();
+        nextStepClient.createUser(createUserRequest);
 
         CreateCredentialRequest credential = new CreateCredentialRequest();
         credential.setCredentialName(TEST_CREDENTIAL_NAME);
@@ -114,7 +101,7 @@ public class NextStepExternalCredentialTest extends NextStepTest {
 
     @Test
     public void testResetUpdateExternalCredentials() throws NextStepClientException {
-        CreateUserResponse user = prepareUser("test_user_external_cred_2", CredentialLocation.LDAP);
+        prepareUser("test_user_external_cred_2", CredentialLocation.LDAP);
 
         ResetCredentialRequest resetCredentialRequest = new ResetCredentialRequest();
         resetCredentialRequest.setUserId("test_user_external_cred_2");
@@ -174,4 +161,3 @@ public class NextStepExternalCredentialTest extends NextStepTest {
         assertEquals(CredentialLocation.LDAP, credentialDetail.getCredentialSource());
     }
 }
-

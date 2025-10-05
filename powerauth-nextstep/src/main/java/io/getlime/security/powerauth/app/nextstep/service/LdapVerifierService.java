@@ -1,6 +1,6 @@
 /*
  * PowerAuth Web Flow and related software components
- * Copyright (C) 2017 Wultra s.r.o.
+ * Copyright (C) 2025 Wultra s.r.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -49,18 +49,16 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
 public class LdapVerifierService {
 
     private final Logger logger = LoggerFactory.getLogger(LdapVerifierService.class);
+    private static final String CONFIG_ERROR = "LDAP_NOT_CONFIGURED";
+    private static final String ACCOUNT_LOCK_ATTRIBUTE = "nsAccountLock";
+    private static final String PASSWORD_RETRY_COUNT_ATTRIBUTE = "passwordRetryCount";
+    private static final String PASSWORD_EXPIRATION_TIME = "passwordExpirationTime";
 
     private final NextStepServerConfiguration nextStepServerConfiguration;
 
     private final LdapTemplate ldapTemplate;
 
-    private static final String CONFIG_ERROR = "LDAP_NOT_CONFIGURED";
 
-    private static final String ACCOUNT_LOCK_ATTRIBUTE = "nsAccountLock";
-
-    private static final String PASSWORD_RETRY_COUNT_ATTRIBUTE = "passwordRetryCount";
-
-    private static final String PASSWORD_EXPIRATION_TIME = "passwordExpirationTime";
 
     @Autowired
     public LdapVerifierService(NextStepServerConfiguration nextStepServerConfiguration, LdapTemplate ldapTemplate) {
@@ -133,18 +131,6 @@ public class LdapVerifierService {
         }
     }
 
-    private static String getStrAttrSafe(Attributes attrs, String name)  {
-        try {
-            Attribute a = attrs.get(name);
-            if (a == null) {
-                return null;
-            }
-            return a.get().toString();
-        } catch (javax.naming.NamingException e) {
-            return null;
-        }
-    }
-
     /**
      * Get attempt counter from LDAP
      *
@@ -168,7 +154,7 @@ public class LdapVerifierService {
 
             final Boolean blocked = getBoolAttrSafe(attrs, ACCOUNT_LOCK_ATTRIBUTE);
             if (blocked != null) {
-                externalCredentialDetail.setCredentialStatus((blocked) ? CredentialStatus.BLOCKED_TEMPORARY : CredentialStatus.ACTIVE);
+                externalCredentialDetail.setCredentialStatus(blocked ? CredentialStatus.BLOCKED_TEMPORARY : CredentialStatus.ACTIVE);
             }
 
             final Integer attemptCounter = getIntAttrSafe(attrs, PASSWORD_RETRY_COUNT_ATTRIBUTE);

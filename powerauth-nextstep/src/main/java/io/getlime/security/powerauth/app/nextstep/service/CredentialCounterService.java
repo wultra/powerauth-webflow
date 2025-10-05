@@ -94,7 +94,6 @@ public class CredentialCounterService {
         return response;
     }
 
-
     private CredentialEntity updateCounterInternal(CredentialEntity credential, AuthenticationResult authenticationResult) throws InvalidRequestException {
         final CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
         final Integer softLimit = credentialDefinition.getCredentialPolicy().getLimitSoft();

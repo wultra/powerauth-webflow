@@ -151,4 +151,3 @@ class NextStepLdapAuthenticationTest extends NextStepTest {
         assertEquals(3, r1.getRemainingAttempts());
     }
 }
-

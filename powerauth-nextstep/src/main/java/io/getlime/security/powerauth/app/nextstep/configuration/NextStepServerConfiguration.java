@@ -43,6 +43,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Configuration of Next Step server.
@@ -313,15 +314,19 @@ public class NextStepServerConfiguration {
     @ConditionalOnProperty(prefix = "powerauth.nextstep.ldap", name = "enabled", havingValue = "true")
     @Bean
     public LdapContextSource contextSource() {
-        LdapContextSource cs = new LdapContextSource();
+        final LdapContextSource cs = new LdapContextSource();
         cs.setUrl(ldapUrl);
         cs.setBase(ldapBase);
-        if (StringUtils.hasText(managerDn)) cs.setUserDn(managerDn);
-        if (StringUtils.hasText(managerPassword)) cs.setPassword(managerPassword);
+        if (StringUtils.hasText(managerDn)) {
+            cs.setUserDn(managerDn);
+        }
+        if (StringUtils.hasText(managerPassword)) {
+            cs.setPassword(managerPassword);
+        }
         cs.setPooled(ldapPooled);
         cs.setAnonymousReadOnly(ldapAnonymousReadOnly);
 
-        Hashtable<String, Object> env = new Hashtable<>();
+        final Map<String, Object> env = new Hashtable<>();
         env.put("com.sun.jndi.ldap.connect.timeout", String.valueOf(ldapConnectTimeoutMs));
         env.put("com.sun.jndi.ldap.read.timeout", String.valueOf(ldapReadTimeoutMs));
         cs.setBaseEnvironmentProperties(env);
