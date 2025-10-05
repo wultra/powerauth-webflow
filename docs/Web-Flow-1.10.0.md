@@ -13,7 +13,7 @@ Added table `shedlock` to prevent execution of the same task from another node.
 
 ## REST API
 
-### Adding Credential Source and Credentual Target
+### Adding Credential Source and Credential Target
 
 Credentials object holders extends of attributes `credentialSource` and `credentialTarget` with type `credentialLocation`. 
 
