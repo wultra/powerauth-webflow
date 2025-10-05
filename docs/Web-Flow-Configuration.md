@@ -272,6 +272,20 @@ new SecureRandom().nextBytes(randomBytes);
 String encryptionKey = Base64.getEncoder().encodeToString(randomBytes);
 ```
 
+Properties for connection to LDAP Server and corresponding environment properties. By default, LDAP is disabled and all properties ignored.
+```properties
+powerauth.nextstep.ldap.enabled=${POWERAUTH_NEXTSTEP_LDAP_ENABLED:false}
+powerauth.nextstep.ldap.url=${POWERAUTH_NEXTSTEP_LDAP_URL:}
+powerauth.nextstep.ldap.base=${POWERAUTH_NEXTSTEP_LDAP_BASE:}
+powerauth.nextstep.ldap.managerDn=${POWERAUTH_NEXTSTEP_LDAP_MANAGERDN:}
+powerauth.nextstep.ldap.managerPassword=${POWERAUTH_NEXTSTEP_LDAP_MANAGERPASSWORD:}
+powerauth.nextstep.ldap.anonymousReadOnly=${POWERAUTH_NEXTSTEP_LDAP_ANONYMOUSREADONLY:false}
+powerauth.nextstep.ldap.userSearchBase=${POWERAUTH_NEXTSTEP_LDAP_USERSEARCHBASE:ou=People}
+powerauth.nextstep.ldap.userSearchFilter=${POWERAUTH_NEXTSTEP_LDAP_USERSEARCHFILTER:(uid={0})}
+powerauth.nextstep.ldap.connectTimeout=${POWERAUTH_NEXTSTEP_LDAP_CONNECTTIMEOUT:5000}
+powerauth.nextstep.ldap.readTimeout=${POWERAUTH_NEXTSTEP_LDAP_READTIMEOUT:5000}
+```
+
 <!-- begin box warning -->
 Do not use the same key for end-to-encryption and database record encryption. Store the keys securely, ideally using a vault mechanism._
 <!-- end -->
