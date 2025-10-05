@@ -15,7 +15,7 @@ Added table `shedlock` to prevent execution of the same task from another node.
 
 ### Adding Credential Source and Credential Target
 
-Credentials object holders extends of attributes `credentialSource` and `credentialTarget` with type `credentialLocation`. 
+Credentials object holders are extended with the attributes `credentialSource` and `credentialTarget` of type `credentialLocation`. 
 
 The possible values:
 
