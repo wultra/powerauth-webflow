@@ -84,10 +84,7 @@ jobs:
           INIT_IMAGE_NAME=${{ matrix.app }}-init:${IMAGE_VERSION}
           echo "IMAGE_VERSION=$IMAGE_VERSION" >> $GITHUB_ENV
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
-      - name: Set image name output
-        id: gen_output
-        run: |
-          echo "${{ matrix.app }}=${{ env.IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
+          echo "INIT_IMAGE_NAME=$INIT_IMAGE_NAME" >> $GITHUB_ENV
       - name: Prepare package
         run: |
           mvn -U -DuseInternalRepo=true --no-transfer-progress clean package -pl powerauth-${{ matrix.app }} -am
