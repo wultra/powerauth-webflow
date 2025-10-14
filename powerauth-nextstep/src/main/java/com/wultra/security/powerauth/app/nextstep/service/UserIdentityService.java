@@ -159,7 +159,7 @@ public class UserIdentityService {
                     validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
                 }
                 final CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                        credential.getCredentialType(), credential.getUsername(), credentialValueRequest,
+                        credential.getCredentialType(), credential.getExternalReference(), credential.getUsername(), credentialValueRequest,
                         credential.getTimestampExpires(), validationMode, credential.getCredentialSource(), credential.getCredentialTarget());
                 if (credentialHistory != null && !credentialHistory.isEmpty()) {
                     final int dateCount = credentialHistory.size();
@@ -277,7 +277,7 @@ public class UserIdentityService {
                         credentialValueRequest = endToEndEncryptionService.decryptCredential(credentialValueRequest, credentialDefinition);
                     }
                     final CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                            credential.getCredentialType(), credential.getUsername(), credentialValueRequest,
+                            credential.getCredentialType(), credential.getExternalReference(), credential.getUsername(), credentialValueRequest,
                             credential.getTimestampExpires(), CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL, credential.getCredentialSource(), credential.getCredentialTarget());
                     // Return generated credential value, with possible end2end encryption
                     if (credentialValueRequest == null && credentialDefinition.isE2eEncryptionEnabled()) {

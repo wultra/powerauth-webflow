@@ -100,6 +100,7 @@ public class CredentialService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final CredentialType credentialType = request.getCredentialType();
+        final String externalReference = request.getExternalReference();
         final String username = request.getUsername();
         String credentialValue = request.getCredentialValue();
         if (credentialValue != null && credentialDefinition.isE2eEncryptionEnabled()) {
@@ -111,7 +112,7 @@ public class CredentialService {
         if (validationMode == null) {
             validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
         }
-        final CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition, credentialType, username, credentialValue, timestampExpires, validationMode, request.getCredentialSource(), request.getCredentialTarget());
+        final CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition, credentialType, externalReference, username, credentialValue, timestampExpires, validationMode, request.getCredentialSource(), request.getCredentialTarget());
         if (credentialHistory != null && !credentialHistory.isEmpty()) {
             final int dateCount = credentialHistory.size();
             // Use unique timestamps in seconds to keep order of credential history
@@ -140,6 +141,7 @@ public class CredentialService {
         response.setCredentialTarget(credentialDetail.getCredentialTarget());
         response.setUserId(user.getUserId());
         response.setCredentialStatus(credentialDetail.getCredentialStatus());
+        response.setExternalReference(credentialDetail.getExternalReference());
         response.setUsername(credentialDetail.getUsername());
         if (request.getCredentialValue() == null) {
             // Return generated credential value, with possible end2end encryption
@@ -200,11 +202,12 @@ public class CredentialService {
         if (request.getCredentialTarget() != null) {
             credential.setTarget(request.getCredentialTarget());
         }
-        String username = null;
         String credentialValue = request.getCredentialValue();
         if (credentialValue != null && credentialDefinition.isE2eEncryptionEnabled()) {
             credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
         }
+        credential.setExternalReference(request.getExternalReference());
+        String username = null;
         CredentialValidationMode validationMode = CredentialValidationMode.NO_VALIDATION;
         if (request.getUsername() != null && request.getCredentialValue() != null) {
             username = request.getUsername().toLowerCase();
@@ -233,7 +236,7 @@ public class CredentialService {
             // change value only if the target is local
             if (CredentialLocation.LOCAL == credential.getTarget()) {
                 // if source was proxy change the information about the source
-                if (CredentialLocation.PROXY == credential.getSource()) {
+                if (CredentialLocation.PROXY == credential.getSource() || CredentialLocation.LDAP == credential.getSource()) {
                     credential.setSource(CredentialLocation.LOCAL);
                 }
                 final CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
@@ -284,6 +287,7 @@ public class CredentialService {
         response.setCredentialSource(credential.getSource());
         response.setCredentialTarget(credential.getTarget());
         response.setCredentialStatus(credential.getStatus());
+        response.setExternalReference(credential.getExternalReference());
         response.setUsername(credential.getUsername());
         final boolean credentialChangeRequired;
         if (request.getCredentialValue() != null) {
@@ -653,6 +657,7 @@ public class CredentialService {
      * @param user User identity entity.
      * @param credentialDefinition Credential definition entity.
      * @param credentialType Credential type.
+     * @param externalReference Optional reference to external credentials.
      * @param username Username, use null for generated username.
      * @param credentialValue Credential value, use null for generated credential value.
      * @param timestampExpires Expiration timestamp for case when expiration timestamp is overridden.
@@ -665,7 +670,7 @@ public class CredentialService {
      * @throws EncryptionException Thrown when encryption or decryption fails.
      */
     public CredentialSecretDetail createCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
-                                                   CredentialType credentialType, String username, String credentialValue,
+                                                   CredentialType credentialType, String externalReference, String username, String credentialValue,
                                                    Date timestampExpires, CredentialValidationMode validationMode, CredentialLocation source, CredentialLocation target) throws InvalidConfigurationException, CredentialValidationFailedException, InvalidRequestException, EncryptionException {
         final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
         final CredentialRepository credentialRepository = repositoryCatalogue.getCredentialRepository();
@@ -732,6 +737,7 @@ public class CredentialService {
         }
         credential.setSource(Objects.requireNonNullElse(source, CredentialLocation.LOCAL));
         credential.setTarget(Objects.requireNonNullElse(target, CredentialLocation.LOCAL));
+        credential.setExternalReference(externalReference);
         credential.setUsername(username);
         final String credentialValueRequest = credentialValue;
         if (credentialValue == null) {
@@ -776,10 +782,11 @@ public class CredentialService {
         credentialDetail.setCredentialStatus(CredentialStatus.ACTIVE);
         credentialDetail.setCredentialSource(credential.getSource());
         credentialDetail.setCredentialTarget(credential.getTarget());
+        credentialDetail.setExternalReference(credential.getExternalReference());
         credentialDetail.setUsername(credential.getUsername());
         final boolean credentialChangeRequired;
         // the proxied passwords are maintained by external system, i.e. neither created nor generated.
-        if (CredentialLocation.PROXY == source) {
+        if (CredentialLocation.PROXY == source || CredentialLocation.LDAP == credential.getSource()) {
             credentialChangeRequired = false;
         } else if (credentialValueRequest == null) {
             // Generated credential value is returned in unprotected form, with possible e2e-encryption

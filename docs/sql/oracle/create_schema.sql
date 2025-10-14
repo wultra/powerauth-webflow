@@ -362,6 +362,7 @@ CREATE TABLE ns_credential_storage (
   credential_definition_id         NUMBER(19,0) NOT NULL,                   -- Credential definition identifier.
   user_id                          VARCHAR2(256 CHAR) NOT NULL,             -- User identity identifier.
   type                             VARCHAR2(32 CHAR) NOT NULL,              -- Credential type: PERMANENT, TEMPORARY.
+  external_reference               VARCHAR2(256 CHAR),                      -- Optional reference to external credentials
   user_name                        VARCHAR2(256 CHAR),                      -- Username.
   value                            VARCHAR2(256 CHAR) NOT NULL,             -- Credential value.
   status                           VARCHAR2(32 CHAR) NOT NULL,              -- Credential status: ACTIVE, BLOCKED_TEMPORARY, BLOCKED_PERMANENT, REMOVED.

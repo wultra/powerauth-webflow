@@ -1,6 +1,6 @@
 /*
  * PowerAuth Web Flow and related software components
- * Copyright (C) 2021 Wultra s.r.o.
+ * Copyright (C) 2025 Wultra s.r.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -15,28 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration;
+package com.wultra.security.powerauth.lib.nextstep.model.entity;
+
+import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
+import lombok.Data;
+
+import java.util.Optional;
 
 /**
- * Enumeration representing credential location storage.
+ * Class represents details of a credential in external system.
  *
  * @author Zdenek Cerny, zdenek.cerny@wultra.com
  */
-public enum CredentialLocation {
+@Data
+public class ExternalCredentialDetail {
 
-    /**
-     * Credential location is local.
-     */
-    LOCAL,
+    private CredentialStatus credentialStatus;
+    private Integer failedAttempts;
 
-    /**
-     * Credential are provided by a proxy.
-     */
-    PROXY,
+    public Optional<CredentialStatus> getCredentialStatusOpt() {
+        return Optional.ofNullable(credentialStatus);
+    }
 
-    /**
-     * Credential are stored in LDAP.
-     */
-    LDAP
-
+    public Optional<Integer> getFailedAttemptsOpt() {
+        return Optional.ofNullable(failedAttempts);
+    }
 }

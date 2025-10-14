@@ -70,6 +70,7 @@ public class AuthenticationService {
     private final OtpValueConverter otpValueConverter;
     private final Audit audit;
     private final ObjectMapper objectMapper;
+    private final LdapVerifierService ldapVerifierService;
 
     private final AuthenticationConverter authenticationConverter = new AuthenticationConverter();
 
@@ -82,12 +83,13 @@ public class AuthenticationService {
      * @param objectMapper Object mapper.
      */
     @Autowired
-    public AuthenticationService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, OtpValueConverter otpValueConverter, Audit audit, ObjectMapper objectMapper) {
+    public AuthenticationService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, OtpValueConverter otpValueConverter, Audit audit, ObjectMapper objectMapper, LdapVerifierService ldapVerifierService) {
         this.authenticationRepository = repositoryCatalogue.getAuthenticationRepository();
         this.serviceCatalogue = serviceCatalogue;
         this.otpValueConverter = otpValueConverter;
         this.audit = audit;
         this.objectMapper = objectMapper;
+        this.ldapVerifierService = ldapVerifierService;
     }
 
     /**
@@ -163,6 +165,8 @@ public class AuthenticationService {
                 // neither operation nor organizationId is used in this branch
                 final CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(authRequest);
                 authenticationResult = response.getAuthenticationResult();
+            } else if (CredentialLocation.LDAP == credential.getSource()) {
+                authenticationResult = ldapVerifierService.verifyCredential(credential, credentialValue);
             } else {
                 authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
             }
@@ -623,6 +627,8 @@ public class AuthenticationService {
                     // neither operation nor organizationId is used in this branch
                     final CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(authRequest);
                     credentialAuthenticationResult = response.getAuthenticationResult();
+                } else if (CredentialLocation.LDAP == credential.getSource()) {
+                    credentialAuthenticationResult = ldapVerifierService.verifyCredential(credential, credentialValue);
                 } else {
                     credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
                 }
