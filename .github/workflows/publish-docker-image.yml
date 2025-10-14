@@ -111,7 +111,7 @@ jobs:
           registry: ${{ vars.DISTRIBUTION_REGISTRY_URL }}
           username: ${{ vars.DISTRIBUTION_USERNAME }}
           password: ${{ secrets.DISTRIBUTION_PASSWORD }}
-     - name: Set dynamic tags for image
+      - name: Set dynamic tags for image
         run: |
           echo "TAGS=${{ vars.ACR_REGISTRY_URL != ''  && format('{0}/{1}', vars.ACR_REGISTRY_URL, env.IMAGE_NAME) || '' }} \
                      ${{ vars.DISTRIBUTION_REGISTRY_URL != '' && format('{0}/{1}', vars.DISTRIBUTION_REGISTRY_URL, env.IMAGE_NAME) || '' }}" >> $GITHUB_ENV
