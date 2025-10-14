@@ -6015,6 +6015,8 @@ The list of expected status codes:
       {
         "credentialName": "RETAIL_CREDENTIAL",
         "credentialType": "PERMANENT",
+        "credentialSource": "LOCAL",
+        "credentialTarget": "LOCAL",
         "username": "testuser"
       }
     ]
@@ -6051,6 +6053,8 @@ The list of expected status codes:
       {
         "credentialName": "RETAIL_CREDENTIAL",
         "credentialType": "PERMANENT",
+        "credentialSource": "LOCAL",
+        "credentialTarget": "LOCAL",
         "credentialStatus": "ACTIVE",
         "username": "testuser",
         "credentialValue": "buCH<JpTw1mA",
@@ -6155,6 +6159,8 @@ The list of expected status codes:
       {
         "credentialName": "RETAIL_CREDENTIAL",
         "credentialType": "PERMANENT",
+        "credentialSource": "LOCAL",
+        "credentialTarget": "LOCAL",
         "credentialStatus": "ACTIVE",
         "username": "testuser2",
         "credentialChangeRequired": false,
@@ -6247,6 +6253,8 @@ The list of expected status codes:
       {
         "credentialName": "RETAIL_CREDENTIAL",
         "credentialType": "PERMANENT",
+        "credentialSource": "LOCAL",
+        "credentialTarget": "LOCAL",
         "username": "test1234",
         "credentialValue": "S3cret.1234"
       }
@@ -6286,6 +6294,8 @@ The list of expected status codes:
       {
         "credentialName": "RETAIL_CREDENTIAL",
         "credentialType": "PERMANENT",
+        "credentialSource": "LOCAL",
+        "credentialTarget": "LOCAL",
         "credentialStatus": "ACTIVE",
         "username": "test1234",
         "credentialValue": null,
@@ -6461,6 +6471,8 @@ The list of expected status codes:
         {
           "credentialName": "RETAIL_CREDENTIAL",
           "credentialType": "PERMANENT",
+          "credentialSource": "LOCAL",
+          "credentialTarget": "LOCAL",
           "credentialStatus": "ACTIVE",
           "username": "77002401",
           "credentialChangeRequired": false,
@@ -6562,6 +6574,8 @@ The list of expected status codes:
           {
             "credentialName": "RETAIL_CREDENTIAL",
             "credentialType": "PERMANENT",
+            "credentialSource": "LOCAL",
+            "credentialTarget": "LOCAL",
             "credentialStatus": "ACTIVE",
             "username": "14655327",
             "credentialChangeRequired": false,
@@ -7518,6 +7532,8 @@ The list of expected status codes:
       {
         "credentialName": "RETAIL_CREDENTIAL",
         "credentialType": "PERMANENT",
+        "credentialSource": "LOCAL",
+        "credentialTarget": "LOCAL",
         "credentialStatus": "ACTIVE",
         "username": "test1234",
         "credentialChangeRequired": false,
@@ -7681,6 +7697,8 @@ The list of expected status codes:
     "userId": "user1234",
     "credentialName": "RETAIL_CREDENTIAL",
     "credentialType": "PERMANENT",
+    "credentialSource": "LOCAL",
+    "credentialTarget": "LOCAL",
     "credentialStatus": "ACTIVE",
     "username": "username1234",
     "credentialValue": "JeM1vr%GyJFh",
@@ -7748,6 +7766,8 @@ The list of expected status codes:
     "userId": "user1234",
     "credentialName": "RETAIL_CREDENTIAL",
     "credentialType": "PERMANENT",
+    "credentialSource": "LOCAL",
+    "credentialTarget": "LOCAL",
     "username": "username1234",
     "credentialValue": "JeM1vr%GyJFh",
     "credentialStatus": "ACTIVE",
@@ -7768,6 +7788,8 @@ The list of expected status codes:
     "userId": "user1234",
     "credentialName": "RETAIL_CREDENTIAL",
     "credentialType": "PERMANENT",
+    "credentialSource": "LOCAL",
+    "credentialTarget": "LOCAL",
     "credentialStatus": "ACTIVE",
     "username": "username1234",
     "credentialChangeRequired": false
