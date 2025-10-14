@@ -58,8 +58,6 @@ public class LdapVerifierService {
 
     private final LdapTemplate ldapTemplate;
 
-
-
     @Autowired
     public LdapVerifierService(NextStepServerConfiguration nextStepServerConfiguration, LdapTemplate ldapTemplate) {
         this.nextStepServerConfiguration = nextStepServerConfiguration;
