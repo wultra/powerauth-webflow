@@ -88,6 +88,7 @@ public class CreateUserRequest {
         private CredentialType credentialType;
         private CredentialLocation credentialSource;
         private CredentialLocation credentialTarget;
+        private String externalReference;
         @Size(min = 1, max = 256)
         private String username;
         @Size(min = 1, max = 256)

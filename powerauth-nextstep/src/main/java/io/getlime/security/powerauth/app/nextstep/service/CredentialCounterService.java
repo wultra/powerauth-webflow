@@ -23,7 +23,9 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Creden
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ExternalCredentialDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialLocation;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.ResetCountersRequest;
@@ -51,6 +53,7 @@ public class CredentialCounterService {
 
     private final CredentialRepository credentialRepository;
     private final ServiceCatalogue serviceCatalogue;
+    private final LdapVerifierService ldapVerifierService;
 
     /**
      * Credential counter service constructor.
@@ -58,9 +61,10 @@ public class CredentialCounterService {
      * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public CredentialCounterService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+    public CredentialCounterService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, LdapVerifierService ldapVerifierService) {
         this.credentialRepository = repositoryCatalogue.getCredentialRepository();
         this.serviceCatalogue = serviceCatalogue;
+        this.ldapVerifierService = ldapVerifierService;
     }
 
     /**
@@ -90,13 +94,7 @@ public class CredentialCounterService {
         return response;
     }
 
-    /**
-     * Update credential counter. This method is not transactional.
-     * @param credential Credential entity.
-     * @param authenticationResult Authentication result.
-     * @throws InvalidRequestException Thrown when request is invalid.
-     */
-    public void updateCredentialCounter(CredentialEntity credential, AuthenticationResult authenticationResult) throws InvalidRequestException {
+    private CredentialEntity updateCounterInternal(CredentialEntity credential, AuthenticationResult authenticationResult) throws InvalidRequestException {
         final CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
         final Integer softLimit = credentialDefinition.getCredentialPolicy().getLimitSoft();
         final Integer hardLimit = credentialDefinition.getCredentialPolicy().getLimitHard();
@@ -124,9 +122,69 @@ public class CredentialCounterService {
             }
             default -> throw new InvalidRequestException("Invalid authentication result: " + authenticationResult);
         }
-        credential = credentialRepository.save(credential);
-        logger.info("Credential counter updated, user ID: {}, credential definition name: {}, attempt counter: {}, soft counter: {}, hard counter: {}, status: {}",
-                credential.getUser().getUserId(), credential.getCredentialDefinition().getName(),
+        return credentialRepository.save(credential);
+    }
+
+    private CredentialEntity updateCounterLdap(CredentialEntity credential, AuthenticationResult authenticationResult) throws InvalidRequestException {
+
+        switch (authenticationResult) {
+            case SUCCEEDED -> {
+                credential.setFailedAttemptCounterSoft(0);
+                credential.setFailedAttemptCounterHard(0);
+            }
+            case FAILED -> {
+                ExternalCredentialDetail externalCredentialDetail = ldapVerifierService.readCredentialExternalStatus(credential);
+                credential.setFailedAttemptCounterSoft(externalCredentialDetail.getFailedAttemptsOpt().orElse(0));
+                credential.setFailedAttemptCounterHard(externalCredentialDetail.getFailedAttemptsOpt().orElse(0));
+            }
+            default -> throw new InvalidRequestException("Invalid authentication result: " + authenticationResult);
+        }
+        return credentialRepository.save(credential);
+    }
+
+    private CredentialEntity updateCounterProxy(CredentialEntity credential, AuthenticationResult authenticationResult) throws InvalidRequestException {
+
+        switch (authenticationResult) {
+            case SUCCEEDED -> {
+                credential.setFailedAttemptCounterSoft(0);
+                credential.setFailedAttemptCounterHard(0);
+            }
+            case FAILED -> {
+                credential.setFailedAttemptCounterSoft(credential.getFailedAttemptCounterSoft() + 1);
+                credential.setFailedAttemptCounterHard(credential.getFailedAttemptCounterHard() + 1);
+            }
+            default -> throw new InvalidRequestException("Invalid authentication result: " + authenticationResult);
+        }
+        return credentialRepository.save(credential);
+
+    }
+
+    /**
+     * Update credential counter. This method is not transactional.
+     * @param credential Credential entity.
+     * @param authenticationResult Authentication result.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     */
+    public void updateCredentialCounter(CredentialEntity credential, AuthenticationResult authenticationResult) throws InvalidRequestException {
+        logger.info("action: {}, state: {} userId: {}, getCredentialDefinition: {}, authenticationResult: {}",
+                "updateCredentialCounter", "initiated",
+                credential.getUser().getUserId(), credential.getCredentialDefinition().getName(), authenticationResult);
+        switch (credential.getSource()) {
+            case LOCAL -> {
+                credential = updateCounterInternal(credential, authenticationResult);
+            }
+            case LDAP -> {
+                // for LDAP mode the credentials are managed in LDAP, but we can try to query remaining attempts
+                credential = updateCounterLdap(credential, authenticationResult);
+            }
+            case PROXY -> {
+                // for proxy mode the credentials are managed by PROXY
+                credential = updateCounterProxy(credential, authenticationResult);
+            }
+            default -> throw new InvalidRequestException("Invalid credential source location: " + credential.getSource());
+        }
+        logger.info("action: {}, state: {}, attemptCounter: {}, failedAttemptCounterSoft: {}, failedAttemptCounterHard: {}, status: {}",
+                "updateCredentialCounter", "succeeded",
                 credential.getAttemptCounter(), credential.getFailedAttemptCounterSoft(),
                 credential.getFailedAttemptCounterHard(), credential.getStatus());
     }

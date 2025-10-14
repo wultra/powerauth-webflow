@@ -47,6 +47,7 @@ public class CreateCredentialResponse {
     private CredentialLocation credentialTarget;
     @NotNull
     private CredentialStatus credentialStatus;
+    private String externalReference;
     @Size(min = 1, max = 256)
     private String username;
     @Size(min = 1, max = 256)
