@@ -11,7 +11,7 @@ RUN groupadd -r powerauth && useradd -r -g powerauth -s /sbin/nologin powerauth
 
 RUN mkdir -p ${EXTLIB_PATH} && wget --no-verbose https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc11/${OJDBC_VERSION}/ojdbc11-${OJDBC_VERSION}.jar -O ${EXTLIB_PATH}/ojdbc11.jar
 # Deploy and run applications
-COPY powerauth-nextstep/docker/application.properties /app/application.properties
+COPY powerauth-nextstep/src/main/resources/application.properties /app/application.properties
 COPY powerauth-nextstep/target/powerauth-nextstep-*.war /app/powerauth-nextstep.war
 
 # Docker configuration
