@@ -73,7 +73,7 @@ jobs:
           server-username: INTERNAL_USERNAME
           server-password: INTERNAL_PASSWORD
       - name: Install Cosign
-        uses: sigstore/cosign-installer@v3.10.0
+        uses: sigstore/cosign-installer@v4.0.0
         with:
           cosign-release: 'v2.6.1'
         if: ${{ inputs.push_to_registry == true || (github.ref == 'refs/heads/develop' && github.actor != 'dependabot[bot]' && github.event_name == 'push')}}
