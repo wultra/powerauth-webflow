@@ -244,9 +244,7 @@
                         <version>0.9.0</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <publishingServerId>${env.server_id}</publishingServerId>
-                            <autoPublish>true</autoPublish>
-                            <waitUntil>published</waitUntil>
+                            <skipPublishing>true</skipPublishing>
                         </configuration>
                     </plugin>
                 </plugins>
