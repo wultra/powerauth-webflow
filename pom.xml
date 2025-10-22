@@ -323,6 +323,7 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -482,7 +483,7 @@
                 <plugins>
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
-                        <artifactId>central-publishing-maven-plugin</artifactId
+                        <artifactId>central-publishing-maven-plugin</artifactId>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>${env.server_id}</publishingServerId>
