@@ -109,6 +109,8 @@
         <powerauth.version>2.0.0-SNAPSHOT</powerauth.version>
         <powerauth-crypto.version>2.0.0-SNAPSHOT</powerauth-crypto.version>
         <powerauth-push.version>2.0.0-SNAPSHOT</powerauth-push.version>
+
+        <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -388,6 +390,12 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.cyclonedx</groupId>
+                <artifactId>cyclonedx-maven-plugin</artifactId>
+                <version>${cyclonedx-maven-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
