@@ -99,7 +99,7 @@ jobs:
       - name: Prepare SBOM files
         run: |
           mkdir -p ./powerauth-${{ matrix.app }}/docker/sbom
-          unzip -p ./powerauth-${{ matrix.app }}/target/powerauth-${{ matrix.app }}-*.jar WEB-INF/classes/META-INF/sbom/application.cdx.json > ./powerauth-${{ matrix.app }}/sbom/${{ matrix.app }}.cdx.json
+          unzip -p ./powerauth-${{ matrix.app }}/target/powerauth-${{ matrix.app }}-*.jar WEB-INF/classes/META-INF/sbom/application.cdx.json > ./powerauth-${{ matrix.app }}/docker/sbom/${{ matrix.app }}.cdx.json
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -152,7 +152,7 @@ jobs:
             digest=$(docker buildx imagetools inspect "$tag" --format "{{json .Manifest}}" | jq -r .digest | tr -d '\n')
             images+="${tag}@${digest} "
           done <<< "$TAGS"
-          cosign attest --key env://COSIGN_PRIVATE_KEY --predicate ./powerauth-${{ matrix.app }}/sbom/${{ matrix.app }}.cdx.json --type=cyclonedx ${images} | jq -r .signatures
+          cosign attest --key env://COSIGN_PRIVATE_KEY --predicate ./powerauth-${{ matrix.app }}/docker/sbom/${{ matrix.app }}.cdx.json --type=cyclonedx ${images} | jq -r .signatures
       - name: Sign images with a key
         if: ${{ inputs.push_to_registry == true || (github.ref == 'refs/heads/develop' && github.actor != 'dependabot[bot]' && github.event_name == 'push')}}
         env:
