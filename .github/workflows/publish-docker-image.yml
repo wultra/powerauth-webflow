@@ -120,10 +120,18 @@ jobs:
           password: ${{ secrets.DISTRIBUTION_PASSWORD }}
       - name: Set dynamic tags for image
         run: |
-          echo "TAGS=${{ vars.ACR_REGISTRY_URL != ''  && format('{0}/{1}', vars.ACR_REGISTRY_URL, env.IMAGE_NAME) || '' }} \
-                     ${{ vars.DISTRIBUTION_REGISTRY_URL != '' && format('{0}/{1}', vars.DISTRIBUTION_REGISTRY_URL, env.IMAGE_NAME) || '' }}" >> $GITHUB_ENV
-          echo "INIT_TAGS=${{ vars.ACR_REGISTRY_URL != ''  && format('{0}/{1}', vars.ACR_REGISTRY_URL, env.INIT_IMAGE_NAME) || '' }} \
-                          ${{ vars.DISTRIBUTION_REGISTRY_URL != '' && format('{0}/{1}', vars.DISTRIBUTION_REGISTRY_URL, env.INIT_IMAGE_NAME) || '' }}" >> $GITHUB_ENV
+          {
+            echo "TAGS<<EOF" 
+              echo "${{ vars.ACR_REGISTRY_URL != ''  && format('{0}/{1}', vars.ACR_REGISTRY_URL, env.IMAGE_NAME) || '' }}"
+              echo "${{ vars.DISTRIBUTION_REGISTRY_URL != '' && format('{0}/{1}', vars.DISTRIBUTION_REGISTRY_URL, env.IMAGE_NAME) || '' }}"
+            echo "EOF"
+          } >> $GITHUB_ENV
+          {
+           echo "INIT_TAGS<<EOF" 
+              echo "${{ vars.ACR_REGISTRY_URL != ''  && format('{0}/{1}', vars.ACR_REGISTRY_URL, env.INIT_IMAGE_NAME) || '' }}"
+              echo "${{ vars.DISTRIBUTION_REGISTRY_URL != '' && format('{0}/{1}', vars.DISTRIBUTION_REGISTRY_URL, env.INIT_IMAGE_NAME) || '' }}"
+            echo "EOF"
+          } >> $GITHUB_ENV
       - name: Build and push container image to registry
         uses: docker/build-push-action@v6
         with:
@@ -140,7 +148,7 @@ jobs:
           tags: ${{ env.INIT_TAGS }}
           file: ./powerauth-${{ matrix.app }}/docker-init/Dockerfile
           context: .
-      - name: Sign PAC images with a SBOM
+      - name: Sign images with a SBOM
         if: ${{ inputs.push_to_registry == true || (github.ref == 'refs/heads/develop' && github.actor != 'dependabot[bot]' && github.event_name == 'push')}}
         env:
           TAGS: ${{ env.TAGS }}
@@ -166,7 +174,7 @@ jobs:
             images+="${tag}@${digest} "
           done <<< "$INIT_TAGS"
           cosign sign --yes --key env://COSIGN_PRIVATE_KEY ${images}
-      - name: Verify attestation PAC images with a SBOM
+      - name: Verify attestation images with a SBOM
         if: ${{ inputs.push_to_registry == true || (github.ref == 'refs/heads/develop' && github.actor != 'dependabot[bot]' && github.event_name == 'push')}}
         env:
           TAGS: ${{ env.TAGS }}
