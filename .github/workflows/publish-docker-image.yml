@@ -122,14 +122,14 @@ jobs:
         run: |
           {
             echo "TAGS<<EOF" 
-              echo "${{ vars.ACR_REGISTRY_URL != ''  && format('{0}/{1}', vars.ACR_REGISTRY_URL, env.IMAGE_NAME) || '' }}"
-              echo "${{ vars.DISTRIBUTION_REGISTRY_URL != '' && format('{0}/{1}', vars.DISTRIBUTION_REGISTRY_URL, env.IMAGE_NAME) || '' }}"
+              printf '%s'  "${{ vars.ACR_REGISTRY_URL != ''  && format('{0}/{1}', vars.ACR_REGISTRY_URL, env.IMAGE_NAME) || '' }}"
+              printf '%s'  "${{ vars.DISTRIBUTION_REGISTRY_URL != '' && format('{0}/{1}', vars.DISTRIBUTION_REGISTRY_URL, env.IMAGE_NAME) || '' }}"
             echo "EOF"
           } >> $GITHUB_ENV
           {
            echo "INIT_TAGS<<EOF" 
-              echo "${{ vars.ACR_REGISTRY_URL != ''  && format('{0}/{1}', vars.ACR_REGISTRY_URL, env.INIT_IMAGE_NAME) || '' }}"
-              echo "${{ vars.DISTRIBUTION_REGISTRY_URL != '' && format('{0}/{1}', vars.DISTRIBUTION_REGISTRY_URL, env.INIT_IMAGE_NAME) || '' }}"
+              printf '%s'  "${{ vars.ACR_REGISTRY_URL != ''  && format('{0}/{1}', vars.ACR_REGISTRY_URL, env.INIT_IMAGE_NAME) || '' }}"
+              printf '%s'  "${{ vars.DISTRIBUTION_REGISTRY_URL != '' && format('{0}/{1}', vars.DISTRIBUTION_REGISTRY_URL, env.INIT_IMAGE_NAME) || '' }}"
             echo "EOF"
           } >> $GITHUB_ENV
       - name: Build and push container image to registry
