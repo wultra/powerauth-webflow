@@ -156,6 +156,9 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           while IFS= read -r tag; do
+            if [[ "$tag" == "" ]] ; then
+              continue
+            fi
             tag=$(echo "$tag" | tr -d '\n' | xargs)
             digest=$(docker buildx imagetools inspect "$tag" --format "{{json .Manifest}}" | jq -r .digest | tr -d '\n')
             images+="${tag}@${digest} "
@@ -169,6 +172,9 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           while IFS= read -r tag; do
+            if [[ "$tag" == "" ]] ; then
+              continue
+            fi
             tag=$(echo "$tag" | tr -d '\n' | xargs)
             digest=$(docker buildx imagetools inspect "$tag" --format "{{json .Manifest}}" | jq -r .digest | tr -d '\n')
             images+="${tag}@${digest} "
@@ -181,6 +187,9 @@ jobs:
           COSIGN_PUBLIC_KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
         run: |
           while IFS= read -r tag; do
+            if [[ "$tag" == "" ]] ; then
+              continue
+            fi
             tag=$(echo "$tag" | tr -d '\n' | xargs)
             digest=$(docker buildx imagetools inspect "$tag" --format "{{json .Manifest}}" | jq -r .digest | tr -d '\n')
             images+="${tag}@${digest} "
@@ -194,6 +203,9 @@ jobs:
           COSIGN_PUBLIC_KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
         run: |
           while IFS= read -r tag; do
+            if [[ "$tag" == "" ]] ; then
+              continue
+            fi
             tag=$(echo "$tag" | tr -d '\n' | xargs)
             digest=$(docker buildx imagetools inspect "$tag" --format "{{json .Manifest}}" | jq -r .digest | tr -d '\n')
             images+="${tag}@${digest} "
