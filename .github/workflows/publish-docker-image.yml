@@ -99,7 +99,7 @@ jobs:
       - name: Prepare SBOM files
         run: |
           mkdir -p ./powerauth-${{ matrix.app }}/docker/sbom
-          unzip -p ./powerauth-${{ matrix.app }}/target/powerauth-${{ matrix.app }}.war WEB-INF/classes/META-INF/sbom/application.cdx.json > ./powerauth-${{ matrix.app }}/sbom/${{ matrix.app }}.cdx.json
+          unzip -p ./powerauth-${{ matrix.app }}/target/powerauth-${{ matrix.app }}-*.jar WEB-INF/classes/META-INF/sbom/application.cdx.json > ./powerauth-${{ matrix.app }}/sbom/${{ matrix.app }}.cdx.json
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
