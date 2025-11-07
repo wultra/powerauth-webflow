@@ -1,4 +1,4 @@
-FROM liquibase:4.31.1-alpine
+FROM liquibase:4.33.0-alpine
 
 LABEL maintainer="Wultra <hello@wultra.com>"
 
