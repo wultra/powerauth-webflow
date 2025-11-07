@@ -8,3 +8,6 @@ ALTER TABLE ns_credential_storage ADD source VARCHAR(32) DEFAULT 'LOCAL';
 -- Changeset powerauth-nextstep/1.10.x/20250715-add-location-setting::2::Zdenek Cerny
 -- Add column target to ns_credential_storage
 ALTER TABLE ns_credential_storage ADD target VARCHAR(32) DEFAULT 'LOCAL';
+
+ALTER TABLE ns_credential_storage ADD external_reference VARCHAR(256);
+

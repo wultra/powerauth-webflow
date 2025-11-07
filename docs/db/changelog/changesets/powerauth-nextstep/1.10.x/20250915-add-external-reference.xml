@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="1" logicalFilePath="powerauth-nextstep/1.10.x/20250915-add-external-reference" author="Zdenek Cerny">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ns_credential_storage" columnName="external_reference"/>
+            </not>
+        </preConditions>
+        <comment>Add column external_reference to ns_credential_storage</comment>
+        <addColumn tableName="ns_credential_storage">
+            <column name="external_reference" type="varchar(256)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

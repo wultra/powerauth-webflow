@@ -6,5 +6,6 @@
 
     <include file="20250520-shedlock.xml" relativeToChangelogFile="true" />
     <include file="20250715-add-location-setting.xml" relativeToChangelogFile="true"/>
+    <include file="20250915-add-external-reference.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
