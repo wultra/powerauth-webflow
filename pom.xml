@@ -497,6 +497,7 @@
                             <publishingServerId>${env.server_id}</publishingServerId>
                             <autoPublish>true</autoPublish>
                             <waitUntil>published</waitUntil>
+                            <waitMaxTime>${env.wait_max_time}</waitMaxTime>
                         </configuration>
                     </plugin>
                 </plugins>
