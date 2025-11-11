@@ -476,6 +476,21 @@
             </activation>
             <properties>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>${env.server_id}</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
+                            <waitMaxTime>${env.wait_max_time}</waitMaxTime>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
             <distributionManagement>
                 <snapshotRepository>
                     <id>central-portal-snapshots-distribution</id>
