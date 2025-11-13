@@ -32,6 +32,11 @@
     <name>powerauth-webflow-resources</name>
     <description>PowerAuth WebFlow Resources</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -67,10 +72,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <properties>
-        <skipPublishing>true</skipPublishing>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
     
 </project>

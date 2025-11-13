@@ -32,6 +32,11 @@
     <name>powerauth-webflow-authentication</name>
     <description>PowerAuth WebFlow Authentication</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <!-- Spring Dependencies -->
         <dependency>
@@ -104,10 +109,5 @@
         </dependency>
 
     </dependencies>
-
-    <properties>
-        <skipPublishing>true</skipPublishing>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
 
 </project>

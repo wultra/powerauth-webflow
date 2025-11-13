@@ -30,6 +30,11 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -68,10 +73,5 @@
             </dependencies>
         </profile>
     </profiles>
-
-    <properties>
-        <skipPublishing>true</skipPublishing>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
 
 </project>

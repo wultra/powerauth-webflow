@@ -32,6 +32,11 @@
     <name>powerauth-webflow-authentication-approval-sca</name>
     <description>PowerAuth WebFlow Authentication Approval SCA</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.wultra.security</groupId>
@@ -42,10 +47,5 @@
             <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
     </dependencies>
-
-    <properties>
-        <skipPublishing>true</skipPublishing>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
 
 </project>

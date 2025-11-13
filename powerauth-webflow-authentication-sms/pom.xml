@@ -32,6 +32,11 @@
     <name>powerauth-webflow-authentication-sms</name>
     <description>PowerAuth WebFlow Authentication SMS</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.wultra.security</groupId>
@@ -46,10 +51,5 @@
             <artifactId>powerauth-data-adapter-client</artifactId>
         </dependency>
     </dependencies>
-
-    <properties>
-        <skipPublishing>true</skipPublishing>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
 
 </project>

@@ -32,6 +32,11 @@
     <name>powerauth-webflow-authentication-consent</name>
     <description>PowerAuth WebFlow Authentication Consent</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.wultra.security</groupId>
@@ -50,10 +55,5 @@
             <artifactId>owasp-java-html-sanitizer</artifactId>
         </dependency>
     </dependencies>
-
-    <properties>
-        <skipPublishing>true</skipPublishing>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
 
 </project>

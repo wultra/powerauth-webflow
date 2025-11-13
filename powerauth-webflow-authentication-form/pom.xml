@@ -32,6 +32,11 @@
     <name>powerauth-webflow-authentication-form</name>
     <description>PowerAuth WebFlow Authentication Form</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.wultra.security</groupId>
@@ -48,10 +53,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <properties>
-        <skipPublishing>true</skipPublishing>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
 
 </project>

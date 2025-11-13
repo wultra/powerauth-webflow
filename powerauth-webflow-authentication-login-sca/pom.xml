@@ -32,6 +32,11 @@
     <name>powerauth-webflow-authentication-login-sca</name>
     <description>PowerAuth WebFlow Authentication Login SCA</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.wultra.security</groupId>
@@ -46,10 +51,5 @@
             <artifactId>powerauth-java-crypto</artifactId>
         </dependency>
     </dependencies>
-
-    <properties>
-        <skipPublishing>true</skipPublishing>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
 
 </project>

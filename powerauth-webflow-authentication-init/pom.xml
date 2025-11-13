@@ -32,16 +32,16 @@
     <name>powerauth-webflow-authentication-init</name>
     <description>PowerAuth WebFlow Authentication Init</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.wultra.security</groupId>
             <artifactId>powerauth-webflow-authentication</artifactId>
         </dependency>
     </dependencies>
-
-    <properties>
-        <skipPublishing>true</skipPublishing>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
 
 </project>
