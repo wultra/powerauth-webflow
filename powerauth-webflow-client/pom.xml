@@ -161,6 +161,7 @@
             </activation>
             <properties>
                 <skipPublishing>true</skipPublishing>
+                <maven.deploy.skip>true</maven.deploy.skip>
             </properties>
         </profile>
     </profiles>
