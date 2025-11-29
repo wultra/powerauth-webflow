@@ -24,14 +24,9 @@ on:
       - 'main'
       - 'releases/*'
     paths:
-      - powerauth-nextstep/**
-      - docs/db/**
-  push:
-    branches:
-      - 'develop'
-    paths:
-      - powerauth-nextstep/**
-      - docs/db/**
+      - '**'
+      - '!docs/**'
+      - 'docs/db/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
