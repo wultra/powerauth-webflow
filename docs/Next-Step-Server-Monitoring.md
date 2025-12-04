@@ -32,7 +32,9 @@ management.health.probes.enabled=true          # enable both liveness and readin
 management.health.livenessState.enabled=true   # enable liveness only
 management.health.readinessState.enabled=true  # enable readiness only
 ```
+<!-- begin warning info -->
 Note: management.health.probes.enabled=true automatically enables both liveness and readiness endpoints. The other two can be used for fine-grained control if needed.
+<!-- end -->
 
 ## Metrics (Prometheus)
 
