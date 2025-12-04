@@ -43,7 +43,7 @@ Endpoints:
 - Prometheus format
   - `GET /powerauth-nextstep/actuator/prometheus`
 - Springboot JSON format
-- `GET /powerauth-nextstep/actuator/metrics`
+  - `GET /powerauth-nextstep/actuator/metrics`
 
 Configuration:
 
