@@ -28,8 +28,7 @@ import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.EndTo
 import com.wultra.security.powerauth.lib.nextstep.model.exception.EncryptionException;
 import com.wultra.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import com.wultra.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,9 +43,8 @@ import java.util.Base64;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Service
+@Slf4j
 public class EndToEndEncryptionService {
-
-    private final Logger logger = LoggerFactory.getLogger(EndToEndEncryptionService.class);
 
     private final NextStepServerConfiguration configuration;
 
@@ -103,6 +101,7 @@ public class EndToEndEncryptionService {
             final String ivBase64 = Base64.getEncoder().encodeToString(ivBytes);
             return ivBase64 + ":" + encryptedCredentialBase64;
         } catch (CryptoProviderException | InvalidKeyException | GenericCryptoException ex) {
+            logger.debug("Failed to encrypt credential value", ex);
             throw new EncryptionException(ex);
         }
     }
@@ -153,6 +152,7 @@ public class EndToEndEncryptionService {
             final byte[] decryptedBytes = aes.decrypt(encryptedBytes, iv, secretKey, cipherTransformation);
             return new String(decryptedBytes, StandardCharsets.UTF_8);
         } catch (CryptoProviderException | InvalidKeyException | GenericCryptoException ex) {
+            logger.debug("Failed to decrypt credential value", ex);
             throw new EncryptionException(ex);
         }
     }
