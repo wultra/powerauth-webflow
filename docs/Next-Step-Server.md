@@ -22,7 +22,7 @@ The container with Next Step Server application.
 
 ### SQL DB
 
-Required external service. SQL compatible database. PostgreSQL, Oracle and MS SQL in LTS releases are supported. 
+Required external service. SQL compatible database. PostgreSQL, Oracle and MS SQL in LTS releases are supported.
 
 ### Customer Systems
 
