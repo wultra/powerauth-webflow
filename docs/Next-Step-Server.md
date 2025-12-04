@@ -30,7 +30,7 @@ The external systems calling the REST API of NextStep Server. The integration is
 
 ### Next Step Server Init Container
 
-The Next Step can be optionally deployed with init container. Wultra supplies the init container containing Liquibase database update scripts. The usage of the init container allows better control of deployment and also separation of a database user for schema modification from a user for application runtime. If init container is not used the database scripts has to be executed during the deployment process.  
+The Next Step can be optionally deployed with init container. Wultra supplies the init container containing Liquibase database update scripts. The usage of the init container allows better control of deployment and also separation of a database user for schema modification from a user for application runtime.  
 
 ### Sidecar Container
 
