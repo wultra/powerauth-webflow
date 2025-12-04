@@ -36,7 +36,7 @@ The Next Step can be optionally deployed with init container. Wultra supplies th
 
 The NextStep can be accessed via a sidecar container for advanced ingress management. This depends on the specific deployment and is not provided by Wultra.
 
-### LDAP Server 
+### LDAP Server
 
 The Next Step can be configured to verify passwords in an external LDAP server.
 
