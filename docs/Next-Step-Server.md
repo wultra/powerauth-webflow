@@ -34,7 +34,7 @@ The Next Step can be optionally deployed with init container. Wultra supplies th
 
 ### Sidecar Container
 
-The NextStep can be accessed via a sidecar container for advanced ingress management. This depends on specific deployment it is not provided by Wultra.
+The NextStep can be accessed via a sidecar container for advanced ingress management. This depends on the specific deployment and is not provided by Wultra.
 
 ### LDAP Server 
 
