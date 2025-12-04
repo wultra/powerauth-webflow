@@ -38,7 +38,7 @@ The NextStep can be accessed via a sidecar container for advanced ingress manage
 
 ### LDAP Server 
 
-The Next Step can be configured to verify password in external LDAP server.
+The Next Step can be configured to verify passwords in an external LDAP server.
 
 ### Data Adapter Service
 
