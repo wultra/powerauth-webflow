@@ -97,6 +97,8 @@ OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod,region=eu-central-1
 
 # The logical service name for traces
 OTEL_SERVICE_NAME=next-step-server
+```
+
 ## Application Logging & Distributed Tracing
 
 The service produces structured application logs and participates in distributed tracing using the W3C Trace Context standard. Logs are written to standard output (stdout), which is suitable for containerized environments.
@@ -324,3 +326,36 @@ While the health endpoints themselves are not Prometheus metrics, they are part 
 to diagnose issues affecting Next Step’s availability and performance.
 
 ---
+
+### Log Volume & Severity
+
+In addition to raw logs in the central logging system, Next Step can expose **log event counters** as metrics. Monitoring the rate of log messages at different severity levels helps to detect problems early:
+
+- A rise in **ERROR** logs can indicate internal failures or bugs in the server.
+- A rise in **WARN** logs often indicates issues in **external systems** (downstream services, databases, message brokers) that are affecting Next Step, even if the server is still partially functioning.
+
+<!-- begin info -->
+Note: The exact metric names and availability depend on the logging metrics binder being enabled (e.g., Micrometer Logback metrics). The names below assume the standard Spring Boot + Micrometer + Logback setup.
+<!-- end -->
+
+**What to watch**
+
+- Number and rate of **ERROR** and **WARN** log events over time.
+- Sudden spikes in ERROR-level logs (potential incident).
+- Gradual or repeated increase in WARN-level logs, especially when correlated with external dependency problems (timeouts, connection issues, etc.).
+
+**Metrics produced by the server**
+
+Typical logging metrics:
+
+- `logback_events_total{level="ERROR"}`
+- `logback_events_total{level="WARN"}`
+
+Key signals:
+
+- A sustained increase in `logback_events_total{level="ERROR"}` indicates that the server is frequently encountering errors and may require immediate investigation.
+- An elevated or gradually increasing `logback_events_total{level="WARN"}` may indicate that some external component (external API, message broker) is unstable or misconfigured, and the server is compensating but not yet failing hard.
+- Large changes in the ratio of ERROR/WARN logs to INFO logs can be used as an additional early-warning indicator.
+
+These log-level metrics should be monitored together with other metrics to understand whether the problem is internal to the server or caused by external dependencies.
+
