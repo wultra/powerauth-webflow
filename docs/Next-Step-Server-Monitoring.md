@@ -76,15 +76,25 @@ Next Step can be monitored via other tools as well. Example configuration to ena
 2) Configure the following environment variables:
 
 ```properties
+# Java options to enable the OpenTelemetry agent (example for Tomcat)
 JAVA_OPTS=-javaagent:/app/config/opentelemetry-javaagent.jar -Dotel.jmx.target.system=tomcat
 
-OTEL_EXPORTER_OTLP_ENDPOINT
-OTEL_EXPORTER_OTLP_HEADERS
-OTEL_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_HEADERS
-OTEL_RESOURCE_ATTRIBUTES
-OTEL_SERVICE_NAME
-```
+# OpenTelemetry environment variables (with example values):
 
+# The OTLP endpoint to which traces/metrics are exported
+OTEL_EXPORTER_OTLP_ENDPOINT=https://otel-collector.example.com:4317
+
+# Optional: Custom headers for authentication or other purposes
+OTEL_EXPORTER_OTLP_HEADERS=Authorization=Bearer <token>
+
+# Optional: Comma-separated list of HTTP request headers to capture
+OTEL_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_HEADERS=x-request-id,x-b3-traceid
+
+# Resource attributes describing the service (e.g., environment, region)
+OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod,region=eu-central-1
+
+# The logical service name for traces
+OTEL_SERVICE_NAME=next-step-server
 ## Application Logging & Distributed Tracing
 
 The service produces structured application logs and participates in distributed tracing using the W3C Trace Context standard. Logs are written to standard output (stdout), which is suitable for containerized environments.
