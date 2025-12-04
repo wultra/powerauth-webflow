@@ -2,7 +2,7 @@
 
 Next Step Server resolves the Next Step of the authentication process, handles authentication using credentials and OTP authorization codes, and manages user identities.
 
-You can obtain the war file which can be deployed to a Java EE container in [releases](https://github.com/wultra/powerauth-webflow/releases), or use OCI compatible image stored on [Docker Hub](https://hub.docker.com/r/powerauth/nextstep/)
+You can obtain the war file which can be deployed to a Java EE container in [releases](https://github.com/wultra/powerauth-webflow/releases), or use an OCI compatible image stored on [Docker Hub](https://hub.docker.com/r/powerauth/nextstep/)
 
 ```sh
 docker pull powerauth/nextstep:latest
