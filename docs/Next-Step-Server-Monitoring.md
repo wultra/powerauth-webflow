@@ -25,7 +25,7 @@ The service exposes standard Spring Boot Actuator health endpoints for use by lo
 
 ### Configuration
 
-Set the following configuration properties (e.g., via environment variables or `application.yml`) to enable the respective probes:
+Set the following configuration properties (e.g., via environment variables or `application.properties`) to enable the respective probes:
 
 ```properties
 management.health.probes.enabled=true          # enable both liveness and readiness
