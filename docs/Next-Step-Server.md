@@ -14,7 +14,7 @@ Next step definitions need to be configured before deploying Next Step Server, s
 
 ## Next Step Architecture
 
-![Next Step Architecture Diagram](img/NextStep_Architecture.png)
+![Next Step Architecture Diagram](./img/NextStep_Architecture.png)
 
 ### Next Step Server Container
 
