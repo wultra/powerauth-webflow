@@ -106,7 +106,7 @@
         <logstash.version>8.1</logstash.version>
 
         <!--  Wultra dependencies  -->
-        <wultra-core.version>2.0.0-SNAPSHOT</wultra-core.version>
+        <wultra-core.version>2.0.0</wultra-core.version>
         <powerauth.version>2.0.0-SNAPSHOT</powerauth.version>
         <powerauth-crypto.version>2.0.0-SNAPSHOT</powerauth-crypto.version>
         <powerauth-push.version>2.0.0-SNAPSHOT</powerauth-push.version>
