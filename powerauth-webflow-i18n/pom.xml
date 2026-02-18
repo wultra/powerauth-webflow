@@ -20,16 +20,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>powerauth-webflow-i18n</name>
     <artifactId>powerauth-webflow-i18n</artifactId>
-    <groupId>io.getlime.security</groupId>
+    <name>powerauth-webflow-i18n</name>
     <description>PowerAuth Next Step Server</description>
 
     <parent>
-        <groupId>io.getlime.security</groupId>
+        <groupId>com.wultra.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>1.10.0-SNAPSHOT</version>
+        <version>2.0.0</version>
     </parent>
+
+    <properties>
+        <skipPublishing>true</skipPublishing>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -69,17 +73,5 @@
             </dependencies>
         </profile>
     </profiles>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

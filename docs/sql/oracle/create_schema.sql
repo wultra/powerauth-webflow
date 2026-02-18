@@ -362,6 +362,7 @@ CREATE TABLE ns_credential_storage (
   credential_definition_id         NUMBER(19,0) NOT NULL,                   -- Credential definition identifier.
   user_id                          VARCHAR2(256 CHAR) NOT NULL,             -- User identity identifier.
   type                             VARCHAR2(32 CHAR) NOT NULL,              -- Credential type: PERMANENT, TEMPORARY.
+  external_reference               VARCHAR2(256 CHAR),                      -- Optional reference to external credentials
   user_name                        VARCHAR2(256 CHAR),                      -- Username.
   value                            VARCHAR2(256 CHAR) NOT NULL,             -- Credential value.
   status                           VARCHAR2(32 CHAR) NOT NULL,              -- Credential status: ACTIVE, BLOCKED_TEMPORARY, BLOCKED_PERMANENT, REMOVED.
@@ -697,3 +698,14 @@ EXCEPTION WHEN OTHERS THEN IF SQLCODE != -955 THEN RAISE; END IF; END;
 -- ALTER TABLE ns_user_prefs ADD CONSTRAINT ns_user_prefs_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);
 -- ALTER TABLE ns_otp_storage ADD CONSTRAINT ns_otp_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);
 -- ALTER TABLE ns_authentication ADD CONSTRAINT ns_auth_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);
+
+-- Create a new table shedlock
+CREATE TABLE shedlock (name VARCHAR2(64) NOT NULL, lock_until TIMESTAMP NOT NULL, locked_at TIMESTAMP NOT NULL, locked_by VARCHAR2(255) NOT NULL, CONSTRAINT PK_SHEDLOCK PRIMARY KEY (name));
+
+-- Changeset powerauth-nextstep/1.10.x/20250715-add-location-setting::1::Zdenek Cerny
+-- Add column source to ns_credential_storage
+ALTER TABLE ns_credential_storage ADD source VARCHAR2(32) DEFAULT 'LOCAL';
+
+-- Changeset powerauth-nextstep/1.10.x/20250715-add-location-setting::2::Zdenek Cerny
+-- Add column target to ns_credential_storage
+ALTER TABLE ns_credential_storage ADD target VARCHAR2(32) DEFAULT 'LOCAL';

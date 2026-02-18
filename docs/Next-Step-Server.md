@@ -1,12 +1,48 @@
 # NextStep Server
 
-Next Step Server resolves the Next Step of the authentication process, handled authentication using credentials and OTP authorization codes, and manages user identities.
+Next Step Server resolves the Next Step of the authentication process, handles authentication using credentials and OTP authorization codes, and manages user identities.
 
-You can obtain the war file which can be deployed to a Java EE container in [releases](https://github.com/wultra/powerauth-webflow/releases).
+You can obtain the war file which can be deployed to a Java EE container in [releases](https://github.com/wultra/powerauth-webflow/releases), or use an OCI compatible image stored on [Docker Hub](https://hub.docker.com/r/powerauth/nextstep/)
+
+```sh
+docker pull powerauth/nextstep:latest
+```
 
 The configuration of Next Step Server is described in [Next Step Configuration](./Web-Flow-Configuration.md#next-step-server).
 
 Next step definitions need to be configured before deploying Next Step Server, see chapter [Configuring Next Step](Configuring-Next-Step.md).
+
+## Next Step Architecture
+
+![Next Step Architecture Diagram](./img/NextStep_Architecture.png)
+
+### Next Step Server Container
+
+The container with Next Step Server application.
+
+### SQL DB
+
+Required external service. SQL compatible database. PostgreSQL, Oracle and MS SQL in LTS releases are supported.
+
+### Customer Systems
+
+The external systems calling the REST API of NextStep Server. The integration is always unidirectional.
+
+### Next Step Server Init Container
+
+The Next Step can be optionally deployed with init container. Wultra supplies the init container containing Liquibase database update scripts. The usage of the init container allows better control of deployment and also separation of a database user for schema modification from a user for application runtime.  
+
+### Sidecar Container
+
+The NextStep can be accessed via a sidecar container for advanced ingress management. This depends on the specific deployment and is not provided by Wultra.
+
+### LDAP Server
+
+The Next Step can be configured to verify passwords in an external LDAP server.
+
+### Data Adapter Service
+
+See component [Data Adapter](./Data-Adapter.md). The Data Adapter provides optional connection to other 3rd party systems.
 
 ## Next Step Server functionality
 
@@ -68,3 +104,7 @@ Next Step Server implements following functionality:
 REST services are available for all Next Step functionality listed above.
 
 The Next Step Server functionality is described in details in [Next Step Server REST API Reference](./Next-Step-Server-REST-API-Reference.md).
+
+## Monitoring
+
+See [Monitoring guideline](Next-Step-Server-Monitoring.md) for detailed description how to monitor Next Step Server.

@@ -24,17 +24,22 @@
 
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <groupId>io.getlime.security</groupId>
-        <version>1.10.0-SNAPSHOT</version>
+        <groupId>com.wultra.security</groupId>
+        <version>2.0.0</version>
     </parent>
 
-    <name>powerauth-webflow-authentication-login-sca</name>
     <artifactId>powerauth-webflow-authentication-login-sca</artifactId>
-    <groupId>io.getlime.security</groupId>
+    <name>powerauth-webflow-authentication-login-sca</name>
+    <description>PowerAuth WebFlow Authentication Login SCA</description>
+
+    <properties>
+        <skipPublishing>true</skipPublishing>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.getlime.security</groupId>
+            <groupId>com.wultra.security</groupId>
             <artifactId>powerauth-webflow-authentication</artifactId>
         </dependency>
         <dependency>
@@ -42,21 +47,9 @@
             <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.getlime.security</groupId>
+            <groupId>com.wultra.security</groupId>
             <artifactId>powerauth-java-crypto</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

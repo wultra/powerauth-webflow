@@ -23,7 +23,7 @@
     "axios": "^1.6.8",
     "bluebird": "^3.7.2",
     "intl": "^1.2.5",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "react": "^16.14.0",
     "react-bootstrap": "^0.33.1",
     "react-bootstrap-icons": "^1.10.3",
@@ -38,11 +38,11 @@
     "redux-promise-middleware": "^4.4.2",
     "redux-thunk": "^2.3.0",
     "sanitize-html": "^2.13.0",
-    "snyk": "^1.1288.0",
+    "snyk": "^1.1300.1",
     "sockjs-client": "^1.6.1",
     "spin.js": "^2.3.2",
     "stompjs": "^2.3.3",
-    "webpack": "^5.91.0",
+    "webpack": "^5.105.2",
     "webpack-cli": "^5.1.4"
   },
   "scripts": {
