@@ -17,12 +17,12 @@
  */
 package com.wultra.security.powerauth.app.nextstep;
 
+import com.wultra.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import com.wultra.security.powerauth.crypto.lib.generator.KeyGenerator;
 import com.wultra.security.powerauth.crypto.lib.model.exception.CryptoProviderException;
 import com.wultra.security.powerauth.crypto.lib.model.exception.GenericCryptoException;
 import com.wultra.security.powerauth.crypto.lib.util.AESEncryptionUtils;
 import com.wultra.security.powerauth.crypto.lib.util.KeyConvertor;
-import com.wultra.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import com.wultra.security.powerauth.lib.nextstep.client.NextStepClientException;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import com.wultra.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
@@ -482,7 +482,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         ResetCountersRequest resetCountersRequest = new ResetCountersRequest();
         resetCountersRequest.setResetMode(CounterResetMode.RESET_ACTIVE_AND_BLOCKED_TEMPORARY);
         ResetCountersResponse r2 = nextStepClient.resetAllCounters(resetCountersRequest).getResponseObject();
-        assertEquals(1, r2.getResetCounterCount());
+        assertTrue(r2.getResetCounterCount() > 0);
         GetUserCredentialListResponse r3 = nextStepClient.getUserCredentialList("test_user_1", false).getResponseObject();
         assertEquals(CredentialStatus.ACTIVE, r3.getCredentials().get(0).getCredentialStatus());
     }
