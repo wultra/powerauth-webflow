@@ -102,7 +102,7 @@
         <swagger-annotations-jakarta.version>2.2.41</swagger-annotations-jakarta.version>
 
         <moneta.version>1.4.5</moneta.version>
-        <owasp-java-html-sanitizer.version>20240325.1</owasp-java-html-sanitizer.version>
+        <owasp-java-html-sanitizer.version>20260101.1</owasp-java-html-sanitizer.version>
         <logstash.version>8.1</logstash.version>
 
         <!--  Wultra dependencies  -->
@@ -110,7 +110,6 @@
         <powerauth.version>2.0.0</powerauth.version>
         <powerauth-crypto.version>2.0.1</powerauth-crypto.version>
         <powerauth-push.version>2.0.0</powerauth-push.version>
-
         <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
     </properties>
 
