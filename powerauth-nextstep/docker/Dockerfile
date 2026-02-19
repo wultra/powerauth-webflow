@@ -10,9 +10,16 @@ ENV APP_PATH="/app/powerauth-nextstep.war" \
 # Add PowerAuth user
 RUN groupadd -r powerauth && useradd -r -g powerauth -s /sbin/nologin powerauth
 
-RUN mkdir -p ${EXTLIB_PATH} \
+RUN apt-get -y update  \
+    && apt-get -y upgrade \
+    && apt-get -y install bash wget \
+    && mkdir -p ${EXTLIB_PATH} \
     && wget --no-verbose https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc11/${OJDBC_VERSION}/ojdbc11-${OJDBC_VERSION}.jar -O ${EXTLIB_PATH}/ojdbc11.jar \
-    && wget --no-verbose https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/${MSSQL_JDBC_VERSION}/mssql-jdbc-${MSSQL_JDBC_VERSION}.jar -O ${EXTLIB_PATH}/mssql-jdbc.jar
+    && wget --no-verbose https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/${MSSQL_JDBC_VERSION}/mssql-jdbc-${MSSQL_JDBC_VERSION}.jar -O ${EXTLIB_PATH}/mssql-jdbc.jar \
+# Uninstall packages which are no longer needed and clean apt caches
+    && apt-get -y remove wget gettext-base \
+    && apt-get -y purge --auto-remove \
+    && rm -rf /tmp/* /var/cache/apt/*
 
 # Deploy and run applications
 COPY powerauth-nextstep/target/powerauth-nextstep-*.war /app/powerauth-nextstep.war
