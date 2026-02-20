@@ -435,7 +435,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             // Convert mobile token mode to AllowedAuthCodeType object
             OperationConverter operationConverter = new OperationConverter();
             AllowedAuthCodeType allowedAuthCodeType = operationConverter.fromMobileTokenMode(operationConfig.getMobileTokenMode());
-            // Return whether biometry is allowed in offline mode based on signature type variants
+            // Return whether biometry is allowed in offline mode based on authentication code type variants
             return allowedAuthCodeType != null && allowedAuthCodeType.getVariants() != null
                     && allowedAuthCodeType.getVariants().contains(PowerAuthCodeType.POSSESSION_BIOMETRY.toString());
         }

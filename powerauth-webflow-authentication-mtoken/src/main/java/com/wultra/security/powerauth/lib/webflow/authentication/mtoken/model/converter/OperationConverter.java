@@ -45,7 +45,7 @@ public class OperationConverter {
      * @return Operation.
      */
     public Operation fromOperationDetailResponse(GetOperationDetailResponse input, String mobileTokenMode) {
-        if (input == null || mobileTokenMode == null) { // we also do not want to have null signature type
+        if (input == null || mobileTokenMode == null) { // we also do not want to have null authentication code type
             return null;
         }
         Operation result = new Operation();
@@ -60,9 +60,9 @@ public class OperationConverter {
     }
 
     /**
-     * Convert mobile token mode JSON string to allowed signature type class.
+     * Convert mobile token mode JSON string to allowed authentication code type class.
      * @param mobileTokenMode Mobile token mode JSON string.
-     * @return Allowed signature type class.
+     * @return Allowed authentication code type class.
      */
     public AllowedAuthCodeType fromMobileTokenMode(String mobileTokenMode) {
         AllowedAuthCodeType allowedAuthCodeType;

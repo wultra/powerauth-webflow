@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Enum with PowerAuth signature type values.
+ * Enum with PowerAuth authentication code type values.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  *

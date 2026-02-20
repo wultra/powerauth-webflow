@@ -391,11 +391,11 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     }
 
     /**
-     * Verify if provided PowerAuth signature type is allowed for operation with provided name.
+     * Verify if provided PowerAuth authentication code type is allowed for operation with provided name.
      *
      * @param operationName Operation name.
-     * @param authCodeType Authentication code type that was returned from signature verification.
-     * @return True if the signature type is allowed, false otherwise.
+     * @param authCodeType Authentication code type that was returned from authentication code verification.
+     * @return True if the authentication code type is allowed, false otherwise.
      */
     private boolean isAuthCodeTypeAllowedForOperation(String operationName, PowerAuthCodeType authCodeType)  {
 
@@ -413,7 +413,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         OperationConverter operationConverter = new OperationConverter();
         AllowedAuthCodeType allowedAuthCodeType = operationConverter.fromMobileTokenMode(operationConfig.getMobileTokenMode());
 
-        // Evaluate various signature types
+        // Evaluate various authentication code types
         if (allowedAuthCodeType != null) {
             switch (allowedAuthCodeType.getType()) {
                 case MULTIFACTOR_1FA -> {
