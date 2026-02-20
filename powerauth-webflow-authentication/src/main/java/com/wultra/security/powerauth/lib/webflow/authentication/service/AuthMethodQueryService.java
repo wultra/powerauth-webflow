@@ -21,7 +21,7 @@ import com.wultra.core.rest.model.base.response.ObjectResponse;
 import com.wultra.security.powerauth.client.model.entity.Activation;
 import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
-import com.wultra.security.powerauth.client.v3.PowerAuthClient;
+import com.wultra.security.powerauth.client.v4.PowerAuthClient;
 import com.wultra.security.powerauth.lib.nextstep.client.NextStepClient;
 import com.wultra.security.powerauth.lib.nextstep.client.NextStepClientException;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.AuthStep;

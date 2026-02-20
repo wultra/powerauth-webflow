@@ -18,7 +18,7 @@
 package com.wultra.security.powerauth.lib.webflow.authentication.mtoken.model.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wultra.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
+import com.wultra.security.powerauth.lib.mtoken.model.entity.AllowedAuthCodeType;
 import com.wultra.security.powerauth.lib.mtoken.model.entity.Operation;
 import com.wultra.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class OperationConverter {
         result.setData(input.getOperationData());
         result.setOperationCreated(input.getTimestampCreated());
         result.setOperationExpires(input.getTimestampExpires());
-        result.setAllowedSignatureType(fromMobileTokenMode(mobileTokenMode));
+        result.setAllowedAuthCodeType(fromMobileTokenMode(mobileTokenMode));
         result.setFormData(formDataConverter.fromOperationFormData(input.getFormData()));
         return result;
     }
@@ -64,14 +64,14 @@ public class OperationConverter {
      * @param mobileTokenMode Mobile token mode JSON string.
      * @return Allowed signature type class.
      */
-    public AllowedSignatureType fromMobileTokenMode(String mobileTokenMode) {
-        AllowedSignatureType allowedSignatureType;
+    public AllowedAuthCodeType fromMobileTokenMode(String mobileTokenMode) {
+        AllowedAuthCodeType allowedAuthCodeType;
         try {
-            allowedSignatureType = objectMapper.readValue(mobileTokenMode, AllowedSignatureType.class);
+            allowedAuthCodeType = objectMapper.readValue(mobileTokenMode, AllowedAuthCodeType.class);
         } catch (IOException e) {
             logger.error("Error while deserializing mobile token mode", e);
             return null;
         }
-        return allowedSignatureType;
+        return allowedAuthCodeType;
     }
 }

@@ -18,17 +18,17 @@
 package com.wultra.security.powerauth.app.nextstep.service;
 
 import com.wultra.core.audit.base.Audit;
-import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
-import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
-import com.wultra.security.powerauth.client.model.request.OperationCreateRequest;
-import com.wultra.security.powerauth.client.model.request.OperationDetailRequest;
-import com.wultra.security.powerauth.client.model.response.v3.GetActivationStatusResponse;
-import com.wultra.security.powerauth.client.model.response.v3.OperationDetailResponse;
-import com.wultra.security.powerauth.client.v3.PowerAuthClient;
 import com.wultra.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import com.wultra.security.powerauth.app.nextstep.converter.OperationConverter;
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
+import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
+import com.wultra.security.powerauth.client.model.request.OperationCreateRequest;
+import com.wultra.security.powerauth.client.model.request.OperationDetailRequest;
+import com.wultra.security.powerauth.client.model.response.v4.GetActivationStatusResponse;
+import com.wultra.security.powerauth.client.model.response.v4.OperationDetailResponse;
+import com.wultra.security.powerauth.client.v4.PowerAuthClient;
 import com.wultra.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import com.wultra.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import com.wultra.security.powerauth.lib.dataadapter.model.entity.OperationContext;

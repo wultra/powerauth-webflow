@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
-public class AllowedSignatureType {
+public class AllowedAuthCodeType {
 
     /**
      * Signature types.
@@ -59,7 +59,7 @@ public class AllowedSignatureType {
     /**
      * Default constructor.
      */
-    public AllowedSignatureType() {
+    public AllowedAuthCodeType() {
         this.variants = new ArrayList<>();
     }
 

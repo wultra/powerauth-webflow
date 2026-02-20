@@ -260,22 +260,22 @@ String signatureBaseString
 
 #### 3.4. Verifying Signature
 
-To verify signature, you need to call the REST method [`verifyOfflineSignature`](https://github.com/wultra/powerauth-server/blob/develop/docs/WebServices-Methods.md#method-verifyofflinesignature) providing:
+To verify signature, you need to call the REST method [`verifyOfflineAuthentication`](https://github.com/wultra/powerauth-server/blob/develop/docs/WebServices-Methods.md#method-verifyofflinesignature) providing:
 
 - `activationId` - identifier of the activation (to know which device is responsible for verification)
 - `data` (represented by `signatureBaseString` as obtained in 3.2.) - as data for verification
-- `signature` - value of the signature entered by the user (as obtained in 3.1., 2x8 digits)
+- `authCode` - value of the authentication code entered by the user (as obtained in 3.1., 2x8 digits)
 - `biometryAllowed` - whether biometry signature factor is allowed
 
 The method returns information about signature verification:
 
-- `signatureValid` You can use this value to determine if the signature verification was successful or not.
-- `activationStatus` - Activation status after this attempt of the signature validation.
+- `authenticationValid` You can use this value to determine if the authentication code verification was successful or not.
+- `activationStatus` - Activation status after this attempt of the authentication code verification.
 - `blockedReason` - In case the activation is blocked, this attribute contains additional info about the reason.
-- `activationId` - Activation ID used for validating the signature.
-- `userId` - User ID associated with the activation who authenticated to compute the signature.
-- `applicationId` - Application ID of the application that is associated with given activation ID and was used to compute the signature.
-- `signatureType` - Signature type that was used to compute the signature value.
-- `remainingAttempts` - How many attempts are remaining for the signature validation (single, activation related counter).
+- `activationId` - Activation ID used for validating the authentication code.
+- `userId` - User ID associated with the activation who authenticated to compute the authentication code.
+- `applicationId` - Application ID of the application that is associated with given activation ID and was used to compute the authentication code.
+- `authenticationCodeType` - Authentication code type that was used to compute the authentication code value.
+- `remainingAttempts` - How many attempts are remaining for the authentication code validation (single, activation related counter).
 
 See the REST method documentation for details.

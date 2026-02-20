@@ -24,8 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
-import com.wultra.security.powerauth.client.model.enumeration.OperationStatus;
-import com.wultra.security.powerauth.client.model.response.v3.OperationDetailResponse;
 import com.wultra.security.powerauth.app.nextstep.repository.AuthenticationRepository;
 import com.wultra.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import com.wultra.security.powerauth.app.nextstep.repository.OperationRepository;
@@ -34,6 +32,8 @@ import com.wultra.security.powerauth.app.nextstep.repository.catalogue.Repositor
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.*;
 import com.wultra.security.powerauth.app.nextstep.service.adapter.OperationCustomizationService;
 import com.wultra.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
+import com.wultra.security.powerauth.client.model.enumeration.OperationStatus;
+import com.wultra.security.powerauth.client.model.response.v4.OperationDetailResponse;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.EnableMobileTokenResult;

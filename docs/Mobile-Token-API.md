@@ -69,7 +69,7 @@ Get the list with all operations that are pending confirmation.
       "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "operationCreated": "2018-07-02T14:43:13+0000",
       "operationExpires": "2018-07-02T14:48:17+0000",
-      "allowedSignatureType": {
+      "allowedAuthCodeType": {
         "type": "2FA",
         "variants": [
           "possession_knowledge",

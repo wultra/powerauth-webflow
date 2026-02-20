@@ -25,7 +25,7 @@ import com.wultra.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import com.wultra.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import com.wultra.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import com.wultra.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.PowerAuthSignatureType;
+import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.PowerAuthCodeType;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.PAAuthenticationContext;
 import com.wultra.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import com.wultra.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -100,7 +100,7 @@ public class OperationCustomizationService {
                 try {
                     PAAuthenticationContext authenticationContextNS = objectMapper.readValue(authContext, PAAuthenticationContext.class);
                     authenticationContextDA = new com.wultra.security.powerauth.lib.dataadapter.model.entity.PAAuthenticationContext();
-                    authenticationContextDA.setSignatureType(PowerAuthSignatureType.getEnumFromString(authenticationContextNS.getSignatureType()));
+                    authenticationContextDA.setAuthCodeType(PowerAuthCodeType.getEnumFromString(authenticationContextNS.getAuthCodeType()));
                     authenticationContextDA.setRemainingAttempts(authenticationContextNS.getRemainingAttempts());
                     authenticationContextDA.setBlocked(authenticationContextNS.isBlocked());
                     break;
@@ -115,7 +115,7 @@ public class OperationCustomizationService {
             // PowerAuth authentication context is not present (e.g. operation was canceled before first PowerAuth authentication),
             authenticationContextDA = new com.wultra.security.powerauth.lib.dataadapter.model.entity.PAAuthenticationContext();
             authenticationContextDA.setBlocked(false);
-            authenticationContextDA.setSignatureType(null);
+            authenticationContextDA.setAuthCodeType(null);
             authenticationContextDA.setRemainingAttempts(null);
         }
         operationContext.setAuthenticationContext(authenticationContextDA);
