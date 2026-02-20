@@ -69,7 +69,7 @@ Get the list with all operations that are pending confirmation.
       "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "operationCreated": "2018-07-02T14:43:13+0000",
       "operationExpires": "2018-07-02T14:48:17+0000",
-      "allowedSignatureType": {
+      "allowedAuthCodeType": {
         "type": "2FA",
         "variants": [
           "possession_knowledge",
@@ -234,8 +234,8 @@ Reject an operation with given ID, with a provided reason.
 
 ### Allowed Signature Types
 
-| Type | Description |
-|---|---|
-| `1FA` | One-factor signature - user just has to tap "Confirm" button to confirm it. |
-| `2FA` | Two-factor signature - user needs to use either password of biometry as addition to possession factor. The `variants` key then determines what signature type is allowed for the given operation. |
-| `ECDSA` | ECDSA signature with device private key. |
+| Type    | Description                                                                                                                                                                                                 |
+|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `1FA`   | One-factor signature - user just has to tap "Confirm" button to confirm it.                                                                                                                                 |
+| `2FA`   | Two-factor signature - user needs to use either password of biometry as addition to possession factor. The `variants` key then determines what authentication code type is allowed for the given operation. |
+| `ECDSA` | ECDSA signature with device private key.                                                                                                                                                                    |

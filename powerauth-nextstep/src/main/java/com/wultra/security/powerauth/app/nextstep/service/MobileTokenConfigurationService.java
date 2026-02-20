@@ -18,12 +18,12 @@
 package com.wultra.security.powerauth.app.nextstep.service;
 
 import com.wultra.core.audit.base.Audit;
-import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
-import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
-import com.wultra.security.powerauth.client.model.response.v3.GetActivationStatusResponse;
-import com.wultra.security.powerauth.client.v3.PowerAuthClient;
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import com.wultra.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
+import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
+import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
+import com.wultra.security.powerauth.client.model.response.v4.GetActivationStatusResponse;
+import com.wultra.security.powerauth.client.v4.PowerAuthClient;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.EnableMobileTokenResult;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import com.wultra.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;

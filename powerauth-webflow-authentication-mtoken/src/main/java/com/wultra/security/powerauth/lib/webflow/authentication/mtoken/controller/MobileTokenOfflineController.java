@@ -19,15 +19,15 @@
 package com.wultra.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
 import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
-import com.wultra.security.powerauth.client.model.enumeration.v3.SignatureType;
+import com.wultra.security.powerauth.client.model.enumeration.v4.AuthenticationCodeType;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
-import com.wultra.security.powerauth.client.model.response.v3.CreatePersonalizedOfflineSignaturePayloadResponse;
-import com.wultra.security.powerauth.client.model.response.v3.GetActivationStatusResponse;
-import com.wultra.security.powerauth.client.model.response.v3.VerifyOfflineSignatureResponse;
-import com.wultra.security.powerauth.client.v3.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.response.v4.CreatePersonalizedOfflineAuthPayloadResponse;
+import com.wultra.security.powerauth.client.model.response.v4.GetActivationStatusResponse;
+import com.wultra.security.powerauth.client.model.response.v4.VerifyOfflineAuthenticationResponse;
+import com.wultra.security.powerauth.client.v4.PowerAuthClient;
 import com.wultra.security.powerauth.http.PowerAuthHttpBody;
-import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.PowerAuthSignatureType;
-import com.wultra.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
+import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.PowerAuthCodeType;
+import com.wultra.security.powerauth.lib.mtoken.model.entity.AllowedAuthCodeType;
 import com.wultra.security.powerauth.lib.nextstep.client.NextStepClientException;
 import com.wultra.security.powerauth.lib.nextstep.model.converter.OperationTextNormalizer;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -142,23 +142,23 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         String signatureBaseString = PowerAuthHttpBody.getAuthenticationBaseString("POST", "/operation/authorize/offline", Base64.getDecoder().decode(nonce), data.getBytes());
         // determine whether biometry is allowed in offline mode
         boolean biometryAllowed = isBiometryAllowedInOfflineMode(operationName);
-        VerifyOfflineSignatureResponse signatureResponse;
+        VerifyOfflineAuthenticationResponse signatureResponse;
         try {
-            signatureResponse = powerAuthClient.verifyOfflineSignature(request.getActivationId(), signatureBaseString, request.getAuthCode(), biometryAllowed);
+            signatureResponse = powerAuthClient.verifyOfflineAuthentication(request.getActivationId(), signatureBaseString, request.getAuthCode(), biometryAllowed);
         } catch (PowerAuthClientException ex) {
             logger.warn(ex.getMessage(), ex);
             throw new OfflineModeInvalidAuthCodeException("Offline signature verification failed, reason: " + ex.getMessage());
         }
         PAAuthenticationContext authenticationContext = new PAAuthenticationContext();
         authenticationContext.setBlocked(signatureResponse.getActivationStatus() == ActivationStatus.BLOCKED);
-        authenticationContext.setSignatureType(signatureResponse.getSignatureType() != null ? signatureResponse.getSignatureType().toString().toLowerCase() : null);
+        authenticationContext.setAuthCodeType(signatureResponse.getAuthenticationCodeType() != null ? signatureResponse.getAuthenticationCodeType().toString().toLowerCase() : null);
         authenticationContext.setRemainingAttempts(signatureResponse.getRemainingAttempts() != null ? signatureResponse.getRemainingAttempts().intValue() : null);
 
-        if (signatureResponse.isSignatureValid()) {
+        if (signatureResponse.isAuthenticationValid()) {
             String userId = operation.getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
-                SignatureType signatureType = SignatureType.enumFromString(signatureResponse.getSignatureType().toString());
-                boolean approvalSucceeded = powerAuthOperationService.approveOperation(operation, signatureResponse.getActivationId(), signatureType);
+                AuthenticationCodeType authCodeType = AuthenticationCodeType.enumFromString(signatureResponse.getAuthenticationCodeType().toString());
+                boolean approvalSucceeded = powerAuthOperationService.approveOperation(operation, signatureResponse.getActivationId(), authCodeType);
                 if (!approvalSucceeded) {
                     throw new OperationIsAlreadyFailedException("Operation approval has failed");
                 }
@@ -412,9 +412,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         // Construct offline signature data payload as {OPERATION_ID}\n{TITLE}\n{MESSAGE}\n{OPERATION_DATA}\n{FLAGS}
         String data = operationId+"\n"+title+"\n"+message+"\n"+operationData+"\n"+flags;
 
-        CreatePersonalizedOfflineSignaturePayloadResponse response;
+        CreatePersonalizedOfflineAuthPayloadResponse response;
         try {
-            response = powerAuthClient.createPersonalizedOfflineSignaturePayload(activation.getActivationId(), data);
+            response = powerAuthClient.createPersonalizedOfflineAuthPayload(activation.getActivationId(), data);
         } catch (PowerAuthClientException ex) {
             logger.warn(ex.getMessage(), ex);
             throw new OfflineModeInvalidDataException("Could not generate QR code");
@@ -432,12 +432,12 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
     private boolean isBiometryAllowedInOfflineMode(String operationName) throws AuthStepException {
         GetOperationConfigDetailResponse operationConfig = getOperationConfig(operationName);
         if (operationConfig != null) {
-            // Convert mobile token mode to AllowedSignatureType object
+            // Convert mobile token mode to AllowedAuthCodeType object
             OperationConverter operationConverter = new OperationConverter();
-            AllowedSignatureType allowedSignatureType = operationConverter.fromMobileTokenMode(operationConfig.getMobileTokenMode());
-            // Return whether biometry is allowed in offline mode based on signature type variants
-            return allowedSignatureType != null && allowedSignatureType.getVariants() != null
-                    && allowedSignatureType.getVariants().contains(PowerAuthSignatureType.POSSESSION_BIOMETRY.toString());
+            AllowedAuthCodeType allowedAuthCodeType = operationConverter.fromMobileTokenMode(operationConfig.getMobileTokenMode());
+            // Return whether biometry is allowed in offline mode based on authentication code type variants
+            return allowedAuthCodeType != null && allowedAuthCodeType.getVariants() != null
+                    && allowedAuthCodeType.getVariants().contains(PowerAuthCodeType.POSSESSION_BIOMETRY.toString());
         }
         return false;
     }

@@ -28,7 +28,7 @@ import lombok.Data;
 @Data
 public class PAAuthenticationContext {
 
-    private String signatureType;
+    private String authCodeType;
     @PositiveOrZero
     private Integer remainingAttempts;
     private boolean blocked;

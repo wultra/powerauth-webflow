@@ -21,9 +21,7 @@ import com.wultra.core.rest.client.base.RestClientConfiguration;
 import com.wultra.push.client.PushServerClient;
 import com.wultra.push.client.PushServerClientException;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
-import com.wultra.security.powerauth.client.v3.PowerAuthClient;
 import com.wultra.security.powerauth.rest.client.PowerAuthRestClientConfiguration;
-import com.wultra.security.powerauth.rest.client.v3.PowerAuthRestClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -61,18 +59,34 @@ public class PowerAuthWebServiceConfiguration {
     private boolean acceptInvalidSslCertificate;
 
     /**
-     * Initialize PowerAuth REST client.
-     * @return PowerAuth REST client.
+     * Initialize PowerAuth REST client (V4).
+     * @return PowerAuth REST client (V4).
      */
     @Bean
-    public PowerAuthClient powerAuthClient() throws PowerAuthClientException {
+    public com.wultra.security.powerauth.client.v4.PowerAuthClient powerAuthClientV4() throws PowerAuthClientException {
         final PowerAuthRestClientConfiguration config = new PowerAuthRestClientConfiguration();
         config.setPowerAuthClientToken(clientToken);
         config.setPowerAuthClientSecret(clientSecret);
         config.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
         config.setResponseTimeout(powerAuthServiceTimeout);
         config.setMaxIdleTime(powerAuthServiceMaxIdleTime);
-        return new PowerAuthRestClient(powerAuthRestUrl, config);
+        return new com.wultra.security.powerauth.rest.client.v4.PowerAuthRestClient(powerAuthRestUrl, config);
+    }
+
+    /**
+     * Initialize PowerAuth REST client (V3).
+     * @return PowerAuth REST client (V3).
+     */
+    @Bean
+    public com.wultra.security.powerauth.client.v3.PowerAuthClient powerAuthClientV3() throws PowerAuthClientException {
+        // Temporary workaround for https://github.com/wultra/powerauth-restful-integration/issues/678
+        final PowerAuthRestClientConfiguration config = new PowerAuthRestClientConfiguration();
+        config.setPowerAuthClientToken(clientToken);
+        config.setPowerAuthClientSecret(clientSecret);
+        config.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
+        config.setResponseTimeout(powerAuthServiceTimeout);
+        config.setMaxIdleTime(powerAuthServiceMaxIdleTime);
+        return new com.wultra.security.powerauth.rest.client.v3.PowerAuthRestClient(powerAuthRestUrl, config);
     }
 
     /**

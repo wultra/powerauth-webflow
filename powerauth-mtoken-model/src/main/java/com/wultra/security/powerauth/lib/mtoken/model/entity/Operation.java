@@ -31,7 +31,7 @@ public class Operation {
     private String data;
     private Date operationCreated;
     private Date operationExpires;
-    private AllowedSignatureType allowedSignatureType;
+    private AllowedAuthCodeType allowedAuthCodeType;
     private FormData formData;
 
     /**
@@ -116,19 +116,19 @@ public class Operation {
     }
 
     /**
-     * Get allowed signature type.
-     * @return Allowed signature type.
+     * Get allowed authentication code type.
+     * @return Allowed authentication code type.
      */
-    public AllowedSignatureType getAllowedSignatureType() {
-        return allowedSignatureType;
+    public AllowedAuthCodeType getAllowedAuthCodeType() {
+        return allowedAuthCodeType;
     }
 
     /**
-     * Set allowed signature type.
-     * @param allowedSignatureType Allowed signature type.
+     * Set allowed authentication code type.
+     * @param allowedAuthCodeType Allowed authentication code type.
      */
-    public void setAllowedSignatureType(AllowedSignatureType allowedSignatureType) {
-        this.allowedSignatureType = allowedSignatureType;
+    public void setAllowedAuthCodeType(AllowedAuthCodeType allowedAuthCodeType) {
+        this.allowedAuthCodeType = allowedAuthCodeType;
     }
 
     /**
