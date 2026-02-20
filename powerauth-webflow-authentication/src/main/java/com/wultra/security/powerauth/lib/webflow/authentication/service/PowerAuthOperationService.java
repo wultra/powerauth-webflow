@@ -20,17 +20,17 @@ package com.wultra.security.powerauth.lib.webflow.authentication.service;
 import com.wultra.security.powerauth.client.model.enumeration.ActivationStatus;
 import com.wultra.security.powerauth.client.model.enumeration.OperationStatus;
 import com.wultra.security.powerauth.client.model.enumeration.UserActionResult;
-import com.wultra.security.powerauth.client.model.enumeration.v3.SignatureType;
+import com.wultra.security.powerauth.client.model.enumeration.v4.AuthenticationCodeType;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.client.model.request.OperationCancelRequest;
 import com.wultra.security.powerauth.client.model.request.OperationDetailRequest;
 import com.wultra.security.powerauth.client.model.request.OperationFailApprovalRequest;
 import com.wultra.security.powerauth.client.model.request.OperationRejectRequest;
-import com.wultra.security.powerauth.client.model.request.v3.OperationApproveRequest;
-import com.wultra.security.powerauth.client.model.response.v3.GetActivationStatusResponse;
-import com.wultra.security.powerauth.client.model.response.v3.OperationDetailResponse;
-import com.wultra.security.powerauth.client.model.response.v3.OperationUserActionResponse;
-import com.wultra.security.powerauth.client.v3.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.request.v4.OperationApproveRequest;
+import com.wultra.security.powerauth.client.model.response.v4.GetActivationStatusResponse;
+import com.wultra.security.powerauth.client.model.response.v4.OperationDetailResponse;
+import com.wultra.security.powerauth.client.model.response.v4.OperationUserActionResponse;
+import com.wultra.security.powerauth.client.v4.PowerAuthClient;
 import com.wultra.security.powerauth.lib.nextstep.client.NextStepClient;
 import com.wultra.security.powerauth.lib.nextstep.client.NextStepClientException;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.OperationHistory;
@@ -82,10 +82,10 @@ public class PowerAuthOperationService {
      * Approve a PowerAuth operation.
      * @param operation Operation detail.
      * @param activationId Activation ID.
-     * @param signatureType Used signature type.
+     * @param authCodeType Used authentication code type.
      * @return Whether approval succeeded.
      */
-    public boolean approveOperation(GetOperationDetailResponse operation, String activationId, SignatureType signatureType) {
+    public boolean approveOperation(GetOperationDetailResponse operation, String activationId, AuthenticationCodeType authCodeType) {
         boolean operationEnabled = configuration.isPowerAuthOperationSupportEnabled();
         if (!operationEnabled) {
             return true;
@@ -114,7 +114,7 @@ public class PowerAuthOperationService {
             request.setUserId(operation.getUserId());
             request.setApplicationId(status.getApplicationId());
             request.setData(operation.getOperationData());
-            request.setSignatureType(signatureType);
+            request.setAuthenticationCodeType(authCodeType);
 
             // Approve operation in PowerAuth server
             OperationUserActionResponse paResponse = powerAuthClient.operationApprove(request);

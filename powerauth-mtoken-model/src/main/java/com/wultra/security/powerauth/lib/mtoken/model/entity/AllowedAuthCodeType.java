@@ -28,10 +28,10 @@ import java.util.List;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
-public class AllowedSignatureType {
+public class AllowedAuthCodeType {
 
     /**
-     * Signature types.
+     * Authentication code types.
      */
     public enum Type {
         @JsonProperty("1FA")
@@ -59,21 +59,21 @@ public class AllowedSignatureType {
     /**
      * Default constructor.
      */
-    public AllowedSignatureType() {
+    public AllowedAuthCodeType() {
         this.variants = new ArrayList<>();
     }
 
     /**
-     * Get signature type.
-     * @return Signature type.
+     * Get the authentication code type.
+     * @return Authentication code type.
      */
     public Type getType() {
         return type;
     }
 
     /**
-     * Set signature type.
-     * @param type Signature type.
+     * Set the authentication code type.
+     * @param type Authentication code type.
      */
     public void setType(Type type) {
         this.type = type;

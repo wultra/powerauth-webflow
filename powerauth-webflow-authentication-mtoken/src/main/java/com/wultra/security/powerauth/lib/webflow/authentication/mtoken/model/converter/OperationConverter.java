@@ -18,7 +18,7 @@
 package com.wultra.security.powerauth.lib.webflow.authentication.mtoken.model.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wultra.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
+import com.wultra.security.powerauth.lib.mtoken.model.entity.AllowedAuthCodeType;
 import com.wultra.security.powerauth.lib.mtoken.model.entity.Operation;
 import com.wultra.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class OperationConverter {
      * @return Operation.
      */
     public Operation fromOperationDetailResponse(GetOperationDetailResponse input, String mobileTokenMode) {
-        if (input == null || mobileTokenMode == null) { // we also do not want to have null signature type
+        if (input == null || mobileTokenMode == null) { // we also do not want to have null authentication code type
             return null;
         }
         Operation result = new Operation();
@@ -54,24 +54,24 @@ public class OperationConverter {
         result.setData(input.getOperationData());
         result.setOperationCreated(input.getTimestampCreated());
         result.setOperationExpires(input.getTimestampExpires());
-        result.setAllowedSignatureType(fromMobileTokenMode(mobileTokenMode));
+        result.setAllowedAuthCodeType(fromMobileTokenMode(mobileTokenMode));
         result.setFormData(formDataConverter.fromOperationFormData(input.getFormData()));
         return result;
     }
 
     /**
-     * Convert mobile token mode JSON string to allowed signature type class.
+     * Convert mobile token mode JSON string to allowed authentication code type class.
      * @param mobileTokenMode Mobile token mode JSON string.
-     * @return Allowed signature type class.
+     * @return Allowed authentication code type class.
      */
-    public AllowedSignatureType fromMobileTokenMode(String mobileTokenMode) {
-        AllowedSignatureType allowedSignatureType;
+    public AllowedAuthCodeType fromMobileTokenMode(String mobileTokenMode) {
+        AllowedAuthCodeType allowedAuthCodeType;
         try {
-            allowedSignatureType = objectMapper.readValue(mobileTokenMode, AllowedSignatureType.class);
+            allowedAuthCodeType = objectMapper.readValue(mobileTokenMode, AllowedAuthCodeType.class);
         } catch (IOException e) {
             logger.error("Error while deserializing mobile token mode", e);
             return null;
         }
-        return allowedSignatureType;
+        return allowedAuthCodeType;
     }
 }
