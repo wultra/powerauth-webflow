@@ -63,7 +63,7 @@
         <dependency>
             <groupId>com.wultra.security</groupId>
             <artifactId>powerauth-restful-security-spring</artifactId>
-            <version>${powerauth.version}</version>
+            <version>${powerauth-rest.version}</version>
         </dependency>
         <dependency>
             <groupId>com.wultra.security</groupId>
