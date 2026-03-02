@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.lib.dataadapter.model.entity;
 
-import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.PowerAuthSignatureType;
+import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.PowerAuthCodeType;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
@@ -29,7 +29,7 @@ import lombok.Data;
 @Data
 public class PAAuthenticationContext {
 
-    private PowerAuthSignatureType signatureType;
+    private PowerAuthCodeType authCodeType;
     @PositiveOrZero
     private Integer remainingAttempts;
     private boolean blocked;
