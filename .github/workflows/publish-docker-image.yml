@@ -3,14 +3,14 @@ name: Build and Publish docker image
 on:
   workflow_dispatch:
     inputs:
-      push_to_registry:
-        type: boolean
-        default: false
-        description: Publish to registry?
       environment:
         type: environment
         default: docker-internal
         description: Select the environment
+      push_to_registry:
+        type: boolean
+        default: false
+        description: Publish to registry?
       products_to_build:
         description: Array of product names for which build will be done.
         type: string
@@ -38,4 +38,4 @@ jobs:
     with:
       environment: ${{ inputs.environment }}
       push_to_registry: ${{ inputs.push_to_registry }}
-      products_to_build_and_push: ${{ inputs.products_to_build_and_push }} || '["nextstep"]'
+      products_to_build_and_push: ${{ inputs.products_to_build_and_push || '["nextstep"]' }}
