@@ -107,9 +107,10 @@
 
         <!--  Wultra dependencies  -->
         <wultra-core.version>2.0.0</wultra-core.version>
-        <powerauth.version>2.0.0</powerauth.version>
+        <powerauth.version>2.0.1</powerauth.version>
+        <powerauth-rest.version>2.0.0</powerauth-rest.version>
         <powerauth-crypto.version>2.0.1</powerauth-crypto.version>
-        <powerauth-push.version>2.0.0</powerauth-push.version>
+        <powerauth-push.version>2.0.1</powerauth-push.version>
         <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
     </properties>
 
