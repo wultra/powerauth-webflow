@@ -95,7 +95,7 @@
         <zxing.version>3.5.4</zxing.version>
         <passay.version>1.6.6</passay.version>
         <shedlock.version>7.6.0</shedlock.version>
-        <central.publishing.plugin.version>0.9.0</central.publishing.plugin.version>
+        <central.publishing.plugin.version>0.10.0</central.publishing.plugin.version>
 
         <!-- Documentation Dependencies -->
         <springdoc-openapi-starter-webmvc-ui.version>2.8.14</springdoc-openapi-starter-webmvc-ui.version>
