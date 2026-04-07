@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="1" author="Pavel Sindelar" logicalFilePath="powerauth-tpp-engine/2.1.x/20260407-add-subject-id-to-audit-log.xml">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="audit_log" columnName="subject_id"/>
+            </not>
+        </preConditions>
+        <comment>Add column subject_id to audit_log</comment>
+        <addColumn tableName="audit_log">
+            <column name="subject_id" type="varchar(256)"/>
+        </addColumn>
+        <!-- no rollback on purpose, the audit tables may be shared across several components -->
+        <rollback />
+    </changeSet>
+
+    <changeSet id="2" author="Pavel Sindelar" logicalFilePath="powerauth-tpp-engine/2.1.x/20260407-add-subject-id-to-audit-log.xml">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="audit_log" indexName="audit_log_subject_id_idx"/>
+            </not>
+        </preConditions>
+        <comment>Create index on audit_log(subject_id)</comment>
+        <createIndex tableName="audit_log" indexName="audit_log_subject_id_idx">
+            <column name="subject_id"/>
+        </createIndex>
+        <!-- no rollback on purpose, the audit tables may be shared across several components -->
+        <rollback />
+    </changeSet>
+
+</databaseChangeLog>

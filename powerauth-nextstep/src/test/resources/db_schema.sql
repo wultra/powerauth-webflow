@@ -12,6 +12,7 @@ CREATE TABLE audit_log (
     application_name   VARCHAR(256) NOT NULL,
     audit_level        VARCHAR(32) NOT NULL,
     audit_type         VARCHAR(256),
+    subject_id         VARCHAR(256),
     timestamp_created  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     message            TEXT NOT NULL,
     exception_message  TEXT,
@@ -40,6 +41,7 @@ CREATE INDEX audit_log_timestamp ON audit_log (timestamp_created);
 CREATE INDEX audit_log_application ON audit_log (application_name);
 CREATE INDEX audit_log_level ON audit_log (audit_level);
 CREATE INDEX audit_log_type ON audit_log (audit_type);
+CREATE INDEX audit_log_subject ON audit_log (subject_id);
 CREATE INDEX audit_param_log ON audit_param (audit_log_id);
 CREATE INDEX audit_param_timestamp ON audit_param (timestamp_created);
 CREATE INDEX audit_param_key ON audit_param (param_key);
