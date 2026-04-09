@@ -2,6 +2,7 @@
 
 This page contains PowerAuth Web Flow migration instructions.
 
+- [PowerAuth Web Flow 2.1.0](./Web-Flow-2.1.0.md)
 - [PowerAuth Web Flow 2.0.0](./Web-Flow-2.0.0.md)
 - [PowerAuth Web Flow 1.10.0](./Web-Flow-1.10.0.md)
 - [PowerAuth Web Flow 1.9.0](./Web-Flow-1.9.0.md)

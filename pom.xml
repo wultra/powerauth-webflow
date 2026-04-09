@@ -8,7 +8,7 @@
 
     <groupId>com.wultra.security</groupId>
     <artifactId>powerauth-webflow-parent</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -106,7 +106,7 @@
         <logstash.version>8.1</logstash.version>
 
         <!--  Wultra dependencies  -->
-        <wultra-core.version>2.0.0</wultra-core.version>
+        <wultra-core.version>2.1.0</wultra-core.version>
         <powerauth.version>2.0.1</powerauth.version>
         <powerauth-rest.version>2.0.0</powerauth-rest.version>
         <powerauth-crypto.version>2.0.1</powerauth-crypto.version>
