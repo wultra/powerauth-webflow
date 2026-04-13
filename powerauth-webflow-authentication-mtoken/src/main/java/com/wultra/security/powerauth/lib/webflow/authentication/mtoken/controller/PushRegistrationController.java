@@ -89,8 +89,7 @@ public class PushRegistrationController {
     @PowerAuthToken(authenticationCodeType = {
             PowerAuthCodeType.POSSESSION,
             PowerAuthCodeType.POSSESSION_BIOMETRY,
-            PowerAuthCodeType.POSSESSION_KNOWLEDGE,
-            PowerAuthCodeType.POSSESSION_KNOWLEDGE_BIOMETRY
+            PowerAuthCodeType.POSSESSION_KNOWLEDGE
     })
     public @ResponseBody Response registerDeviceToken(@RequestBody ObjectRequest<PushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, MobileAppApiException {
         return registerDeviceImpl(request, apiAuthentication);
@@ -108,8 +107,7 @@ public class PushRegistrationController {
     @PowerAuthToken(authenticationCodeType = {
             PowerAuthCodeType.POSSESSION,
             PowerAuthCodeType.POSSESSION_BIOMETRY,
-            PowerAuthCodeType.POSSESSION_KNOWLEDGE,
-            PowerAuthCodeType.POSSESSION_KNOWLEDGE_BIOMETRY
+            PowerAuthCodeType.POSSESSION_KNOWLEDGE
     })
     public @ResponseBody Response registerDeviceDefault(@RequestBody ObjectRequest<PushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, MobileAppApiException {
         return registerDeviceImpl(request, apiAuthentication);

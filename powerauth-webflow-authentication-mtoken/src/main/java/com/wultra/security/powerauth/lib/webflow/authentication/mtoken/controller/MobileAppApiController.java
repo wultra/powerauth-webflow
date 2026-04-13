@@ -150,8 +150,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     @PowerAuthToken(authenticationCodeType = {
             PowerAuthCodeType.POSSESSION,
             PowerAuthCodeType.POSSESSION_BIOMETRY,
-            PowerAuthCodeType.POSSESSION_KNOWLEDGE,
-            PowerAuthCodeType.POSSESSION_KNOWLEDGE_BIOMETRY
+            PowerAuthCodeType.POSSESSION_KNOWLEDGE
     })
     public @ResponseBody ObjectResponse<OperationListResponse> getOperationListTokens(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
         return getOperationListImpl(apiAuthentication);
