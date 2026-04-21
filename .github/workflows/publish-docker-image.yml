@@ -64,7 +64,7 @@ jobs:
       COSIGN_PUBLIC_KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
     strategy:
       matrix:
-        app: ${{ fromJSON(github.event.inputs.products_to_build || '["powerauth-nextstep"]') }}
+        app: ${{ fromJSON(github.event.inputs.products_to_build || '["nextstep"]') }}
     steps:
       - uses: actions/checkout@v6
 
