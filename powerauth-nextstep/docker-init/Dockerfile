@@ -5,7 +5,7 @@ LABEL maintainer="Wultra <hello@wultra.com>"
 ENV MSSQL_JDBC_VERSION="13.2.1.jre11" \
     JDBC_DRIVERS_PATH="/liquibase/internal/lib"
 
-COPY docs/db/changelog/changesets/powerauth-nextstep /liquibase/changelog
+COPY docs/db/changelog/changesets/powerauth-nextstep /liquibase/
 COPY powerauth-nextstep/docker-init/docker-entrypoint.sh /docker-entrypoint.sh
 
 RUN rm ${JDBC_DRIVERS_PATH}/snowflake-jdbc.jar
