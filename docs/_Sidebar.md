@@ -31,6 +31,7 @@
 - [Database Table Structure](./Database-Table-Structure.md)
 - [Migration Instructions](./Migration-Instructions.md)
 - [Docker Deployment](./Docker-Deployment.md)
+- [Artifact Signing](./Artifact-Signing.md)
 
 **Customizing Web Flow**
 - [Customizing Web Flow Appearance](https://github.com/wultra/powerauth-webflow-customization/blob/develop/docs/Customizing-Web-Flow-Appearance.md)
