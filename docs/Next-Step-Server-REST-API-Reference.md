@@ -7711,7 +7711,7 @@ The list of expected status codes:
 <!-- begin api PUT /credential -->
 ### Update a Credential
 
-Update a credential.
+Update a credential. Credentials with a credential source `PROXY` or `LDAP` and credential target `LOCAL` are updated and the source is changed to `LOCAL`. For credentials with a non-`LOCAL` target, the external credential value is not updated; attempts to update `credentialValue` are ignored (no-op, with a warning), while other non-secret fields can still be updated.
 
 This method has a `POST /credential/update` alternative.
 
@@ -7868,7 +7868,7 @@ The list of expected status codes:
 <!-- begin api POST /credential/reset -->
 ### Reset a Credential
 
-Reset a credential.
+Reset a credential - i.e. a new credential value is generated and updated in NextStep. For credentials with a credential source `PROXY` or `LDAP` and credential target `LOCAL` the source is changed to LOCAL. The credential value in the external system is *not reset*.
 
 <!-- begin remove -->
 <table>
@@ -7924,7 +7924,9 @@ The list of expected status codes:
     "credentialName": "RETAIL_CREDENTIAL",
     "username": "username1234",
     "credentialValue": "N4DuitRp:HUx",
-    "credentialStatus": "ACTIVE"
+    "credentialStatus": "ACTIVE",
+    "credentialSource": "LOCAL",
+    "credentialTarget": "LOCAL"
   }
 }
 ```
