@@ -7868,7 +7868,7 @@ The list of expected status codes:
 <!-- begin api POST /credential/reset -->
 ### Reset a Credential
 
-Reset a credential - i.e. a new credential value is generated and updated in NextStep. For credentials with a credential source `PROXY` or `LDAP` and credential target `LOCAL` the source is changed to LOCAL. The credential value in the external system is *not reset*.
+Reset a credential - i.e. a new credential value is generated and updated in NextStep. For credentials with a credential source `PROXY` or `LDAP` and credential target `LOCAL` the source is changed to `LOCAL`. The credential value in the external system is *not reset*.
 
 <!-- begin remove -->
 <table>
