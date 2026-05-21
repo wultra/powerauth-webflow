@@ -2,6 +2,11 @@
 
 This guide contains instructions for migration from PowerAuth Web Flow version `2.0.x` to version `2.1.0`.
 
+## REST API
+
+### Credential Reset
+
+Similar to a credential update, the NextStep API endpoint `POST /credential/reset` resets credentials with source `LDAP` or `PROXY` and target `LOCAL`. The stored credential source is then updated to `LOCAL`.
 
 ## Database Changes
 

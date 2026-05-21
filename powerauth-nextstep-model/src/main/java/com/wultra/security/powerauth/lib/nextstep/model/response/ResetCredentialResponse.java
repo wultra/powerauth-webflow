@@ -17,6 +17,7 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.response;
 
+import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialLocation;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -42,6 +43,10 @@ public class ResetCredentialResponse {
     @NotBlank
     @Size(min = 1, max = 256)
     private String credentialValue;
+    @NotNull
+    private CredentialLocation credentialSource;
+    @NotNull
+    private CredentialLocation credentialTarget;
     @NotNull
     private CredentialStatus credentialStatus;
 

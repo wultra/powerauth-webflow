@@ -235,8 +235,8 @@ public class CredentialService {
         if (credentialValue != null) {
             // change value only if the target is local
             if (CredentialLocation.LOCAL == credential.getTarget()) {
-                // if source was proxy change the information about the source
-                if (CredentialLocation.PROXY == credential.getSource() || CredentialLocation.LDAP == credential.getSource()) {
+                // if source was not local change the information about the source
+                if (CredentialLocation.LOCAL != credential.getSource()) {
                     credential.setSource(CredentialLocation.LOCAL);
                 }
                 final CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
@@ -246,7 +246,7 @@ public class CredentialService {
                 credential.setTimestampLastCredentialChange(changeTimestamp);
                 updateCredentialExpiration = true;
             } else {
-                logger.warn("invalid attempt to set credential value for external password, userId: {}", user.getUserId());
+                logger.warn("Attempt to update external credentials, credentials updated, external credential value is NOT updated, userId: {}", user.getUserId());
             }
         }
         if (request.getTimestampExpires() != null) {
@@ -446,6 +446,15 @@ public class CredentialService {
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
         }
+        if (CredentialLocation.LOCAL == credential.getTarget()) {
+            // if source was not local change the information about the source
+            if (CredentialLocation.LOCAL != credential.getSource()) {
+                credential.setSource(CredentialLocation.LOCAL);
+            }
+        } else {
+            logger.warn("Attempt to reset external credentials, credentials reset, external credential value is NOT updated, userId: {}", user.getUserId());
+        }
+
         if (request.getTimestampExpires() != null) {
             // Credential expiration is set in the request
             credential.setTimestampExpires(request.getTimestampExpires());
@@ -485,6 +494,8 @@ public class CredentialService {
             credentialValueResponse = endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition);
         }
         response.setCredentialValue(credentialValueResponse);
+        response.setCredentialSource(credential.getSource());
+        response.setCredentialTarget(credential.getTarget());
         response.setCredentialStatus(credential.getStatus());
         return response;
     }

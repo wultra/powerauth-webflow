@@ -46,19 +46,25 @@ class NextStepExternalCredentialTest extends NextStepTest {
         nextStepTestConfiguration.configure(nextStepClient);
     }
 
-    private CreateUserResponse prepareUser(String userIdentification, CredentialLocation target) throws NextStepClientException {
-        // Create user identity with LDAP credentials
+    private CreateUserResponse prepareUser(String userIdentification, CredentialLocation source, CredentialLocation target) throws NextStepClientException {
+        // Create user identity with credentials configured for the specified source and target locations
         CreateUserRequest createUserRequest = new CreateUserRequest();
         createUserRequest.setUserId(userIdentification);
         CreateUserRequest.NewCredential credential = new CreateUserRequest.NewCredential();
         credential.setCredentialName(TEST_CREDENTIAL_NAME);
         credential.setCredentialType(CredentialType.PERMANENT);
         credential.setUsername(userIdentification);
-        credential.setCredentialSource(CredentialLocation.LDAP);
+        credential.setCredentialSource(source);
         credential.setCredentialTarget(target);
         createUserRequest.getCredentials().add(credential);
         return nextStepClient.createUser(createUserRequest).getResponseObject();
     }
+
+    private CreateUserResponse prepareUserLDAP(String userIdentification, CredentialLocation target) throws NextStepClientException {
+        // Create user identity with LDAP credentials
+        return prepareUser(userIdentification, CredentialLocation.LDAP, target);
+    }
+
 
     @Test
     void testCreateUpdateExternalCredentials() throws NextStepClientException {
@@ -99,7 +105,7 @@ class NextStepExternalCredentialTest extends NextStepTest {
 
     @Test
     public void testResetUpdateExternalCredentials() throws NextStepClientException {
-        prepareUser("test_user_external_cred_2", CredentialLocation.LDAP);
+        prepareUserLDAP("test_user_external_cred_2", CredentialLocation.LDAP);
 
         ResetCredentialRequest resetCredentialRequest = new ResetCredentialRequest();
         resetCredentialRequest.setUserId("test_user_external_cred_2");
@@ -117,8 +123,31 @@ class NextStepExternalCredentialTest extends NextStepTest {
     }
 
     @Test
+    public void testResetLDAPExternalCredentials() throws NextStepClientException {
+        prepareUserLDAP("ResetLDAPExternalCredentials", CredentialLocation.LOCAL);
+
+        ResetCredentialRequest resetCredentialRequest = new ResetCredentialRequest();
+        resetCredentialRequest.setUserId("ResetLDAPExternalCredentials");
+        resetCredentialRequest.setCredentialName(TEST_CREDENTIAL_NAME);
+        ResetCredentialResponse resetCredentialResponse = nextStepClient.resetCredential(resetCredentialRequest).getResponseObject();
+        assertEquals(CredentialLocation.LOCAL, resetCredentialResponse.getCredentialTarget());
+        assertEquals(CredentialLocation.LOCAL, resetCredentialResponse.getCredentialSource());
+    }
+
+    @Test
+    public void testResetPROXYExternalCredentials() throws NextStepClientException {
+        prepareUser("ResetPROXYExternalCredentials", CredentialLocation.PROXY, CredentialLocation.LOCAL);
+        ResetCredentialRequest resetCredentialRequest = new ResetCredentialRequest();
+        resetCredentialRequest.setUserId("ResetPROXYExternalCredentials");
+        resetCredentialRequest.setCredentialName(TEST_CREDENTIAL_NAME);
+        ResetCredentialResponse resetCredentialResponse = nextStepClient.resetCredential(resetCredentialRequest).getResponseObject();
+        assertEquals(CredentialLocation.LOCAL, resetCredentialResponse.getCredentialTarget());
+        assertEquals(CredentialLocation.LOCAL, resetCredentialResponse.getCredentialSource());
+    }
+
+    @Test
     public void testCreateUpdateUserWithExternalCredentials() throws NextStepClientException {
-        CreateUserResponse user = prepareUser("test_user_external_cred_3", null);
+        CreateUserResponse user = prepareUserLDAP("test_user_external_cred_3", null);
         CredentialSecretDetail credential = user.getCredentials().get(0);
         assertEquals(CredentialLocation.LOCAL, credential.getCredentialTarget());
         assertEquals(CredentialLocation.LDAP, credential.getCredentialSource());
@@ -147,15 +176,5 @@ class NextStepExternalCredentialTest extends NextStepTest {
         assertEquals(CredentialLocation.LOCAL, credentialSecretDetail.getCredentialTarget());
         assertEquals(CredentialLocation.LDAP, credentialSecretDetail.getCredentialSource());
 
-        ResetCredentialRequest resetCredentialRequest = new ResetCredentialRequest();
-        resetCredentialRequest.setUserId("test_user_external_cred_3");
-        resetCredentialRequest.setCredentialName(TEST_CREDENTIAL_NAME);
-        nextStepClient.resetCredential(resetCredentialRequest);
-
-        // RESET only reset the credentials, not change the location
-        GetUserDetailResponse userDetailResponse = nextStepClient.getUserDetail("test_user_external_cred_3", false).getResponseObject();
-        CredentialDetail credentialDetail = userDetailResponse.getCredentials().get(0);
-        assertEquals(CredentialLocation.LOCAL, credentialDetail.getCredentialTarget());
-        assertEquals(CredentialLocation.LDAP, credentialDetail.getCredentialSource());
     }
 }
