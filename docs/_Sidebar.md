@@ -18,7 +18,7 @@
 
 **REST APIs**
 
-- [NextStep Server REST API Reference](./Next-Step-Server-REST-API-Reference.md)
+- [Next Step Server REST API Reference](./Next-Step-Server-REST-API-Reference.md)
 - [Data Adapter REST API Reference](./Data-Adapter-REST-API-Reference.md)
 - [Web Flow REST API Reference](./Web-Flow-REST-API-Reference.md)
 - [Mobile Push Registration API](./Mobile-Push-Registration-API.md)
@@ -27,6 +27,7 @@
 **Deployment**
 
 - [Web Flow Installation Manual](./Web-Flow-Installation-Manual.md)
+- [Next Step Server Installation](./Next-Step-Server-Installation.md)
 - [Deploying Web Flow on JBoss / Wildfly](./Deploying-Wildfly.md)
 - [Database Table Structure](./Database-Table-Structure.md)
 - [Migration Instructions](./Migration-Instructions.md)
@@ -37,7 +38,7 @@
 - [Customizing Web Flow Appearance](https://github.com/wultra/powerauth-webflow-customization/blob/develop/docs/Customizing-Web-Flow-Appearance.md)
 - [Implementing Data Adapter Interface](https://github.com/wultra/powerauth-webflow-customization/blob/develop/docs/Implementing-the-Data-Adapter-Interface.md)
 - [Web Flow Configuration](./Web-Flow-Configuration.md)
-- [Configuring Next Step](Configuring-Next-Step.md)
+- [Configuring Next Step](./Next-Step-Server-Configuration.md)
 - [Customizing Operation Form Data](./Customizing-Operation-Form-Data.md)
 - [Mobile Token Configuration](./Mobile-Token-Configuration.md)
 
