@@ -46,7 +46,7 @@ public class UserOperationAuthentication extends AbstractAuthenticationToken imp
      * Default constructor.
      */
     public UserOperationAuthentication() {
-        super(null);
+        super(Collections.emptyList());
         this.strongAuthentication = false;
         this.language = Locale.US.getLanguage();
         this.organizationId = null;
@@ -60,7 +60,7 @@ public class UserOperationAuthentication extends AbstractAuthenticationToken imp
      * @param organizationId Organization ID.
      */
     public UserOperationAuthentication(String operationId, String userId, String organizationId) {
-        super(null);
+        super(Collections.emptyList());
         this.operationId = operationId;
         this.userId = userId;
         this.strongAuthentication = false;

@@ -102,7 +102,7 @@ public class SecurityConfiguration {
                 );
         http
                 // Apply OAuth 2.1 authorization server configuration
-                .apply(authorizationServerConfigurer);
+                .with(authorizationServerConfigurer, Customizer.withDefaults());
         return http
                 // Accept access tokens for user info endpoints in resource server, use token introspection
                 .oauth2ResourceServer(oauth2 -> oauth2
