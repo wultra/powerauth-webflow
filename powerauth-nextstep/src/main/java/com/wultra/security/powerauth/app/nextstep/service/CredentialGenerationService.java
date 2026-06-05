@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import com.wultra.security.powerauth.app.nextstep.converter.ParameterConverter;
 import com.wultra.security.powerauth.app.nextstep.repository.CredentialRepository;
@@ -145,7 +145,7 @@ public class CredentialGenerationService {
         final UsernameGenerationParam param;
         try {
             param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam(), UsernameGenerationParam.class);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidConfigurationException(ex);
         }
         final int length = param.getLength();
@@ -180,7 +180,7 @@ public class CredentialGenerationService {
         final UsernameGenerationParam param;
         try {
             param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam(), UsernameGenerationParam.class);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidConfigurationException(ex);
         }
         final int length = param.getLength();
@@ -213,7 +213,7 @@ public class CredentialGenerationService {
         final CredentialGenerationParam param;
         try {
             param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam(), CredentialGenerationParam.class);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidConfigurationException(ex);
         }
         final int length = param.getLength();
@@ -295,7 +295,7 @@ public class CredentialGenerationService {
         final CredentialGenerationParam param;
         try {
             param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam(), CredentialGenerationParam.class);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidConfigurationException(ex);
         }
         final int length = param.getLength();

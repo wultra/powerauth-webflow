@@ -17,9 +17,10 @@
  */
 package com.wultra.security.powerauth.app.nextstep.converter;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
@@ -34,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +118,7 @@ public class OperationConverter {
             OperationFormData formData = null;
             try {
                 formData = objectMapper.readValue(operation.getOperationFormData(), OperationFormData.class);
-            } catch (IOException ex) {
+            } catch (JacksonException ex) {
                 logger.error("Error while deserializing operation display formData", ex);
                 audit.error("Error while deserializing operation display formData", ex);
             }
@@ -143,7 +143,7 @@ public class OperationConverter {
                     final JavaType listType = objectMapper.getTypeFactory().constructParametricType(List.class, String.class);
                     final List<String> originalScopes = objectMapper.readValue(operation.getApplicationOriginalScopes(), listType);
                     applicationContext.getOriginalScopes().addAll(originalScopes);
-                } catch (IOException ex) {
+                } catch (JacksonException ex) {
                     logger.error("Error while deserializing application scopes.", ex);
                     audit.error("Error while deserializing application scopes.", ex);
                 }
@@ -153,7 +153,7 @@ public class OperationConverter {
                     final JavaType mapType = objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
                     final Map<String, Object> extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
                     applicationContext.getExtras().putAll(extras);
-                } catch (IOException ex) {
+                } catch (JacksonException ex) {
                     logger.error("Error while deserializing application extras.", ex);
                     audit.error("Error while deserializing application extras.", ex);
                 }
@@ -198,7 +198,7 @@ public class OperationConverter {
             try {
                 final PAAuthenticationContext authenticationContext = objectMapper.readValue(historyEntity.getPowerAuthAuthenticationContext(), PAAuthenticationContext.class);
                 history.setPaAuthenticationContext(authenticationContext);
-            } catch (IOException ex) {
+            } catch (JacksonException ex) {
                 logger.error("Error while deserializing authentication context", ex);
                 audit.error("Error while deserializing authentication context", ex);
             }
@@ -233,7 +233,7 @@ public class OperationConverter {
         try {
             final TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
             return objectMapper.readValue(extras, typeRef);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             logger.error("Error occurred while deserializing data", e);
             audit.error("Error occurred while deserializing data", e);
             return new HashMap<>();

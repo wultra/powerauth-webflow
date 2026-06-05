@@ -17,9 +17,9 @@
  */
 package com.wultra.security.powerauth.app.nextstep.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class ValueListConverter {
      * @param values Values serialized as string.
      * @return List with deserialized values.
      */
-    public List<String> fromString(String values) throws JsonProcessingException {
+    public List<String> fromString(String values) throws JacksonException {
         return objectMapper.readValue(values, new TypeReference<>() {});
     }
 
@@ -46,7 +46,7 @@ public class ValueListConverter {
      * @param valueList Parameters map.
      * @return String with serialized values.
      */
-    public String fromList(List<String> valueList) throws JsonProcessingException {
+    public String fromList(List<String> valueList) throws JacksonException {
         return objectMapper.writeValueAsString(valueList);
     }
 }

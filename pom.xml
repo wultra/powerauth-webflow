@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.6</version>
         <relativePath/> <!-- lookup parent from the repository -->
     </parent>
 
@@ -107,11 +107,11 @@
         <logstash.version>8.1</logstash.version>
 
         <!--  Wultra dependencies  -->
-        <wultra-core.version>2.1.0</wultra-core.version>
-        <powerauth.version>2.0.1</powerauth.version>
-        <powerauth-rest.version>2.1.0-SNAPSHOT</powerauth-rest.version>
-        <powerauth-crypto.version>2.1.0-SNAPSHOT</powerauth-crypto.version>
-        <powerauth-push.version>2.0.1</powerauth-push.version>
+        <wultra-core.version>2.2.0-SNAPSHOT</wultra-core.version>
+        <powerauth.version>2.2.0-SNAPSHOT</powerauth.version>
+        <powerauth-rest.version>2.2.0-SNAPSHOT</powerauth-rest.version>
+        <powerauth-crypto.version>2.2.0-SNAPSHOT</powerauth-crypto.version>
+        <powerauth-push.version>2.2.0-SNAPSHOT</powerauth-push.version>
         <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
     </properties>
 
@@ -315,9 +315,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.20.1</version>
         </dependency>
     </dependencies>
 

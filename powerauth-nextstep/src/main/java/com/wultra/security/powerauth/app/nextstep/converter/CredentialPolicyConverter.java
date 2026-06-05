@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.CredentialPolicyDetail;
@@ -59,18 +59,18 @@ public class CredentialPolicyConverter {
         credentialPolicyDetail.setUsernameGenAlgorithm(credentialPolicy.getUsernameGenAlgorithm());
         try {
             credentialPolicyDetail.setUsernameGenParam(parameterConverter.fromString(credentialPolicy.getUsernameGenParam(), UsernameGenerationParam.class));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidConfigurationException(ex);
         }
         credentialPolicyDetail.setCredentialGenAlgorithm(credentialPolicy.getCredentialGenAlgorithm());
         try {
             credentialPolicyDetail.setCredentialGenParam(parameterConverter.fromString(credentialPolicy.getCredentialGenParam(), CredentialGenerationParam.class));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidConfigurationException(ex);
         }
         try {
             credentialPolicyDetail.setCredentialValParam(parameterConverter.fromString(credentialPolicy.getCredentialValParam(), CredentialValidationParam.class));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidConfigurationException(ex);
         }
         credentialPolicyDetail.setTimestampCreated(credentialPolicy.getTimestampCreated());

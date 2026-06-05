@@ -18,10 +18,11 @@
 package com.wultra.security.powerauth.app.nextstep.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
 import com.wultra.security.powerauth.app.nextstep.repository.AuthenticationRepository;
@@ -53,7 +54,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -71,7 +71,10 @@ public class OperationPersistenceService {
     private final Logger logger = LoggerFactory.getLogger(OperationPersistenceService.class);
     private static final String AUDIT_TYPE_OPERATION = "OPERATION";
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builder()
+            .changeDefaultPropertyInclusion(inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .build();
 
     private final OperationRepository operationRepository;
     private final OrganizationRepository organizationRepository;
@@ -79,12 +82,7 @@ public class OperationPersistenceService {
     private final AuthenticationRepository authenticationRepository;
     private final ServiceCatalogue serviceCatalogue;
     private final Audit audit;
-
-    {
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-    }
-
+    
     /**
      * Service constructor.
      * @param repositoryCatalogue Repository catalogue.
@@ -132,7 +130,7 @@ public class OperationPersistenceService {
             try {
                 // Store form data as serialized JSON string.
                 operation.setOperationFormData(objectMapper.writeValueAsString(request.getFormData()));
-            } catch (JsonProcessingException ex) {
+            } catch (JacksonException ex) {
                 logger.error("Error while serializing operation form data", ex);
                 audit.error("Error while serializing operation form data", ex);
             }
@@ -152,7 +150,7 @@ public class OperationPersistenceService {
             // We can add these entities later in case they are needed.
             operationHistory.setRequestParams(objectMapper.writeValueAsString(request.getParams()));
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             logger.error("Error while serializing operation history", ex);
             audit.error("Error while serializing operation history", ex);
         }
@@ -261,7 +259,7 @@ public class OperationPersistenceService {
             }
             operationHistory.setRequestParams(objectMapper.writeValueAsString(request.getParams()));
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             logger.error("Error occurred while serializing operation history", e);
             audit.error("Error occurred while serializing operation history", e);
         }
@@ -338,7 +336,7 @@ public class OperationPersistenceService {
             // update only formData.userInput which should contain all input from the user
             formData.getUserInput().putAll(request.getFormData().getUserInput());
             operation.setOperationFormData(objectMapper.writeValueAsString(formData));
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             logger.error("Error occurred while serializing operation form data", e);
             audit.error("Error occurred while serializing operation form data", e);
         }
@@ -460,7 +458,7 @@ public class OperationPersistenceService {
                 operation.setApplicationOriginalScopes(objectMapper.writeValueAsString(applicationContext.getOriginalScopes()));
                 operation.setApplicationExtras(objectMapper.writeValueAsString(applicationContext.getExtras()));
             }
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             logger.error("Error occurred while serializing application attributes for an operation", e);
             audit.error("Error occurred while serializing application attributes for an operation", e);
         }
@@ -639,7 +637,7 @@ public class OperationPersistenceService {
         try {
             steps.addAll(objectMapper.readValue(responseSteps, new TypeReference<List<AuthStep>>() {}));
             return steps;
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             // in case of an error empty list is returned
             logger.error("Error occurred while deserializing response steps", e);
             audit.error("Error occurred while deserializing response steps", e);
@@ -691,7 +689,7 @@ public class OperationPersistenceService {
         try {
             operationEntity.setApplicationExtras(objectMapper.writeValueAsString(applicationContext.getExtras()));
             operationEntity.setApplicationOriginalScopes(objectMapper.writeValueAsString(applicationContext.getOriginalScopes()));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             logger.error("Error while serializing application attributes.", ex);
             audit.error("Error while serializing application attributes.", ex);
         }

@@ -17,11 +17,11 @@
  */
 package com.wultra.security.powerauth.app.nextstep.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -34,14 +34,14 @@ import java.util.List;
 @Configuration
 public class WebApplicationConfig implements WebMvcConfigurer {
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
 
     /**
      * Configuration constructor.
      * @param objectMapper Object mapper.
      */
     @Autowired
-    public WebApplicationConfig(ObjectMapper objectMapper) {
+    public WebApplicationConfig(JsonMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -51,10 +51,8 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      *
      * @return New custom converter with a correct object mapper.
      */
-    private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-        final MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(objectMapper);
-        return converter;
+    private JacksonJsonHttpMessageConverter jacksonJsonHttpMessageConverter() {
+        return new JacksonJsonHttpMessageConverter(objectMapper);
     }
 
     /**
@@ -62,7 +60,7 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      */
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(mappingJackson2HttpMessageConverter());
+        converters.add(jacksonJsonHttpMessageConverter());
     }
 
 }

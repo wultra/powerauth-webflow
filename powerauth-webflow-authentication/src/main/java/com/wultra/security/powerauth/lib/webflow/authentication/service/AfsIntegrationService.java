@@ -17,8 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.webflow.authentication.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.wultra.core.rest.model.base.response.ObjectResponse;
 import com.wultra.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import com.wultra.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
@@ -279,7 +279,7 @@ public class AfsIntegrationService {
     private String convertExtrasToString(Map<String, Object> extras) {
         try {
             return objectMapper.writeValueAsString(extras);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             logger.error("Error occurred while serializing data", e);
             return null;
         }

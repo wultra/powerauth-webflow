@@ -17,9 +17,9 @@
  */
 package com.wultra.security.powerauth.app.nextstep.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
@@ -37,7 +37,7 @@ public class ParameterConverter {
      * @param param Parameters serialized as string.
      * @return Map with deserialized parameters.
      */
-    public Map<String, String> fromString(String param) throws JsonProcessingException {
+    public Map<String, String> fromString(String param) throws JacksonException {
         return objectMapper.readValue(param, new TypeReference<>() {});
     }
 
@@ -47,7 +47,7 @@ public class ParameterConverter {
      * @param clazz Parameter type.
      * @return Object with deserialized parameters.
      */
-    public <T> T fromString(String param, Class<T> clazz) throws JsonProcessingException {
+    public <T> T fromString(String param, Class<T> clazz) throws JacksonException {
         return objectMapper.readValue(param, clazz);
     }
 
@@ -56,7 +56,7 @@ public class ParameterConverter {
      * @param paramMap Parameters map.
      * @return String with serialized parameters.
      */
-    public String fromMap(Map<String, String> paramMap) throws JsonProcessingException {
+    public String fromMap(Map<String, String> paramMap) throws JacksonException {
         return objectMapper.writeValueAsString(paramMap);
     }
 
@@ -65,7 +65,7 @@ public class ParameterConverter {
      * @param object Parameters object.
      * @return String with serialized parameters.
      */
-    public String fromObject(Object object) throws JsonProcessingException {
+    public String fromObject(Object object) throws JacksonException {
         return objectMapper.writeValueAsString(object);
     }
 

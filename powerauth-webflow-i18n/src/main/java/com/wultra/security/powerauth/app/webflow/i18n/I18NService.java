@@ -17,8 +17,8 @@
  */
 package com.wultra.security.powerauth.app.webflow.i18n;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +64,7 @@ public class I18NService {
     public String generateMessages(Locale locale) {
         try {
             return objectMapper.writeValueAsString(messageSource.getAllProperties(locale));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return null;
         }
     }

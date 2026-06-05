@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.OtpPolicyEntity;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.OtpGenerationParam;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.OtpPolicyDetail;
@@ -48,7 +48,7 @@ public class OtpPolicyConverter {
         otpPolicyDetail.setGenAlgorithm(otpPolicy.getGenAlgorithm());
         try {
             otpPolicyDetail.setGenParam(parameterConverter.fromString(otpPolicy.getGenParam(), OtpGenerationParam.class));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidConfigurationException(ex);
         }
         otpPolicyDetail.setExpirationTime(otpPolicy.getExpirationTime());

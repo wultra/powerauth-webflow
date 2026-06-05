@@ -17,7 +17,8 @@
  */
 package com.wultra.security.powerauth.app.nextstep.service.adapter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
 import com.wultra.security.powerauth.app.nextstep.converter.OperationConverter;
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
@@ -34,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -104,7 +104,7 @@ public class OperationCustomizationService {
                     authenticationContextDA.setRemainingAttempts(authenticationContextNS.getRemainingAttempts());
                     authenticationContextDA.setBlocked(authenticationContextNS.isBlocked());
                     break;
-                } catch (IOException ex) {
+                } catch (JacksonException ex) {
                     logger.error("Error while deserializing authentication context", ex);
                     // Invalid authentication context, do not continue searching
                     break;

@@ -18,10 +18,10 @@
 
 package com.wultra.security.powerauth.lib.nextstep.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
 import com.wultra.core.rest.client.base.RestClientException;
 import com.wultra.core.rest.model.base.entity.Error;
 import com.wultra.core.rest.model.base.response.ErrorResponse;
@@ -103,7 +103,10 @@ public class NextStepClientException extends Exception {
                     logger.warn("No response received during REST client call");
                     return null;
                 }
-                ErrorResponse errorResponse = objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).readValue(ex.getResponse(), ErrorResponse.class);
+                ErrorResponse errorResponse = objectMapper.rebuild()
+                        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                        .build()
+                        .readValue(ex.getResponse(), ErrorResponse.class);
                 if (errorResponse != null && errorResponse.getResponseObject() != null) {
                     switch (errorResponse.getResponseObject().getCode()) {
                         case "CREDENTIAL_VALIDATION_FAILED" -> {
@@ -121,7 +124,7 @@ public class NextStepClientException extends Exception {
                         }
                     }
                 }
-            } catch (JsonProcessingException ex2) {
+            } catch (JacksonException ex2) {
                 logger.debug("Problem to deserialize error response", ex2);
                 // Ignore unknown responses
                 return null;

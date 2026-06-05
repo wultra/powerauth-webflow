@@ -16,7 +16,7 @@
  */
 package com.wultra.security.powerauth.app.webflow.demo.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.wultra.security.powerauth.app.webflow.demo.configuration.WebFlowServiceConfiguration;
 import com.wultra.security.powerauth.app.webflow.demo.model.AvailableOperation;
 import com.wultra.security.powerauth.app.webflow.demo.model.OperationForm;

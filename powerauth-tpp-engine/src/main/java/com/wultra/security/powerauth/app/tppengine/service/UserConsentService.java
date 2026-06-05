@@ -18,8 +18,8 @@
 
 package com.wultra.security.powerauth.app.tppengine.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.wultra.security.powerauth.app.tppengine.errorhandling.exception.ConsentNotFoundException;
 import com.wultra.security.powerauth.app.tppengine.model.entity.GivenConsent;
 import com.wultra.security.powerauth.app.tppengine.model.entity.GivenConsentHistory;
@@ -391,7 +391,7 @@ public class UserConsentService {
     private String convertToJsonString(Map<String, String> parameters) {
         try {
             return objectMapper.writeValueAsString(parameters);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             logger.warn("Unable to serialize JSON string from object.", e);
             return null;
         }
