@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.dataadapter.model.enumeration;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,6 +78,16 @@ public enum PowerAuthCodeType {
      */
     public boolean equalsName(String otherName) {
         return value.equalsIgnoreCase(otherName);
+    }
+
+    /**
+     * Serialize the enum using its constant name to preserve the original (Jackson 2) wire format,
+     * independent of the {@code WRITE_ENUMS_USING_TO_STRING} feature default change in Jackson 3.
+     * @return Enum constant name.
+     */
+    @JsonValue
+    public String toJsonValue() {
+        return name();
     }
 
     @Override

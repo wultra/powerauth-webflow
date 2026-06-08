@@ -19,7 +19,6 @@ package com.wultra.security.powerauth.app.webflow.demo.configuration;
 
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.json.JsonMapper;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -45,7 +44,6 @@ public class WebApplicationConfig implements WebMvcConfigurer {
     private ObjectMapper objectMapper() {
         return JsonMapper.builder()
                 .enable(SerializationFeature.INDENT_OUTPUT)
-                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .build();
     }
 

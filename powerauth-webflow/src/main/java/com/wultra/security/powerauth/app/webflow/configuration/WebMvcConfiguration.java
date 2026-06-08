@@ -20,7 +20,6 @@ package com.wultra.security.powerauth.app.webflow.configuration;
 
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.json.JsonMapper;
 import com.wultra.security.powerauth.app.webflow.i18n.ReloadableResourceBundleMessageSourceWithListing;
 import com.wultra.security.powerauth.rest.api.spring.annotation.support.PowerAuthAnnotationInterceptor;
@@ -183,7 +182,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         return JsonMapper.builder()
                 .enable(SerializationFeature.INDENT_OUTPUT)
                 .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .build();
     }
 
