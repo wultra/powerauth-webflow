@@ -17,6 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.configuration;
 
+import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -34,14 +35,14 @@ import java.util.List;
 @Configuration
 public class WebApplicationConfig implements WebMvcConfigurer {
 
-    private final JsonMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     /**
      * Configuration constructor.
      * @param objectMapper Object mapper.
      */
     @Autowired
-    public WebApplicationConfig(JsonMapper objectMapper) {
+    public WebApplicationConfig(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -52,7 +53,7 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      * @return New custom converter with a correct object mapper.
      */
     private JacksonJsonHttpMessageConverter jacksonJsonHttpMessageConverter() {
-        return new JacksonJsonHttpMessageConverter(objectMapper);
+        return new JacksonJsonHttpMessageConverter((JsonMapper) objectMapper);
     }
 
     /**
