@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
 import jakarta.validation.constraints.NotBlank;
@@ -41,6 +43,7 @@ public class CreateHashConfigResponse {
     @NotNull
     private HashAlgorithm algorithm;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, String> parameters = new LinkedHashMap<>();
     @NotNull
     private HashConfigStatus hashConfigStatus;

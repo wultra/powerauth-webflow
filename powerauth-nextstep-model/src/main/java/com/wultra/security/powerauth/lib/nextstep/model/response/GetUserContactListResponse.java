@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.UserContactDetail;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -38,6 +40,7 @@ public class GetUserContactListResponse {
     @Size(min = 1, max = 256)
     private String userId;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<UserContactDetail> contacts = new ArrayList<>();
 
 }

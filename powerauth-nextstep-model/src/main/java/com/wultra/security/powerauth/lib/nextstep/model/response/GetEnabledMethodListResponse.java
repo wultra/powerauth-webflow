@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import com.wultra.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import jakarta.validation.constraints.NotBlank;
@@ -43,6 +45,7 @@ public class GetEnabledMethodListResponse {
     @Size(min = 2, max = 256)
     private String operationName;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<AuthMethod> enabledAuthMethods = new ArrayList<>();
 
 }

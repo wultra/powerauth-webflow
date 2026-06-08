@@ -17,6 +17,8 @@
 
 package com.wultra.security.powerauth.lib.nextstep.model.entity.error;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.core.rest.model.base.entity.Error;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,6 +35,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class ExtendedError extends Error {
 
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<Violation> violations = new ArrayList<>();
 
     /**

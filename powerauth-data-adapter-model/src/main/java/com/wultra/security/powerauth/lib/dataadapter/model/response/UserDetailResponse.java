@@ -18,6 +18,8 @@
 
 package com.wultra.security.powerauth.lib.dataadapter.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 
 import java.util.LinkedHashMap;
@@ -35,6 +37,7 @@ public class UserDetailResponse {
     private String familyName;
     private String organizationId;
     private AccountStatus accountStatus;
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, Object> extras = new LinkedHashMap<>();
 
     /**

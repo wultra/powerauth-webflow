@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.dataadapter.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -45,6 +47,7 @@ public class AfsResponse {
     /**
      * Extra parameters sent with the response which should be persisted together with the operation.
      */
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, Object> extras = new LinkedHashMap<>();
 
     /**

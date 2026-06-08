@@ -18,6 +18,8 @@
 package com.wultra.security.powerauth.lib.dataadapter.model.entity.attribute;
 
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType;
 
 import java.util.HashMap;
@@ -38,6 +40,7 @@ public class AttributeFormatted extends Attribute {
     /**
      * Formatted values.
      */
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, String> formattedValues = new HashMap<>();
 
     /**

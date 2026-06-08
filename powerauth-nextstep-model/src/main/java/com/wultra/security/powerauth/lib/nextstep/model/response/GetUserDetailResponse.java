@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.UserContactDetail;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
@@ -43,15 +45,19 @@ public class GetUserDetailResponse {
     private UserIdentityStatus userIdentityStatus;
 
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, Object> extras = new LinkedHashMap<>();
 
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<String> roles = new ArrayList<>();
 
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<UserContactDetail> contacts = new ArrayList<>();
 
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<CredentialDetail> credentials = new ArrayList<>();
 
     @NotNull

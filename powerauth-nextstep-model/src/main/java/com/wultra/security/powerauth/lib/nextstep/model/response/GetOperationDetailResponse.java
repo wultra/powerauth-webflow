@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.*;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import com.wultra.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -64,10 +66,13 @@ public class GetOperationDetailResponse {
     @Size(max = 256)
     private String operationData;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<AuthStep> steps = new ArrayList<>();
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<OperationHistory> history = new ArrayList<>();
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<AfsActionDetail> afsActions = new ArrayList<>();
     private OperationFormData formData;
     private AuthMethod chosenAuthMethod;
