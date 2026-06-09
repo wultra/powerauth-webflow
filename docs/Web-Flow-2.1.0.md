@@ -26,3 +26,12 @@ Added a new indexed column `subject_id` holding an identifier linking the audit 
 <!-- begin box warning -->
 The auditing tables may be already updated in your database schema if the database schema is not separated for different PowerAuth applications. In case the column `audit_log.subject_id` and its index `audit_log_subject_id_idx` are already present, you can safely skip this migration step.
 <!-- end -->
+
+
+## Dependency Updates
+
+
+### Docker Base Image Upgrade
+
+The Docker base image has been upgraded from `ibm-semeru-runtimes:open-21.0.9_10-jre-noble` (OpenJDK 21) to `ibm-semeru-runtimes:open-jdk-25.0.3.0-jre-noble` (OpenJDK 25).
+

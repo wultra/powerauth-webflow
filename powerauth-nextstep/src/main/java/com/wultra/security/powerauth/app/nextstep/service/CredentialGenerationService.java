@@ -28,12 +28,10 @@ import com.wultra.security.powerauth.app.nextstep.repository.model.entity.Creden
 import com.wultra.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import com.wultra.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
-import org.passay.CharacterData;
-import org.passay.CharacterRule;
-import org.passay.EnglishCharacterData;
-import org.passay.PasswordGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.passay.data.CharacterData;
+import org.passay.data.EnglishCharacterData;
+import org.passay.generate.PasswordGenerator;
+import org.passay.rule.CharacterRule;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -49,8 +47,6 @@ import java.util.Optional;
  */
 @Service
 public class CredentialGenerationService {
-
-    private final Logger logger = LoggerFactory.getLogger(CredentialGenerationService.class);
 
     private final CredentialRepository credentialRepository;
     private final NextStepServerConfiguration nextStepServerConfiguration;
@@ -244,7 +240,6 @@ public class CredentialGenerationService {
         if (countFromRules > 0 && countFromRules != length) {
             throw new InvalidConfigurationException("Invalid configuration of algorithm RANDOM_PASSWORD: credential length does not match rules");
         }
-        final PasswordGenerator passwordGenerator = new PasswordGenerator();
         final List<CharacterRule> characterRules = new ArrayList<>();
         if (includeSmallLetters) {
             final CharacterRule rule;
@@ -282,7 +277,8 @@ public class CredentialGenerationService {
             }
             characterRules.add(rule);
         }
-        return passwordGenerator.generatePassword(length, characterRules);
+        final PasswordGenerator passwordGenerator = new PasswordGenerator(length, characterRules);
+        return passwordGenerator.generate().toString();
     }
 
     /**
@@ -299,8 +295,8 @@ public class CredentialGenerationService {
             throw new InvalidConfigurationException(ex);
         }
         final int length = param.getLength();
-        final PasswordGenerator passwordGenerator = new PasswordGenerator();
-        return passwordGenerator.generatePassword(length, new CharacterRule(EnglishCharacterData.Digit));
+        final PasswordGenerator passwordGenerator = new PasswordGenerator(length, new CharacterRule(EnglishCharacterData.Digit));
+        return passwordGenerator.generate().toString();
     }
 
     /**

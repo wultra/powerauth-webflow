@@ -34,6 +34,8 @@ import com.wultra.security.powerauth.lib.nextstep.model.exception.EncryptionExce
 import com.wultra.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import com.wultra.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import org.passay.*;
+import org.passay.data.EnglishCharacterData;
+import org.passay.rule.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -211,7 +213,7 @@ public class CredentialValidationService {
                 if (allowedChars == null) {
                     throw new InvalidConfigurationException("The allowedChars value is missing");
                 }
-                rules.add(new AllowedCharacterRule(allowedChars.toCharArray()));
+                rules.add(new AllowedCharacterRule(new UnicodeString(allowedChars)));
             }
             if (param.isIncludeAllowedRegexRule()) {
                 final String allowedRegex = param.getAllowedRegex();
@@ -225,7 +227,7 @@ public class CredentialValidationService {
                 if (illegalChars == null) {
                     throw new InvalidConfigurationException("The illegalChars value is missing");
                 }
-                rules.add(new IllegalCharacterRule(illegalChars.toCharArray()));
+                rules.add(new IllegalCharacterRule(new UnicodeString(illegalChars)));
             }
             if (param.isIncludeIllegalRegexRule()) {
                 final String illegalRegex = param.getIllegalRegex();
@@ -298,8 +300,8 @@ public class CredentialValidationService {
                 passwordData = new PasswordData(credentialValue);
             }
 
-            final PasswordValidator passwordValidator = new PasswordValidator(rules);
-            final RuleResult result = passwordValidator.validate(passwordData);
+            final PasswordValidator passwordValidator = new DefaultPasswordValidator(rules);
+            final ValidationResult result = passwordValidator.validate(passwordData);
             for (RuleResultDetail detail : result.getDetails()) {
                 final CredentialValidationFailure failure = convertToValidationFailure(detail.getErrorCode());
                 if (!validationFailures.contains(failure)) {
