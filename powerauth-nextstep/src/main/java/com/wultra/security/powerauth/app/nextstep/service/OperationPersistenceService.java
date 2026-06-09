@@ -72,7 +72,7 @@ public class OperationPersistenceService {
     private static final String AUDIT_TYPE_OPERATION = "OPERATION";
 
     private final ObjectMapper objectMapper = JsonMapper.builder()
-            .changeDefaultPropertyInclusion(inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+            .changeDefaultPropertyInclusion(inclusion -> JsonInclude.Value.construct(JsonInclude.Include.NON_EMPTY, JsonInclude.Include.NON_EMPTY))
             .enable(SerializationFeature.INDENT_OUTPUT)
             .build();
 

@@ -17,7 +17,6 @@
  */
 package com.wultra.security.powerauth.app.webflow.demo.configuration;
 
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +40,7 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      *
      * @return A new object mapper.
      */
-    private ObjectMapper objectMapper() {
+    private JsonMapper objectMapper() {
         return JsonMapper.builder()
                 .enable(SerializationFeature.INDENT_OUTPUT)
                 .build();
@@ -53,7 +52,7 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      * @return New custom converter with a correct object mapper.
      */
     private JacksonJsonHttpMessageConverter jacksonJsonHttpMessageConverter() {
-        return new JacksonJsonHttpMessageConverter((JsonMapper) objectMapper());
+        return new JacksonJsonHttpMessageConverter(objectMapper());
     }
 
     /**

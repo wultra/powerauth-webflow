@@ -46,6 +46,12 @@
             <groupId>com.wultra.core</groupId>
             <artifactId>rest-client-base</artifactId>
         </dependency>
+
+        <!-- JSON -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
     </dependencies>
 
 
