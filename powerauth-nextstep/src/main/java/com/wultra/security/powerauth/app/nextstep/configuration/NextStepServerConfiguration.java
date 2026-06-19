@@ -17,7 +17,6 @@
  */
 package com.wultra.security.powerauth.app.nextstep.configuration;
 
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 import com.wultra.core.audit.base.Audit;
@@ -237,7 +236,7 @@ public class NextStepServerConfiguration {
      * @return Object mapper.
      */
     @Bean
-    public ObjectMapper objectMapper() {
+    public JsonMapper objectMapper() {
         return JsonMapper.builder()
                 .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                 .enable(SerializationFeature.INDENT_OUTPUT)

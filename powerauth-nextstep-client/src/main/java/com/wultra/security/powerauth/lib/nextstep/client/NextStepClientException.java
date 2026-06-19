@@ -124,5 +124,4 @@ public class NextStepClientException extends Exception {
         }
         return ex.getErrorResponse() != null ? ex.getErrorResponse().getResponseObject() : null;
     }
-
 }
