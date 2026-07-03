@@ -17,6 +17,10 @@ on:
         type: string
         default: '["nextstep"]'
         required: true
+      push_latest:
+        type: boolean
+        default: false
+        description: Push 'latest' tag to distribution registry?
   pull_request:
     branches:
       - 'develop'
@@ -89,6 +93,7 @@ jobs:
         with:
           app_to_build: ${{ matrix.app }}
           app_version: ${{ steps.build-maven.outputs.app_version }}
+          push_latest: ${{ inputs.push_latest }}
 
       - name: Build and push Docker image
         uses: wultra/wultra-infrastructure/.github/actions/build-and-push-docker@develop
