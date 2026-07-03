@@ -70,7 +70,7 @@ jobs:
       matrix:
         app: ${{ fromJSON(github.event.inputs.products_to_build || '["nextstep"]') }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Setup Java
         uses: wultra/wultra-infrastructure/.github/actions/setup-java@develop
