@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.security.powerauth.crypto.lib.model.exception.GenericCryptoException;
 import com.wultra.security.powerauth.crypto.server.util.DataDigest;
 import com.wultra.security.powerauth.app.nextstep.converter.ParameterConverter;
@@ -78,7 +78,7 @@ public class OtpGenerationService {
                 final OtpGenerationParam otpGenerationParam;
                 try {
                     otpGenerationParam = parameterConverter.fromString(otpPolicy.getGenParam(), OtpGenerationParam.class);
-                } catch (JsonProcessingException ex) {
+                } catch (JacksonException ex) {
                     throw new InvalidConfigurationException(ex);
                 }
                 final Integer groupSize = otpGenerationParam.getGroupSize();

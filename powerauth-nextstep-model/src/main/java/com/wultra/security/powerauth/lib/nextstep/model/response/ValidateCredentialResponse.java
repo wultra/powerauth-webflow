@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationResult;
 import jakarta.validation.constraints.NotNull;
@@ -36,6 +38,7 @@ public class ValidateCredentialResponse {
     @NotNull
     private CredentialValidationResult validationResult;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<CredentialValidationFailure> validationErrors = new ArrayList<>();
 
 }

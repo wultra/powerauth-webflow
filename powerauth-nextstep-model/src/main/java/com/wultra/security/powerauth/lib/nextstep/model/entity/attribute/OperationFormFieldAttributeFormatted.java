@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.entity.attribute;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 
 import java.util.HashMap;
@@ -37,6 +39,7 @@ public class OperationFormFieldAttributeFormatted extends OperationFormFieldAttr
     /**
      * Formatted values.
      */
+    @JsonSetter(nulls = Nulls.SKIP)
     protected final Map<String, String> formattedValues = new HashMap<>();
 
     /**

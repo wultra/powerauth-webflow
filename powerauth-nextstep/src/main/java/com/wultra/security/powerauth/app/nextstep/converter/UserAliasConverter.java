@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.UserAliasEntity;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.UserAliasDetail;
 
@@ -37,7 +37,7 @@ public class UserAliasConverter {
      * @param alias User alias entity.
      * @return User alias detail.
      */
-    public UserAliasDetail fromEntity(UserAliasEntity alias) throws JsonProcessingException {
+    public UserAliasDetail fromEntity(UserAliasEntity alias) throws JacksonException {
         final UserAliasDetail aliasDetail = new UserAliasDetail();
         aliasDetail.setAliasName(alias.getName());
         aliasDetail.setAliasValue(alias.getValue());

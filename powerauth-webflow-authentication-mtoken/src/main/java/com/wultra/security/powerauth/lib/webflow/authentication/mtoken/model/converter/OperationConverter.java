@@ -17,14 +17,13 @@
  */
 package com.wultra.security.powerauth.lib.webflow.authentication.mtoken.model.converter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
 import com.wultra.security.powerauth.lib.mtoken.model.entity.AllowedAuthCodeType;
 import com.wultra.security.powerauth.lib.mtoken.model.entity.Operation;
 import com.wultra.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 /**
  * Converter for the Operation objects used for mobile API.
@@ -68,7 +67,7 @@ public class OperationConverter {
         AllowedAuthCodeType allowedAuthCodeType;
         try {
             allowedAuthCodeType = objectMapper.readValue(mobileTokenMode, AllowedAuthCodeType.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             logger.error("Error while deserializing mobile token mode", e);
             return null;
         }

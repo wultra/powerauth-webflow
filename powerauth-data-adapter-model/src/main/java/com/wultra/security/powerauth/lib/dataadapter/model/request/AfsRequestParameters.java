@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.dataadapter.model.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
 import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.AfsAuthInstrument;
 import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
@@ -61,6 +63,7 @@ public class AfsRequestParameters {
     /**
      * Authentication instruments used during this authentication step.
      */
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<AfsAuthInstrument> authInstruments = new ArrayList<>();
 
     /**

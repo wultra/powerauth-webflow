@@ -18,9 +18,9 @@
 
 package com.wultra.security.powerauth.app.webflow.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import com.wultra.security.powerauth.app.webflow.i18n.ReloadableResourceBundleMessageSourceWithListing;
 import com.wultra.security.powerauth.rest.api.spring.annotation.support.PowerAuthAnnotationInterceptor;
 import com.wultra.security.powerauth.rest.api.spring.annotation.support.PowerAuthEncryptionArgumentResolver;
@@ -34,8 +34,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -180,15 +179,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
      * @return A new object mapper.
      */
     private ObjectMapper objectMapper() {
-        Jackson2ObjectMapperFactoryBean bean = new Jackson2ObjectMapperFactoryBean();
-        bean.setIndentOutput(true);
-        bean.afterPropertiesSet();
-        ObjectMapper objectMapper = bean.getObject();
-        objectMapper.registerModule(new JavaTimeModule());
-        // replacement for ISO8601DateFormat which is deprecated
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        return objectMapper;
+        return JsonMapper.builder()
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                .build();
     }
 
     /**
@@ -196,10 +190,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
      *
      * @return New custom converter with a correct object mapper.
      */
-    private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(objectMapper());
-        return converter;
+    private JacksonJsonHttpMessageConverter jacksonJsonHttpMessageConverter() {
+        return new JacksonJsonHttpMessageConverter((JsonMapper) objectMapper());
     }
 
     /**
@@ -207,7 +199,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
      */
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(mappingJackson2HttpMessageConverter());
+        converters.add(jacksonJsonHttpMessageConverter());
     }
 
 }

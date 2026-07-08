@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.UserAliasStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -45,6 +47,7 @@ public class UserAliasDetail {
     @NotNull
     private UserAliasStatus userAliasStatus;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, Object> extras = new LinkedHashMap<>();
     @NotNull
     private Date timestampCreated;

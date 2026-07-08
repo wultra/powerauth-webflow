@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.dataadapter.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wultra.security.powerauth.lib.dataadapter.model.entity.attribute.*;
 import com.wultra.security.powerauth.lib.dataadapter.model.enumeration.BannerType;
@@ -37,8 +39,11 @@ public class FormData {
     private MessageAttribute title;
     private MessageAttribute greeting;
     private MessageAttribute summary;
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<FormFieldConfig> config = new ArrayList<>();
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<FormBanner> banners = new ArrayList<>();
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<Attribute> parameters = new ArrayList<>();
     private Map<String, String> userInput = new LinkedHashMap<>();
 

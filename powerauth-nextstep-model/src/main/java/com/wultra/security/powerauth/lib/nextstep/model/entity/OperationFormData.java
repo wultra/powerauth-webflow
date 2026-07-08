@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.attribute.*;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.BannerType;
@@ -41,14 +43,18 @@ public class OperationFormData {
     private OperationFormMessageAttribute greeting;
     private OperationFormMessageAttribute summary;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<OperationFormFieldConfig> config;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<OperationFormBanner> banners;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<OperationFormFieldAttribute> parameters;
     @NotNull
     private boolean dynamicDataLoaded;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, String> userInput;
 
     /**

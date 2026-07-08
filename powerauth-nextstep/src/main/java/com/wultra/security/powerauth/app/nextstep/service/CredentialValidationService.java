@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.security.powerauth.app.nextstep.converter.ParameterConverter;
 import com.wultra.security.powerauth.app.nextstep.repository.CredentialRepository;
 import com.wultra.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
@@ -184,7 +184,7 @@ public class CredentialValidationService {
         try {
             final CredentialValidationParam param = parameterConverter.fromString(credentialPolicy.getCredentialValParam(), CredentialValidationParam.class);
             validationFailures.addAll(validateCredentialValueAdvanced(username, credentialValue, param));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidConfigurationException(ex);
         }
         return validationFailures;

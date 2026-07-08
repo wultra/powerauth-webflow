@@ -17,9 +17,9 @@
  */
 package com.wultra.security.powerauth.app.nextstep.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
@@ -37,7 +37,7 @@ public class ExtrasConverter {
      * @param extras Extras serialized as string.
      * @return Map with deserialized extras.
      */
-    public Map<String, Object> fromString(String extras) throws JsonProcessingException {
+    public Map<String, Object> fromString(String extras) throws JacksonException {
         return objectMapper.readValue(extras, new TypeReference<>() {});
     }
 
@@ -46,7 +46,7 @@ public class ExtrasConverter {
      * @param extrasMap Extras map.
      * @return String with serialized extras.
      */
-    public String fromMap(Map<String, Object> extrasMap) throws JsonProcessingException {
+    public String fromMap(Map<String, Object> extrasMap) throws JacksonException {
         return objectMapper.writeValueAsString(extrasMap);
     }
 }

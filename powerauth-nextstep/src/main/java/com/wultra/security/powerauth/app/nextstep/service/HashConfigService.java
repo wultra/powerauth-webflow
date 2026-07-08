@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
 import com.wultra.security.powerauth.app.nextstep.converter.HashConfigConverter;
@@ -97,7 +97,7 @@ public class HashConfigService {
             try {
                 final String parameters = parameterConverter.fromMap(request.getParameters());
                 hashConfig.setParameters(parameters);
-            } catch (JsonProcessingException ex) {
+            } catch (JacksonException ex) {
                 throw new InvalidRequestException(ex);
             }
         }
@@ -136,7 +136,7 @@ public class HashConfigService {
             try {
                 final String parameters = parameterConverter.fromMap(request.getParameters());
                 hashConfig.setParameters(parameters);
-            } catch (JsonProcessingException ex) {
+            } catch (JacksonException ex) {
                 throw new InvalidRequestException(ex);
             }
         }

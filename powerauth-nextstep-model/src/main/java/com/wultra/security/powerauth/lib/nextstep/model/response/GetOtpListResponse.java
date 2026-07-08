@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.OtpDetail;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -36,6 +38,7 @@ public class GetOtpListResponse {
     @Size(min = 1, max = 256)
     private String operationId;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<OtpDetail> otpDetails = new ArrayList<>();
 
 }

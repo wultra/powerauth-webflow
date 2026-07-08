@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.security.powerauth.app.nextstep.converter.CredentialValueConverter;
 import com.wultra.security.powerauth.app.nextstep.converter.ParameterConverter;
 import com.wultra.security.powerauth.app.nextstep.repository.CredentialRepository;
@@ -92,7 +92,7 @@ public class CredentialProtectionService {
         final Map<String, String> param;
         try {
             param = parameterConverter.fromString(hashingConfig.getParameters());
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidConfigurationException(ex);
         }
         switch (algorithm) {

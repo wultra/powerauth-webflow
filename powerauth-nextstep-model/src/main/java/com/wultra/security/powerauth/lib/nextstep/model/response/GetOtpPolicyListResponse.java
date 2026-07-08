@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.OtpPolicyDetail;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -33,6 +35,7 @@ import java.util.List;
 public class GetOtpPolicyListResponse {
 
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<OtpPolicyDetail> otpPolicies = new ArrayList<>();
 
 }

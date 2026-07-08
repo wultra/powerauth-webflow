@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -33,6 +35,7 @@ import java.util.List;
 public class ApplicationExtras {
 
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<String> requestedScopes = new ArrayList<>();
     @Size(min = 2, max = 256)
     private String applicationOwner;

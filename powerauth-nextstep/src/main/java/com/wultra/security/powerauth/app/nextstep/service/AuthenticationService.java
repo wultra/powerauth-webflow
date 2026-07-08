@@ -17,9 +17,9 @@
  */
 package com.wultra.security.powerauth.app.nextstep.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
 import com.wultra.security.powerauth.app.nextstep.converter.AuthenticationConverter;
@@ -969,7 +969,7 @@ public class AuthenticationService {
                             "during credential authentication, operation ID: " + operation.getOperationId());
                 }
                 updateRequest.setAuthMethod(authSteps.get(0).getAuthMethod());
-            } catch (JsonProcessingException ex) {
+            } catch (JacksonException ex) {
                 throw new InvalidConfigurationException("Next steps could not be determined " +
                         "during credential authentication, operation ID: " + operation.getOperationId());
             }

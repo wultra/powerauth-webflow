@@ -18,8 +18,7 @@
 
 package com.wultra.security.powerauth.lib.webflow.authentication.configuration;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.SerializationFeature;
 import com.wultra.core.rest.client.base.RestClientConfiguration;
 import com.wultra.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import com.wultra.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
@@ -158,7 +157,6 @@ public class WebFlowServicesConfiguration {
     private static RestClientConfiguration.JacksonConfiguration createJacksonConfiguration() {
         final RestClientConfiguration.JacksonConfiguration jacksonConfiguration = new RestClientConfiguration.JacksonConfiguration();
         jacksonConfiguration.getSerialization().put(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        jacksonConfiguration.getDeserialization().put(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return jacksonConfiguration;
     }
 

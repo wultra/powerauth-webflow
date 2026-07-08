@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
 import com.wultra.security.powerauth.app.nextstep.converter.ExtrasConverter;
@@ -117,7 +117,7 @@ public class UserAliasService {
             try {
                 String extras = extrasConverter.fromMap(request.getExtras());
                 alias.setExtras(extras);
-            } catch (JsonProcessingException ex) {
+            } catch (JacksonException ex) {
                 throw new InvalidRequestException(ex);
             }
         }
@@ -160,7 +160,7 @@ public class UserAliasService {
             try {
                 final UserAliasDetail aliasDetail = userAliasConverter.fromEntity(alias);
                 response.getAliases().add(aliasDetail);
-            } catch (JsonProcessingException ex) {
+            } catch (JacksonException ex) {
                 throw new InvalidRequestException(ex);
             }
         }
@@ -196,7 +196,7 @@ public class UserAliasService {
             try {
                 final String extras = extrasConverter.fromMap(request.getExtras());
                 alias.setExtras(extras);
-            } catch (JsonProcessingException ex) {
+            } catch (JacksonException ex) {
                 throw new InvalidRequestException(ex);
             }
         }

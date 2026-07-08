@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -32,6 +34,7 @@ import java.util.Map;
 public class AuthMethodConfiguration {
 
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, String> parameters = new LinkedHashMap<>();
 
 }

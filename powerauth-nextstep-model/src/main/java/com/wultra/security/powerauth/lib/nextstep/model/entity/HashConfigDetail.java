@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
 import jakarta.validation.constraints.NotBlank;
@@ -46,6 +48,7 @@ public class HashConfigDetail {
     @NotNull
     private HashConfigStatus hashConfigStatus;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, String> parameters = new LinkedHashMap<>();
     @NotNull
     private Date timestampCreated;

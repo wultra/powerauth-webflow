@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -32,6 +34,7 @@ import java.util.List;
 public class GetOrganizationListResponse {
 
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<GetOrganizationDetailResponse> organizations = new ArrayList<>();
 
 }

@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -36,6 +38,7 @@ public class AuthStep {
     @NotNull
     private AuthMethod authMethod;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<KeyValueParameter> params = new ArrayList<>();
 
 }

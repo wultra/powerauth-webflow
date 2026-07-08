@@ -17,8 +17,9 @@
  */
 package com.wultra.security.powerauth.app.nextstep.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.MapType;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.type.MapType;
+import tools.jackson.core.JacksonException;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
 import com.wultra.security.powerauth.app.nextstep.repository.AuthMethodRepository;
@@ -48,7 +49,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -173,7 +173,7 @@ public class AuthMethodService {
                         try {
                             final MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, String.class);
                             configMap = objectMapper.readValue(config, mapType);
-                        } catch (IOException e) {
+                        } catch (JacksonException e) {
                             logger.error("Error while deserializing config", e);
                             audit.error("Error while deserializing config", e);
                             configMap = new HashMap<>();
@@ -227,7 +227,7 @@ public class AuthMethodService {
         String configAsStr;
         try {
             configAsStr = objectMapper.writeValueAsString(config);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             logger.error("Error while serializing config", e);
             audit.error("Error while serializing config", e);
             configAsStr = "{}";

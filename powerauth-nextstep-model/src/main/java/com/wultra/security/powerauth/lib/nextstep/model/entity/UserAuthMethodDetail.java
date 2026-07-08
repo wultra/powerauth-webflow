@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -46,6 +48,7 @@ public class UserAuthMethodDetail {
     @NotNull
     private Boolean hasMobileToken;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, String> config = new LinkedHashMap<>();
 
 }

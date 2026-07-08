@@ -18,11 +18,10 @@
 
 package com.wultra.security.powerauth.lib.tpp.engine.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
 import com.wultra.core.rest.client.base.DefaultRestClient;
 import com.wultra.core.rest.client.base.RestClient;
 import com.wultra.core.rest.client.base.RestClientConfiguration;
@@ -71,7 +70,6 @@ public class TppEngineClient {
         try {
             final RestClientConfiguration.JacksonConfiguration jacksonConfiguration = new RestClientConfiguration.JacksonConfiguration();
             jacksonConfiguration.getSerialization().put(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-            jacksonConfiguration.getDeserialization().put(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
             RestClientConfiguration config = new RestClientConfiguration();
             config.setBaseUrl(serviceUrl);
@@ -409,7 +407,7 @@ public class TppEngineClient {
                 if (errorResponse != null && errorResponse.getResponseObject() != null) {
                     return errorResponse.getResponseObject();
                 }
-            } catch (JsonProcessingException ex2) {
+            } catch (JacksonException ex2) {
                 logger.debug("Problem to deserialize error response", ex2);
             }
             return new TppEngineError(resolveErrorCode(e), e.getMessage());

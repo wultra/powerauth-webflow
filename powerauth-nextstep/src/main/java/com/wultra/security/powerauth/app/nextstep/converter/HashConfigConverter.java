@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.security.powerauth.app.nextstep.repository.model.entity.HashConfigEntity;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.HashConfigDetail;
 import com.wultra.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
@@ -47,7 +47,7 @@ public class HashConfigConverter {
         try {
             Map<String, String> parameters = parameterConverter.fromString(hashConfig.getParameters());
             hashConfigDetail.getParameters().putAll(parameters);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidConfigurationException(ex);
         }
         return hashConfigDetail;

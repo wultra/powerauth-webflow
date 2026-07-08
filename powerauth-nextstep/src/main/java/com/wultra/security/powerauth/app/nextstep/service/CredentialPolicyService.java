@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
 import com.wultra.security.powerauth.app.nextstep.converter.CredentialPolicyConverter;
@@ -107,18 +107,18 @@ public class CredentialPolicyService {
         credentialPolicy.setUsernameGenAlgorithm(request.getUsernameGenAlgorithm());
         try {
             credentialPolicy.setUsernameGenParam(parameterConverter.fromObject(request.getUsernameGenParam()));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidRequestException(ex);
         }
         credentialPolicy.setCredentialGenAlgorithm(request.getCredentialGenAlgorithm());
         try {
             credentialPolicy.setCredentialGenParam(parameterConverter.fromObject(request.getCredentialGenParam()));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidRequestException(ex);
         }
         try {
             credentialPolicy.setCredentialValParam(parameterConverter.fromObject(request.getCredentialValParam()));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidRequestException(ex);
         }
         credentialPolicy.setTimestampCreated(new Date());
@@ -187,7 +187,7 @@ public class CredentialPolicyService {
         if (request.getUsernameGenParam() != null) {
             try {
                 credentialPolicy.setUsernameGenParam(parameterConverter.fromObject(request.getUsernameGenParam()));
-            } catch (JsonProcessingException ex) {
+            } catch (JacksonException ex) {
                 throw new InvalidRequestException(ex);
             }
         }
@@ -197,14 +197,14 @@ public class CredentialPolicyService {
         if (request.getCredentialGenParam() != null) {
             try {
                 credentialPolicy.setCredentialGenParam(parameterConverter.fromObject(request.getCredentialGenParam()));
-            } catch (JsonProcessingException ex) {
+            } catch (JacksonException ex) {
                 throw new InvalidRequestException(ex);
             }
         }
         if (request.getCredentialValParam() != null) {
             try {
                 credentialPolicy.setCredentialValParam(parameterConverter.fromObject(request.getCredentialValParam()));
-            } catch (JsonProcessingException ex) {
+            } catch (JacksonException ex) {
                 throw new InvalidRequestException(ex);
             }
         }

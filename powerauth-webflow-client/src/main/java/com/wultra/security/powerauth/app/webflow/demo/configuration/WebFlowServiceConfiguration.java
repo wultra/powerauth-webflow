@@ -18,8 +18,7 @@
 
 package com.wultra.security.powerauth.app.webflow.demo.configuration;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.SerializationFeature;
 import com.wultra.core.rest.client.base.RestClientConfiguration;
 import com.wultra.security.powerauth.lib.nextstep.client.NextStepClient;
 import com.wultra.security.powerauth.lib.nextstep.client.NextStepClientException;
@@ -228,7 +227,6 @@ public class WebFlowServiceConfiguration {
     public NextStepClient defaultNextStepClient() {
         final RestClientConfiguration.JacksonConfiguration jacksonConfiguration = new RestClientConfiguration.JacksonConfiguration();
         jacksonConfiguration.getSerialization().put(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        jacksonConfiguration.getDeserialization().put(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         RestClientConfiguration restClientConfiguration = new RestClientConfiguration();
         restClientConfiguration.setBaseUrl(nextstepServiceUrl);

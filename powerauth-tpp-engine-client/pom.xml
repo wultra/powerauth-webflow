@@ -37,7 +37,7 @@
         <!-- Spring Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
 
         <dependency>
@@ -50,6 +50,12 @@
         <dependency>
             <groupId>com.wultra.core</groupId>
             <artifactId>rest-client-base</artifactId>
+        </dependency>
+
+        <!-- JSON -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <!-- PowerAuth Web Flow Dependencies -->

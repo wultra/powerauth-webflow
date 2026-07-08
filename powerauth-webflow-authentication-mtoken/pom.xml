@@ -79,6 +79,12 @@
             <artifactId>audit-base</artifactId>
         </dependency>
 
+        <!-- JSON -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
         <!-- Other Dependencies -->
         <dependency>
             <groupId>com.google.zxing</groupId>

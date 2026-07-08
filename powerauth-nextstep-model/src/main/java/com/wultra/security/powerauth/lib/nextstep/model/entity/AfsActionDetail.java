@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -44,8 +46,10 @@ public class AfsActionDetail {
     @NotNull
     private boolean afsResponseApplied;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, Object> requestExtras = new LinkedHashMap<>();
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<String, Object> responseExtras = new LinkedHashMap<>();
 
 }

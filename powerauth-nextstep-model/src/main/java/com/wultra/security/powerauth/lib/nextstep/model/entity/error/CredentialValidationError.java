@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.entity.error;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.core.rest.model.base.entity.Error;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;
 
@@ -38,6 +40,7 @@ public class CredentialValidationError extends Error implements Serializable {
     /**
      * List of validation failures.
      */
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<CredentialValidationFailure> validationFailures = new ArrayList<>();
 
     /**

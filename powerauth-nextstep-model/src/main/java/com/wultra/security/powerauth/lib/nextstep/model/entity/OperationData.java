@@ -17,6 +17,8 @@
  */
 package com.wultra.security.powerauth.lib.nextstep.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.nextstep.model.entity.data.OperationDataAttribute;
 import com.wultra.security.powerauth.lib.nextstep.model.exception.InvalidOperationDataException;
 import jakarta.validation.constraints.NotBlank;
@@ -49,6 +51,7 @@ public class OperationData {
     @Size(min = 1, max = 256)
     private final Integer templateId;
     @NotNull
+    @JsonSetter(nulls = Nulls.SKIP)
     private final Map<Integer, OperationDataAttribute> attributes = new LinkedHashMap<>();
 
     /**

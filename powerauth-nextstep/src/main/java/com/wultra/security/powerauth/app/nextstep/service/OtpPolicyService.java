@@ -17,7 +17,7 @@
  */
 package com.wultra.security.powerauth.app.nextstep.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.wultra.core.audit.base.Audit;
 import com.wultra.core.audit.base.model.AuditDetail;
 import com.wultra.security.powerauth.app.nextstep.converter.OtpPolicyConverter;
@@ -98,7 +98,7 @@ public class OtpPolicyService {
         otpPolicy.setGenAlgorithm(request.getGenAlgorithm());
         try {
             otpPolicy.setGenParam(parameterConverter.fromObject(request.getGenParam()));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new InvalidRequestException(ex);
         }
         otpPolicy.setExpirationTime(request.getExpirationTime());
@@ -148,7 +148,7 @@ public class OtpPolicyService {
         if (request.getGenParam() != null) {
             try {
                 otpPolicy.setGenParam(parameterConverter.fromObject(request.getGenParam()));
-            } catch (JsonProcessingException ex) {
+            } catch (JacksonException ex) {
                 throw new InvalidRequestException(ex);
             }
         }

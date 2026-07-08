@@ -18,10 +18,9 @@
 
 package com.wultra.security.powerauth.lib.nextstep.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import com.wultra.core.rest.client.base.RestClientException;
 import com.wultra.core.rest.model.base.entity.Error;
 import com.wultra.core.rest.model.base.response.ErrorResponse;
@@ -95,40 +94,34 @@ public class NextStepClientException extends Exception {
             final String message = cause != null ? cause.getMessage() : "General error without explicit cause";
             return new Error(Error.Code.ERROR_GENERIC, message);
         }
-        if (ex.getErrorResponse() == null) {
-            logger.trace("Wultra Java Core lib did not parse ErrorResponse for {}", ex.getResponse());
-            try {
+        if (ex.getResponse() == null) {
+            logger.warn("No response received during REST client call");
+            return ex.getErrorResponse() != null ? ex.getErrorResponse().getResponseObject() : null;
+        }
+        try {
+            final ErrorResponse errorResponse = objectMapper.readValue(ex.getResponse(), ErrorResponse.class);
+            if (errorResponse != null && errorResponse.getResponseObject() != null) {
                 // TODO (racansky, 2022-12-06) workaround until https://github.com/wultra/lime-java-core/issues/32
-                if (ex.getResponse() == null) {
-                    logger.warn("No response received during REST client call");
-                    return null;
-                }
-                ErrorResponse errorResponse = objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).readValue(ex.getResponse(), ErrorResponse.class);
-                if (errorResponse != null && errorResponse.getResponseObject() != null) {
-                    switch (errorResponse.getResponseObject().getCode()) {
-                        case "CREDENTIAL_VALIDATION_FAILED" -> {
-                            ObjectResponse<CredentialValidationError> validationErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<>() {
-                            });
-                            return validationErrorResponse.getResponseObject();
-                        }
-                        case "REQUEST_VALIDATION_FAILED" -> {
-                            ObjectResponse<ExtendedError> extendedErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<>() {
-                            });
-                            return extendedErrorResponse.getResponseObject();
-                        }
-                        default -> {
-                            return null;
-                        }
+                switch (errorResponse.getResponseObject().getCode()) {
+                    case "CREDENTIAL_VALIDATION_FAILED" -> {
+                        ObjectResponse<CredentialValidationError> validationErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<>() {
+                        });
+                        return validationErrorResponse.getResponseObject();
+                    }
+                    case "REQUEST_VALIDATION_FAILED" -> {
+                        ObjectResponse<ExtendedError> extendedErrorResponse = objectMapper.readValue(ex.getResponse(), new TypeReference<>() {
+                        });
+                        return extendedErrorResponse.getResponseObject();
+                    }
+                    default -> {
+                        return errorResponse.getResponseObject();
                     }
                 }
-            } catch (JsonProcessingException ex2) {
-                logger.debug("Problem to deserialize error response", ex2);
-                // Ignore unknown responses
-                return null;
             }
-            return null;
+        } catch (JacksonException ex2) {
+            logger.debug("Problem to deserialize error response", ex2);
+            // Ignore unknown responses
         }
-        return ex.getErrorResponse().getResponseObject();
+        return ex.getErrorResponse() != null ? ex.getErrorResponse().getResponseObject() : null;
     }
-
 }

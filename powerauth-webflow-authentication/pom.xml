@@ -95,6 +95,12 @@
             <artifactId>audit-base</artifactId>
         </dependency>
 
+        <!-- JSON -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
         <!-- Library for formatting monetary amounts -->
         <dependency>
             <groupId>org.javamoney.moneta</groupId>

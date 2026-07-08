@@ -17,13 +17,11 @@
  */
 package com.wultra.security.powerauth.app.webflow.demo.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -42,16 +40,10 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      *
      * @return A new object mapper.
      */
-    private ObjectMapper objectMapper() {
-        Jackson2ObjectMapperFactoryBean bean = new Jackson2ObjectMapperFactoryBean();
-        bean.setIndentOutput(true);
-        bean.afterPropertiesSet();
-        ObjectMapper objectMapper = bean.getObject();
-        if (objectMapper != null) {
-            objectMapper.registerModule(new JavaTimeModule());
-            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false); // replacement for ISO8601DateFormat which is deprecated
-        }
-        return objectMapper;
+    private JsonMapper objectMapper() {
+        return JsonMapper.builder()
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .build();
     }
 
     /**
@@ -59,10 +51,8 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      *
      * @return New custom converter with a correct object mapper.
      */
-    private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(objectMapper());
-        return converter;
+    private JacksonJsonHttpMessageConverter jacksonJsonHttpMessageConverter() {
+        return new JacksonJsonHttpMessageConverter(objectMapper());
     }
 
     /**
@@ -70,7 +60,7 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      */
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(mappingJackson2HttpMessageConverter());
+        converters.add(jacksonJsonHttpMessageConverter());
     }
 
 }

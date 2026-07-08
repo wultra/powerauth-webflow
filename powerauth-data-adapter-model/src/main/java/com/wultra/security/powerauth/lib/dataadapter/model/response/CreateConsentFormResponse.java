@@ -18,6 +18,8 @@
 
 package com.wultra.security.powerauth.lib.dataadapter.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.wultra.security.powerauth.lib.dataadapter.model.entity.ConsentOption;
 
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ import java.util.List;
 public class CreateConsentFormResponse {
 
     private String consentHtml;
+    @JsonSetter(nulls = Nulls.SKIP)
     private final List<ConsentOption> options;
 
     /**
